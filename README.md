@@ -24,6 +24,8 @@ Plans to support for Zigbee devices from other manufacturers. May be support for
 
 # Install
 
+[![Xiaomi Gateway 3 control from Home Assistant](https://img.youtube.com/vi/CQVSFISC9CE/mqdefault.jpg)](https://www.youtube.com/watch?v=CQVSFISC9CE)
+
 You can install component with HACS custom repo ([example](https://github.com/AlexxIT/SonoffLAN#install-with-hacs)): `AlexxIT/XiaomiGateway3`.
 
 Or manually copy `xiaomi_gateway3` folder from latest release to `custom_components` folder in your config folder.
