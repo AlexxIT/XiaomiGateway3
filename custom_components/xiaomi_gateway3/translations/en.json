@@ -1,0 +1,16 @@
+{
+  "config": {
+    "error":{
+      "text": "{error_text}"
+    },
+    "step": {
+      "user": {
+        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token {error_text}",
+        "data": {
+          "host": "Host",
+          "token": "Token"
+        }
+      }
+    }
+  }
+}
