@@ -16,8 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class Gateway3(Thread):
     devices: dict = None
-    updates: dict = None
-    setups: dict = None
+    updates: dict = {}
+    setups: dict = {}
 
     log = None
 
@@ -42,14 +42,10 @@ class Gateway3(Thread):
 
     def add_update(self, did: str, handler):
         """Add handler to device update event."""
-        if self.updates is None:
-            self.updates = {}
         self.updates.setdefault(did, []).append(handler)
 
     def add_setup(self, domain: str, handler):
         """Add hass device setup funcion."""
-        if self.setups is None:
-            self.setups = {}
         self.setups[domain] = handler
 
     def run(self):
