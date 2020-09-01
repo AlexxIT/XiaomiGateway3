@@ -7,6 +7,10 @@ from .gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
 
+DEVICE_CLASS = {
+    'contact': 'door'
+}
+
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
@@ -23,7 +27,7 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
 
     @property
     def device_class(self):
-        return self._attr
+        return DEVICE_CLASS.get(self._attr, self._attr)
 
     def update(self, data: dict = None):
         if self._attr not in data:

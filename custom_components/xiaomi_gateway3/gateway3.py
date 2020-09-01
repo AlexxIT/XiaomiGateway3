@@ -130,9 +130,9 @@ class Gateway3(Thread):
                 for k, v in data.items():
                     if k in ('temperature', 'humidity'):
                         data[k] = v / 100.0
-                    elif v == 'on':
+                    elif v in ('on', 'open'):
                         data[k] = 1
-                    elif v == 'off':
+                    elif v in ('off', 'close'):
                         data[k] = 0
 
                 device['init'] = data
@@ -225,8 +225,8 @@ class Gateway3(Thread):
 
     def on_connect(self, client, userdata, flags, rc):
         _LOGGER.debug(f"{self.host} | MQTT connected")
-        # self.mqtt.subscribe('#')
-        self.mqtt.subscribe('zigbee/send')
+        self.mqtt.subscribe('#')
+        # self.mqtt.subscribe('zigbee/send')
 
     def on_disconnect(self, client, userdata, rc):
         _LOGGER.debug(f"{self.host} | MQTT disconnected")

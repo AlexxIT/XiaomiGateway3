@@ -34,6 +34,7 @@ GLOBAL_PROP = {
 }
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
+# https://slsys.io/action/devicelists.html
 # Zigbee Model: [Manufacturer, Device Name, Device Model]
 # params: [lumi res name, xiaomi prop name, hass attr name, hass domain]
 DEVICES = [{
@@ -171,7 +172,7 @@ DEVICES = [{
     'lumi.sensor_magnet': ["Xiaomi", "Door Sensor", "MCCGQ01LM"],
     'lumi.sensor_magnet.aq2': ["Aqara", "Door Sensor", "MCCGQ11LM"],
     'params': [
-        ['3.1.85', 'status', 'occupancy', 'binary_sensor'],
+        ['3.1.85', 'status', 'contact', 'binary_sensor'],
     ]
 }, {
     # motion sensor
