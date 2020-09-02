@@ -63,6 +63,7 @@ DEVICES = [{
     'lumi.switch.b1nacn02': ["Aqara", "D1 Wall Single Switch", "QBKG23LM"],
     'params': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
     ]
 }, {
@@ -72,7 +73,10 @@ DEVICES = [{
     'lumi.ctrl_ln2.aq1': ["Aqara", "Wall Double Switch", "QBKG12LM"],
     'lumi.switch.b2nacn02': ["Aqara", "D1 Wall Double Switch", "QBKG24LM"],
     'params': [
+        # ['0.11.85', 'load_voltage', 'power', 'sensor'],  # 0
         ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
+        # ['0.14.85', None, '?', 'sensor'],  # 5.01, 6.13
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         # [?, 'enable_motor_mode', 'interlock', None]
