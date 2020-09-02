@@ -108,6 +108,7 @@ DEVICES = [{
         # ['0.2.85', '?', '?', '?'],
         ['0.3.85', None, 'angle', None],
         ['13.1.85', None, 'action', 'sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # light with brightness
@@ -131,6 +132,7 @@ DEVICES = [{
     'params': [
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # multi button action, no retain
@@ -150,6 +152,7 @@ DEVICES = [{
         ['13.6.85', None, 'button_5', None],
         ['13.7.85', None, 'button_6', None],
         [None, None, 'action', 'sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # temperature and humidity sensor
@@ -157,6 +160,7 @@ DEVICES = [{
     'params': [
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # temperature, humidity and pressure sensor
@@ -166,6 +170,7 @@ DEVICES = [{
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
         ['0.3.85', 'pressure', 'pressure', 'sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # door window sensor
@@ -173,12 +178,14 @@ DEVICES = [{
     'lumi.sensor_magnet.aq2': ["Aqara", "Door Sensor", "MCCGQ11LM"],
     'params': [
         ['3.1.85', 'status', 'contact', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # motion sensor
     'lumi.sensor_motion': ["Xiaomi", "Motion Sensor", "RTCGQ01LM"],
     'params': [
         ['3.1.85', None, 'motion', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # motion sensor with illuminance
@@ -186,6 +193,7 @@ DEVICES = [{
     'params': [
         ['0.4.85', 'illumination', 'illuminance', 'sensor'],
         ['3.1.85', None, 'motion', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # water leak sensor
