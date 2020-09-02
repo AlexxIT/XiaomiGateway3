@@ -2,37 +2,6 @@ import logging
 from logging import FileHandler, Formatter
 from typing import Optional
 
-GLOBAL_PROP = {
-    '8.0.2001': 'battery',
-    '8.0.2002': 'reset_cnt',
-    '8.0.2003': 'send_all_cnt',
-    '8.0.2004': 'send_fail_cnt',
-    '8.0.2005': 'send_retry_cnt',
-    '8.0.2006': 'chip_temperature',
-    '8.0.2007': 'lqi',
-    '8.0.2008': 'voltage',
-    '8.0.2009': 'pv_state',
-    '8.0.2010': 'cur_state',
-    '8.0.2011': 'pre_state',
-    '8.0.2012': 'power_tx',
-    '8.0.2013': 'CCA',
-    '8.0.2014': 'protect',
-    '8.0.2015': 'power',
-    '8.0.2022': 'fw_ver',
-    '8.0.2023': 'hw_ver',
-    '8.0.2030': 'poweroff_memory',
-    '8.0.2031': 'charge_protect',
-    '8.0.2032': 'en_night_tip_light',
-    '8.0.2034': 'load_s0',  # ctrl_dualchn
-    '8.0.2035': 'load_s1',  # ctrl_dualchn
-    '8.0.2036': 'parent',
-    '8.0.2041': 'model',
-    '8.0.2042': 'max_power',
-    '8.0.2044': 'plug_detection',
-    '8.0.2101': 'nl_invert',  # ctrl_86plug
-    '8.0.9001': 'battery_end_of_life'
-}
-
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
 # https://slsys.io/action/devicelists.html
 # Zigbee Model: [Manufacturer, Device Name, Device Model]
@@ -229,6 +198,37 @@ DEVICES = [{
         [None, None, 'motion', 'binary_sensor'],
     ]
 }]
+
+GLOBAL_PROP = {
+    '8.0.2001': 'battery',
+    '8.0.2002': 'reset_cnt',
+    '8.0.2003': 'send_all_cnt',
+    '8.0.2004': 'send_fail_cnt',
+    '8.0.2005': 'send_retry_cnt',
+    '8.0.2006': 'chip_temperature',
+    '8.0.2007': 'lqi',
+    '8.0.2008': 'voltage',
+    '8.0.2009': 'pv_state',
+    '8.0.2010': 'cur_state',
+    '8.0.2011': 'pre_state',
+    '8.0.2012': 'power_tx',
+    '8.0.2013': 'CCA',
+    '8.0.2014': 'protect',
+    '8.0.2015': 'power',
+    '8.0.2022': 'fw_ver',
+    '8.0.2023': 'hw_ver',
+    '8.0.2030': 'poweroff_memory',
+    '8.0.2031': 'charge_protect',
+    '8.0.2032': 'en_night_tip_light',
+    '8.0.2034': 'load_s0',  # ctrl_dualchn
+    '8.0.2035': 'load_s1',  # ctrl_dualchn
+    '8.0.2036': 'parent',
+    '8.0.2041': 'model',
+    '8.0.2042': 'max_power',
+    '8.0.2044': 'plug_detection',
+    '8.0.2101': 'nl_invert',  # ctrl_86plug
+    '8.0.9001': 'battery_end_of_life'
+}
 
 
 def get_device(zigbee_model: str) -> Optional[dict]:
