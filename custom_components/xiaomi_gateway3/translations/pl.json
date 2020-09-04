@@ -1,0 +1,16 @@
+{
+  "config": {
+    "error":{
+      "text": "{error_text}"
+    },
+    "step": {
+      "user": {
+        "description": "[Zdobądź](https://github.com/Czapla-dev/hassio-doc) token Mi Home {error_text}",
+        "data": {
+          "host": "Host (Adres IP bramki)",
+          "token": "Token"
+        }
+      }
+    }
+  }
+}
