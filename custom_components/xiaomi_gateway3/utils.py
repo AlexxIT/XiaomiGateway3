@@ -258,11 +258,11 @@ def get_device(zigbee_model: str) -> Optional[dict]:
 
 
 def get_ble_domain(param: str) -> Optional[str]:
-    if param in ('motion', 'is_active', 'mosquitto'):
+    if param in ('motion', 'is_active'):
         return 'binary_sensor'
 
     elif param in ('temperature', 'humidity', 'illuminance', 'moisture',
-                   'conductivity', 'battery', 'formaldehyde'):
+                   'conductivity', 'battery', 'formaldehyde', 'mosquitto'):
         return 'sensor'
 
     return None
