@@ -5,9 +5,8 @@ from telnetlib import Telnet
 from threading import Thread
 from typing import Optional
 
-from paho.mqtt.client import Client, MQTTMessage
-
 from miio import Device
+from paho.mqtt.client import Client, MQTTMessage
 from . import utils
 from .utils import GLOBAL_PROP
 
@@ -19,7 +18,7 @@ class Gateway3(Thread):
     updates: dict = {}
     setups: dict = {}
 
-    log = None
+    DEBUG = ''
 
     def __init__(self, host: str, token: str):
         super().__init__(daemon=True)
@@ -32,9 +31,6 @@ class Gateway3(Thread):
         self.mqtt.on_disconnect = self.on_disconnect
         self.mqtt.on_message = self.on_message
         self.mqtt.connect_async(host)
-
-        if isinstance(self.log, str):
-            self.log = utils.get_logger(self.log)
 
     @property
     def device(self):
@@ -212,11 +208,25 @@ class Gateway3(Thread):
             telnet.read_until(b"login: ")
             telnet.write(b"admin\r\n")
             telnet.read_very_eager()  # skip response
+
+            # enable public mqtt
             telnet.write(b"killall mosquitto\r\n")
             telnet.read_very_eager()  # skip response
+            time.sleep(.5)
             telnet.write(b"mosquitto -d\r\n")
             telnet.read_very_eager()  # skip response
             time.sleep(1)
+
+            # enable BLE logs to MQTT
+            telnet.write(b"killall tail\r\n")
+            telnet.read_very_eager()  # skip response
+            time.sleep(.5)
+            # grep and sed has buffer problems
+            telnet.write(b"tail -F /var/log/messages | awk '/BT/{print $0}' | "
+                         b"mosquitto_pub -l -t log/bt &\r\n")
+            telnet.read_very_eager()  # skip response
+            time.sleep(1)
+
             telnet.close()
             return True
         except Exception as e:
@@ -226,7 +236,6 @@ class Gateway3(Thread):
     def on_connect(self, client, userdata, flags, rc):
         _LOGGER.debug(f"{self.host} | MQTT connected")
         self.mqtt.subscribe('#')
-        # self.mqtt.subscribe('zigbee/send')
 
     def on_disconnect(self, client, userdata, rc):
         _LOGGER.debug(f"{self.host} | MQTT disconnected")
@@ -234,12 +243,16 @@ class Gateway3(Thread):
         self.mqtt.disconnect()
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
-        if self.log:
-            self.log.debug(f"[{self.host}] {msg.topic} {msg.payload.decode()}")
+        if 'mqtt' in Gateway3.DEBUG:
+            _LOGGER.debug(f"[MQ] {msg.topic} {msg.payload.decode()}")
 
         if msg.topic == 'zigbee/send':
             payload = json.loads(msg.payload)
             self.process_message(payload)
+
+        elif msg.topic == 'log/bt':
+            payload = msg.payload[msg.payload.index(b'BT') + 5:].decode()
+            self.process_bluetooth(payload)
 
     def setup_devices(self, devices: list):
         """Add devices to hass."""
@@ -249,7 +262,7 @@ class Gateway3(Thread):
                 _LOGGER.debug(f"Unsupported model: {device}")
                 continue
 
-            _LOGGER.debug(f"Setup device {device['model']}")
+            _LOGGER.debug(f"{self.host} | Setup device {device['model']}")
 
             device.update(desc)
 
@@ -314,6 +327,58 @@ class Gateway3(Thread):
             device = payload['added_device']
             device['mac'] = '0x' + device['mac']
             self.setup_devices([device])
+
+    def process_bluetooth(self, raw: str):
+        if 'bluetooth' in Gateway3.DEBUG:
+            _LOGGER.debug(f"[BT] {raw}")
+
+        if '_async.ble_event' not in raw:
+            return
+
+        z = raw[10:]
+        data = json.loads(raw[10:])['params']
+
+        _LOGGER.debug(f"{self.host} | Process BLE {data}")
+
+        did = data['dev']['did']
+        if did not in self.devices:
+            self.devices[did] = device = {
+                'did': did,
+                'mac': data['dev']['mac'].replace(':', '').lower(),
+                'device_name': "BLE"
+            }
+            device['init'] = {}
+        else:
+            device = self.devices[did]
+
+        # check if only one
+        assert len(data['evt']) == 1, data
+
+        payload = utils.parse_xiaomi_ble(data['evt'][0])
+        if payload is None:
+            _LOGGER.debug(f"Unsupported BLE {data}")
+            return
+
+        # init entities if needed
+        for k in payload.keys():
+            if k in device['init']:
+                continue
+
+            device['init'][k] = payload[k]
+
+            domain = utils.get_ble_domain(k)
+            if not domain:
+                continue
+
+            # wait domain init
+            while domain not in self.setups:
+                time.sleep(1)
+
+            self.setups[domain](self, device, k)
+
+        if did in self.updates:
+            for handler in self.updates[did]:
+                handler(payload)
 
     def send(self, device: dict, param: str, value):
         # convert hass prop to lumi prop

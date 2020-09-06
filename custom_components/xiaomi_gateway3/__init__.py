@@ -1,8 +1,10 @@
 import logging
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import CONNECTION_ZIGBEE
 from homeassistant.helpers.entity import Entity
 
@@ -13,12 +15,25 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'xiaomi_gateway3'
 
+CONF_DEBUG = 'debug'
+
+CONFIG_SCHEMA = vol.Schema({
+    DOMAIN: vol.Schema({
+        vol.Optional(CONF_DEBUG): cv.string,
+    }, extra=vol.ALLOW_EXTRA),
+}, extra=vol.ALLOW_EXTRA)
+
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
     hass.data[DOMAIN] = {}
 
-    if DOMAIN in hass_config and 'log' in hass_config[DOMAIN]:
-        Gateway3.log = hass.config.path(hass_config[DOMAIN]['log'])
+    config = hass_config.get(DOMAIN)
+    if config and 'debug' in config:
+        Gateway3.DEBUG = config['debug']
+
+        debug = utils.XiaomiGateway3Debug(hass)
+        _LOGGER.setLevel(logging.DEBUG)
+        _LOGGER.addHandler(debug)
 
     return True
 
@@ -71,14 +86,15 @@ class Gateway3Device(Entity):
 
     @property
     def device_info(self):
-        if self.device['did'] == 'lumi.0':
+        did: str = self.device['did']
+        if did == 'lumi.0':
             return {
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
                 'name': self.device['device_name']
             }
-        else:
+        elif not did.startswith('blt'):
             return {
                 'connections': {(CONNECTION_ZIGBEE, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
@@ -86,6 +102,13 @@ class Gateway3Device(Entity):
                 'model': self.device['device_model'],
                 'name': self.device['device_name'],
                 # 'sw_version': None,
+                'via_device': (DOMAIN, self.gw.device['mac'])
+            }
+        else:
+            return {
+                'connections': {('bluetooth', self.device['mac'])},
+                'identifiers': {(DOMAIN, self.device['mac'])},
+                'name': self.device['device_name'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
 

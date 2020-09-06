@@ -1,6 +1,12 @@
 import logging
-from logging import FileHandler, Formatter
+import re
+import uuid
+from datetime import datetime
 from typing import Optional
+
+from aiohttp import web
+from homeassistant.components.http import HomeAssistantView
+from homeassistant.helpers.typing import HomeAssistantType
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
 # https://slsys.io/action/devicelists.html
@@ -251,15 +257,125 @@ def get_device(zigbee_model: str) -> Optional[dict]:
     return None
 
 
-def get_logger(filename: str):
-    fmt = Formatter('%(asctime)s %(message)s')
+def get_ble_domain(param: str) -> Optional[str]:
+    if param in ('motion', 'is_active', 'mosquitto'):
+        return 'binary_sensor'
 
-    hdlt = FileHandler(filename)
-    hdlt.setFormatter(fmt)
+    elif param in ('temperature', 'humidity', 'illuminance', 'moisture',
+                   'conductivity', 'battery', 'formaldehyde'):
+        return 'sensor'
 
-    log = logging.getLogger('mqtt')
-    log.propagate = False
-    log.setLevel(logging.DEBUG)
-    log.addHandler(hdlt)
+    return None
 
-    return log
+
+def parse_xiaomi_ble(event: dict) -> Optional[dict]:
+    """Thanks to:
+    https://github.com/esphome/esphome/blob/dev/esphome/components/xiaomi_ble/xiaomi_ble.cpp
+    """
+    raw = event['eid'].to_bytes(length=2, byteorder='little')
+    data = bytes.fromhex(event['edata'])
+
+    if raw[0] == 0x03 and len(data) == 1:
+        return {'motion': bool(data)}
+
+    elif raw[0] == 0x04 and len(data) == 2:
+        return {
+            'temperature': int.from_bytes(data, byteorder='little') / 10.0
+        }
+
+    elif raw[0] == 0x06 and len(data) == 2:
+        return {
+            'humidity': int.from_bytes(data, byteorder='little') / 10.0
+        }
+
+    elif raw[0] in (0x07, 0x0F) and len(data) == 3:
+        return {
+            'illuminance': int.from_bytes(data, byteorder='little')
+        }
+
+    elif raw[0] == 0x08 and len(data) == 1:
+        return {
+            # why not humidity?
+            'moisture': int.from_bytes(data, byteorder='little')
+        }
+
+    elif raw[0] == 0x09 and len(data) == 2:
+        return {
+            'conductivity': int.from_bytes(data, byteorder='little')
+        }
+
+    elif raw[0] == 0x0A and len(data) == 1:
+        return {
+            'battery': int.from_bytes(data, byteorder='little')
+        }
+
+    elif raw[0] == 0x0D and len(data) == 4:
+        return {
+            'temperature': int.from_bytes(data[:2], byteorder='little') / 10.0,
+            'humidity': int.from_bytes(data[2:], byteorder='little') / 10.0
+        }
+
+    elif raw[0] == 0x10 and len(data) == 2:
+        return {
+            'formaldehyde': int.from_bytes(data, byteorder='little') / 100.0
+        }
+
+    elif raw[0] == 0x12 and len(data) == 1:
+        return {'is_active': bool(data)}
+
+    elif raw[0] == 0x13 and len(data) == 1:
+        return {
+            'mosquitto': int.from_bytes(data, byteorder='little')
+        }
+
+    # elif raw[0] == 0x17 and len(data) == 4:
+    #     return {
+    #         'idle_time': int.from_bytes(data, byteorder='little') / 60.0
+    #     }
+
+    return None
+
+
+TITLE = "Xiaomi Gateway 3 Debug"
+NOTIFY_TEXT = '<a href="%s" target="_blank">Open Log<a>'
+HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'
+        '<meta http-equiv="refresh" content="%s"></head>'
+        '<body><pre>%s</pre></body></html>')
+
+
+class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
+    name = "sonoff_debug"
+    requires_auth = False
+
+    text = ''
+
+    def __init__(self, hass: HomeAssistantType):
+        super().__init__()
+
+        # random url because without authorization!!!
+        self.url = f"/{uuid.uuid4()}"
+
+        hass.http.register_view(self)
+        hass.components.persistent_notification.async_create(
+            NOTIFY_TEXT % self.url, title=TITLE)
+
+    def handle(self, rec: logging.LogRecord) -> None:
+        dt = datetime.fromtimestamp(rec.created).strftime("%Y-%m-%d %H:%M:%S")
+        module = 'main' if rec.module == '__init__' else rec.module
+        self.text += f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}\n"
+
+    async def get(self, request: web.Request):
+        reload = request.query.get('r', '')
+
+        if 'q' in request.query:
+            try:
+                reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
+                body = '\n'.join([p for p in self.text.split('\n')
+                                  if reg.search(p)])
+            except:
+                return web.Response(status=500)
+        else:
+            body = self.text
+
+        return web.Response(text=HTML % (reload, body),
+                            content_type="text/html")
