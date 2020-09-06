@@ -1,4 +1,5 @@
 import logging
+import time
 
 from homeassistant.const import *
 
@@ -81,15 +82,24 @@ class Gateway3Action(Gateway3Device):
         return self._state
 
     def update(self, data: dict = None):
+        new_state = None
         for k, v in data.items():
             if k == 'button':
-                self._state = BUTTON[v]
+                new_state = BUTTON[v]
             elif k == 'button_both':
-                self._state = k + '_' + BUTTON_BOTH[v]
+                new_state = k + '_' + BUTTON_BOTH[v]
             elif k.startswith('button'):
-                self._state = k + '_' + BUTTON[v]
+                new_state = k + '_' + BUTTON[v]
             elif k == 'vibration':
-                self._state = VIBRATION[v]
+                new_state = VIBRATION[v]
             elif k == 'action':
-                self._state = v
-        self.schedule_update_ha_state()
+                new_state = v
+
+        if new_state:
+            self._state = new_state
+            self.schedule_update_ha_state()
+
+            time.sleep(.1)
+
+            self._state = None
+            self.schedule_update_ha_state()
