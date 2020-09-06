@@ -14,13 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Gateway3(Thread):
-    devices: dict = None
-    updates: dict = {}
-    setups: dict = {}
-
-    DEBUG = ''
-
-    def __init__(self, host: str, token: str):
+    def __init__(self, host: str, token: str, config: dict):
         super().__init__(daemon=True)
 
         self.host = host
@@ -31,6 +25,11 @@ class Gateway3(Thread):
         self.mqtt.on_disconnect = self.on_disconnect
         self.mqtt.on_message = self.on_message
         self.mqtt.connect_async(host)
+
+        self.debug = config['debug'] if 'debug' in config else ''
+        self.devices = config['devices'] if 'devices' in config else {}
+        self.updates = {}
+        self.setups = {}
 
     @property
     def device(self):
@@ -46,7 +45,7 @@ class Gateway3(Thread):
 
     def run(self):
         """Main loop"""
-        while self.devices is None:
+        while 'lumi.0' not in self.devices:
             if self._miio_connect():
                 devices = self._get_devices1()
                 if devices:
@@ -243,7 +242,7 @@ class Gateway3(Thread):
         self.mqtt.disconnect()
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
-        if 'mqtt' in Gateway3.DEBUG:
+        if 'mqtt' in self.debug:
             _LOGGER.debug(f"[MQ] {msg.topic} {msg.payload.decode()}")
 
         if msg.topic == 'zigbee/send':
@@ -265,6 +264,11 @@ class Gateway3(Thread):
             _LOGGER.debug(f"{self.host} | Setup device {device['model']}")
 
             device.update(desc)
+
+            # update params from config
+            default_config = self.devices.get(device['mac'])
+            if default_config:
+                device.update(default_config)
 
             if self.devices is None:
                 self.devices = {}
@@ -329,7 +333,7 @@ class Gateway3(Thread):
             self.setup_devices([device])
 
     def process_bluetooth(self, raw: str):
-        if 'bluetooth' in Gateway3.DEBUG:
+        if 'bluetooth' in self.debug:
             _LOGGER.debug(f"[BT] {raw}")
 
         if '_async.ble_event' not in raw:

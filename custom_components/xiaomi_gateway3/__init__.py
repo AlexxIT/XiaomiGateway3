@@ -15,32 +15,38 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'xiaomi_gateway3'
 
+CONF_DEVICES = 'devices'
 CONF_DEBUG = 'debug'
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
+        vol.Optional(CONF_DEVICES): {
+            cv.string: vol.Schema({
+                vol.Optional('occupancy_timeout'): cv.positive_int,
+            }, extra=vol.ALLOW_EXTRA),
+        },
         vol.Optional(CONF_DEBUG): cv.string,
     }, extra=vol.ALLOW_EXTRA),
 }, extra=vol.ALLOW_EXTRA)
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
-    hass.data[DOMAIN] = {}
-
-    config = hass_config.get(DOMAIN)
-    if config and 'debug' in config:
-        Gateway3.DEBUG = config['debug']
-
+    config = hass_config.get(DOMAIN) or {}
+    if 'debug' in config:
         debug = utils.XiaomiGateway3Debug(hass)
         _LOGGER.setLevel(logging.DEBUG)
         _LOGGER.addHandler(debug)
+
+    hass.data[DOMAIN] = {'config': config}
 
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
+    config = hass.data[DOMAIN]['config']
+
     hass.data[DOMAIN][config_entry.unique_id] = \
-        gw = Gateway3(**config_entry.data)
+        gw = Gateway3(**config_entry.data, config=config)
 
     # init setup for each supported domains
     for domain in ('binary_sensor', 'light', 'remote', 'sensor', 'switch'):
