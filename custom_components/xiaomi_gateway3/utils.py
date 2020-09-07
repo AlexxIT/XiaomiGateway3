@@ -179,6 +179,7 @@ DEVICES = [{
     'lumi.sensor_wleak.aq1': ["Aqara", "Water Leak Sensor", "SJCGQ11LM"],
     'params': [
         ['3.1.85', 'alarm', 'moisture', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     # vibration sensor
@@ -189,6 +190,7 @@ DEVICES = [{
         ['0.3.85', None, 'vibrate_intensity', None],
         ['13.1.85', None, 'vibration', None],
         ['14.1.85', None, 'vibration_level', None],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
         [None, None, 'action', 'sensor']
     ]
 }, {  # OTHER MANUFACTURERS
