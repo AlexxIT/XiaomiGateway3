@@ -70,7 +70,7 @@ class Gateway3Device(Entity):
         self._unique_id = f"{self.device['mac']}_{self._attr}"
         self._name = self.device['device_name'] + ' ' + self._attr.title()
 
-        self.entity_id = '.' + self._unique_id
+        self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
         gateway.add_update(device['did'], self.update)
 
