@@ -52,8 +52,8 @@ class Gateway3(Thread):
                 devices = self._get_devices_v3()
                 if devices:
                     self.setup_devices(devices)
-                # else:
-                #     self._enable_telnet()
+                else:
+                    self._enable_telnet()
             else:
                 time.sleep(30)
 
@@ -198,7 +198,7 @@ class Gateway3(Thread):
         """Load device list via Telnet."""
         _LOGGER.debug(f"{self.host} | Read devices")
         try:
-            telnet = Telnet(self.host)
+            telnet = Telnet(self.host, timeout=5)
             telnet.read_until(b"login: ")
             telnet.write(b"admin\r\n")
             telnet.read_until(b'\r\n# ')  # skip greeting
@@ -260,8 +260,9 @@ class Gateway3(Thread):
             })
 
             return devices
+
         except Exception as e:
-            _LOGGER.exception(f"Can't read devices: {e}")
+            _LOGGER.debug(f"Can't read devices: {e}")
             return None
 
     def _enable_telnet(self):
@@ -302,7 +303,7 @@ class Gateway3(Thread):
             telnet.close()
             return True
         except Exception as e:
-            _LOGGER.exception(f"Can't run MQTT: {e}")
+            _LOGGER.debug(f"Can't run MQTT: {e}")
             return False
 
     def on_connect(self, client, userdata, flags, rc):
