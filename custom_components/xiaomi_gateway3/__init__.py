@@ -107,7 +107,7 @@ class Gateway3Device(Entity):
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
                 'name': self.device['device_name'],
-                # 'sw_version': None,
+                'sw_version': self.device['zb_ver'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
         else:

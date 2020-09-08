@@ -193,6 +193,12 @@ DEVICES = [{
         ['8.0.2001', 'battery', 'battery', 'sensor'],
         [None, None, 'action', 'sensor']
     ]
+}, {
+    'lumi.sen_ill.mgl01': ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
+    'params': [
+        ['2.1', '2.1', 'illuminance', 'sensor'],
+        ['3.1', '3.1', 'battery', 'sensor'],
+    ]
 }, {  # OTHER MANUFACTURERS
     'TRADFRI bulb E27 W opal 1000lm': ["IKEA", "Bulb E27"],
     'LWB010': ["Philips", "Hue Bulb E27"],
