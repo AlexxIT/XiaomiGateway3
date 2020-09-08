@@ -15,17 +15,19 @@ Thanks to **Serrj** for [instruction how to enable Telnet](https://community.hom
 # Supported Zigbee Devices
 
 Tested Devices:
-- Aqara Cube
-- Aqara Double Wall Button
-- Aqara Motion Sensor
-- Aqara Opple Six Button
-- Aqara Relay
-- Aqara Vibration Sensor
-- Aqara Water Leak Sensor
+- Aqara Cube (MFKZQ01LM)
+- Aqara Double Wall Button (WXKG02LM)
+- Aqara Motion Sensor (RTCGQ11LM)
+- Aqara Opple Six Button (WXCJKG13LM)
+- Aqara Relay (LLKZMK11LM)
+- Aqara Vibration Sensor (DJT11LM)
+- Aqara Water Leak Sensor (SJCGQ11LM)
 - IKEA Bulb E14
-- Xiaomi Button
-- Xiaomi Plug
-- Xiaomi TH Sensor
+- Xiaomi Button (WXKG01LM)
+- Xiaomi Door Sensor (MCCGQ01LM)
+- Xiaomi Light Sensor (GZCGQ01LM)
+- Xiaomi Plug (ZNCZ02LM)
+- Xiaomi TH Sensor (WSDCGQ01LM)
 
 Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py#L9).
 
