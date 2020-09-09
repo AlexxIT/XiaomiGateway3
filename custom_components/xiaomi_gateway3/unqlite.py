@@ -1,6 +1,3 @@
-import base64
-
-
 class Unqlite:
     page_size = 0
     pos = 0

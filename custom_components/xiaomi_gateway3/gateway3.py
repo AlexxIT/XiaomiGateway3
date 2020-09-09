@@ -1,6 +1,8 @@
 import base64
 import json
 import logging
+import re
+import socket
 import time
 from telnetlib import Telnet
 from threading import Thread
@@ -203,12 +205,19 @@ class Gateway3(Thread):
             telnet.write(b"admin\r\n")
             telnet.read_until(b'\r\n# ')  # skip greeting
 
-            telnet.write(b"cat /data/zigbee_gw/zigbee_gw.db | base64\r\n")
+            # https://github.com/AlexxIT/XiaomiGateway3/issues/14
+            # fw 1.4.6_0012 and below have one zigbee_gw.db file
+            # fw 1.4.6_0030 have many json files in this folder
+            telnet.write(b"cat /data/zigbee_gw/* | base64\r\n")
             telnet.read_until(b'\r\n')  # skip command
             raw = telnet.read_until(b'# ')
             raw = base64.b64decode(raw)
-            db = Unqlite(raw)
-            data = db.read_all()
+            if raw.startswith(b'unqlite'):
+                db = Unqlite(raw)
+                data = db.read_all()
+            else:
+                raw = re.sub(br'}\s+{', b',', raw)
+                data = json.loads(raw)
 
             devices = []
 
@@ -260,6 +269,9 @@ class Gateway3(Thread):
             })
 
             return devices
+
+        except (ConnectionRefusedError, socket.timeout):
+            return None
 
         except Exception as e:
             _LOGGER.debug(f"Can't read devices: {e}")
