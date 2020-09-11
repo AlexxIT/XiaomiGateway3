@@ -62,6 +62,7 @@ DEVICES = [{
     'lumi.switch.b1lacn02': ["Aqara", "D1 Wall Single Switch", "QBKG21LM"],
     'params': [
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # or neutral_0?
+        ['13.1.85', None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off
@@ -70,6 +71,9 @@ DEVICES = [{
     'params': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # triple channel on/off
