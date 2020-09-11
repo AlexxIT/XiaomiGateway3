@@ -274,7 +274,8 @@ def get_ble_domain(param: str) -> Optional[str]:
         return 'binary_sensor'
 
     elif param in ('temperature', 'humidity', 'illuminance', 'moisture',
-                   'conductivity', 'battery', 'formaldehyde', 'mosquitto'):
+                   'conductivity', 'battery', 'formaldehyde', 'mosquitto',
+                   'action'):
         return 'sensor'
 
     return None
@@ -338,6 +339,11 @@ def parse_xiaomi_ble(event: dict) -> Optional[dict]:
     elif raw[0] == 0x13 and len(data) == 1:
         return {
             'mosquitto': int.from_bytes(data, byteorder='little')
+        }
+
+    elif raw == b'\x01\x10':  # magic cube
+        return {
+            'action': 'right' if data == b'\x00\x00\x00' else 'left'
         }
 
     # elif raw[0] == 0x17 and len(data) == 4:
