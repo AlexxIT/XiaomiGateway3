@@ -226,7 +226,11 @@ class Gateway3(Thread):
 
             devices = []
 
-            for did in json.loads(data['dev_list']) or []:
+            # data = {} or data = {'dev_list': 'null'}
+            dev_list = json.loads(data.get('dev_list', 'null')) or []
+            _LOGGER.debug(f"{self.host} | Load {len(dev_list)} zigbee devices")
+
+            for did in dev_list:
                 model = data[did + '.model']
                 desc = utils.get_device(model)
 
