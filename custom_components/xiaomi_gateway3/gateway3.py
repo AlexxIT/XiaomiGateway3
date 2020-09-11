@@ -30,6 +30,8 @@ class Gateway3(Thread):
         self.mqtt.on_message = self.on_message
         self.mqtt.connect_async(host)
 
+        self.ble = GatewayBLE(self)
+
         self.debug = config['debug'] if 'debug' in config else ''
         self.devices = config['devices'] if 'devices' in config else {}
         self.updates = {}
@@ -58,6 +60,9 @@ class Gateway3(Thread):
                     self._enable_telnet()
             else:
                 time.sleep(30)
+
+        # start bluetooth read loop
+        self.ble.start()
 
         while True:
             if self._mqtt_connect():
@@ -302,16 +307,6 @@ class Gateway3(Thread):
             telnet.read_very_eager()  # skip response
             time.sleep(1)
 
-            # enable BLE logs to MQTT
-            telnet.write(b"killall tail\r\n")
-            telnet.read_very_eager()  # skip response
-            time.sleep(.5)
-            # grep and sed has buffer problems
-            telnet.write(b"tail -F /var/log/messages | awk '/BT/{print $0}' | "
-                         b"mosquitto_pub -l -t log/bt &\r\n")
-            telnet.read_very_eager()  # skip response
-            time.sleep(1)
-
             telnet.close()
             return True
         except Exception as e:
@@ -334,10 +329,6 @@ class Gateway3(Thread):
         if msg.topic == 'zigbee/send':
             payload = json.loads(msg.payload)
             self.process_message(payload)
-
-        elif msg.topic == 'log/bt':
-            payload = msg.payload[msg.payload.index(b'BT') + 5:].decode()
-            self.process_bluetooth(payload)
 
     def setup_devices(self, devices: list):
         """Add devices to hass."""
@@ -427,13 +418,7 @@ class Gateway3(Thread):
             device['mac'] = '0x' + device['mac']
             self.setup_devices([device])
 
-    def process_bluetooth(self, raw: str):
-        if 'bluetooth' in self.debug:
-            _LOGGER.debug(f"[BT] {raw}")
-
-        if '_async.ble_event' not in raw:
-            return
-
+    def process_ble_event(self, raw: bytes):
         data = json.loads(raw[10:])['params']
 
         _LOGGER.debug(f"{self.host} | Process BLE {data}")
@@ -494,7 +479,39 @@ class Gateway3(Thread):
         self.mqtt.publish('zigbee/recv', payload)
 
 
-DIV_100 = ['temperature', 'humidity']
+class GatewayBLE(Thread):
+    def __init__(self, gw: Gateway3):
+        super().__init__(daemon=True)
+        self.gw = gw
+
+    def run(self):
+        _LOGGER.debug(f"{self.gw.host} | Start BLE ")
+        while True:
+            try:
+                telnet = Telnet(self.gw.host, timeout=5)
+                telnet.read_until(b"login: ")
+                telnet.write(b"admin\r\n")
+                telnet.read_until(b'\r\n# ')  # skip greeting
+
+                telnet.write(b"killall silabs_ncp_bt; "
+                             b"silabs_ncp_bt /dev/ttyS1 1\r\n")
+                telnet.read_until(b'\r\n')  # skip command
+
+                while True:
+                    raw = telnet.read_until(b'\r\n')
+
+                    if 'bluetooth' in self.gw.debug:
+                        _LOGGER.debug(f"[BT] {raw}")
+
+                    if b'_async.ble_event' in raw:
+                        self.gw.process_ble_event(raw)
+
+            except (ConnectionRefusedError, socket.timeout):
+                pass
+            except Exception as e:
+                _LOGGER.exception(f"Bluetooth loop error: {e}")
+
+            time.sleep(30)
 
 
 def is_gw3(host: str, token: str) -> Optional[str]:
