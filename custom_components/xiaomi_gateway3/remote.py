@@ -1,5 +1,6 @@
 import logging
 
+from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device
@@ -40,3 +41,9 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
 
     def turn_off(self):
         self.gw.send(self.device, {'pairing_stop': 0})
+
+    async def async_send_command(self, command, **kwargs):
+        for cmd in command:
+            # for testing purposes
+            if cmd == 'ble':
+                self.gw.process_ble_event(kwargs[ATTR_DEVICE])

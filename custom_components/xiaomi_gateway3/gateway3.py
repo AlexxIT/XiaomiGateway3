@@ -6,7 +6,7 @@ import socket
 import time
 from telnetlib import Telnet
 from threading import Thread
-from typing import Optional
+from typing import Optional, Union
 
 from paho.mqtt.client import Client, MQTTMessage
 from . import utils
@@ -240,6 +240,8 @@ class Gateway3(Thread):
                     continue
 
                 retain = json.loads(data[did + '.prop'])['props']
+                _LOGGER.debug(f"{self.host} | {model} retain: {retain}")
+
                 params = {
                     p[2]: retain.get(p[1])
                     for p in desc['params']
@@ -422,8 +424,9 @@ class Gateway3(Thread):
             device['mac'] = '0x' + device['mac']
             self.setup_devices([device])
 
-    def process_ble_event(self, raw: bytes):
-        data = json.loads(raw[10:])['params']
+    def process_ble_event(self, raw: Union[bytes, str]):
+        data = json.loads(raw[10:])['params'] \
+            if isinstance(raw, bytes) else json.loads(raw)
 
         _LOGGER.debug(f"{self.host} | Process BLE {data}")
 
