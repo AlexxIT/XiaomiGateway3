@@ -71,11 +71,11 @@ class Gateway3Device(Entity):
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
-        gateway.add_update(device['did'], self.update)
-
     async def async_added_to_hass(self):
         if 'init' in self.device:
             self.update(self.device['init'])
+
+        self.gw.add_update(self.device['did'], self.update)
 
     @property
     def should_poll(self) -> bool:
