@@ -221,7 +221,7 @@ class Gateway3(Thread):
 
             devices = []
 
-            for did in json.loads(data['dev_list']):
+            for did in json.loads(data['dev_list']) or []:
                 model = data[did + '.model']
                 desc = utils.get_device(model)
 
