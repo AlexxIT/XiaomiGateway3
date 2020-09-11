@@ -77,6 +77,8 @@ VIBRATION = {
 
 
 class Gateway3Action(Gateway3Device):
+    _state = ''
+
     @property
     def state(self):
         return self._state
@@ -101,5 +103,5 @@ class Gateway3Action(Gateway3Device):
 
             time.sleep(.1)
 
-            self._state = None
+            self._state = ''
             self.schedule_update_ha_state()
