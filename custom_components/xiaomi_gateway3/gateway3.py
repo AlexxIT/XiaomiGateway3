@@ -506,7 +506,8 @@ class GatewayBLE(Thread):
                     if b'_async.ble_event' in raw:
                         self.gw.process_ble_event(raw)
 
-            except (ConnectionRefusedError, socket.timeout):
+            except (ConnectionRefusedError, ConnectionResetError,
+                    socket.timeout):
                 pass
             except Exception as e:
                 _LOGGER.exception(f"Bluetooth loop error: {e}")
