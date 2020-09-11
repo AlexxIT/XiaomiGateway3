@@ -1,7 +1,6 @@
 import logging
 
 import voluptuous as vol
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -42,7 +41,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, config_entry):
     config = hass.data[DOMAIN]['config']
 
     hass.data[DOMAIN][config_entry.unique_id] = \
