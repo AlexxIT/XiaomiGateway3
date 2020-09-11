@@ -76,9 +76,19 @@ DEVICES = [{
         [None, None, 'action', 'sensor'],
     ]
 }, {
-    # triple channel on/off
+    # triple channel on/off, no neutral wire
     'lumi.switch.l3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG25LM"],
     'params': [
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+    ]
+}, {
+    # with neutral wire, thanks @Mantoui
+    'lumi.switch.n3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG26LM"],
+    'params': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
