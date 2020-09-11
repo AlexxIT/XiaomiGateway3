@@ -467,13 +467,17 @@ class Gateway3(Thread):
             for handler in self.updates[did]:
                 handler(payload)
 
-    def send(self, device: dict, param: str, value):
+    def send(self, device: dict, data: dict):
         # convert hass prop to lumi prop
-        prop = next(p[0] for p in device['params'] if p[2] == param)
+        params = [{
+            'res_name': next(p[0] for p in device['params'] if p[2] == k),
+            'value': v
+        } for k, v in data.items()]
+
         payload = {
             'cmd': 'write',
             'did': device['did'],
-            'params': [{'res_name': prop, 'value': value}],
+            'params': params,
         }
 
         _LOGGER.debug(f"{self.host} | {device['did']} {device['model']} => "

@@ -36,7 +36,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             self.schedule_update_ha_state()
 
     def turn_on(self):
-        self.gw.send(self.device, 'pairing_start', 60)
+        self.gw.send(self.device, {'pairing_start': 60})
 
     def turn_off(self):
-        self.gw.send(self.device, 'pairing_stop', 0)
+        self.gw.send(self.device, {'pairing_stop': 0})

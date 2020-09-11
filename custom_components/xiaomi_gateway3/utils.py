@@ -104,10 +104,17 @@ DEVICES = [{
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
-    # light with brightness
+    # light with brightness and color temp
     'lumi.light.aqcn02': ["Aqara", "Bulb", "ZNLDP12LM"],
     'lumi.light.cwopcn02': ["Aqara", "Opple MX650", "XDD12LM"],
     'lumi.light.cwopcn03': ["Aqara", "Opple MX480", "XDD13LM"],
+    'params': [
+        ['4.1.85', 'power_status', 'light', 'light'],
+        ['14.1.85', 'light_level', 'brightness', None],
+        ['14.2.85', 'colour_temperature', 'color_temp', None],
+    ]
+},{
+    # light with brightness
     'ikea.light.led1649c5': ["IKEA", "Bulb E14"],  # tested
     'params': [
         ['4.1.85', 'power_status', 'light', 'light'],

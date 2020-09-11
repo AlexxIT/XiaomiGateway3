@@ -28,7 +28,7 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
         self.schedule_update_ha_state()
 
     def turn_on(self):
-        self.gw.send(self.device, self._attr, 1)
+        self.gw.send(self.device, {self._attr: 1})
 
     def turn_off(self):
-        self.gw.send(self.device, self._attr, 0)
+        self.gw.send(self.device, {self._attr: 0})
