@@ -10,33 +10,53 @@ Gateway support **Zigbee 3**, **Bluetooth Mesh** and **HomeKit**.
 
 This method does not change the device firmware. Gateway continues to work with Mi Home and HomeKit.
 
-Thanks to **Serrj** for [instruction how to enable Telnet](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) on this device.
+Thanks to **Serrj** for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on this device.
+
+**Important:** This component does not work with:
+ - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
+ - Xiaomi Gateway EU (DGNWG05LM, lumi.gateway.mieu01)
 
 # Supported Zigbee Devices
 
 Tested Devices:
+- Aqara Bulb (ZNLDP12LM)
+- Aqara Button (WXKG11LM)
 - Aqara Cube (MFKZQ01LM)
+- Aqara Door Sensor (MCCGQ11LM)
 - Aqara Double Wall Button (WXKG02LM)
 - Aqara Motion Sensor (RTCGQ11LM)
 - Aqara Opple Six Button (WXCJKG13LM)
 - Aqara Relay (LLKZMK11LM)
+- Aqara Socket (QBCZ11LM)
 - Aqara Vibration Sensor (DJT11LM)
+- Aqara Wall Double Switch (QBKG03LM)
 - Aqara Water Leak Sensor (SJCGQ11LM)
 - IKEA Bulb E14
 - Xiaomi Button (WXKG01LM)
 - Xiaomi Door Sensor (MCCGQ01LM)
 - Xiaomi Light Sensor (GZCGQ01LM)
+- Xiaomi Motion Sensor (RTCGQ01LM)
 - Xiaomi Plug (ZNCZ02LM)
+- Xiaomi Plug EU (ZNCZ04LM)
 - Xiaomi TH Sensor (WSDCGQ01LM)
 
-Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py#L9).
+Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
 
 Plans to support for Zigbee devices from other manufacturers. May be support for [ZHA](https://www.home-assistant.io/integrations/zha/).
 
 # Supported BLE Devices
 
+Demo video:
+
+[![Xiaomi Rubik's Cube](https://img.youtube.com/vi/4D_vqvUre_0/mqdefault.jpg)](https://www.youtube.com/watch?v=4D_vqvUre_0)
+
 Tested Devices:
+- Xiaomi Door Sensor 2 (MCCGQ02HL)
+- Xiaomi Flower Monitor (HHCCJCY01)
+- Xiaomi Rubik's Cube (XMMF01JQD) - don't sends edge info, only direction!
+- Xiaomi TH Sensor (LYWSD03MMC)
 - Xiaomi TH Sensor (LYWSDCGQ/01ZM)
+- Xiaomi TH Watch (LYWSD02MMC)
 
 Currently supported, but not tested, other Xiaomi BLE devices officially supported by the Gateway with these attributes:
 
@@ -68,7 +88,7 @@ Support custom occupancy timeout for motion sensor. Default 90 seconds.
 xiaomi_gateway3:
   devices:
     '0x158d00044c5dff':
-      occupancy_timeout: 15  # (optional) default 90 seconds
+      occupancy_timeout: 90  # (optional) default 90 seconds
 ```
 
 # How it works
