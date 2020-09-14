@@ -33,6 +33,12 @@ DEVICES = [{
     'lumi.plug.maus01': ["Xiaomi", "Plug US", "ZNCZ12LM"],
     'lumi.ctrl_86plug': ["Aqara", "Socket", "QBCZ11LM"],
     'lumi.ctrl_86plug.aq1': ["Aqara", "Socket", "QBCZ11LM"],
+    'params': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
+        ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+    ]
+}, {
     'lumi.ctrl_ln1': ["Aqara", "Wall Single Switch", "QBKG11LM"],
     'lumi.ctrl_ln1.aq1': ["Aqara", "Wall Single Switch", "QBKG11LM"],
     'lumi.switch.b1nacn02': ["Aqara", "D1 Wall Single Switch", "QBKG23LM"],
@@ -40,6 +46,7 @@ DEVICES = [{
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+        ['13.1.85', None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off, power measurement
@@ -55,6 +62,9 @@ DEVICES = [{
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         # [?, 'enable_motor_mode', 'interlock', None]
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # on/off
@@ -67,7 +77,7 @@ DEVICES = [{
 }, {
     # dual channel on/off
     'lumi.ctrl_neutral2': ["Aqara", "Wall Double Switch", "QBKG03LM"],
-    'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Single Switch", "QBKG22LM"],
+    'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Double Switch", "QBKG22LM"],
     'params': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
@@ -82,6 +92,10 @@ DEVICES = [{
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        ['13.3.85', None, 'button_3', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # with neutral wire, thanks @Mantoui
@@ -92,6 +106,10 @@ DEVICES = [{
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        ['13.3.85', None, 'button_3', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # cube action, no retain
