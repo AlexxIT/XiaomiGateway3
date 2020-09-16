@@ -131,7 +131,7 @@ DEVICES = [{
         ['14.1.85', 'light_level', 'brightness', None],
         ['14.2.85', 'colour_temperature', 'color_temp', None],
     ]
-},{
+}, {
     # light with brightness
     'ikea.light.led1649c5': ["IKEA", "Bulb E14"],  # tested
     'params': [
@@ -300,105 +300,6 @@ def get_device(zigbee_model: str) -> Optional[dict]:
                 if len(desc) > 2 else zigbee_model,
                 'params': device['params']
             }
-
-    return None
-
-
-def get_ble_domain(param: str) -> Optional[str]:
-    if param in ('motion', 'is_active', 'contact', 'light'):
-        return 'binary_sensor'
-
-    elif param in ('temperature', 'humidity', 'illuminance', 'moisture',
-                   'conductivity', 'battery', 'formaldehyde', 'mosquitto',
-                   'action'):
-        return 'sensor'
-
-    return None
-
-
-def parse_xiaomi_ble(event: dict) -> Optional[dict]:
-    """Thanks to:
-    https://github.com/esphome/esphome/blob/dev/esphome/components/xiaomi_ble/xiaomi_ble.cpp
-    """
-    raw = event['eid'].to_bytes(length=2, byteorder='little')
-    data = bytes.fromhex(event['edata'])
-
-    if raw[0] == 0x01 and len(data) == 3:  # magic cube
-        return {
-            'action': 'right' if data == b'\x00\x00\x00' else 'left'
-        }
-
-    elif raw[0] == 0x03 and len(data) == 1:
-        return {'motion': bool(data)}
-
-    elif raw[0] == 0x04 and len(data) == 2:
-        return {
-            'temperature': int.from_bytes(data, byteorder='little') / 10.0
-        }
-
-    elif raw[0] == 0x06 and len(data) == 2:
-        return {
-            'humidity': int.from_bytes(data, byteorder='little') / 10.0
-        }
-
-    elif raw[0] in (0x07, 0x0F) and len(data) == 3:
-        return {
-            'illuminance': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x08 and len(data) == 1:
-        return {
-            # why not humidity?
-            'moisture': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x09 and len(data) == 2:
-        return {
-            'conductivity': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x0A and len(data) == 1:
-        return {
-            'battery': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x0D and len(data) == 4:
-        return {
-            'temperature': int.from_bytes(data[:2], byteorder='little') / 10.0,
-            'humidity': int.from_bytes(data[2:], byteorder='little') / 10.0
-        }
-
-    elif raw[0] == 0x10 and len(data) == 2:
-        return {
-            'formaldehyde': int.from_bytes(data, byteorder='little') / 100.0
-        }
-
-    elif raw[0] == 0x12 and len(data) == 1:
-        return {'is_active': bool(data)}
-
-    elif raw[0] == 0x13 and len(data) == 1:
-        return {
-            'mosquitto': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x18 and len(data) == 1:
-        return {
-            'light': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x19 and len(data) == 1:
-        # HA: open == true == 1
-        if data == b'\x00':  # xiaomi open
-            return {'contact': 1}
-        elif data == b'\x01':  # xiaomi close
-            return {'contact': 0}
-        else:  # timeout
-            return {}
-
-    # elif raw[0] == 0x17 and len(data) == 4:
-    #     return {
-    #         'idle_time': int.from_bytes(data, byteorder='little') / 60.0
-    #     }
 
     return None
 

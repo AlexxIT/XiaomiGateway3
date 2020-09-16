@@ -46,4 +46,5 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         for cmd in command:
             # for testing purposes
             if cmd == 'ble':
-                self.gw.process_ble_event(kwargs[ATTR_DEVICE])
+                raw = kwargs[ATTR_DEVICE].replace('\'', '"')
+                self.gw.process_ble_event(raw)

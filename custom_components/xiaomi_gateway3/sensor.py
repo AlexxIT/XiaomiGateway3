@@ -84,6 +84,10 @@ class Gateway3Action(Gateway3Device):
     def state(self):
         return self._state
 
+    @property
+    def state_attributes(self):
+        return self._attrs
+
     def update(self, data: dict = None):
         new_state = None
         for k, v in data.items():
@@ -99,10 +103,11 @@ class Gateway3Action(Gateway3Device):
                 new_state = v
 
         if new_state:
+            self._attrs = data
             self._state = new_state
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
             time.sleep(.1)
 
             self._state = ''
-            self.schedule_update_ha_state()
+            self.async_schedule_update_ha_state()

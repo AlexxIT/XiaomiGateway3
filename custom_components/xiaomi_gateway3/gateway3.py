@@ -9,7 +9,7 @@ from threading import Thread
 from typing import Optional, Union
 
 from paho.mqtt.client import Client, MQTTMessage
-from . import utils
+from . import ble, utils
 from .miio_fix import Device
 from .unqlite import Unqlite
 from .utils import GLOBAL_PROP
@@ -87,6 +87,7 @@ class Gateway3(Thread):
             self.miio.send_handshake()
             return True
         except:
+            _LOGGER.debug(f"{self.host} | Can't send handshake")
             return False
 
     def _get_devices_v1(self) -> Optional[list]:
@@ -263,6 +264,7 @@ class Gateway3(Thread):
                     'did': did,
                     'mac': '0x' + data[did + '.mac'],
                     'model': data[did + '.model'],
+                    'type': 'zigbee',
                     'zb_ver': data[did + '.version'],
                     'init': params
                 }
@@ -276,7 +278,8 @@ class Gateway3(Thread):
             devices.insert(0, {
                 'did': 'lumi.0',
                 'model': 'lumi.gateway.mgl03',
-                'mac': device['mac']
+                'mac': device['mac'],
+                'type': 'gateway'
             })
 
             return devices
@@ -432,19 +435,24 @@ class Gateway3(Thread):
 
         did = data['dev']['did']
         if did not in self.devices:
+            mac = data['dev']['mac'].replace(':', '').lower() \
+                if 'mac' in data['dev'] else \
+                'ble_' + did.replace('blt.3.', '')
             self.devices[did] = device = {
-                'did': did,
-                'mac': data['dev']['mac'].replace(':', '').lower(),
-                'device_name': "BLE"
-            }
-            device['init'] = {}
+                'did': did, 'mac': mac, 'init': {}, 'device_name': "BLE",
+                'type': 'ble'}
         else:
             device = self.devices[did]
 
-        # check if only one
-        assert len(data['evt']) == 1, data
+        if isinstance(data['evt'], list):
+            # check if only one
+            assert len(data['evt']) == 1, data
+            payload = ble.parse_xiaomi_ble(data['evt'][0])
+        elif isinstance(data['evt'], dict):
+            payload = ble.parse_xiaomi_ble(data['evt'])
+        else:
+            payload = None
 
-        payload = utils.parse_xiaomi_ble(data['evt'][0])
         if payload is None:
             _LOGGER.debug(f"Unsupported BLE {data}")
             return
@@ -456,7 +464,7 @@ class Gateway3(Thread):
 
             device['init'][k] = payload[k]
 
-            domain = utils.get_ble_domain(k)
+            domain = ble.get_ble_domain(k)
             if not domain:
                 continue
 
