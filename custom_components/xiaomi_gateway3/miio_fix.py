@@ -46,14 +46,7 @@ class Device(miio.Device):
                 return []
 
             for item in part:
-                mac = f"0x{item['did'][5:]}" \
-                    if item['did'].startswith('lumi.') \
-                    else item['did']
-                devices[item['num']] = {
-                    'did': item['did'],
-                    'mac': f"0x{item['did'][5:]}",
-                    'model': item['model'],
-                }
+                devices[item['num']] = item
 
         return list(devices.values())
 

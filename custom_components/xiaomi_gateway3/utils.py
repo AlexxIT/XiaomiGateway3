@@ -33,6 +33,12 @@ DEVICES = [{
     'lumi.plug.maus01': ["Xiaomi", "Plug US", "ZNCZ12LM"],
     'lumi.ctrl_86plug': ["Aqara", "Socket", "QBCZ11LM"],
     'lumi.ctrl_86plug.aq1': ["Aqara", "Socket", "QBCZ11LM"],
+    'params': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
+        ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+    ]
+}, {
     'lumi.ctrl_ln1': ["Aqara", "Wall Single Switch", "QBKG11LM"],
     'lumi.ctrl_ln1.aq1': ["Aqara", "Wall Single Switch", "QBKG11LM"],
     'lumi.switch.b1nacn02': ["Aqara", "D1 Wall Single Switch", "QBKG23LM"],
@@ -40,6 +46,7 @@ DEVICES = [{
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+        ['13.1.85', None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off, power measurement
@@ -55,6 +62,9 @@ DEVICES = [{
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         # [?, 'enable_motor_mode', 'interlock', None]
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # on/off
@@ -62,22 +72,44 @@ DEVICES = [{
     'lumi.switch.b1lacn02': ["Aqara", "D1 Wall Single Switch", "QBKG21LM"],
     'params': [
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # or neutral_0?
+        ['13.1.85', None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off
     'lumi.ctrl_neutral2': ["Aqara", "Wall Double Switch", "QBKG03LM"],
-    'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Single Switch", "QBKG22LM"],
+    'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Double Switch", "QBKG22LM"],
     'params': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
-    # triple channel on/off
+    # triple channel on/off, no neutral wire
     'lumi.switch.l3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG25LM"],
     'params': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        ['13.3.85', None, 'button_3', None],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
+    # with neutral wire, thanks @Mantoui
+    'lumi.switch.n3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG26LM"],
+    'params': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        ['13.3.85', None, 'button_3', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # cube action, no retain
@@ -90,10 +122,17 @@ DEVICES = [{
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
-    # light with brightness
+    # light with brightness and color temp
     'lumi.light.aqcn02': ["Aqara", "Bulb", "ZNLDP12LM"],
     'lumi.light.cwopcn02': ["Aqara", "Opple MX650", "XDD12LM"],
     'lumi.light.cwopcn03': ["Aqara", "Opple MX480", "XDD13LM"],
+    'params': [
+        ['4.1.85', 'power_status', 'light', 'light'],
+        ['14.1.85', 'light_level', 'brightness', None],
+        ['14.2.85', 'colour_temperature', 'color_temp', None],
+    ]
+}, {
+    # light with brightness
     'ikea.light.led1649c5': ["IKEA", "Bulb E14"],  # tested
     'params': [
         ['4.1.85', 'power_status', 'light', 'light'],
@@ -261,85 +300,6 @@ def get_device(zigbee_model: str) -> Optional[dict]:
                 if len(desc) > 2 else zigbee_model,
                 'params': device['params']
             }
-
-    return None
-
-
-def get_ble_domain(param: str) -> Optional[str]:
-    if param in ('motion', 'is_active'):
-        return 'binary_sensor'
-
-    elif param in ('temperature', 'humidity', 'illuminance', 'moisture',
-                   'conductivity', 'battery', 'formaldehyde', 'mosquitto'):
-        return 'sensor'
-
-    return None
-
-
-def parse_xiaomi_ble(event: dict) -> Optional[dict]:
-    """Thanks to:
-    https://github.com/esphome/esphome/blob/dev/esphome/components/xiaomi_ble/xiaomi_ble.cpp
-    """
-    raw = event['eid'].to_bytes(length=2, byteorder='little')
-    data = bytes.fromhex(event['edata'])
-
-    if raw[0] == 0x03 and len(data) == 1:
-        return {'motion': bool(data)}
-
-    elif raw[0] == 0x04 and len(data) == 2:
-        return {
-            'temperature': int.from_bytes(data, byteorder='little') / 10.0
-        }
-
-    elif raw[0] == 0x06 and len(data) == 2:
-        return {
-            'humidity': int.from_bytes(data, byteorder='little') / 10.0
-        }
-
-    elif raw[0] in (0x07, 0x0F) and len(data) == 3:
-        return {
-            'illuminance': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x08 and len(data) == 1:
-        return {
-            # why not humidity?
-            'moisture': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x09 and len(data) == 2:
-        return {
-            'conductivity': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x0A and len(data) == 1:
-        return {
-            'battery': int.from_bytes(data, byteorder='little')
-        }
-
-    elif raw[0] == 0x0D and len(data) == 4:
-        return {
-            'temperature': int.from_bytes(data[:2], byteorder='little') / 10.0,
-            'humidity': int.from_bytes(data[2:], byteorder='little') / 10.0
-        }
-
-    elif raw[0] == 0x10 and len(data) == 2:
-        return {
-            'formaldehyde': int.from_bytes(data, byteorder='little') / 100.0
-        }
-
-    elif raw[0] == 0x12 and len(data) == 1:
-        return {'is_active': bool(data)}
-
-    elif raw[0] == 0x13 and len(data) == 1:
-        return {
-            'mosquitto': int.from_bytes(data, byteorder='little')
-        }
-
-    # elif raw[0] == 0x17 and len(data) == 4:
-    #     return {
-    #         'idle_time': int.from_bytes(data, byteorder='little') / 60.0
-    #     }
 
     return None
 

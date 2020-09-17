@@ -1,5 +1,6 @@
 import logging
 
+from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device
@@ -36,7 +37,14 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             self.schedule_update_ha_state()
 
     def turn_on(self):
-        self.gw.send(self.device, 'pairing_start', 60)
+        self.gw.send(self.device, {'pairing_start': 60})
 
     def turn_off(self):
-        self.gw.send(self.device, 'pairing_stop', 0)
+        self.gw.send(self.device, {'pairing_stop': 0})
+
+    async def async_send_command(self, command, **kwargs):
+        for cmd in command:
+            # for testing purposes
+            if cmd == 'ble':
+                raw = kwargs[ATTR_DEVICE].replace('\'', '"')
+                self.gw.process_ble_event(raw)

@@ -10,7 +10,8 @@ _LOGGER = logging.getLogger(__name__)
 
 UNITS = {
     DEVICE_CLASS_TEMPERATURE: TEMP_CELSIUS,
-    DEVICE_CLASS_HUMIDITY: UNIT_PERCENTAGE,
+    DEVICE_CLASS_HUMIDITY: '%',
+    DEVICE_CLASS_PRESSURE: 'hPa',
     DEVICE_CLASS_ILLUMINANCE: 'lm',
     DEVICE_CLASS_POWER: POWER_WATT,
     'consumption': ENERGY_WATT_HOUR
@@ -77,9 +78,15 @@ VIBRATION = {
 
 
 class Gateway3Action(Gateway3Device):
+    _state = ''
+
     @property
     def state(self):
         return self._state
+
+    @property
+    def state_attributes(self):
+        return self._attrs
 
     def update(self, data: dict = None):
         new_state = None
@@ -96,10 +103,11 @@ class Gateway3Action(Gateway3Device):
                 new_state = v
 
         if new_state:
+            self._attrs = data
             self._state = new_state
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
             time.sleep(.1)
 
-            self._state = None
-            self.schedule_update_ha_state()
+            self._state = ''
+            self.async_schedule_update_ha_state()

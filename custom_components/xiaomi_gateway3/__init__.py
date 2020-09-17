@@ -1,11 +1,9 @@
 import logging
 
 import voluptuous as vol
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.device_registry import CONNECTION_ZIGBEE
 from homeassistant.helpers.entity import Entity
 
 from . import utils
@@ -42,7 +40,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, config_entry):
     config = hass.data[DOMAIN]['config']
 
     hass.data[DOMAIN][config_entry.unique_id] = \
@@ -66,17 +64,18 @@ class Gateway3Device(Entity):
         self.device = device
 
         self._attr = attr
+        self._attrs = {}
 
         self._unique_id = f"{self.device['mac']}_{self._attr}"
         self._name = self.device['device_name'] + ' ' + self._attr.title()
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
-        gateway.add_update(device['did'], self.update)
-
     async def async_added_to_hass(self):
         if 'init' in self.device:
             self.update(self.device['init'])
+
+        self.gw.add_update(self.device['did'], self.update)
 
     @property
     def should_poll(self) -> bool:
@@ -92,17 +91,20 @@ class Gateway3Device(Entity):
 
     @property
     def device_info(self):
-        did: str = self.device['did']
-        if did == 'lumi.0':
+        """
+        https://developers.home-assistant.io/docs/device_registry_index/
+        """
+        type_ = self.device['type']
+        if type_ == 'gateway':
             return {
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
                 'name': self.device['device_name']
             }
-        elif not did.startswith('blt'):
+        elif type_ == 'zigbee':
             return {
-                'connections': {(CONNECTION_ZIGBEE, self.device['mac'])},
+                'connections': {(type_, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
@@ -110,9 +112,9 @@ class Gateway3Device(Entity):
                 'sw_version': self.device['zb_ver'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
-        else:
+        elif type_ == 'ble':
             return {
-                'connections': {('bluetooth', self.device['mac'])},
+                'connections': {(type_, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'name': self.device['device_name'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
