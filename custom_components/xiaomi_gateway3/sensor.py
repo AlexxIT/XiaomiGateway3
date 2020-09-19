@@ -89,25 +89,28 @@ class Gateway3Action(Gateway3Device):
         return self._attrs
 
     def update(self, data: dict = None):
-        new_state = None
         for k, v in data.items():
             if k == 'button':
-                new_state = BUTTON[v]
+                data[self._attr] = BUTTON[v]
+                break
             elif k == 'button_both':
-                new_state = k + '_' + BUTTON_BOTH[v]
+                data[self._attr] = k + '_' + BUTTON_BOTH[v]
+                break
             elif k.startswith('button'):
-                new_state = k + '_' + BUTTON[v]
+                data[self._attr] = k + '_' + BUTTON[v]
+                break
             elif k == 'vibration':
-                new_state = VIBRATION[v]
-            elif k == 'action':
-                new_state = v
+                data[self._attr] = VIBRATION[v]
+                break
 
-        if new_state:
-            self._attrs = data
-            self._state = new_state
-            self.async_write_ha_state()
+        if self._attr not in data:
+            return
 
-            time.sleep(.1)
+        self._attrs = data
+        self._state = data[self._attr]
+        self.async_write_ha_state()
 
-            self._state = ''
-            self.async_schedule_update_ha_state()
+        time.sleep(.1)
+
+        self._state = ''
+        self.async_schedule_update_ha_state()
