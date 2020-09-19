@@ -251,7 +251,7 @@ class Gateway3(Thread):
 
                 # fix some param values
                 for k, v in params.items():
-                    if k in ('temperature', 'humidity'):
+                    if k in ('temperature', 'humidity', 'pressure'):
                         params[k] = v / 100.0
                     elif v in ('on', 'open'):
                         params[k] = 1
@@ -407,7 +407,7 @@ class Gateway3(Thread):
                 prop = next((p[2] for p in device['params']
                              if p[0] == prop), prop)
 
-            if prop in ('temperature', 'humidity'):
+            if prop in ('temperature', 'humidity', 'pressure'):
                 payload[prop] = param['value'] / 100.0
             elif prop == 'battery' and param['value'] > 1000:
                 payload[prop] = round((min(param['value'], 3200) - 2500) / 7)
