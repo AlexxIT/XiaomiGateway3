@@ -244,6 +244,20 @@ DEVICES = [{
         ['2.1', '2.1', 'illuminance', 'sensor'],
         ['3.1', '3.1', 'battery', 'sensor'],
     ]
+}, {
+    'lumi.sensor_smoke': ["Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW"],
+    'params': [
+        ['0.1.85', 'density', 'smoke density', 'sensor'],
+        ['13.1.85', 'alarm', 'smoke', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
+}, {
+    'lumi.sensor_natgas': ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
+    'params': [
+        ['0.1.85', 'density', 'gas density', 'sensor'],
+        ['13.1.85', 'alarm', 'gas', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
 }, {  # OTHER MANUFACTURERS
     'TRADFRI bulb E27 W opal 1000lm': ["IKEA", "Bulb E27"],
     'LWB010': ["Philips", "Hue Bulb E27"],

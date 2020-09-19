@@ -14,7 +14,15 @@ UNITS = {
     DEVICE_CLASS_PRESSURE: 'hPa',
     DEVICE_CLASS_ILLUMINANCE: 'lm',
     DEVICE_CLASS_POWER: POWER_WATT,
-    'consumption': ENERGY_WATT_HOUR
+    'consumption': ENERGY_WATT_HOUR,
+    'gas density': '% LEL',
+    'smoke density': '% obs/ft',
+}
+
+ICONS = {
+    'consumption': 'mdi:flash',
+    'gas density': 'mdi:google-circles-communities',
+    'smoke density': 'mdi:google-circles-communities',
 }
 
 
@@ -42,6 +50,10 @@ class Gateway3Sensor(Gateway3Device):
     @property
     def unit_of_measurement(self):
         return UNITS.get(self._attr)
+
+    @property
+    def icon(self):
+        return ICONS.get(self._attr)
 
     def update(self, data: dict = None):
         if self._attr not in data:

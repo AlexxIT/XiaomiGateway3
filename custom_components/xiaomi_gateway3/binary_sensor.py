@@ -62,7 +62,8 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
     def update(self, data: dict = None):
         if self._attr not in data:
             return
-        self._state = data[self._attr] == 1
+        # gas and smoke => 1 and 2
+        self._state = data[self._attr] >= 1
         self.schedule_update_ha_state()
 
         if self._state:
