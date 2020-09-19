@@ -306,15 +306,20 @@ class Gateway3(Thread):
             telnet = Telnet(self.host)
             telnet.read_until(b"login: ")
             telnet.write(b"admin\r\n")
-            telnet.read_very_eager()  # skip response
+            telnet.read_until(b"\r\n# ")  # skip greeting
 
             # enable public mqtt
             telnet.write(b"killall mosquitto\r\n")
-            telnet.read_very_eager()  # skip response
-            time.sleep(.5)
+            telnet.read_until(b"\r\n")  # skip command
+            time.sleep(.5)  # it's important to wait
             telnet.write(b"mosquitto -d\r\n")
-            telnet.read_very_eager()  # skip response
-            time.sleep(1)
+            telnet.read_until(b"\r\n")  # skip command
+            time.sleep(.5)  # it's important to wait
+
+            # fix CPU 90% full time bug
+            telnet.write(b"killall zigbee_gw\r\n")
+            telnet.read_until(b"\r\n")  # skip command
+            time.sleep(.5)  # it's important to wait
 
             telnet.close()
             return True
@@ -519,14 +524,14 @@ class GatewayBLE(Thread):
                 telnet = Telnet(self.gw.host, timeout=5)
                 telnet.read_until(b"login: ")
                 telnet.write(b"admin\r\n")
-                telnet.read_until(b'\r\n# ')  # skip greeting
+                telnet.read_until(b"\r\n# ")  # skip greeting
 
                 telnet.write(b"killall silabs_ncp_bt; "
                              b"silabs_ncp_bt /dev/ttyS1 1\r\n")
-                telnet.read_until(b'\r\n')  # skip command
+                telnet.read_until(b"\r\n")  # skip command
 
                 while True:
-                    raw = telnet.read_until(b'\r\n')
+                    raw = telnet.read_until(b"\r\n")
 
                     if 'bluetooth' in self.gw.debug:
                         _LOGGER.debug(f"[BT] {raw}")
@@ -534,7 +539,7 @@ class GatewayBLE(Thread):
                     if b'_async.ble_event' in raw:
                         self.gw.process_ble_event(raw)
 
-            except (ConnectionRefusedError, ConnectionResetError,
+            except (ConnectionRefusedError, ConnectionResetError, EOFError,
                     socket.timeout):
                 pass
             except Exception as e:
