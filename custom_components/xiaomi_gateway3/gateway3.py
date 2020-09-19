@@ -432,6 +432,8 @@ class Gateway3(Thread):
             # 'version': '21', 'zb_ver': '3.0'}
             device = payload['added_device']
             device['mac'] = '0x' + device['mac']
+            device['type'] = 'zigbee'
+            device['init'] = payload
             self.setup_devices([device])
 
     def process_ble_event(self, raw: Union[bytes, str]):
