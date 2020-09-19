@@ -126,6 +126,10 @@ DEVICES = [{
     'lumi.light.aqcn02': ["Aqara", "Bulb", "ZNLDP12LM"],
     'lumi.light.cwopcn02': ["Aqara", "Opple MX650", "XDD12LM"],
     'lumi.light.cwopcn03': ["Aqara", "Opple MX480", "XDD13LM"],
+    'ikea.light.led1545g12': ["IKEA", "Bulb E27 980 lm", "LED1545G12"],
+    'ikea.light.led1546g12': ["IKEA", "Bulb E27 950 lm", "LED1546G12"],
+    'ikea.light.led1536g5': ["IKEA", "Bulb E14 400 lm", "LED1536G5"],
+    'ikea.light.led1537r6': ["IKEA", "Bulb GU10 400 lm", "LED1537R6"],
     'params': [
         ['4.1.85', 'power_status', 'light', 'light'],
         ['14.1.85', 'light_level', 'brightness', None],
@@ -133,7 +137,9 @@ DEVICES = [{
     ]
 }, {
     # light with brightness
-    'ikea.light.led1649c5': ["IKEA", "Bulb E14"],  # tested
+    'ikea.light.led1623g12': ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
+    'ikea.light.led1650r5': ["IKEA", "Bulb GU10 400 lm", "LED1650R5"],
+    'ikea.light.led1649c5': ["IKEA", "Bulb E14", "LED1649C5"],  # tested
     'params': [
         ['4.1.85', 'power_status', 'light', 'light'],
         ['14.1.85', 'light_level', 'brightness', None],
