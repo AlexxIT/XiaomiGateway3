@@ -231,7 +231,7 @@ DEVICES = [{
     'lumi.vibration.aq1': ["Aqara", "Vibration Sensor", "DJT11LM"],
     'params': [
         ['0.1.85', None, 'bed_activity', None],
-        ['0.2.85', None, 'final_tilt_angle', None],
+        ['0.2.85', None, 'tilt_angle', None],
         ['0.3.85', None, 'vibrate_intensity', None],
         ['13.1.85', None, 'vibration', None],
         ['14.1.85', None, 'vibration_level', None],

@@ -99,8 +99,11 @@ class Gateway3Action(Gateway3Device):
             elif k.startswith('button'):
                 data[self._attr] = k + '_' + BUTTON[v]
                 break
-            elif k == 'vibration':
+            elif k == 'vibration' and v != 2:  # skip tilt and wait tilt_angle
                 data[self._attr] = VIBRATION[v]
+                break
+            elif k == 'tilt_angle':
+                data = {'vibration': 2, 'angle': v, self._attr: 'tilt'}
                 break
 
         if self._attr not in data:
