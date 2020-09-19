@@ -116,7 +116,7 @@ DEVICES = [{
     'lumi.sensor_cube': ["Aqara", "Cube", "MFKZQ01LM"],
     'lumi.sensor_cube.aqgl01': ["Aqara", "Cube", "MFKZQ01LM"],  # tested
     'params': [
-        # ['0.2.85', '?', '?', '?'],
+        ['0.2.85', None, 'duration', None],
         ['0.3.85', None, 'angle', None],
         ['13.1.85', None, 'action', 'sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],

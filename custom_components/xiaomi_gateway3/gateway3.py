@@ -410,7 +410,14 @@ class Gateway3(Thread):
             if prop in ('temperature', 'humidity', 'pressure'):
                 payload[prop] = param['value'] / 100.0
             elif prop == 'battery' and param['value'] > 1000:
+                # xiaomi light sensor
                 payload[prop] = round((min(param['value'], 3200) - 2500) / 7)
+            elif prop == 'angle':
+                # xiaomi cube 100 points = 360 degrees
+                payload[prop] = param['value'] * 4
+            elif prop == 'duration':
+                # xiaomi cube
+                payload[prop] = param['value'] / 1000.0
             else:
                 payload[prop] = param['value']
 
