@@ -51,12 +51,15 @@ Demo video:
 [![Xiaomi Rubik's Cube](https://img.youtube.com/vi/4D_vqvUre_0/mqdefault.jpg)](https://www.youtube.com/watch?v=4D_vqvUre_0)
 
 Tested Devices:
+- Aqara N100 Smart Door Lock
 - Xiaomi Door Sensor 2 (MCCGQ02HL)
 - Xiaomi Flower Monitor (HHCCJCY01)
+- Xiaomi Loock Smart Lock
 - Xiaomi Rubik's Cube (XMMF01JQD) - don't sends edge info, only direction!
 - Xiaomi TH Sensor (LYWSD03MMC)
 - Xiaomi TH Sensor (LYWSDCGQ/01ZM)
 - Xiaomi TH Watch (LYWSD02MMC)
+
 
 Currently supported, but not tested, other Xiaomi BLE devices officially supported by the Gateway with these attributes:
 
@@ -91,6 +94,25 @@ xiaomi_gateway3:
   devices:
     '0x158d00044c5dff':
       occupancy_timeout: 90  # (optional) default 90 seconds
+```
+
+# Handle Button Actions
+
+[![Handling Zigbee buttons with Xiaomi Gateway 3 in Home Assistant](https://img.youtube.com/vi/a8hsNlTErac/mqdefault.jpg)](https://www.youtube.com/watch?v=a8hsNlTErac)
+
+Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its state for a split second and returns to an empty state. The attributes contain useful data, they are not cleared after the event is triggered.
+
+```yaml
+automation:
+- alias: Turn off all lights
+  trigger:
+  - platform: state
+    entity_id: sensor.0x158d0002fa99fd_action
+    to: button_1_single
+  action:
+  - service: light.turn_off
+    entity_id: all
+  mode: single
 ```
 
 # Handle BLE Locks
