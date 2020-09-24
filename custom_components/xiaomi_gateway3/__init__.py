@@ -47,7 +47,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry):
         gw = Gateway3(**config_entry.data, config=config)
 
     # init setup for each supported domains
-    for domain in ('binary_sensor', 'light', 'remote', 'sensor', 'switch'):
+    for domain in (
+            'binary_sensor', 'cover', 'light', 'remote', 'sensor', 'switch'
+    ):
         hass.async_create_task(hass.config_entries.async_forward_entry_setup(
             config_entry, domain))
 

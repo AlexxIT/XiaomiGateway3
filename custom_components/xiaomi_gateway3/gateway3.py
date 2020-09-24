@@ -237,11 +237,11 @@ class Gateway3(Thread):
 
                 # skip unknown model
                 if desc is None:
-                    _LOGGER.debug(f"Unsupported model: {model}")
+                    _LOGGER.debug(f"{did} has an unsupported modell: {model}")
                     continue
 
                 retain = json.loads(data[did + '.prop'])['props']
-                _LOGGER.debug(f"{self.host} | {model} retain: {retain}")
+                _LOGGER.debug(f"{self.host} | {did} {model} retain: {retain}")
 
                 params = {
                     p[2]: retain.get(p[1])
@@ -249,24 +249,13 @@ class Gateway3(Thread):
                     if p[1] is not None
                 }
 
-                # fix some param values
-                for k, v in params.items():
-                    if k in ('temperature', 'humidity', 'pressure'):
-                        params[k] = v / 100.0
-                    elif v in ('on', 'open'):
-                        params[k] = 1
-                    elif v in ('off', 'close'):
-                        params[k] = 0
-                    elif k == 'battery' and v and v > 1000:
-                        params[k] = round((min(v, 3200) - 2500) / 7)
-
                 device = {
                     'did': did,
                     'mac': '0x' + data[did + '.mac'],
                     'model': data[did + '.model'],
                     'type': 'zigbee',
                     'zb_ver': data[did + '.version'],
-                    'init': params
+                    'init': utils.fix_xiaomi_props(params)
                 }
                 devices.append(device)
 

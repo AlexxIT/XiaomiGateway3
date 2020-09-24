@@ -10,6 +10,8 @@ from homeassistant.helpers.typing import HomeAssistantType
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
 # https://slsys.io/action/devicelists.html
+# All lumi models:
+#   https://github.com/rytilahti/python-miio/issues/699#issuecomment-643208618
 # Zigbee Model: [Manufacturer, Device Name, Device Model]
 # params: [lumi res name, xiaomi prop name, hass attr name, hass domain]
 DEVICES = [{
@@ -258,6 +260,24 @@ DEVICES = [{
         ['13.1.85', 'alarm', 'gas', 'binary_sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
+}, {
+    'lumi.curtain': ["Aqara", "Curtain", "ZNCLDJ11LM"],
+    'lumi.curtain.aq2': ["Aqara", "Roller Shade", "ZNGZDJ11LM"],
+    'params': [
+        ['1.1.85', 'curtain_level', 'position', None],
+        ['14.2.85', None, 'motor', 'cover'],
+        ['14.3.85', 'cfg_param', 'cfg_param', None],
+        ['14.4.85', 'run_state', 'run_state', None],
+    ]
+}, {
+    'lumi.curtain.hagl04': ["Aqara", "B1 Curtain", "ZNCLDJ12LM"],
+    'params': [
+        ['1.1.85', 'curtain_level', 'position', None],
+        ['14.2.85', None, 'motor', 'cover'],
+        ['14.3.85', 'cfg_param', 'cfg_param', None],
+        ['14.4.85', 'run_state', 'run_state', None],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
 }, {  # OTHER MANUFACTURERS
     'TRADFRI bulb E27 W opal 1000lm': ["IKEA", "Bulb E27"],
     'LWB010': ["Philips", "Hue Bulb E27"],
@@ -322,6 +342,23 @@ def get_device(zigbee_model: str) -> Optional[dict]:
             }
 
     return None
+
+
+def fix_xiaomi_props(params) -> dict:
+    for k, v in params.items():
+        if k in ('temperature', 'humidity', 'pressure'):
+            params[k] = v / 100.0
+        elif v in ('on', 'open'):
+            params[k] = 1
+        elif v in ('off', 'close'):
+            params[k] = 0
+        elif k == 'battery' and v and v > 1000:
+            params[k] = round((min(v, 3200) - 2500) / 7)
+        elif k == 'run_state':
+            params[k] = ['offing', 'oning', 'stop',
+                         'hinder_stop'].index(v)
+
+    return params
 
 
 TITLE = "Xiaomi Gateway 3 Debug"
