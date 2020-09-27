@@ -43,7 +43,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
 async def async_setup_entry(hass: HomeAssistant, config_entry):
     config = hass.data[DOMAIN]['config']
 
-    hass.data[DOMAIN][config_entry.unique_id] = \
+    hass.data[DOMAIN][config_entry.entry_id] = \
         gw = Gateway3(**config_entry.data, config=config)
 
     # init setup for each supported domains

@@ -34,7 +34,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             Gateway3Sensor(gateway, device, attr)
         ])
 
-    gw: Gateway3 = hass.data[DOMAIN][config_entry.unique_id]
+    gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('sensor', setup)
 
 
