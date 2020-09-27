@@ -500,6 +500,12 @@ class Gateway3(Thread):
         payload = json.dumps(payload, separators=(',', ':')).encode()
         self.mqtt.publish('zigbee/recv', payload)
 
+    def get_device(self, mac: str) -> Optional[dict]:
+        for device in self.devices.values():
+            if device.get('mac') == mac:
+                return device
+        return None
+
 
 class GatewayBLE(Thread):
     def __init__(self, gw: Gateway3):
