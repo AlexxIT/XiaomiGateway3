@@ -15,6 +15,20 @@ Thanks to **Serrj** for [instruction](https://community.home-assistant.io/t/xiao
 **Important:** This component does not work with:
  - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
  - Xiaomi Gateway EU (DGNWG05LM, lumi.gateway.mieu01)
+ 
+# Table of Contents
+
+- [Supported Zigbee Devices](#supported-zigbee-devices)
+- [Supported BLE Devices](#supported-ble-devices)
+- [Install](#install)
+- [Config](#config)
+- [Advanced config](#advanced-config)
+- [Add and remove Zigbee devices](#add-and-remove-zigbee-devices)
+- [Add third-party Zigbee devices](#add-third-party-zigbee-devices)
+- [Handle Button Actions](#handle-button-actions)
+- [Handle BLE Locks](#handle-ble-locks)
+- [How it works](#how-it-works)
+- [Debug mode](#debug-mode)
 
 # Supported Zigbee Devices
 
@@ -97,6 +111,44 @@ xiaomi_gateway3:
     '0x158d00044c5dff':
       occupancy_timeout: 90  # (optional) default 90 seconds
 ```
+
+# Add and remove Zigbee devices
+
+To enter the pairing mode, turn on the switch **Xiaomi Gateway 3 Pair**. Pairing lasts 60 seconds.
+
+After successfully adding the device, the Gateway will sound two long beeps.
+
+If the addition was unsuccessful, for example, an unsupported device, the Gateway will sound three short beeps.
+
+To delete a device from Hass and from Gateway - you need to rename device to **delete**. Just the device, not its objects!
+
+# Add third-party Zigbee devices
+
+Video Demo:
+
+[![Control non Xiaomi zigbee devices from Xiaomi Gateway 3](https://img.youtube.com/vi/hwtBPMtMnKo/mqdefault.jpg)](https://www.youtube.com/watch?v=hwtBPMtMnKo)
+
+**Attention 1:** Only devices similar to Xiaomi devices will work!
+
+**Attention 2:** After the first pairing, Mi Home remembers the selected device model. And with the next pairings, it will show old interface, even if you change the model. Hass will take the new device model on the next pairings.
+
+To add a custom device, you need to call the service `remote.send_command` with params:
+
+```yaml
+entity_id: remote.0x680ae2fffe123456_pair  # change to your Gateway remote
+command: pair
+device: ikea.light.led1623g12  # change to your device model
+```
+
+You need to choose the most similar Xiaomi model for your device from [this file](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
+
+For example, for a lamp or dimmer - choose an IKEA lamp `ikea.light.led1623g12`.
+
+Sometimes it doesn't work the first time and you need to try pairing again.
+
+The devices added in this way will work even after the Gateway is restarted. They will continue to work without Hass. And they can be used in Mi Home automations.
+
+You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/issues/44).
 
 # Handle Button Actions
 
@@ -187,7 +239,7 @@ The state changes to `door`, `lock`, `fingerprint`,` armed` when an event occurs
 - `key_id`: 0xc0de1003, `error`: The accessory battery is low
 - `key_id`: 0xc0de1004, `error`: Mechanical failure
 
-Email me if the values are wrong somewhere. I translated from Chinese [documentation](https://iot.mi.com/new/doc/embedded-development/ble/object-definition).
+Write me if the values are wrong somewhere. I translated from Chinese [documentation](https://iot.mi.com/new/doc/embedded-development/ble/object-definition).
 
 Example of several automations:
 
