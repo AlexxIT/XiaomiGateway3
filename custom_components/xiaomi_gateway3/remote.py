@@ -1,5 +1,6 @@
 import logging
 
+from homeassistant.components import persistent_notification
 from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
@@ -32,9 +33,19 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         if 'pairing_start' in data:
             self._state = True
             self.schedule_update_ha_state()
+
         elif 'pairing_stop' in data:
             self._state = False
             self.schedule_update_ha_state()
+
+            self.gw.pair_model = None
+
+        elif 'added_device' in data:
+            text = "New device:\n" + '\n'.join(
+                f"{k}: {v}" for k, v in data['added_device'].items()
+            )
+            persistent_notification.async_create(self.hass, text,
+                                                 "Xiaomi Gateway 3")
 
     def turn_on(self):
         self.gw.send(self.device, {'pairing_start': 60})
@@ -48,3 +59,8 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             if cmd == 'ble':
                 raw = kwargs[ATTR_DEVICE].replace('\'', '"')
                 self.gw.process_ble_event(raw)
+            elif cmd == 'pair':
+                model: str = kwargs[ATTR_DEVICE]
+                self.gw.pair_model = (model[:-3] if model.endswith('.v1')
+                                      else model)
+                self.turn_on()

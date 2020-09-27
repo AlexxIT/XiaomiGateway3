@@ -16,8 +16,13 @@ from .utils import GLOBAL_PROP
 
 _LOGGER = logging.getLogger(__name__)
 
+RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
+
 
 class Gateway3(Thread):
+    pair_model = None
+    pair_payload = None
+
     def __init__(self, host: str, token: str, config: dict):
         super().__init__(daemon=True)
 
@@ -332,6 +337,8 @@ class Gateway3(Thread):
         if msg.topic == 'zigbee/send':
             payload = json.loads(msg.payload)
             self.process_message(payload)
+        elif self.pair_model and msg.topic.endswith('/commands'):
+            self.process_pair(msg.payload)
 
     def setup_devices(self, devices: list):
         """Add devices to hass."""
@@ -429,6 +436,29 @@ class Gateway3(Thread):
             device['type'] = 'zigbee'
             device['init'] = payload
             self.setup_devices([device])
+
+    def process_pair(self, raw: bytes):
+        # get shortID and eui64 of paired device
+        if b'lumi send-nwk-key' in raw:
+            # create model response
+            payload = f"0x18010105000042{len(self.pair_model):02x}" \
+                      f"{self.pair_model.encode().hex()}"
+            m = RE_NWK_KEY.search(raw.decode())
+            self.pair_payload = json.dumps({
+                'sourceAddress': m[1],
+                'eui64': '0x' + m[2],
+                'profileId': '0x0104',
+                'clusterId': '0x0000',
+                'sourceEndpoint': '0x01',
+                'destinationEndpoint': '0x01',
+                'APSCounter': '0x01',
+                'APSPlayload': payload
+            }, separators=(',', ':'))
+
+        # send model response "from device"
+        elif b'zdo active ' in raw:
+            mac = self.device['mac'][2:].upper()
+            self.mqtt.publish(f"gw/{mac}/MessageReceived", self.pair_payload)
 
     def process_ble_event(self, raw: Union[bytes, str]):
         data = json.loads(raw[10:])['params'] \
