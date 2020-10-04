@@ -23,10 +23,12 @@ class Gateway3(Thread):
     pair_model = None
     pair_payload = None
 
-    def __init__(self, host: str, token: str, config: dict):
+    def __init__(self, host: str, token: str, config: dict, zha: bool = False):
         super().__init__(daemon=True)
 
         self.host = host
+        self.zha = zha
+
         self.miio = Device(host, token)
 
         self.mqtt = Client()
@@ -56,29 +58,48 @@ class Gateway3(Thread):
 
     def run(self):
         """Main loop"""
-        while 'lumi.0' not in self.devices:
-            if self._miio_connect():
-                devices = self._get_devices_v3()
-                if devices:
-                    self.setup_devices(devices)
-                else:
-                    self._enable_telnet()
-            else:
+        while True:
+            # if not telnet - enable it
+            if not self._check_port(23) and not self._enable_telnet():
                 time.sleep(30)
+                continue
+
+            devices = self._get_devices_v3()
+            if devices:
+                self.setup_devices(devices)
+                break
 
         # start bluetooth read loop
         self.ble.start()
 
         while True:
-            if self._mqtt_connect():
+            # if not telnet - enable it
+            if not self._check_port(23) and not self._enable_telnet():
+                time.sleep(30)
+                continue
+
+            if not self.zha:
+                # if not mqtt - enable it
+                if not self._mqtt_connect() and not self._enable_mqtt():
+                    time.sleep(60)
+                    continue
+
                 self.mqtt.loop_forever()
 
-            elif self._miio_connect() and self._enable_telnet():
-                self._enable_mqtt()
+            elif not self._check_port(8888) and not self._enable_zha():
+                time.sleep(60)
+                continue
 
             else:
-                _LOGGER.debug("sleep 30")
-                time.sleep(30)
+                # ZHA works fine, check every 60 seconds
+                time.sleep(60)
+
+    def _check_port(self, port: int):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            return s.connect_ex((self.host, port)) == 0
+        finally:
+            s.close()
 
     def _mqtt_connect(self) -> bool:
         try:
@@ -216,6 +237,22 @@ class Gateway3(Thread):
             telnet.write(b"admin\r\n")
             telnet.read_until(b'\r\n# ')  # skip greeting
 
+            # read coordinator info
+            telnet.write(b"cat /data/zigbee/coordinator.info\r\n")
+            telnet.read_until(b'\r\n')  # skip command
+            raw = telnet.read_until(b'# ')
+
+            device = json.loads(raw[:-2])
+            devices = [{
+                'did': 'lumi.0',
+                'model': 'lumi.gateway.mgl03',
+                'mac': device['mac'],
+                'type': 'gateway'
+            }]
+
+            if self.zha:
+                return devices
+
             # https://github.com/AlexxIT/XiaomiGateway3/issues/14
             # fw 1.4.6_0012 and below have one zigbee_gw.db file
             # fw 1.4.6_0030 have many json files in this folder
@@ -229,8 +266,6 @@ class Gateway3(Thread):
             else:
                 raw = re.sub(br'}\s+{', b',', raw)
                 data = json.loads(raw)
-
-            devices = []
 
             # data = {} or data = {'dev_list': 'null'}
             dev_list = json.loads(data.get('dev_list', 'null')) or []
@@ -263,18 +298,6 @@ class Gateway3(Thread):
                     'init': utils.fix_xiaomi_props(params)
                 }
                 devices.append(device)
-
-            telnet.write(b"cat /data/zigbee/coordinator.info\r\n")
-            telnet.read_until(b'\r\n')  # skip command
-            raw = telnet.read_until(b'# ')
-
-            device = json.loads(raw[:-2])
-            devices.insert(0, {
-                'did': 'lumi.0',
-                'model': 'lumi.gateway.mgl03',
-                'mac': device['mac'],
-                'type': 'gateway'
-            })
 
             return devices
 
@@ -319,6 +342,41 @@ class Gateway3(Thread):
             return True
         except Exception as e:
             _LOGGER.debug(f"Can't run MQTT: {e}")
+            return False
+
+    def _enable_zha(self):
+        _LOGGER.debug(f"{self.host} | Try enable ZHA")
+        try:
+            check_socat = \
+                "(md5sum /data/socat | grep 92b77e1a93c4f4377b4b751a5390d979)"
+            download_socat = \
+                "(curl -o /data/socat http://pkg.musl.cc/socat/" \
+                "mipsel-linux-musln32/bin/socat && chmod +x /data/socat)"
+            run_socat = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
+
+            telnet = Telnet(self.host, timeout=5)
+            telnet.read_until(b"login: ")
+            telnet.write(b"admin\r\n")
+            telnet.read_until(b"\r\n# ")  # skip greeting
+
+            # download socat and check md5
+            telnet.write(f"{check_socat} || {download_socat}\r\n".encode())
+            raw = telnet.read_until(b"\r\n# ")
+            if b"Received" in raw:
+                _LOGGER.debug(f"{self.host} | Downloading socat")
+
+            telnet.write(f"{check_socat} && {run_socat} &\r\n".encode())
+            telnet.read_until(b"\r\n# ")
+
+            telnet.write(
+                b"killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT\r\n")
+            telnet.read_until(b"\r\n# ")
+
+            telnet.close()
+            return True
+
+        except Exception as e:
+            _LOGGER.debug(f"Can't enable ZHA: {e}")
             return False
 
     def on_connect(self, client, userdata, flags, rc):

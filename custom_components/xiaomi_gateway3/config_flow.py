@@ -24,6 +24,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required('host'): str,
                 vol.Required('token'): str,
+                vol.Required('zha'): bool
             }),
             description_placeholders={
                 'error_text': "\nERROR: " + error if error else ''
