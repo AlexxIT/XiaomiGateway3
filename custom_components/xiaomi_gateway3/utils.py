@@ -34,11 +34,17 @@ DEVICES = [{
     'lumi.plug.mmeu01': ["Xiaomi", "Plug EU", "ZNCZ04LM"],
     'lumi.plug.maus01': ["Xiaomi", "Plug US", "ZNCZ12LM"],
     'lumi.ctrl_86plug': ["Aqara", "Socket", "QBCZ11LM"],
-    'lumi.ctrl_86plug.aq1': ["Aqara", "Socket", "QBCZ11LM"],
     'params': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+    ]
+}, {
+    'lumi.ctrl_86plug.aq1': ["Aqara", "Socket", "QBCZ11LM"],
+    'params': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'consumption', 'sensor'],
+        ['4.1.85', 'channel_0', 'switch', 'switch'],  # to4ko
     ]
 }, {
     'lumi.ctrl_ln1': ["Aqara", "Wall Single Switch", "QBKG11LM"],
@@ -79,6 +85,14 @@ DEVICES = [{
 }, {
     # dual channel on/off
     'lumi.ctrl_neutral2': ["Aqara", "Wall Double Switch", "QBKG03LM"],
+    'params': [
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
     'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Double Switch", "QBKG22LM"],
     'params': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
@@ -91,9 +105,9 @@ DEVICES = [{
     # triple channel on/off, no neutral wire
     'lumi.switch.l3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG25LM"],
     'params': [
-        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
-        ['4.2.85', 'channel_1', 'channel 2', 'switch'],
-        ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
+        ['4.3.85', 'neutral_2', 'channel 3', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
