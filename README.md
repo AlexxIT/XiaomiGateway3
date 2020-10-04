@@ -16,6 +16,8 @@ Thanks to **Serrj** for [instruction](https://community.home-assistant.io/t/xiao
  - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
  - Xiaomi Gateway EU (DGNWG05LM, lumi.gateway.mieu01)
  
+**Attention:** component works with the **ZNDMWG03LM** model and firmwares **v1.4.6_0012** and **v1.4.6_0030**. When new firmwares appear - do not update until someone tell you that it is safe!
+
 # Table of Contents
 
 - [Supported Zigbee Devices](#supported-zigbee-devices)
@@ -25,6 +27,7 @@ Thanks to **Serrj** for [instruction](https://community.home-assistant.io/t/xiao
 - [Advanced config](#advanced-config)
 - [Add and remove Zigbee devices](#add-and-remove-zigbee-devices)
 - [Add third-party Zigbee devices](#add-third-party-zigbee-devices)
+- [Zigbee Home Automation Mode](#zigbee-home-automation-mode)
 - [Handle Button Actions](#handle-button-actions)
 - [Handle BLE Locks](#handle-ble-locks)
 - [How it works](#how-it-works)
@@ -124,7 +127,7 @@ To delete a device from Hass and from Gateway - you need to rename device to **d
 
 # Add third-party Zigbee devices
 
-Video Demo:
+**Video Demo**
 
 [![Control non Xiaomi zigbee devices from Xiaomi Gateway 3](https://img.youtube.com/vi/hwtBPMtMnKo/mqdefault.jpg)](https://www.youtube.com/watch?v=hwtBPMtMnKo)
 
@@ -149,6 +152,26 @@ Sometimes it doesn't work the first time and you need to try pairing again.
 The devices added in this way will work even after the Gateway is restarted. They will continue to work without Hass. And they can be used in Mi Home automations.
 
 You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/issues/44).
+
+# Zigbee Home Automation Mode
+
+**Video Demo**
+
+[![Zigbee Home Automation (ZHA) with Xiaomi Gateway 3 on original firmware without soldering](https://img.youtube.com/vi/AEkiUK7wGbs/mqdefault.jpg)](https://www.youtube.com/watch?v=AEkiUK7wGbs)
+
+[Zigbee Home Automation](https://www.home-assistant.io/integrations/zha/) (ZHA) is a standard Home Assistant component for managing Zigbee devices. It works with various radio modules such as CC2531, Conbee II, Tasmoted Sonoff ZBBridge and others.
+
+**Important:** ZHA component is in early development stage. Don't expect it to work well with all devices.
+
+**Attention: ZHA mode cannot work simultaneously with Mi Home!**
+
+When you turn on ZHA mode - zigbee devices in Mi Home will stop working. Bluetooth devices will continue to work.
+
+To switch the mode - delete the old integration and configure the new one in a different mode. Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them again with ZHA.
+
+You can change the operating mode at any time. Just remove the old integration and set up the new one. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
+
+When switching from ZHA to Mi Home mode - restart the gateway. When switching from Mi Home to ZHA - no reboot required.
 
 # Handle Button Actions
 
