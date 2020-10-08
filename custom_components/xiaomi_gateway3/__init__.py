@@ -76,6 +76,10 @@ async def _handle_device_remove(hass: HomeAssistant):
         registry = hass.data['device_registry']
         hass_device = registry.async_get(event.data['device_id'])
 
+        # check empty identifiers
+        if not hass_device.identifiers:
+            return
+
         domain, mac = next(iter(hass_device.identifiers))
         # handle only our devices
         if domain != DOMAIN or hass_device.name_by_user != 'delete':
