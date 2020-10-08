@@ -441,7 +441,8 @@ class Gateway3(Thread):
         elif data['cmd'] == 'write_rsp':
             pkey = 'results'
         else:
-            raise NotImplemented(f"Unsupported cmd: {data}")
+            _LOGGER.warning(f"Unsupported cmd: {data}")
+            return
 
         did = data['did']
 
