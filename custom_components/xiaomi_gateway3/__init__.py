@@ -161,6 +161,8 @@ class Gateway3Device(Entity):
             return {
                 'connections': {(type_, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
+                'manufacturer': self.device.get('device_manufacturer'),
+                'model': self.device['device_model'],
                 'name': self.device['device_name'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }

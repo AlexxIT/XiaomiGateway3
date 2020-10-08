@@ -531,8 +531,10 @@ class Gateway3(Thread):
                 if 'mac' in data['dev'] else \
                 'ble_' + did.replace('blt.3.', '')
             self.devices[did] = device = {
-                'did': did, 'mac': mac, 'init': {}, 'device_name': "BLE",
-                'type': 'ble'}
+                'did': did, 'mac': mac, 'init': {}, 'type': 'ble'}
+            pdid = data['dev'].get('pdid')
+            desc = ble.get_device(pdid)
+            device.update(desc)
         else:
             device = self.devices[did]
 
