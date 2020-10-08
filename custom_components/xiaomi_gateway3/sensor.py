@@ -9,19 +9,24 @@ from .gateway3 import Gateway3
 _LOGGER = logging.getLogger(__name__)
 
 UNITS = {
-    DEVICE_CLASS_TEMPERATURE: TEMP_CELSIUS,
     DEVICE_CLASS_HUMIDITY: '%',
-    DEVICE_CLASS_PRESSURE: 'hPa',
-    DEVICE_CLASS_ILLUMINANCE: 'lm',
+    DEVICE_CLASS_ILLUMINANCE: 'lx',  # zb light and motion and ble flower - lux
     DEVICE_CLASS_POWER: POWER_WATT,
+    DEVICE_CLASS_PRESSURE: 'hPa',
+    DEVICE_CLASS_TEMPERATURE: TEMP_CELSIUS,
+    'conductivity': "µS/cm",
     'consumption': ENERGY_WATT_HOUR,
     'gas density': '% LEL',
     'smoke density': '% obs/ft',
+    'moisture': '%',
 }
 
 ICONS = {
+    'action': 'mdi:bell',
+    'conductivity': 'mdi:flower',
     'consumption': 'mdi:flash',
     'gas density': 'mdi:google-circles-communities',
+    'moisture': 'mdi:water-percent',
     'smoke density': 'mdi:google-circles-communities',
 }
 

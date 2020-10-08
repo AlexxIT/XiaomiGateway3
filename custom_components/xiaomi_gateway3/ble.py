@@ -114,7 +114,7 @@ def parse_xiaomi_ble(event: dict) -> Optional[dict]:
         return {'humidity': int.from_bytes(data, 'little') / 10.0}
 
     elif eid == 0x1007 and length == 3:
-        # Range: 0-120000
+        # Range: 0-120000, lux
         return {'illuminance': int.from_bytes(data, 'little')}
 
     elif eid == 0x1008 and length == 1:
