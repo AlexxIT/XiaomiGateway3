@@ -23,7 +23,8 @@ class Gateway3(Thread):
     pair_model = None
     pair_payload = None
 
-    def __init__(self, host: str, token: str, config: dict, zha: bool = False):
+    def __init__(self, host: str, token: str, config: dict, ble: bool = True,
+                 zha: bool = False):
         super().__init__(daemon=True)
 
         self.host = host
@@ -37,7 +38,7 @@ class Gateway3(Thread):
         self.mqtt.on_message = self.on_message
         self.mqtt.connect_async(host)
 
-        self.ble = GatewayBLE(self)
+        self.ble = GatewayBLE(self) if ble else None
 
         self.debug = config['debug'] if 'debug' in config else ''
         self.devices = config['devices'] if 'devices' in config else {}
@@ -70,7 +71,8 @@ class Gateway3(Thread):
                 break
 
         # start bluetooth read loop
-        self.ble.start()
+        if self.ble:
+            self.ble.start()
 
         while True:
             # if not telnet - enable it

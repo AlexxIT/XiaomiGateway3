@@ -9,6 +9,7 @@
         "data": {
           "host": "Host",
           "token": "Token",
+          "ble": "Support BLE Devices",
           "zha": "Zigbee Home Automation Mode"
         }
       }

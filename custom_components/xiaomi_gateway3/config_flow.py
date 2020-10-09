@@ -24,6 +24,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required('host'): str,
                 vol.Required('token'): str,
+                vol.Required('ble', default=True): bool,
                 vol.Required('zha', default=False): bool
             }),
             description_placeholders={
