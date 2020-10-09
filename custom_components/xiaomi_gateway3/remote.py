@@ -37,6 +37,10 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         return self._state
 
     @property
+    def state_attributes(self):
+        return self._attrs
+
+    @property
     def icon(self):
         return 'mdi:zigbee'
 
@@ -57,6 +61,10 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             )
             persistent_notification.async_create(self.hass, text,
                                                  "Xiaomi Gateway 3")
+
+        elif 'network_pan_id' in data:
+            self._attrs.update(data)
+            self.schedule_update_ha_state()
 
     def turn_on(self):
         self.gw.send(self.device, {'pairing_start': 60})
