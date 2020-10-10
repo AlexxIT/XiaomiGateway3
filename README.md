@@ -10,7 +10,11 @@ Gateway support **Zigbee 3**, **Bluetooth Mesh** and **HomeKit**.
 
 This method does not change the device firmware. Gateway continues to work with Mi Home and HomeKit.
 
-Thanks to **Serrj** for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on this device.
+**Real [user](https://github.com/to4ko/myconfig) config with 3 Gateways**
+
+<img src="integrations.png" width="758">
+
+Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on this device.
 
 **Important:** This component does not work with:
  - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
@@ -172,6 +176,8 @@ To switch the mode - delete the old integration and configure the new one in a d
 You can change the operating mode at any time. Just remove the old integration and set up the new one. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
 
 When switching from ZHA to Mi Home mode - restart the gateway. When switching from Mi Home to ZHA - no reboot required.
+
+Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
 
 # Handle Button Actions
 
