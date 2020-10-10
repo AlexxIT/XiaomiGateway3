@@ -297,7 +297,8 @@ class Gateway3(Thread):
                     'model': data[did + '.model'],
                     'type': 'zigbee',
                     'zb_ver': data[did + '.version'],
-                    'init': utils.fix_xiaomi_props(params)
+                    'init': utils.fix_xiaomi_props(params),
+                    'online': retain['alive']
                 }
                 devices.append(device)
 
@@ -477,6 +478,9 @@ class Gateway3(Thread):
             elif prop == 'battery' and param['value'] > 1000:
                 # xiaomi light sensor
                 payload[prop] = round((min(param['value'], 3200) - 2500) / 7)
+            elif prop == 'alive':
+                # {'res_name':'8.0.2102','value':{'status':'online','time':0}}
+                device['online'] = (param['value']['status'] == 'online')
             elif prop == 'angle':
                 # xiaomi cube 100 points = 360 degrees
                 payload[prop] = param['value'] * 4

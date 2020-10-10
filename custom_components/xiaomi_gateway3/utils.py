@@ -334,6 +334,7 @@ GLOBAL_PROP = {
     '8.0.2042': 'max_power',
     '8.0.2044': 'plug_detection',
     '8.0.2101': 'nl_invert',  # ctrl_86plug
+    '8.0.2102': 'alive',
     '8.0.9001': 'battery_end_of_life'
 }
 

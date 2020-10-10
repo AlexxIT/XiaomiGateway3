@@ -22,9 +22,8 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
         return self._state
 
     def update(self, data: dict = None):
-        if self._attr not in data:
-            return
-        self._state = data[self._attr] == 1
+        if self._attr in data:
+            self._state = data[self._attr] == 1
         self.schedule_update_ha_state()
 
     def turn_on(self):

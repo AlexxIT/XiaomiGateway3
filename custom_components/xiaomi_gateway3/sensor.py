@@ -61,9 +61,8 @@ class Gateway3Sensor(Gateway3Device):
         return ICONS.get(self._attr)
 
     def update(self, data: dict = None):
-        if self._attr not in data:
-            return
-        self._state = data[self._attr]
+        if self._attr in data:
+            self._state = data[self._attr]
         self.schedule_update_ha_state()
 
 
@@ -123,14 +122,14 @@ class Gateway3Action(Gateway3Device):
                 data = {'vibration': 2, 'angle': v, self._attr: 'tilt'}
                 break
 
-        if self._attr not in data:
-            return
+        if self._attr in data:
+            # TODO: fix me
+            self._attrs = data
+            self._state = data[self._attr]
+            self.async_write_ha_state()
 
-        self._attrs = data
-        self._state = data[self._attr]
-        self.async_write_ha_state()
+            time.sleep(.1)
 
-        time.sleep(.1)
+            self._state = ''
 
-        self._state = ''
         self.async_schedule_update_ha_state()
