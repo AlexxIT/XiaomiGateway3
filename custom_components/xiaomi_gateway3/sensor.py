@@ -22,7 +22,6 @@ UNITS = {
 }
 
 ICONS = {
-    'action': 'mdi:bell',
     'conductivity': 'mdi:flower',
     'consumption': 'mdi:flash',
     'gas density': 'mdi:google-circles-communities',
@@ -103,6 +102,10 @@ class Gateway3Action(Gateway3Device):
     @property
     def state_attributes(self):
         return self._attrs
+
+    @property
+    def icon(self):
+        return 'mdi:bell'
 
     def update(self, data: dict = None):
         for k, v in data.items():
