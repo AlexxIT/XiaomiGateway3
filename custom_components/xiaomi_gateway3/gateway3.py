@@ -386,10 +386,14 @@ class Gateway3(Thread):
         _LOGGER.debug(f"{self.host} | MQTT connected")
         self.mqtt.subscribe('#')
 
+        self.process_gw_message({'online': True})
+
     def on_disconnect(self, client, userdata, rc):
         _LOGGER.debug(f"{self.host} | MQTT disconnected")
         # force end mqtt.loop_forever()
         self.mqtt.disconnect()
+
+        self.process_gw_message({'online': False})
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
         if 'mqtt' in self.debug:
@@ -400,7 +404,7 @@ class Gateway3(Thread):
             self.process_message(payload)
         elif msg.topic.endswith('/heartbeat'):
             payload = json.loads(msg.payload)
-            self.process_heartbeat(payload)
+            self.process_gw_message(payload)
         elif self.pair_model and msg.topic.endswith('/commands'):
             self.process_pair(msg.payload)
 
@@ -505,15 +509,23 @@ class Gateway3(Thread):
             device['init'] = payload
             self.setup_devices([device])
 
-    def process_heartbeat(self, payload: json):
-        _LOGGER.debug(f"{self.host} | heartbeat <= {payload}")
-        if 'lumi.0' in self.updates:
-            for handler in self.updates['lumi.0']:
-                handler({
-                    'network_pan_id': payload['networkPanId'],
-                    'radio_tx_power': payload['radioTxPower'],
-                    'radio_channel': payload['radioChannel'],
-                })
+    def process_gw_message(self, payload: json):
+        _LOGGER.debug(f"{self.host} | gateway <= {payload}")
+
+        if 'lumi.0' not in self.updates:
+            return
+
+        if 'networkUp' in payload:
+            payload = {
+                'network_pan_id': payload['networkPanId'],
+                'radio_tx_power': payload['radioTxPower'],
+                'radio_channel': payload['radioChannel'],
+            }
+        elif 'online' in payload:
+            self.device['online'] = payload['online']
+
+        for handler in self.updates['lumi.0']:
+            handler(payload)
 
     def process_pair(self, raw: bytes):
         # get shortID and eui64 of paired device
