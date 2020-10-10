@@ -317,7 +317,7 @@ class Gateway3(Thread):
             resp = self.miio.send("enable_telnet_service")
             return resp[0] == 'ok'
         except Exception as e:
-            _LOGGER.exception(f"Can't enable telnet: {e}")
+            _LOGGER.debug(f"Can't enable telnet: {e}")
             return False
 
     def _enable_mqtt(self):
