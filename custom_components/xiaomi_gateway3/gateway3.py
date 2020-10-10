@@ -622,6 +622,27 @@ class Gateway3(Thread):
         payload = json.dumps(payload, separators=(',', ':')).encode()
         self.mqtt.publish('zigbee/recv', payload)
 
+    def send_telnet(self, *args: str):
+        try:
+            telnet = Telnet(self.host, timeout=5)
+            telnet.read_until(b"login: ")
+            telnet.write(b"admin\r\n")
+            telnet.read_until(b"\r\n# ")  # skip greeting
+
+            for command in args:
+                telnet.write(command.encode() + b'\r\n')
+                telnet.read_until(b"\r\n")  # skip command
+
+            telnet.close()
+
+        except Exception as e:
+            _LOGGER.exception(f"Telnet command error: {e}")
+
+    def send_mqtt(self, cmd: str):
+        if cmd == 'publishstate':
+            mac = self.device['mac'][2:].upper()
+            self.mqtt.publish(f"gw/{mac}/publishstate")
+
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():
             if device.get('mac') == mac:
