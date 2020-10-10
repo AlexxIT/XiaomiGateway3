@@ -298,7 +298,7 @@ class Gateway3(Thread):
                     'type': 'zigbee',
                     'zb_ver': data[did + '.version'],
                     'init': utils.fix_xiaomi_props(params),
-                    'online': retain['alive']
+                    'online': retain.get('alive', 1) == 1
                 }
                 devices.append(device)
 
