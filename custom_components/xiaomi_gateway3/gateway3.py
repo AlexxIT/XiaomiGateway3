@@ -448,7 +448,7 @@ class Gateway3(Thread):
             pkey = 'res_list'
         elif data['cmd'] == 'report':
             pkey = 'params' if 'params' in data else 'mi_spec'
-        elif data['cmd'] == 'write_rsp':
+        elif data['cmd'] in ('write_rsp', 'read_rsp'):
             pkey = 'results'
         else:
             _LOGGER.warning(f"Unsupported cmd: {data}")
