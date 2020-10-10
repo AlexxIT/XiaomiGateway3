@@ -5,6 +5,7 @@ DEVICES = {
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
+    1115: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD"],
     1371: ["Xiaomi", "TH Sensor 2", "LYWSD03MMC"],
     1694: ["Aqara", "Door Lock N100", "ZNMS16LM"],
