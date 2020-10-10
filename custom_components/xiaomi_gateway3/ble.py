@@ -9,6 +9,7 @@ DEVICES = {
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD"],
     1371: ["Xiaomi", "TH Sensor 2", "LYWSD03MMC"],
     1694: ["Aqara", "Door Lock N100", "ZNMS16LM"],
+    1747: ["Xaiomi", "ZenMeasure Clock", "MHO-C303"],
     1983: ["Yeelight", "Button S1", "YLAI003"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
 }
