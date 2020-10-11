@@ -1,10 +1,26 @@
 {
   "config": {
-    "error":{
-      "text": "{error_text}"
+    "error": {
+      "no_servers": "Please select at least one server",
+      "cant_login": "Can't login. Check logs for more info"
     },
     "step": {
       "user": {
+        "title": "Select Action",
+        "data": {
+          "action": "action"
+        }
+      },
+      "cloud": {
+        "title": "Add Mi Cloud Account",
+        "description": "Select only those servers where you have devices",
+        "data": {
+          "username": "Email / Mi Account ID",
+          "password": "Password",
+          "servers": "Servers"
+        }
+      },
+      "token": {
         "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token {error_text}",
         "data": {
           "host": "Host",
@@ -12,6 +28,17 @@
           "ble": "Support BLE Devices",
           "zha": "Zigbee Home Automation Mode"
         }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "MiCloud devices info",
+        "data": {
+          "did": "Device"
+        },
+        "description": "{device_info}"
       }
     }
   }

@@ -4,10 +4,14 @@ import voluptuous as vol
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.storage import Store
+from homeassistant.util import sanitize_filename
 
 from . import utils
 from .gateway3 import Gateway3
+from .xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,6 +34,9 @@ CONFIG_SCHEMA = vol.Schema({
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
     config = hass_config.get(DOMAIN) or {}
+
+    config.setdefault('devices', {})
+
     if 'debug' in config:
         debug = utils.XiaomiGateway3Debug(hass)
         _LOGGER.setLevel(logging.DEBUG)
@@ -43,6 +50,12 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry):
+    """Support two kind of enties - MiCloud and Gateway."""
+
+    # entry for MiCloud login
+    if 'servers' in config_entry.data:
+        return await _setup_micloud_entry(hass, config_entry)
+
     config = hass.data[DOMAIN]['config']
 
     hass.data[DOMAIN][config_entry.entry_id] = \
@@ -62,6 +75,59 @@ async def async_setup_entry(hass: HomeAssistant, config_entry):
 
 # async def async_unload_entry(hass: HomeAssistant, config_entry):
 #     return True
+
+async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
+    data: dict = config_entry.data.copy()
+
+    session = async_create_clientsession(hass)
+    cloud = MiCloud(session)
+
+    if 'service_token' in data:
+        # load devices with saved MiCloud auth
+        cloud.auth = data
+        devices = await cloud.get_total_devices(data['servers'])
+    else:
+        devices = None
+
+    if devices is None:
+        _LOGGER.debug(f"Login to MiCloud for {config_entry.title}")
+        if await cloud.login(data['username'], data['password']):
+            # update MiCloud auth in .storage
+            data.update(cloud.auth)
+            hass.config_entries.async_update_entry(config_entry, data=data)
+
+            devices = await cloud.get_total_devices(data['servers'])
+            if devices is None:
+                _LOGGER.error("Can't load devices from MiCloud")
+
+        else:
+            _LOGGER.error("Can't login to MiCloud")
+
+    # load devices from or save to .storage
+    filename = sanitize_filename(data['username'])
+    store = Store(hass, 1, f"{DOMAIN}/{filename}.json")
+    if devices is None:
+        _LOGGER.debug("Loading a list of devices from the .storage")
+        devices = await store.async_load()
+    else:
+        _LOGGER.debug(f"Loaded from MiCloud {len(devices)} devices")
+        await store.async_save(devices)
+
+    if devices is None:
+        _LOGGER.debug("No devices in .storage")
+        return False
+
+    # TODO: Think about a bunch of devices
+    if 'devices' not in hass.data[DOMAIN]:
+        hass.data[DOMAIN]['devices'] = devices
+    else:
+        hass.data[DOMAIN]['devices'] += devices
+
+    default_devices = hass.data[DOMAIN]['config']['devices']
+    for device in devices:
+        default_devices[device['did']] = {'device_name': device['name']}
+
+    return True
 
 
 async def _handle_device_remove(hass: HomeAssistant):

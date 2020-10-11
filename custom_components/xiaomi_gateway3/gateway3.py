@@ -41,7 +41,9 @@ class Gateway3(Thread):
         self.ble = GatewayBLE(self) if ble else None
 
         self.debug = config['debug'] if 'debug' in config else ''
-        self.devices = config['devices'] if 'devices' in config else {}
+        self.default_devices = config['devices']
+
+        self.devices = {}
         self.updates = {}
         self.setups = {}
 
@@ -421,7 +423,8 @@ class Gateway3(Thread):
             device.update(desc)
 
             # update params from config
-            default_config = self.devices.get(device['mac'])
+            default_config = self.default_devices.get(device['mac']) or \
+                             self.default_devices.get(device['did'])
             if default_config:
                 device.update(default_config)
 
@@ -566,6 +569,12 @@ class Gateway3(Thread):
             pdid = data['dev'].get('pdid')
             desc = ble.get_device(pdid)
             device.update(desc)
+
+            # update params from config
+            default_config = self.default_devices.get(did)
+            if default_config:
+                device.update(default_config)
+
         else:
             device = self.devices[did]
 
