@@ -2,7 +2,7 @@
   "config": {
     "error": {
       "no_servers": "Please select at least one server",
-      "cant_login": "Can't login. Check logs for more info"
+      "cant_login": "Can't login, check username and password"
     },
     "step": {
       "user": {

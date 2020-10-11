@@ -48,7 +48,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                     description_placeholders={'error_text': ''}
                 )
 
-        if 'devices' in self.hass.data[DOMAIN]:
+        if DOMAIN in self.hass.data and 'devices' in self.hass.data[DOMAIN]:
             for device in self.hass.data[DOMAIN]['devices']:
                 if (device['model'] == 'lumi.gateway.mgl03' and
                         device['did'] not in ACTIONS):
@@ -65,7 +65,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_cloud(self, user_input=None, error=None):
         if user_input:
             if not user_input['servers']:
-                return self.async_step_cloud(error='no_servers')
+                return await self.async_step_cloud(error='no_servers')
 
             session = async_create_clientsession(self.hass)
             cloud = MiCloud(session)
@@ -76,7 +76,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                                                data=user_input)
 
             else:
-                return self.async_step_cloud(error='cant_login')
+                return await self.async_step_cloud(error='cant_login')
 
         return self.async_show_form(
             step_id='cloud',
