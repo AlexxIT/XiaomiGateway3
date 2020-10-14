@@ -24,6 +24,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 
 # Table of Contents
 
+- [Supported Firmwares](#supported-firmwares)
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
 - [Install](#install)
@@ -36,6 +37,19 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Handle BLE Locks](#handle-ble-locks)
 - [How it works](#how-it-works)
 - [Debug mode](#debug-mode)
+
+# Supported Firmwares
+
+**ZNDMWG03LM (Chinese version, US plug)**
+- v1.4.4_0003 - factory firmware, supported
+- v1.4.5_0012 - factory firmware, supported
+- v1.4.5_0016 - safe to update, supported
+- v1.4.6_0012 - safe to update, supported
+- v1.4.6_0030 - was available in summer 2020, now unavailable, supported
+- v1.4.7_0040 - some users started receiving updates, **telnet cannot be opened**
+
+**ZNDMWG02LM (Euro version, EU plug)**
+- v1.4.6_0043 - factory firmware, **telnet has a password**
 
 # Supported Zigbee Devices
 
