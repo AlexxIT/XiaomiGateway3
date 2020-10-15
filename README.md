@@ -24,6 +24,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 
 # Table of Contents
 
+- [FAQ](#faq)
 - [Supported Firmwares](#supported-firmwares)
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
@@ -35,8 +36,47 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Zigbee Home Automation Mode](#zigbee-home-automation-mode)
 - [Handle Button Actions](#handle-button-actions)
 - [Handle BLE Locks](#handle-ble-locks)
+- [Obtain Mi Home device token](#obtain-mi-home-device-token)
 - [How it works](#how-it-works)
 - [Debug mode](#debug-mode)
+
+# FAQ
+
+**Q. Can Xiaomi close support for this integration in firmware updates?**  
+A. Yes, they can and are already doing it. But if you have a worked hub and you do not update it, it will continue to work.
+
+**Q. Does this integration support hubs DGNWG02LM, DGNWG05LM, Aqara Hub...?**  
+A. No. The integration only supports ZNDMWG03LM.
+
+**Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**  
+A. No. The integration does not support Xiaomi Wi-Fi devices.
+
+**Q. Does the integration work without internet?**  
+A. Yes. The component connects to a hub on the local network. But adding new Zigbee devices to Mi Home requires Internet.
+
+**Q. Does the integration support non Xiaomi Zigbee devices?**  
+A. Yes. There are two ways to connect third party Zigbee devices. The first method allows devices to work in both Mi Home and Hass at the same time. The second method (ZHA) disconnects the hub from Mi Home and only works with Hass. Both methods have a different set of supported devices. There is no exact supported list. Don't expect absolutely every device on the market to be supported in any of these methods.
+
+**Q. Will the Zigbee devices continue to work in Mi Home?**  
+A. Yes. If you do not enable ZHA mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
+
+**Q. Do I need to receive a token or enable Telnet manually?**  
+A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
+
+**Q. Should I open or solder the hub?**  
+A. No. The component works with the hub on original firmware without modifications.
+
+**Q. Should I use ZHA mode?**  
+A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best not to enable ZHA. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
+
+**Q. How many Zigbee devices does the hub support?**  
+A. Official Xiaomi documentation says that 32 devices with direct connection. And 128 devices using routers. Most wired Zigbee devices are routers. Newer expensive hubs (like Aqara M2) have the same parameters. Don't expect to get better numbers by paying 3-4 times the price.
+
+**Q. Does the component support decoupled mode for switches?**  
+A. Yes, but it needs to be turned on in the Mi Home app.
+
+**Q. Why does the two-button switch only have one entity action?**  
+A. All button clicks are displayed in the status of that one entity.
 
 # Supported Firmwares
 
@@ -79,11 +119,9 @@ Tested Devices:
 
 Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
 
-Plans to support for Zigbee devices from other manufacturers. May be support for [ZHA](https://www.home-assistant.io/integrations/zha/).
-
 # Supported BLE Devices
 
-Demo video:
+**Video DEMO**
 
 [![Xiaomi Rubik's Cube](https://img.youtube.com/vi/4D_vqvUre_0/mqdefault.jpg)](https://www.youtube.com/watch?v=4D_vqvUre_0)
 
@@ -97,7 +135,6 @@ Tested Devices:
 - Xiaomi TH Sensor (LYWSDCGQ/01ZM)
 - Xiaomi TH Watch (LYWSD02MMC)
 
-
 Currently supported, but not tested, other Xiaomi BLE devices officially supported by the Gateway with these attributes:
 
 > temperature, humidity, motion, illuminance, moisture, conductivity, formaldehyde, mosquitto, battery
@@ -106,7 +143,7 @@ BLE devices and their attributes do not appear immediately! And don't save their
 
 # Install
 
-HOWTO video:
+**Video DEMO**
 
 [![Xiaomi Gateway 3 control from Home Assistant](https://img.youtube.com/vi/CQVSFISC9CE/mqdefault.jpg)](https://www.youtube.com/watch?v=CQVSFISC9CE)
 
@@ -116,9 +153,11 @@ Or manually copy `xiaomi_gateway3` folder from latest release to `custom_compone
 
 # Config
 
-With GUI. Configuration > Integration > Xiaomi Gateway 3. And enter Gateway **IP address** and **Mi Home token**.
+**Video DEMO**
 
-You need [obtain Mi Home token](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). I am using the [method with Mi Home v5.4.54](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md#non-rooted-android-phones) for non-rooted Android. If you don't have an Android - you can install the [emulator on Windows](https://www.bignox.com/).
+[![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
+
+With GUI. Configuration > Integration > Xiaomi Gateway 3.
 
 **Attention:** The component is under active development. Breaking changes may appear.
 
@@ -145,7 +184,7 @@ To delete a device from Hass and from Gateway - you need to rename device to **d
 
 # Add third-party Zigbee devices
 
-**Video Demo**
+**Video DEMO**
 
 [![Control non Xiaomi zigbee devices from Xiaomi Gateway 3](https://img.youtube.com/vi/hwtBPMtMnKo/mqdefault.jpg)](https://www.youtube.com/watch?v=hwtBPMtMnKo)
 
@@ -173,7 +212,7 @@ You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/iss
 
 # Zigbee Home Automation Mode
 
-**Video Demo**
+**Video DEMO**
 
 [![Zigbee Home Automation (ZHA) with Xiaomi Gateway 3 on original firmware without soldering](https://img.youtube.com/vi/AEkiUK7wGbs/mqdefault.jpg)](https://www.youtube.com/watch?v=AEkiUK7wGbs)
 
@@ -332,6 +371,14 @@ automation:
         Opening method: {{ trigger.to_state.attributes['method'] }}
         User ID: {{ trigger.to_state.attributes['key_id'] }}
 ```
+
+# Obtain Mi Home device token
+
+**Video DEMO**
+
+[![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
+
+You can use this integration to **get a token for any of your Xiaomi devices**. You don't need to have Xiaomi Gateway 3. Just install and add the integration, enter the username / password from your Mi Home account. And use the integration settings to view your account's device tokens.
 
 # How it works
 
