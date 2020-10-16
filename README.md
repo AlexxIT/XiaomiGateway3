@@ -86,10 +86,11 @@ A. All button clicks are displayed in the status of that one entity.
 - v1.4.5_0016 - safe to update, supported
 - v1.4.6_0012 - safe to update, supported
 - v1.4.6_0030 - was available in summer 2020, now unavailable, supported
-- v1.4.7_0040 - some users started receiving updates, **telnet cannot be opened**
+- v1.4.7_0040 - some users started receiving updates, **not supported** (telnet cannot be opened)
+- v1.4.7_0063 - some users started receiving updates, **not supported** (telnet cannot be opened)
 
 **ZNDMWG02LM (Euro version, EU plug)**
-- v1.4.6_0043 - factory firmware, **telnet has a password**
+- v1.4.6_0043 - factory firmware, **not supported** (telnet has a password)
 
 # Supported Zigbee Devices
 
@@ -149,7 +150,7 @@ BLE devices and their attributes do not appear immediately! And don't save their
 
 You can install component with HACS custom repo ([example](https://github.com/AlexxIT/SonoffLAN#install-with-hacs)): `AlexxIT/XiaomiGateway3`.
 
-Or manually copy `xiaomi_gateway3` folder from latest release to `custom_components` folder in your config folder.
+Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.com/AlexxIT/XiaomiGateway3/releases/latest) to `custom_components` folder in your config folder.
 
 # Config
 
