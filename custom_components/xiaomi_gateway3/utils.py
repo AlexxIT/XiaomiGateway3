@@ -292,18 +292,6 @@ DEVICES = [{
         ['14.4.85', 'run_state', 'run_state', None],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
-}, {  # OTHER MANUFACTURERS
-    'TRADFRI bulb E27 W opal 1000lm': ["IKEA", "Bulb E27"],
-    'LWB010': ["Philips", "Hue Bulb E27"],
-    'FNB56-ZSC01LX1.2': ["Ali", "Dimmer"],
-    'params': [
-        [None, None, 'light', 'light'],
-    ]
-}, {
-    'MS01': ["Sonoff", "Motion Sensor"],
-    'params': [
-        [None, None, 'motion', 'binary_sensor'],
-    ]
 }]
 
 GLOBAL_PROP = {
