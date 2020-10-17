@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 DEVICES = {
+    # BLE
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
@@ -13,6 +14,9 @@ DEVICES = {
     1747: ["Xaiomi", "ZenMeasure Clock", "MHO-C303"],
     1983: ["Yeelight", "Button S1", "YLAI003"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
+    # Mesh
+    1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
+    2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
 }
 
 BLE_FINGERPRINT_ACTION = [
@@ -236,7 +240,41 @@ def parse_xiaomi_ble(event: dict) -> Optional[dict]:
     return None
 
 
-def get_device(pdid: int) -> Optional[dict]:
+MESH_PROPS = [None, 'light', 'brightness', 'color_temp']
+
+
+def parse_xiaomi_mesh(data: list):
+    """Can receive multiple properties from multiple devices."""
+    result = {}
+
+    for payload in data:
+        if payload['siid'] != 2 or payload.get('code', 0) != 0:
+            continue
+
+        did = payload['did']
+        key = MESH_PROPS[payload['piid']]
+        result.setdefault(did, {})[key] = payload['value']
+
+    return result
+
+
+def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
+    if isinstance(data, dict):
+        return [{
+            'did': did,
+            'siid': 2,
+            'piid': MESH_PROPS.index(k),
+            'value': v
+        } for k, v in data.items()]
+    else:
+        return [{
+            'did': did,
+            'siid': 2,
+            'piid': MESH_PROPS.index(k),
+        } for k in data]
+
+
+def get_device(pdid: int, default_name: str) -> Optional[dict]:
     if pdid in DEVICES:
         desc = DEVICES[pdid]
         return {
@@ -246,6 +284,6 @@ def get_device(pdid: int) -> Optional[dict]:
         }
     else:
         return {
-            'device_name': "BLE",
+            'device_name': default_name,
             'device_model': pdid
         }

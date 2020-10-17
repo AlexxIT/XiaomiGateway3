@@ -1,3 +1,8 @@
+"""Two classes for read Unqlite and SQLite DB files frow raw bytes. Default
+python sqlite3 library can't read DB from memory.
+"""
+
+
 class Unqlite:
     page_size = 0
     pos = 0
@@ -70,3 +75,98 @@ class Unqlite:
             page_offset += self.page_size
 
         return result
+
+
+class SQLite:
+    page_size = 0
+    pos = 0
+
+    def __init__(self, raw: bytes):
+        self.raw = raw
+        self.read_db_header()
+
+    @property
+    def size(self):
+        return len(self.raw)
+
+    def read(self, length: int):
+        self.pos += length
+        return self.raw[self.pos - length:self.pos]
+
+    def read_int(self, length: int):
+        return int.from_bytes(self.read(length), 'big')
+
+    def read_varint(self):
+        result = 0
+        while True:
+            i = self.read_int(1)
+            result += i & 0x7f
+            if i < 0x80:
+                break
+            result <<= 7
+
+        return result
+
+    def read_db_header(self):
+        assert self.read(16) == b'SQLite format 3\0', "Wrong file signature"
+        self.page_size = self.read_int(2)
+
+    def read_page(self, page_num: int):
+        self.pos = 100 if page_num == 0 else self.page_size * page_num
+
+        page_type = self.read(1)
+        # check if page is leaf table b-tree page
+        assert page_type == b'\x0D'
+
+        first_block = self.read_int(2)
+        cells_num = self.read_int(2)
+        cells_pos = self.read_int(2)
+        fragmented_free_bytes = self.read_int(1)
+
+        cells_pos = [self.read_int(2) for _ in range(cells_num)]
+        rows = []
+
+        for cell_pos in cells_pos:
+            self.pos = self.page_size * page_num + cell_pos
+
+            payload_len = self.read_varint()
+            rowid = self.read_varint()
+
+            columns_type = []
+
+            payload_pos = self.pos
+            header_size = self.read_varint()
+            while self.pos < payload_pos + header_size:
+                column_type = self.read_varint()
+                columns_type.append(column_type)
+
+            cells = []
+
+            for column_type in columns_type:
+                if column_type == 0:
+                    data = rowid
+                elif 1 <= column_type <= 4:
+                    data = self.read_int(column_type)
+                elif column_type == 5:
+                    data = self.read_int(6)
+                elif column_type == 6:
+                    data = self.read_int(8)
+                elif column_type == 7:
+                    # TODO: float
+                    data = self.read(8)
+                elif column_type == 8:
+                    data = 0
+                elif column_type == 9:
+                    data = 1
+                elif column_type >= 12 and column_type % 2 == 0:
+                    length = int((column_type - 12) / 2)
+                    data = self.read(length)
+                else:
+                    length = int((column_type - 13) / 2)
+                    data = self.read(length).decode()
+
+                cells.append(data)
+
+            rows.append(cells)
+
+        return rows

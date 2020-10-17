@@ -227,7 +227,7 @@ class Gateway3Device(Entity):
                 'sw_version': self.device['zb_ver'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
-        elif type_ == 'ble':
+        elif type_ == 'bluetooth':
             return {
                 'connections': {(type_, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},

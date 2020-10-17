@@ -9,9 +9,9 @@ from threading import Thread
 from typing import Optional, Union
 
 from paho.mqtt.client import Client, MQTTMessage
-from . import ble, utils
+from . import bluetooth, utils
 from .miio_fix import Device
-from .unqlite import Unqlite
+from .unqlite import Unqlite, SQLite
 from .utils import GLOBAL_PROP
 
 _LOGGER = logging.getLogger(__name__)
@@ -565,9 +565,9 @@ class Gateway3(Thread):
                 if 'mac' in data['dev'] else \
                 'ble_' + did.replace('blt.3.', '')
             self.devices[did] = device = {
-                'did': did, 'mac': mac, 'init': {}, 'type': 'ble'}
+                'did': did, 'mac': mac, 'init': {}, 'type': 'bluetooth'}
             pdid = data['dev'].get('pdid')
-            desc = ble.get_device(pdid)
+            desc = bluetooth.get_device(pdid, 'BLE')
             device.update(desc)
 
             # update params from config
@@ -581,9 +581,9 @@ class Gateway3(Thread):
         if isinstance(data['evt'], list):
             # check if only one
             assert len(data['evt']) == 1, data
-            payload = ble.parse_xiaomi_ble(data['evt'][0])
+            payload = bluetooth.parse_xiaomi_ble(data['evt'][0])
         elif isinstance(data['evt'], dict):
-            payload = ble.parse_xiaomi_ble(data['evt'])
+            payload = bluetooth.parse_xiaomi_ble(data['evt'])
         else:
             payload = None
 
@@ -598,7 +598,7 @@ class Gateway3(Thread):
 
             device['init'][k] = payload[k]
 
-            domain = ble.get_ble_domain(k)
+            domain = bluetooth.get_ble_domain(k)
             if not domain:
                 continue
 
@@ -611,6 +611,32 @@ class Gateway3(Thread):
         if did in self.updates:
             for handler in self.updates[did]:
                 handler(payload)
+
+    def process_mesh_data(self, raw: Union[bytes, list]):
+        data = json.loads(raw[10:])['params'] \
+            if isinstance(raw, bytes) else raw
+
+        _LOGGER.debug(f"{self.host} | Process Mesh {data}")
+
+        data = bluetooth.parse_xiaomi_mesh(data)
+        for did, payload in data.items():
+            device = self.devices.get(did)
+            if not device:
+                _LOGGER.warning("Unknown mesh device, reboot Hass may helps")
+                return
+
+            if 'init' not in device:
+                device['init'] = payload
+
+                # wait domain init
+                while 'light' not in self.setups:
+                    time.sleep(1)
+
+                self.setups['light'](self, device, 'light')
+
+            if did in self.updates:
+                for handler in self.updates[did]:
+                    handler(payload)
 
     def send(self, device: dict, data: dict):
         # convert hass prop to lumi prop
@@ -652,6 +678,11 @@ class Gateway3(Thread):
             mac = self.device['mac'][2:].upper()
             self.mqtt.publish(f"gw/{mac}/publishstate")
 
+    def send_mesh(self, device: dict, data: dict):
+        did = device['did']
+        payload = bluetooth.pack_xiaomi_mesh(did, data)
+        self.miio.send('set_properties', payload)
+
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():
             if device.get('mac') == mac:
@@ -660,6 +691,8 @@ class Gateway3(Thread):
 
 
 class GatewayBLE(Thread):
+    devices_loaded = False
+
     def __init__(self, gw: Gateway3):
         super().__init__(daemon=True)
         self.gw = gw
@@ -673,6 +706,10 @@ class GatewayBLE(Thread):
                 telnet.write(b"admin\r\n")
                 telnet.read_until(b"\r\n# ")  # skip greeting
 
+                if not self.devices_loaded:
+                    self.get_devices(telnet)
+                    self.devices_loaded = True
+
                 telnet.write(b"killall silabs_ncp_bt; "
                              b"silabs_ncp_bt /dev/ttyS1 1\r\n")
                 telnet.read_until(b"\r\n")  # skip command
@@ -685,6 +722,8 @@ class GatewayBLE(Thread):
 
                     if b'_async.ble_event' in raw:
                         self.gw.process_ble_event(raw)
+                    elif b'properties_changed' in raw:
+                        self.gw.process_mesh_data(raw)
 
             except (ConnectionRefusedError, ConnectionResetError, EOFError,
                     socket.timeout):
@@ -693,6 +732,50 @@ class GatewayBLE(Thread):
                 _LOGGER.exception(f"Bluetooth loop error: {e}")
 
             time.sleep(30)
+
+    def get_devices(self, telnet: Telnet):
+        payload = []
+
+        # read bluetooth db
+        telnet.write(b"cat /data/miio/mible_local.db | base64\r\n")
+        telnet.read_until(b'\r\n')  # skip command
+        raw = telnet.read_until(b'# ')
+        raw = base64.b64decode(raw)
+
+        db = SQLite(raw)
+        tables = db.read_page(0)
+        device_page = next(table[3] - 1 for table in tables
+                           if table[1] == 'mesh_device')
+        rows = db.read_page(device_page)
+        for row in rows:
+            did = row[0]
+            mac = row[1].replace(':', '')
+            device = {'did': did, 'mac': mac, 'type': 'bluetooth'}
+            # get device model from pdid
+            desc = bluetooth.get_device(row[2], 'Mesh')
+            device.update(desc)
+
+            # update params from config
+            default_config = self.gw.default_devices.get(did)
+            if default_config:
+                device.update(default_config)
+
+            self.gw.devices[did] = device
+
+            payload += [{'did': did, 'siid': 2, 'piid': p}
+                        for p in range(1, 4)]
+
+        if not payload:
+            return
+
+        # 3 attempts to get actual data
+        for _ in range(3):
+            resp = self.gw.miio.send('get_properties', payload)
+            if all(p['code'] == 0 for p in resp):
+                break
+            time.sleep(1)
+
+        self.gw.process_mesh_data(resp)
 
 
 def is_gw3(host: str, token: str) -> Optional[str]:
