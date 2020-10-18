@@ -6,6 +6,8 @@
 
 Control Zigbee devices from Home Assistant with **Xiaomi Gateway 3 (ZNDMWG03LM)** on original firmware.
 
+**ATTENTION:** The component **does not work with new firmware versions**. Don't update your gateway! Check [supported firmwares](#supported-firmwares).
+
 Gateway support **Zigbee 3**, **Bluetooth Mesh** and **HomeKit**.
 
 This method does not change the device firmware. Gateway continues to work with Mi Home and HomeKit.
@@ -19,8 +21,8 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 **Important:** This component does not work with:
  - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
  - Xiaomi Gateway EU (DGNWG05LM, lumi.gateway.mieu01)
- 
-**Attention:** component works with the **ZNDMWG03LM** model and firmwares **v1.4.6_0012** and **v1.4.6_0030**. When new firmwares appear - do not update until someone tell you that it is safe!
+
+**Attention:** The component is under active development. Breaking changes may appear.
 
 # Table of Contents
 
@@ -28,6 +30,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Supported Firmwares](#supported-firmwares)
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
+- [Supported Bluetooth Mesh Devices](#supported-bluetooth-mesh-devices)
 - [Install](#install)
 - [Config](#config)
 - [Advanced config](#advanced-config)
@@ -96,26 +99,42 @@ A. All button clicks are displayed in the status of that one entity.
 
 Tested Devices:
 - Aqara Bulb (ZNLDP12LM)
-- Aqara Button (WXKG11LM)
+- Aqara Button (WXKG11LM,WXKG12LM)
+- Aqara Single Wall Button (WXKG03LM)
+- Aqara Double Wall Button (WXKG02LM)
 - Aqara Cube (MFKZQ01LM)
 - Aqara Curtain (ZNCLDJ11LM)
+- Aqara B1 Curtain (ZNCLDJ12LM)
 - Aqara Door Sensor (MCCGQ11LM)
-- Aqara Double Wall Button (WXKG02LM)
 - Aqara Motion Sensor (RTCGQ11LM)
-- Aqara Opple Six Button (WXCJKG13LM)
 - Aqara Relay (LLKZMK11LM)
 - Aqara Roller Shade (ZNGZDJ11LM)
 - Aqara Socket (QBCZ11LM)
+- Aqara TH Sensor (WSDCGQ11LM,WSDCGQ12LM)
 - Aqara Vibration Sensor (DJT11LM)
-- Aqara Wall Double Switch (QBKG03LM)
+- Aqara Wall Single Switch (QBKG11LM,QBKG04LM)
+- Aqara Wall Double Switch (QBKG12LM,QBKG03LM)
 - Aqara Water Leak Sensor (SJCGQ11LM)
-- IKEA Bulb E14
+- Aqara Opple Two Button (WXCJKG11LM)
+- Aqara Opple Four Button (WXCJKG12LM)
+- Aqara Opple Six Button (WXCJKG13LM)
+- Aqara D1 Single Wall Button (WXKG06LM)
+- Aqara D1 Double Wall Button (WXKG07LM)
+- Aqara D1 Wall Single Switch (QBKG21LM,QBKG23LM)
+- Aqara D1 Wall Double Switch (QBKG22LM,QBKG24LM)
+- Aqara D1 Wall Triple Switch (QBKG25LM,QBKG26LM)
+- Honeywell Gas Sensor (JTQJ-BF-01LM/BW)
+- Honeywell Smoke Sensor (JTYJ-GD-01LM/BW)
+- IKEA Bulb E14 400 lm (LED1536G5,LED1649C5)
+- IKEA Bulb E27 950 lm (LED1546G12)
+- IKEA Bulb E27 980 lm (LED1545G12)
+- IKEA Bulb E27 1000 lm (LED1623G12)
+- IKEA Bulb GU10 400 lm (LED1650R5,LED1537R6)
 - Xiaomi Button (WXKG01LM)
 - Xiaomi Door Sensor (MCCGQ01LM)
 - Xiaomi Light Sensor (GZCGQ01LM)
 - Xiaomi Motion Sensor (RTCGQ01LM)
-- Xiaomi Plug (ZNCZ02LM)
-- Xiaomi Plug EU (ZNCZ04LM)
+- Xiaomi Plug (ZNCZ02LM,ZNCZ03LM,ZNCZ04LM,ZNCZ12LM)
 - Xiaomi TH Sensor (WSDCGQ01LM)
 
 Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
@@ -127,20 +146,31 @@ Currently supported, but not tested other Xiaomi and Aqara Zibee devices officia
 [![Xiaomi Rubik's Cube](https://img.youtube.com/vi/4D_vqvUre_0/mqdefault.jpg)](https://www.youtube.com/watch?v=4D_vqvUre_0)
 
 Tested Devices:
-- Aqara N100 Smart Door Lock
+- Aqara Door Lock N100 (ZNMS16LM)
+- Xiaomi Alarm Clock (CGD1)
 - Xiaomi Door Sensor 2 (MCCGQ02HL)
-- Xiaomi Flower Monitor (HHCCJCY01)
+- Xiaomi Flower Care (HHCCJCY01)
 - Xiaomi Loock Smart Lock
+- Xiaomi Mosquito Repellent (WX08ZM)
 - Xiaomi Rubik's Cube (XMMF01JQD) - don't sends edge info, only direction!
-- Xiaomi TH Sensor (LYWSD03MMC)
+- Xiaomi TH Clock (LYWSD02MMC)
 - Xiaomi TH Sensor (LYWSDCGQ/01ZM)
-- Xiaomi TH Watch (LYWSD02MMC)
+- Xiaomi TH Sensor 2 (LYWSD03MMC)
+- Xaiomi ZenMeasure Clock (MHO-C303)
 
-Currently supported, but not tested, other Xiaomi BLE devices officially supported by the Gateway with these attributes:
+Other BLE devices also maybe supported...
 
-> temperature, humidity, motion, illuminance, moisture, conductivity, formaldehyde, mosquitto, battery
+Kettles and scooters are not BLE devices. It is not known whether the gateway can work with them. Currently not supported.
 
 BLE devices and their attributes do not appear immediately! And don't save their data across HA reboots! Their data is updated only when the device itself sends them. Temperature, humidity and battery may refresh at different times.
+
+# Supported Bluetooth Mesh Devices
+
+Tested Devices:
+- Xiaomi Mesh Bulb (MJDP09YL)
+- Yeelight Mesh Bulb M2 (YLDP25YL/YLDP26YL)
+
+Other Mesh devices also maybe supported...
 
 # Install
 
@@ -160,7 +190,7 @@ Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.c
 
 With GUI. Configuration > Integration > Xiaomi Gateway 3.
 
-**Attention:** The component is under active development. Breaking changes may appear.
+If the integration is not in the list, you need to clear the browser cache.
 
 # Advanced config
 
