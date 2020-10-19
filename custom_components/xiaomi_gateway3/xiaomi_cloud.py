@@ -26,7 +26,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -36,7 +36,6 @@ import os
 import random
 import string
 import time
-from asyncio.exceptions import TimeoutError
 
 from aiohttp import ClientSession
 
@@ -146,7 +145,7 @@ class MiCloud:
             assert resp['code'] == 0, resp
             return resp['result']['list']
 
-        except TimeoutError:
+        except asyncio.TimeoutError:
             _LOGGER.error("Timeout while loading MiCloud device list")
         except:
             _LOGGER.exception(f"Can't load devices list")
