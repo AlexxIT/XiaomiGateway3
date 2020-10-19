@@ -9,6 +9,7 @@ from .gateway3 import Gateway3
 _LOGGER = logging.getLogger(__name__)
 
 UNITS = {
+    DEVICE_CLASS_BATTERY: '%',
     DEVICE_CLASS_HUMIDITY: '%',
     DEVICE_CLASS_ILLUMINANCE: 'lx',  # zb light and motion and ble flower - lux
     DEVICE_CLASS_POWER: POWER_WATT,
