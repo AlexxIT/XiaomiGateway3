@@ -15,8 +15,10 @@ DEVICES = {
     1983: ["Yeelight", "Button S1", "YLAI003"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     # Mesh
+    996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
+    2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
 }
 
