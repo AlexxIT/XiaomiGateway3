@@ -516,6 +516,8 @@ class Gateway3(Thread):
             elif prop == 'duration':
                 # xiaomi cube
                 payload[prop] = param['value'] / 1000.0
+            elif prop in ('consumption', 'power'):
+                payload[prop] = round(param['value'], 2)
             else:
                 payload[prop] = param['value']
 
