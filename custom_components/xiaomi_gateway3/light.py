@@ -1,10 +1,11 @@
 import logging
+import time
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP
 from homeassistant.util import color
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN, Gateway3Device, bluetooth
 from .gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,6 +83,10 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
     _color_temp = None
 
     @property
+    def should_poll(self) -> bool:
+        return True
+
+    @property
     def is_on(self) -> bool:
         return self._state
 
@@ -107,19 +112,36 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
         return SUPPORT_BRIGHTNESS | SUPPORT_COLOR_TEMP
 
     def update(self, data: dict = None):
+        if data is None:
+            did = self.device['did']
+            try:
+                payload = [{'did': did, 'siid': 2, 'piid': p}
+                           for p in range(1, 4)]
+                resp = self.gw.miio.send('get_properties', payload)
+                data = bluetooth.parse_xiaomi_mesh(resp)[did]
+            except Exception as e:
+                _LOGGER.debug(f"{self.gw.host} | {did} poll error")
+                self.device['online'] = False
+                return
+
+            _LOGGER.debug(f"{self.gw.host} | {did} poll mesh <= {data}")
+        else:
+            did = None
+
+        self.device['online'] = True
+
         if self._attr in data:
             self._state = data[self._attr]
         if 'brightness' in data:
             # 0...65535
             self._brightness = data['brightness'] / 65535.0 * 255.0
-            self._state = True
         if 'color_temp' in data:
             # 2700..6500 => 370..153
             self._color_temp = \
                 color.color_temperature_kelvin_to_mired(data['color_temp'])
-            self._state = True
 
-        self.schedule_update_ha_state()
+        if did is None:
+            self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         payload = {}
@@ -136,7 +158,8 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
             payload[self._attr] = True
 
         self.gw.send_mesh(self.device, payload)
-        pass
+        time.sleep(.5)  # delay before poll actual status
 
     def turn_off(self):
         self.gw.send_mesh(self.device, {self._attr: False})
+        time.sleep(.5)  # delay before poll actual status

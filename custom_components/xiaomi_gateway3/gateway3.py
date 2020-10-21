@@ -418,7 +418,7 @@ class Gateway3(Thread):
                 _LOGGER.debug(f"Unsupported model: {device}")
                 continue
 
-            _LOGGER.debug(f"{self.host} | Setup device {device['model']}")
+            _LOGGER.debug(f"{self.host} | Setup Zigbee device {device}")
 
             device.update(desc)
 
@@ -441,6 +441,28 @@ class Gateway3(Thread):
 
                 attr = param[2]
                 self.setups[domain](self, device, attr)
+
+    def setup_mesh_devices(self, devices: list):
+        for device in devices:
+            desc = bluetooth.get_device(device['model'], 'Mesh')
+            device.update(desc)
+
+            _LOGGER.debug(f"{self.host} | Setup Mesh device {device}")
+
+            # update params from config
+            default_config = self.default_devices.get(device['did'])
+            if default_config:
+                device.update(default_config)
+
+            device['online'] = False
+
+            self.devices[device['did']] = device
+
+            # wait domain init
+            while 'light' not in self.setups:
+                time.sleep(1)
+
+            self.setups['light'](self, device, 'light')
 
     def process_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
@@ -625,15 +647,6 @@ class Gateway3(Thread):
                 _LOGGER.warning("Unknown mesh device, reboot Hass may helps")
                 return
 
-            if 'init' not in device:
-                device['init'] = payload
-
-                # wait domain init
-                while 'light' not in self.setups:
-                    time.sleep(1)
-
-                self.setups['light'](self, device, 'light')
-
             if did in self.updates:
                 for handler in self.updates[did]:
                     handler(payload)
@@ -681,7 +694,7 @@ class Gateway3(Thread):
     def send_mesh(self, device: dict, data: dict):
         did = device['did']
         payload = bluetooth.pack_xiaomi_mesh(did, data)
-        self.miio.send('set_properties', payload)
+        return self.miio.send('set_properties', payload)
 
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():
@@ -707,7 +720,7 @@ class GatewayBLE(Thread):
                 telnet.read_until(b"\r\n# ")  # skip greeting
 
                 if not self.devices_loaded:
-                    self.get_devices(telnet)
+                    self._get_devices(telnet)
                     self.devices_loaded = True
 
                 telnet.write(b"killall silabs_ncp_bt; "
@@ -733,9 +746,7 @@ class GatewayBLE(Thread):
 
             time.sleep(30)
 
-    def get_devices(self, telnet: Telnet):
-        payload = []
-
+    def _get_devices(self, telnet: Telnet):
         # read bluetooth db
         telnet.write(b"cat /data/miio/mible_local.db | base64\r\n")
         telnet.read_until(b'\r\n')  # skip command
@@ -747,35 +758,16 @@ class GatewayBLE(Thread):
         device_page = next(table[3] - 1 for table in tables
                            if table[1] == 'mesh_device')
         rows = db.read_page(device_page)
-        for row in rows:
-            did = row[0]
-            mac = row[1].replace(':', '')
-            device = {'did': did, 'mac': mac, 'type': 'bluetooth'}
-            # get device model from pdid
-            desc = bluetooth.get_device(row[2], 'Mesh')
-            device.update(desc)
-
-            # update params from config
-            default_config = self.gw.default_devices.get(did)
-            if default_config:
-                device.update(default_config)
-
-            self.gw.devices[did] = device
-
-            payload += [{'did': did, 'siid': 2, 'piid': p}
-                        for p in range(1, 4)]
-
-        if not payload:
+        if not rows:
             return
 
-        # 3 attempts to get actual data
-        for _ in range(3):
-            resp = self.gw.miio.send('get_properties', payload)
-            if all(p['code'] == 0 for p in resp):
-                break
-            time.sleep(1)
-
-        self.gw.process_mesh_data(resp)
+        devices = [{
+            'did': row[0],
+            'mac': row[1].replace(':', ''),
+            'model': row[2],
+            'type': 'bluetooth'
+        } for row in rows]
+        self.gw.setup_mesh_devices(devices)
 
 
 def is_gw3(host: str, token: str) -> Optional[str]:
