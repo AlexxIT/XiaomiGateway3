@@ -55,7 +55,7 @@ A. No. The integration only supports ZNDMWG03LM.
 A. No. The integration does not support Xiaomi Wi-Fi devices.
 
 **Q. Does the integration work without internet?**  
-A. Yes. The component connects to a hub on the local network. But adding new Zigbee devices to Mi Home requires Internet.
+A. Partially. The component connects to a hub on the local network. Zigbee devices work without internet. But adding new Zigbee devices to Mi Home requires Internet. Updating BLE device data may not work without Internet.
 
 **Q. Does the integration support non Xiaomi Zigbee devices?**  
 A. Yes. There are two ways to connect third party Zigbee devices. The first method allows devices to work in both Mi Home and Hass at the same time. The second method (ZHA) disconnects the hub from Mi Home and only works with Hass. Both methods have a different set of supported devices. There is no exact supported list. Don't expect absolutely every device on the market to be supported in any of these methods.
@@ -89,8 +89,7 @@ A. All button clicks are displayed in the status of that one entity.
 - v1.4.5_0016 - safe to update, supported
 - v1.4.6_0012 - safe to update, supported
 - v1.4.6_0030 - was available in summer 2020, now unavailable, supported
-- v1.4.7_0040 - some users started receiving updates, **not supported** (telnet cannot be opened)
-- v1.4.7_0063 - some users started receiving updates, **not supported** (telnet cannot be opened)
+- v1.4.7_0040, v1.4.7_0063, v1.4.7_0065 - some users started receiving updates, **not supported** (telnet cannot be opened)
 
 **ZNDMWG02LM (Euro version, EU plug)**
 - v1.4.6_0043 - factory firmware, **not supported** (telnet has a password)
