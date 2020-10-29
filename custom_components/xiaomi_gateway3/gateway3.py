@@ -17,6 +17,7 @@ from .utils import GLOBAL_PROP
 _LOGGER = logging.getLogger(__name__)
 
 RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
+RE_MAC = re.compile('^0x0*')
 
 
 class Gateway3(Thread):
@@ -295,6 +296,9 @@ class Gateway3(Thread):
         elif msg.topic.endswith('/heartbeat'):
             payload = json.loads(msg.payload)
             self.process_gw_message(payload)
+        elif msg.topic.endswith('/MessageReceived'):
+            payload = json.loads(msg.payload)
+            self.process_zb_message(payload)
         elif self.pair_model and msg.topic.endswith('/commands'):
             self.process_pair(msg.payload)
 
@@ -441,6 +445,14 @@ class Gateway3(Thread):
 
         for handler in self.updates['lumi.0']:
             handler(payload)
+
+    def process_zb_message(self, payload: dict):
+        did = 'lumi.' + RE_MAC.sub('', payload['eui64']).lower()
+        if did not in self.devices:
+            return
+        device = self.devices[did]
+        device['linq_quality'] = payload['linkQuality']
+        _LOGGER.debug(f"{self.host} | {did} <= LQI {payload['linkQuality']}")
 
     def process_pair(self, raw: bytes):
         # get shortID and eui64 of paired device
