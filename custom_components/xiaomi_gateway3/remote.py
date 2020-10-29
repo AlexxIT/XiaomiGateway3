@@ -5,7 +5,7 @@ from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device
-from .gateway3 import Gateway3
+from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
 

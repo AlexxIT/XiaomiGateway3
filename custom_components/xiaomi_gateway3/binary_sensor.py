@@ -6,7 +6,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.event import async_call_later
 
 from . import DOMAIN, Gateway3Device
-from .gateway3 import Gateway3
+from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
 

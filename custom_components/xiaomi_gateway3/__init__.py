@@ -9,9 +9,9 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.storage import Store
 from homeassistant.util import sanitize_filename
 
-from . import utils
-from .gateway3 import Gateway3
-from .xiaomi_cloud import MiCloud
+from .core import utils
+from .core.gateway3 import Gateway3
+from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
 

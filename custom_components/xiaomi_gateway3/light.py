@@ -5,8 +5,9 @@ from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP
 from homeassistant.util import color
 
-from . import DOMAIN, Gateway3Device, bluetooth
-from .gateway3 import Gateway3
+from . import DOMAIN, Gateway3Device
+from .core import bluetooth
+from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
 

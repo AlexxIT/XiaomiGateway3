@@ -26,6 +26,7 @@ DEVICES = [{
         ['8.0.2111', None, 'pair_command', None],  # add new device
         ['8.0.2155', None, 'cloud', None],  # {"cloud_link":0}
         [None, None, 'pair', 'remote'],
+        [None, None, 'firmware lock', 'switch'],  # firmware lock
     ]
 }, {
     # on/off, power measurement

@@ -5,7 +5,7 @@ from homeassistant.components.cover import CoverEntity, ATTR_POSITION, \
 from homeassistant.const import STATE_CLOSING, STATE_OPENING
 
 from . import DOMAIN, Gateway3Device
-from .gateway3 import Gateway3
+from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
 
