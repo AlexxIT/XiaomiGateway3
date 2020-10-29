@@ -583,6 +583,8 @@ class Gateway3(Thread):
 
         _LOGGER.debug(f"{self.host} | Process BLE {data}")
 
+        pdid = data['dev'].get('pdid')
+
         did = data['dev']['did']
         if did not in self.devices:
             mac = data['dev']['mac'].replace(':', '').lower() \
@@ -590,7 +592,6 @@ class Gateway3(Thread):
                 'ble_' + did.replace('blt.3.', '')
             self.devices[did] = device = {
                 'did': did, 'mac': mac, 'init': {}, 'type': 'bluetooth'}
-            pdid = data['dev'].get('pdid')
             desc = bluetooth.get_device(pdid, 'BLE')
             device.update(desc)
 
@@ -605,9 +606,9 @@ class Gateway3(Thread):
         if isinstance(data['evt'], list):
             # check if only one
             assert len(data['evt']) == 1, data
-            payload = bluetooth.parse_xiaomi_ble(data['evt'][0])
+            payload = bluetooth.parse_xiaomi_ble(data['evt'][0], pdid)
         elif isinstance(data['evt'], dict):
-            payload = bluetooth.parse_xiaomi_ble(data['evt'])
+            payload = bluetooth.parse_xiaomi_ble(data['evt'], pdid)
         else:
             payload = None
 
