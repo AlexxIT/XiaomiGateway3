@@ -136,7 +136,7 @@ Tested Devices:
 - Xiaomi Plug (ZNCZ02LM,ZNCZ03LM,ZNCZ04LM,ZNCZ12LM)
 - Xiaomi TH Sensor (WSDCGQ01LM)
 
-Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
+Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/utils.py).
 
 # Supported BLE Devices
 
@@ -230,7 +230,7 @@ command: pair
 device: ikea.light.led1623g12  # change to your device model
 ```
 
-You need to choose the most similar Xiaomi model for your device from [this file](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/utils.py).
+You need to choose the most similar Xiaomi model for your device from [this file](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/utils.py).
 
 For example, for a lamp or dimmer - choose an IKEA lamp `ikea.light.led1623g12`.
 
