@@ -141,7 +141,7 @@ class OptionsFlowHandler(OptionsFlow):
         elif not self.hass.data[DOMAIN].get('devices'):
             device_info = "No devices in account"
         else:
-            device_info = "SELECT device FROM list"
+            device_info = "Select device from list"
 
         devices = {
             device['did']: f"{device['name']} ({device['localip']})"
