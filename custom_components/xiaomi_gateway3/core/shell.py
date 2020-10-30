@@ -59,7 +59,7 @@ class TelnetShell(Telnet):
         self.write(b"killall silabs_ncp_bt; silabs_ncp_bt /dev/ttyS1 1\r\n")
 
     def run_public_mosquitto(self):
-        self.exec("killall mosquitto; sleep .5; mosquitto -d")
+        self.exec("killall mosquitto")
         time.sleep(.5)
         self.exec("mosquitto -d")
         time.sleep(.5)
