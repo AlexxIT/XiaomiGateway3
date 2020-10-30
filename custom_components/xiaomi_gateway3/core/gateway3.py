@@ -143,6 +143,9 @@ class Gateway3(Thread):
                 if "Lumi_Z3GatewayHost_MQTT" in ps:
                     self.debug("Stop Lumi Zigbee")
                     shell.stop_lumi_zigbee()
+
+            elif "Lumi_Z3GatewayHost_MQTT" not in ps:
+                shell.run_lumi_zigbee()
             # elif "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps:
             #     self.debug("Run public Zigbee console")
             #     shell.run_public_zb_console()

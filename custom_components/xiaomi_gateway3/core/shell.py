@@ -40,6 +40,9 @@ class TelnetShell(Telnet):
     def run_socat(self):
         self.exec(f"{CHECK_SOCAT} && {RUN_SOCAT}")
 
+    def run_lumi_zigbee(self):
+        self.exec("daemon_app.sh &")
+
     def stop_lumi_zigbee(self):
         self.exec("killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT")
 
