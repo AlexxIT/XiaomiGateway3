@@ -17,9 +17,8 @@ LOCK_FIRMWARE = "/data/busybox chattr +i /data/firmware.bin"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware.bin"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 
-MIIO_PTRN = "ble_event|properties_changed"
 # use awk because buffer
-MIIO2MQTT = f"(miio_client -l 4 -d /data/miio | awk '/{MIIO_PTRN}/{{print $0;fflush()}}' | mosquitto_pub -t log/miio -l &)"
+MIIO2MQTT = "(miio_client -l 4 -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
 
 
 class TelnetShell(Telnet):
@@ -76,10 +75,10 @@ class TelnetShell(Telnet):
     def get_running_ps(self) -> str:
         return self.exec("ps")
 
-    def redirect_miio2mqtt(self):
+    def redirect_miio2mqtt(self, pattern: str):
         self.exec("killall daemon_miio.sh; killall miio_client")
         time.sleep(.5)
-        self.exec(MIIO2MQTT)
+        self.exec(MIIO2MQTT % pattern)
         self.exec("daemon_miio.sh &")
 
     def run_public_zb_console(self):

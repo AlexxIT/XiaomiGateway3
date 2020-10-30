@@ -81,7 +81,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                 self.gw.pair_model = (model[:-3] if model.endswith('.v1')
                                       else model)
                 self.turn_on()
-            elif cmd == 'reboot':
-                self.gw.send_telnet('reboot')
+            elif cmd in ('reboot', 'ftp'):
+                self.gw.send_telnet(cmd)
             elif cmd == 'publishstate':
                 self.gw.send_mqtt('publishstate')

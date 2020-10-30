@@ -9,7 +9,7 @@ from typing import Optional, Union
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils
 from .miio_fix import Device
-from .shell import TelnetShell, MIIO_PTRN
+from .shell import TelnetShell
 from .unqlite import Unqlite, SQLite
 from .utils import GLOBAL_PROP
 
@@ -128,10 +128,13 @@ class Gateway3(Thread):
                 self.debug("Run public mosquitto")
                 shell.run_public_mosquitto()
 
-            # TODO: fix me
-            if MIIO_PTRN not in ps:
+            # all data or only necessary events
+            pattern = '\\{"' if 'miio' in self._debug \
+                else "ble_event|properties_changed"
+
+            if f"awk /{pattern} {{" not in ps:
                 self.debug("Redirect miio to MQTT")
-                shell.redirect_miio2mqtt()
+                shell.redirect_miio2mqtt(pattern)
 
             if self.zha:
                 if "socat" not in ps:
