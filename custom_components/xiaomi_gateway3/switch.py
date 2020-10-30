@@ -39,6 +39,10 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
 
 
 class FirmwareLock(Gateway3Switch):
+    @property
+    def icon(self):
+        return 'mdi:cloud-lock'
+
     def turn_on(self):
         if self.gw.lock_firmware(enable=True):
             self._state = True
