@@ -592,7 +592,11 @@ class Gateway3(Thread):
         try:
             shell = TelnetShell(self.host)
             for command in args:
-                shell.exec(command)
+                if command == 'ftp':
+                    shell.check_or_download_busybox()
+                    shell.run_ftp()
+                else:
+                    shell.exec(command)
             shell.close()
 
         except Exception as e:

@@ -15,6 +15,7 @@ CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
 DOWNLOAD_BUSYBOX = "(curl -k -o /data/busybox https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel && chmod +x /data/busybox)"
 LOCK_FIRMWARE = "/data/busybox chattr +i /data/firmware.bin"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware.bin"
+RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 
 MIIO_PTRN = "ble_event|properties_changed"
 # use awk because buffer
@@ -57,6 +58,9 @@ class TelnetShell(Telnet):
     def lock_firmware(self, enable: bool):
         command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
         self.exec(f"{CHECK_BUSYBOX} && {command}")
+
+    def run_ftp(self):
+        self.exec(f"{CHECK_BUSYBOX} && {RUN_FTP}")
 
     def sniff_bluetooth(self):
         self.write(b"killall silabs_ncp_bt; silabs_ncp_bt /dev/ttyS1 1\r\n")
