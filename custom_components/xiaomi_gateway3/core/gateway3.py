@@ -535,13 +535,13 @@ class Gateway3(Thread):
         else:
             data = raw
 
-        self.debug(f"Process Mesh {data}")
+        # not always Mesh devices
+        self.debug(f"Process Mesh* {data}")
 
         data = bluetooth.parse_xiaomi_mesh(data)
         for did, payload in data.items():
             device = self.devices.get(did)
             if not device:
-                _LOGGER.warning("Unknown mesh device, reboot Hass may helps")
                 return
 
             if did in self.updates:
