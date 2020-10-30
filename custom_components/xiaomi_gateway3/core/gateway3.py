@@ -466,11 +466,15 @@ class Gateway3(Thread):
         self.debug(f"{did} <= LQI {payload['linkQuality']}")
 
     def process_ble_event(self, raw: Union[bytes, str]):
-        if isinstance(raw, bytes):
-            m = RE_JSON.search(raw)
-            data = json.loads(m[0])['params']
-        else:
-            data = json.loads(raw)
+        try:
+            if isinstance(raw, bytes):
+                m = RE_JSON.search(raw)
+                data = json.loads(m[0])['params']
+            else:
+                data = json.loads(raw)
+        except:
+            self.debug(f"Wrong BLE input: {raw}")
+            return
 
         self.debug(f"Process BLE {data}")
 
@@ -529,11 +533,15 @@ class Gateway3(Thread):
                 handler(payload)
 
     def process_mesh_data(self, raw: Union[bytes, list]):
-        if isinstance(raw, bytes):
-            m = RE_JSON.search(raw)
-            data = json.loads(m[0])['params']
-        else:
-            data = raw
+        try:
+            if isinstance(raw, bytes):
+                m = RE_JSON.search(raw)
+                data = json.loads(m[0])['params']
+            else:
+                data = raw
+        except:
+            self.debug(f"Wrong Mesh* input: {raw}")
+            return
 
         # not always Mesh devices
         self.debug(f"Process Mesh* {data}")
