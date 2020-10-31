@@ -254,6 +254,11 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
             'timestamp': timestamp
         }
 
+    elif eid == 0x0F:
+        # 1 - moving no light, 100 - moving with light
+        # TODO: fix me in future
+        return {'action': int.from_bytes(data, 'little')}
+
     return None
 
 
