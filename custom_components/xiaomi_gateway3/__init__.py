@@ -178,7 +178,8 @@ class Gateway3Device(Entity):
         self._attrs = {}
 
         self._unique_id = f"{self.device['mac']}_{self._attr}"
-        self._name = self.device['device_name'] + ' ' + self._attr.title()
+        self._name = (self.device['device_name'] + ' ' +
+                      self._attr.replace('_', ' ').title())
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
