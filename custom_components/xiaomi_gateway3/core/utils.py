@@ -293,6 +293,13 @@ DEVICES = [{
         ['14.4.85', 'run_state', 'run_state', None],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
+}, {
+    'lumi.lock.acn02': ["Aqara", "Door Lock S2", "ZNMS12LM"],
+    'params': [
+        ['13.1.85', None, 'key_id', 'sensor'],
+        ['13.20.85', 'lock_state', 'lock', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
 }]
 
 GLOBAL_PROP = {
