@@ -41,6 +41,7 @@ class Gateway3(Thread):
         self.mqtt.connect_async(host)
 
         self._debug = config['debug'] if 'debug' in config else ''
+        self._disable_buzzer = config.get('buzzer') is False
         self.default_devices = config['devices']
 
         self.devices = {}
@@ -135,6 +136,10 @@ class Gateway3(Thread):
             if f"awk /{pattern} {{" not in ps:
                 self.debug("Redirect miio to MQTT")
                 shell.redirect_miio2mqtt(pattern)
+
+            if self._disable_buzzer and "basic_gw -b" in ps:
+                _LOGGER.debug("Disable buzzer")
+                shell.stop_buzzer()
 
             if self.zha:
                 if "socat" not in ps:

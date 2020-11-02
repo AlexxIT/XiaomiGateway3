@@ -19,6 +19,7 @@ DOMAIN = 'xiaomi_gateway3'
 
 CONF_DEVICES = 'devices'
 CONF_DEBUG = 'debug'
+CONF_BUZZER = 'buzzer'
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
@@ -27,6 +28,7 @@ CONFIG_SCHEMA = vol.Schema({
                 vol.Optional('occupancy_timeout'): cv.positive_int,
             }, extra=vol.ALLOW_EXTRA),
         },
+        vol.Optional(CONF_BUZZER): cv.boolean,
         vol.Optional(CONF_DEBUG): cv.string,
     }, extra=vol.ALLOW_EXTRA),
 }, extra=vol.ALLOW_EXTRA)

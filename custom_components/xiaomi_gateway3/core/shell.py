@@ -100,3 +100,9 @@ class TelnetShell(Telnet):
             self.write(f"cat {filename}\r\n".encode())
             self.read_until(b"\r\n")  # skip command
             return self.read_until(b"# ")[:-2]
+
+    def stop_buzzer(self):
+        self.exec("killall daemon_miio.sh; killall -9 basic_gw")
+        # run dummy process with same str in it
+        self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
+        self.exec("daemon_miio.sh &")
