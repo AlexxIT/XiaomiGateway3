@@ -83,13 +83,18 @@ A. All button clicks are displayed in the status of that one entity.
 
 # Supported Firmwares
 
+**Attention:** Starting from 2020.10, there is a high chance of buying any version of the gateway with "bad" firmware. Only soldering will be able to open Telnet.
+
+Instruction for downgrading firmware by soldering: [read more](https://github.com/AlexxIT/XiaomiGateway3/issues/87#issuecomment-719467858).
+
 **ZNDMWG03LM (Chinese version, US plug)**
 - v1.4.4_0003 - factory firmware, supported
 - v1.4.5_0012 - factory firmware, supported
 - v1.4.5_0016 - safe to update, supported
 - v1.4.6_0012 - safe to update, supported
 - v1.4.6_0030 - was available in summer 2020, now unavailable, supported
-- v1.4.7_0040, v1.4.7_0063, v1.4.7_0065 - some users started receiving updates, **not supported** (telnet cannot be opened)
+- v1.4.6_0043 - **factory firmware from 2020.10, not supported** (telnet has a password)
+- v1.4.7_0040, v1.4.7_0063, v1.4.7_0065 - **not supported** (telnet cannot be opened)
 
 **ZNDMWG02LM (Euro version, EU plug)**
 - v1.4.6_0043 - factory firmware, **not supported** (telnet has a password)
