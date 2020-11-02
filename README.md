@@ -46,7 +46,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 # FAQ
 
 **Q. Can Xiaomi close support for this integration in firmware updates?**  
-A. Yes, they can and are already doing it. But if you have a worked hub and you do not update it, it will continue to work.
+A. Yes, they can and are already doing it. But if you have a worked hub and you do not update it, it will continue to work. Component can block fw updates with **Lock Firmware** switch.
 
 **Q. Does this integration support hubs DGNWG02LM, DGNWG05LM, Aqara Hub...?**  
 A. No. The integration only supports ZNDMWG03LM.
@@ -67,13 +67,13 @@ A. Yes. If you do not enable ZHA mode, the devices will continue to work in Mi H
 A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
 
 **Q. Should I open or solder the hub?**  
-A. No. The component works with the hub on original firmware without modifications.
+A. Depends on the firmware version. Read [supported firmwares](#supported-firmwares) section.
 
 **Q. Should I use ZHA mode?**  
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best not to enable ZHA. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
 
 **Q. How many Zigbee devices does the hub support?**  
-A. Official Xiaomi documentation says that 32 devices with direct connection. And 128 devices using routers. Most wired Zigbee devices are routers. Newer expensive hubs (like Aqara M2) have the same parameters. Don't expect to get better numbers by paying 3-4 times the price.
+A. The hub can connect directly up to 32 battery-powered devices (end devices). And **additionaly** up to 26 powered devices (routers). Other devices on your network can work through routers. The maximum number of devices is unknown. Official Xiaomi documentation writes about 128 devices.
 
 **Q. Does the component support decoupled mode for switches?**  
 A. Yes, but it needs to be turned on in the Mi Home app.
@@ -87,6 +87,10 @@ A. All button clicks are displayed in the status of that one entity.
 
 Instruction for downgrading firmware by soldering: [read more](https://github.com/AlexxIT/XiaomiGateway3/issues/87#issuecomment-719467858).
 
+Component can block fw updates with **Lock Firmware** switch.
+
+[![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
+
 **ZNDMWG03LM (Chinese version, US plug)**
 - v1.4.4_0003 - factory firmware, supported
 - v1.4.5_0012 - factory firmware, supported
@@ -96,7 +100,7 @@ Instruction for downgrading firmware by soldering: [read more](https://github.co
 - v1.4.6_0043 - **factory firmware from 2020.10, not supported** (telnet has a password)
 - v1.4.7_0040, v1.4.7_0063, v1.4.7_0065 - **not supported** (telnet cannot be opened)
 
-**ZNDMWG02LM (Euro version, EU plug)**
+**ZNDMWG02LM (Euro version, no plug)**
 - v1.4.6_0043 - factory firmware, **not supported** (telnet has a password)
 
 # Supported Zigbee Devices
