@@ -80,7 +80,7 @@ class MiCloud:
             headers={'User-Agent': UA % self.device_id},
             params={'sid': 'xiaomiio', '_json': 'true'})
         raw = await r.read()
-        _LOGGER.debug(f"MiCloud step1: {raw}")
+        _LOGGER.debug(f"MiCloud step1")
         resp: dict = json.loads(raw[11:])
         return {k: v for k, v in resp.items()
                 if k in ('sid', 'qs', 'callback', '_sign')}
@@ -96,14 +96,14 @@ class MiCloud:
             headers={'User-Agent': UA % self.device_id},
             params={'_json': 'true'})
         raw = await r.read()
-        _LOGGER.debug(f"MiCloud step2: {raw}")
+        _LOGGER.debug(f"MiCloud step2")
         resp = json.loads(raw[11:])
         return resp
 
     async def _login_step3(self, location):
         r = await self.session.get(location, headers={'User-Agent': UA})
         service_token = r.cookies['serviceToken'].value
-        _LOGGER.debug(f"MiCloud step3: {service_token}")
+        _LOGGER.debug(f"MiCloud step3")
         return service_token
 
     async def get_total_devices(self, servers: list):
