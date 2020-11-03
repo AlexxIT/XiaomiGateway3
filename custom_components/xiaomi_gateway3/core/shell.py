@@ -38,7 +38,7 @@ class TelnetShell(Telnet):
         return self.exec(f"{CHECK_SOCAT} || {DOWNLOAD_SOCAT}")
 
     def run_socat(self):
-        self.exec(f"{CHECK_SOCAT} && {RUN_SOCAT}")
+        self.exec(f"{CHECK_SOCAT} && {RUN_SOCAT} &")
 
     def stop_socat(self):
         self.exec(f"killall socat")
