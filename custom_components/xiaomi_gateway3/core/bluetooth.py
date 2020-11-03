@@ -112,87 +112,87 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
     data = bytes.fromhex(event['edata'])
     length = len(data)
 
-    if eid == 0x1001 and length == 3:  # magic cube or button
+    if eid == 0x1001 and length == 3:  # 4097
         if pdid in ACTIONS and data[0] < len(ACTIONS[pdid]):
             return {'action': ACTIONS[pdid][data[0]]}
         else:
             return {'action': data[0]}
 
-    elif eid == 0x1002 and length == 1:
+    elif eid == 0x1002 and length == 1:  # 4098
         # No sleep (0x00), falling asleep (0x01)
         return {'sleep': data[0]}  # 1 => true
 
-    elif eid == 0x1003 and length == 1:
+    elif eid == 0x1003 and length == 1:  # 4099
         # Signal strength value
         return {'rssi': data[0]}
 
-    elif eid == 0x1004 and length == 2:
+    elif eid == 0x1004 and length == 2:  # 4100
         return {'temperature': int.from_bytes(data, 'little') / 10.0}
 
-    elif eid == 0x1006 and length == 2:
+    elif eid == 0x1006 and length == 2:  # 4102
         # Humidity percentage, ranging from 0-1000
         return {'humidity': int.from_bytes(data, 'little') / 10.0}
 
-    elif eid == 0x1007 and length == 3:
+    elif eid == 0x1007 and length == 3:  # 4103
         # Range: 0-120000, lux
         return {'illuminance': int.from_bytes(data, 'little')}
 
-    elif eid == 0x1008 and length == 1:
+    elif eid == 0x1008 and length == 1:  # 4104
         # Humidity percentage, range: 0-100
         return {'moisture': data[0]}
 
-    elif eid == 0x1009 and length == 2:
+    elif eid == 0x1009 and length == 2:  # 4105
         # Soil EC value, Unit us/cm, range: 0-5000
         return {'conductivity': int.from_bytes(data, 'little')}
 
-    elif eid == 0x100A:
+    elif eid == 0x100A:  # 4106
         # TODO: lock timestamp
         return {'battery': data[0]}
 
-    elif eid == 0x100D and length == 4:
+    elif eid == 0x100D and length == 4:  # 4109
         return {
             'temperature': int.from_bytes(data[:2], 'little') / 10.0,
             'humidity': int.from_bytes(data[2:], 'little') / 10.0
         }
 
-    elif eid == 0x100E and length == 1:
+    elif eid == 0x100E and length == 1:  # 4110
         # 1 => true => on => unlocked
         # 0x00: unlock state (all bolts retracted)
         # TODO: other values
         return {'lock': 1 if data[0] == 0 else 0}
 
-    elif eid == 0x100F and length == 1:
+    elif eid == 0x100F and length == 1:  # 4111
         # 1 => true => on => dooor opening
         return {'opening': 1 if data[0] == 0 else 0}
 
-    elif eid == 0x1010 and length == 2:
+    elif eid == 0x1010 and length == 2:  # 4112
         return {'formaldehyde': int.from_bytes(data, 'little') / 100.0}
 
-    elif eid == 0x1012 and length == 1:
+    elif eid == 0x1012 and length == 1:  # 4114
         return {'opening': data[0]}  # 1 => true => open
 
-    elif eid == 0x1013 and length == 1:
+    elif eid == 0x1013 and length == 1:  # 4115
         # Remaining percentage, range 0~100
         return {'mosquitto': data[0]}
 
-    elif eid == 0x1014 and length == 1:
+    elif eid == 0x1014 and length == 1:  # 4116
         return {'water_leak': data[0]}  # 1 => on => wet
 
-    elif eid == 0x1015 and length == 1:
+    elif eid == 0x1015 and length == 1:  # 4117
         # TODO: equipment failure (0x02)
         return {'smoke': data[0]}  # 1 => on => alarm
 
-    elif eid == 0x1016 and length == 1:
+    elif eid == 0x1016 and length == 1:  # 4118
         return {'gas': data[0]}  # 1 => on => alarm
 
-    elif eid == 0x1017 and length == 4:
+    elif eid == 0x1017 and length == 4:  # 4119
         # The duration of the unmanned state, in seconds
         return {'idle_time': int.from_bytes(data, 'little')}
 
-    elif eid == 0x1018 and length == 1:
+    elif eid == 0x1018 and length == 1:  # 4120
         return {'light': data[0]}  # 1 => on => strong light
 
-    elif eid == 0x1019 and length == 1:
+    elif eid == 0x1019 and length == 1:  # 4121
         # 0x00: open the door, 0x01: close the door,
         # 0x02: not closed after timeout, 0x03: device reset
         # 1 => true => open
@@ -228,7 +228,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
             'state': bool(data[0])
         }
 
-    elif eid == 0x000B:
+    elif eid == 0x000B:  # 11
         action = data[0] & 0x0F
         method = data[0] >> 4
         key_id = int.from_bytes(data[1:5], 'little')
@@ -254,7 +254,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
             'timestamp': timestamp
         }
 
-    elif eid == 0x0F:
+    elif eid == 0x0F:  # 15
         # 1 - moving no light, 100 - moving with light
         # TODO: fix me in future
         return {'action': int.from_bytes(data, 'little')}
