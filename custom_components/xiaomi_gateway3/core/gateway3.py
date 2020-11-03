@@ -442,7 +442,7 @@ class Gateway3(Thread):
             device['init'] = payload
             self.setup_devices([device])
 
-    def process_gw_message(self, payload: json):
+    def process_gw_message(self, payload: dict):
         self.debug(f"gateway <= {payload}")
 
         if 'lumi.0' not in self.updates:
