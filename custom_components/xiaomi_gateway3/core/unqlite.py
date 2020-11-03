@@ -84,6 +84,7 @@ class SQLite:
     def __init__(self, raw: bytes):
         self.raw = raw
         self.read_db_header()
+        self.tables = self.read_page(0)
 
     @property
     def size(self):
@@ -170,3 +171,7 @@ class SQLite:
             rows.append(cells)
 
         return rows
+
+    def read_table(self, name: str):
+        page = next(t[3] - 1 for t in self.tables if t[1] == name)
+        return self.read_page(page)

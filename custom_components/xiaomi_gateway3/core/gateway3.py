@@ -18,6 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
 RE_MAC = re.compile('^0x0*')
 RE_JSON = re.compile(b'{.+}')
+# MAC reverse
+RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 
 
 class Gateway3(Thread):
@@ -242,20 +244,30 @@ class Gateway3(Thread):
                 }
                 devices.append(device)
 
-        # 3. Read mesh devices
+        # 3. Read bluetooth devices
         if self.ble:
             raw = shell.read_file('/data/miio/mible_local.db', as_base64=True)
             db = SQLite(raw)
-            tables = db.read_page(0)
-            device_page = next(table[3] - 1 for table in tables
-                               if table[1] == 'mesh_device')
-            rows = db.read_page(device_page)
+
+            # load BLE devices
+            rows = db.read_table('gateway_authed_table')
+            for row in rows:
+                device = {
+                    'did': row[4],
+                    'mac': RE_REVERSE.sub(r'\6\5\4\3\2\1', row[1]),
+                    'model': row[2],
+                    'type': 'ble'
+                }
+                devices.append(device)
+
+            # load Mesh devices
+            rows = db.read_table('mesh_device')
             for row in rows:
                 device = {
                     'did': row[0],
                     'mac': row[1].replace(':', ''),
                     'model': row[2],
-                    'type': 'bluetooth'
+                    'type': 'mesh'
                 }
                 devices.append(device)
 
@@ -314,6 +326,11 @@ class Gateway3(Thread):
             payload = json.loads(msg.payload)
             self.process_zb_message(payload)
 
+        # read only retained ble
+        elif msg.topic.startswith('ble') and msg.retain:
+            payload = json.loads(msg.payload)
+            self.process_ble_retain(msg.topic[4:], payload)
+
         elif self.pair_model and msg.topic.endswith('/commands'):
             self.process_pair(msg.payload)
 
@@ -350,7 +367,7 @@ class Gateway3(Thread):
                     attr = param[2]
                     self.setups[domain](self, device, attr)
 
-            elif device['type'] == 'bluetooth':
+            elif device['type'] == 'mesh':
                 desc = bluetooth.get_device(device['model'], 'Mesh')
                 device.update(desc)
 
@@ -370,6 +387,20 @@ class Gateway3(Thread):
                     time.sleep(1)
 
                 self.setups['light'](self, device, 'light')
+
+            elif device['type'] == 'ble':
+                # only save info for future
+                desc = bluetooth.get_device(device['model'], 'BLE')
+                device.update(desc)
+
+                # update params from config
+                default_config = self.default_devices.get(device['did'])
+                if default_config:
+                    device.update(default_config)
+
+                self.devices[device['did']] = device
+
+                device['init'] = {}
 
     def process_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
@@ -517,6 +548,40 @@ class Gateway3(Thread):
         # init entities if needed
         for k in payload.keys():
             if k in device['init']:
+                continue
+
+            device['init'][k] = payload[k]
+
+            domain = bluetooth.get_ble_domain(k)
+            if not domain:
+                continue
+
+            # wait domain init
+            while domain not in self.setups:
+                time.sleep(1)
+
+            self.setups[domain](self, device, k)
+
+        if did in self.updates:
+            for handler in self.updates[did]:
+                handler(payload)
+
+        raw = json.dumps(device['init'], separators=(',', ':'))
+        self.mqtt.publish(f"ble/{did}", raw, retain=True)
+
+    def process_ble_retain(self, did: str, payload: dict):
+        if did not in self.devices:
+            _LOGGER.debug(f"BLE device {did} is no longer on the gateway")
+            return
+
+        _LOGGER.debug(f"{did} retain: {payload}")
+
+        device = self.devices[did]
+
+        # init entities if needed
+        for k in payload.keys():
+            # don't retain action
+            if k in device['init'] or k == 'action':
                 continue
 
             device['init'][k] = payload[k]
