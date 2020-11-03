@@ -17,17 +17,17 @@ UNITS = {
     DEVICE_CLASS_TEMPERATURE: TEMP_CELSIUS,
     'conductivity': "µS/cm",
     'consumption': ENERGY_WATT_HOUR,
-    'gas_density': '% LEL',
-    'smoke_density': '% obs/ft',
+    'gas density': '% LEL',
+    'smoke density': '% obs/ft',
     'moisture': '%',
 }
 
 ICONS = {
     'conductivity': 'mdi:flower',
     'consumption': 'mdi:flash',
-    'gas_density': 'mdi:google-circles-communities',
+    'gas density': 'mdi:google-circles-communities',
     'moisture': 'mdi:water-percent',
-    'smoke_density': 'mdi:google-circles-communities',
+    'smoke density': 'mdi:google-circles-communities',
 }
 
 

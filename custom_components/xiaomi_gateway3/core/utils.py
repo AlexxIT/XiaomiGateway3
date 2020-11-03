@@ -26,7 +26,7 @@ DEVICES = [{
         ['8.0.2111', None, 'pair_command', None],  # add new device
         ['8.0.2155', None, 'cloud', None],  # {"cloud_link":0}
         [None, None, 'pair', 'remote'],
-        [None, None, 'firmware_lock', 'switch'],  # firmware lock
+        [None, None, 'firmware lock', 'switch'],  # firmware lock
     ]
 }, {
     # on/off, power measurement
@@ -68,8 +68,8 @@ DEVICES = [{
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
         # ['0.14.85', None, '?', 'sensor'],  # 5.01, 6.13
-        ['4.1.85', 'channel_0', 'channel_1', 'switch'],
-        ['4.2.85', 'channel_1', 'channel_2', 'switch'],
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel 1', 'channel 2', 'switch'],
         # [?, 'enable_motor_mode', 'interlock', None]
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
@@ -87,8 +87,8 @@ DEVICES = [{
     # dual channel on/off
     'lumi.ctrl_neutral2': ["Aqara", "Wall Double Switch", "QBKG03LM"],
     'params': [
-        ['4.1.85', 'neutral_0', 'channel_1', 'switch'],  # to4ko
-        ['4.2.85', 'neutral_1', 'channel_2', 'switch'],
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         [None, None, 'action', 'sensor'],
@@ -96,8 +96,8 @@ DEVICES = [{
 }, {
     'lumi.switch.b2lacn02': ["Aqara", "D1 Wall Double Switch", "QBKG22LM"],
     'params': [
-        ['4.1.85', 'channel_0', 'channel_1', 'switch'],
-        ['4.2.85', 'channel_1', 'channel_2', 'switch'],
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel 1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         [None, None, 'action', 'sensor'],
@@ -106,9 +106,9 @@ DEVICES = [{
     # triple channel on/off, no neutral wire
     'lumi.switch.l3acn3': ["Aqara", "D1 Wall Triple Switch", "QBKG25LM"],
     'params': [
-        ['4.1.85', 'neutral_0', 'channel_1', 'switch'],  # to4ko
-        ['4.2.85', 'neutral_1', 'channel_2', 'switch'],
-        ['4.3.85', 'neutral_2', 'channel_3', 'switch'],
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
+        ['4.3.85', 'neutral_2', 'channel 3', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
@@ -120,9 +120,9 @@ DEVICES = [{
     'params': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
-        ['4.1.85', 'channel_0', 'channel_1', 'switch'],
-        ['4.2.85', 'channel_1', 'channel_2', 'switch'],
-        ['4.3.85', 'channel_2', 'channel_3', 'switch'],
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel 1', 'channel 2', 'switch'],
+        ['4.3.85', 'channel 2', 'channel 3', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
@@ -264,14 +264,14 @@ DEVICES = [{
 }, {
     'lumi.sensor_smoke': ["Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW"],
     'params': [
-        ['0.1.85', 'density', 'smoke_density', 'sensor'],
+        ['0.1.85', 'density', 'smoke density', 'sensor'],
         ['13.1.85', 'alarm', 'smoke', 'binary_sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     'lumi.sensor_natgas': ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
     'params': [
-        ['0.1.85', 'density', 'gas_density', 'sensor'],
+        ['0.1.85', 'density', 'gas density', 'sensor'],
         ['13.1.85', 'alarm', 'gas', 'binary_sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
