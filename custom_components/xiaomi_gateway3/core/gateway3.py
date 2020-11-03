@@ -82,21 +82,12 @@ class Gateway3(Thread):
                 time.sleep(30)
                 continue
 
-            if not self.zha:
-                # if not mqtt - enable it
-                if not self._mqtt_connect() and not self._prepeare_gateway():
-                    time.sleep(60)
-                    continue
-
-                self.mqtt.loop_forever()
-
-            elif not self._check_port(8888) and not self._prepeare_gateway():
+            # if not mqtt - enable it (handle Mi Home and ZHA mode)
+            if not self._mqtt_connect() and not self._prepeare_gateway():
                 time.sleep(60)
                 continue
 
-            else:
-                # ZHA works fine, check every 60 seconds
-                time.sleep(60)
+            self.mqtt.loop_forever()
 
     def _check_port(self, port: int):
         """Check if gateway port open."""
