@@ -40,6 +40,8 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Handle Button Actions](#handle-button-actions)
 - [Handle BLE Locks](#handle-ble-locks)
 - [Obtain Mi Home device token](#obtain-mi-home-device-token)
+- [Disable Buzzer](#disable-buzzer)
+- [Advanced commands](#advanced-commands)
 - [How it works](#how-it-works)
 - [Debug mode](#debug-mode)
 
@@ -170,7 +172,7 @@ Other BLE devices also maybe supported...
 
 Kettles and scooters are not BLE devices. It is not known whether the gateway can work with them. Currently not supported.
 
-BLE devices and their attributes do not appear immediately! And don't save their data across HA reboots! Their data is updated only when the device itself sends them. Temperature, humidity and battery may refresh at different times.
+BLE devices and their attributes **don't appear immediately**! Data collected and stored at the gateway. After rebooting Hass - data restored from the gateway. Rebooting the gateway will clear the saved data!
 
 # Supported Bluetooth Mesh Devices
 
@@ -418,6 +420,32 @@ automation:
 [![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
 
 You can use this integration to **get a token for any of your Xiaomi devices**. You don't need to have Xiaomi Gateway 3. Just install and add the integration, enter the username / password from your Mi Home account. And use the integration settings to view your account's device tokens.
+
+# Disable Buzzer
+
+If you have a hacked motion sensor, the gateway will beep periodically.
+
+The gateway has an application that handle the **button, LED and beeper**. This option can turn off this application.
+
+**Attention:** I don't know what else this app does and will the gateway work fine without it.
+
+```yaml
+xiaomi_gateway3:
+  buzzer: off
+```
+
+To cancel this changes - disable this option and restart the gateway. The application will continue to work again.
+
+# Advanced commands
+
+```yaml
+script:
+  reboot_gateway:
+    sequence:
+    - service: remote.send_command
+      entity_id: remote.0x0123456789abcdef_pair  # change to your gateway
+      command: reboot
+```
 
 # How it works
 
