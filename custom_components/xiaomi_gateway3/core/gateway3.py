@@ -502,6 +502,9 @@ class Gateway3(Thread):
     def process_ble_event(self, raw: Union[bytes, str]):
         try:
             if isinstance(raw, bytes):
+                # fix two json bug
+                if '}{' in raw:
+                    raw = raw[:raw.index('}{') + 1]
                 m = RE_JSON.search(raw)
                 data = json.loads(m[0])['params']
             else:
@@ -603,6 +606,9 @@ class Gateway3(Thread):
     def process_mesh_data(self, raw: Union[bytes, list]):
         try:
             if isinstance(raw, bytes):
+                # fix two json bug
+                if '}{' in raw:
+                    raw = raw[:raw.index('}{') + 1]
                 m = RE_JSON.search(raw)
                 data = json.loads(m[0])['params']
             else:
