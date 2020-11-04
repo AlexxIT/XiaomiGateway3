@@ -150,9 +150,11 @@ class Gateway3(Thread):
 
             else:
                 if "socat" in ps:
+                    self.debug("Stop socat")
                     shell.stop_socat()
 
                 if "Lumi_Z3GatewayHost_MQTT" not in ps:
+                    self.debug("Run Lumi Zigbee")
                     shell.run_lumi_zigbee()
             # elif "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps:
             #     self.debug("Run public Zigbee console")
