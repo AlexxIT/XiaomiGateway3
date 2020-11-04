@@ -65,10 +65,16 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         self.async_write_ha_state()
 
     def turn_on(self):
-        self.gw.send(self.device, {'pairing_start': 60})
+        # work for any device model, dev_type: 0 - zb1, 1 - zb3, don't matter
+        self.gw.miio.send('miIO.zb_start_provision', {
+            'dev_type': 0, 'duration': 60, 'method': 0,
+            'model': 'lumi.sensor_switch.v2', 'pid': 62
+        })
+        # self.gw.send(self.device, {'pairing_start': 60})
 
     def turn_off(self):
-        self.gw.send(self.device, {'pairing_stop': 0})
+        self.gw.miio.send('miIO.zb_end_provision', {'code': -1})
+        # self.gw.send(self.device, {'pairing_stop': 0})
 
     async def async_send_command(self, command, **kwargs):
         for cmd in command:
