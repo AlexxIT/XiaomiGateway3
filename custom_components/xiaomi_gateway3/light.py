@@ -17,7 +17,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if device['type'] == 'zigbee':
             async_add_entities([Gateway3Light(gateway, device, attr)])
         else:
-            async_add_entities([Gateway3MeshLight(gateway, device, attr)])
+            async_add_entities([Gateway3MeshLight(gateway, device, attr)],
+                               True)
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('light', setup)
@@ -83,6 +84,20 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
     _brightness = None
     _color_temp = None
 
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.add_update(did, self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
+
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.remove_update(did, self.update)
+
     @property
     def should_poll(self) -> bool:
         return True
@@ -114,21 +129,28 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
 
     def update(self, data: dict = None):
         if data is None:
-            did = self.device['did']
+            did = (self.device['childs'][0]
+                   if 'childs' in self.device
+                   else self.device['did'])
             try:
                 payload = [{'did': did, 'siid': 2, 'piid': p}
                            for p in range(1, 4)]
                 resp = self.gw.miio.send('get_properties', payload)
                 data = bluetooth.parse_xiaomi_mesh(resp)[did]
-            except Exception as e:
+
+            except:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error")
                 self.device['online'] = False
                 return
 
-            _LOGGER.debug(f"{self.gw.host} | {did} poll mesh <= {data}")
-        else:
-            did = None
+            # _LOGGER.debug(f"{self.gw.host} | {did} poll mesh <= {data}")
+            self._update(data)
 
+        else:
+            self._update(data)
+            self.async_write_ha_state()
+
+    def _update(self, data: dict):
         self.device['online'] = True
 
         if self._attr in data:
@@ -140,9 +162,6 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
             # 2700..6500 => 370..153
             self._color_temp = \
                 color.color_temperature_kelvin_to_mired(data['color_temp'])
-
-        if did is None:
-            self.async_write_ha_state()
 
     def turn_on(self, **kwargs):
         payload = {}

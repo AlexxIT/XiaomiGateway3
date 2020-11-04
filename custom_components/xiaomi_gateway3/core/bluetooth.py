@@ -23,6 +23,8 @@ DEVICES = {
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    # Mesh Group
+    0: ["Mesh", "Mesh Group"]
 }
 
 BLE_FINGERPRINT_ACTION = [

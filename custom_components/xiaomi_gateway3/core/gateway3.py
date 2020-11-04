@@ -266,16 +266,48 @@ class Gateway3(Thread):
                 }
                 devices.append(device)
 
-            # load Mesh devices
-            rows = db.read_table('mesh_device')
-            for row in rows:
-                device = {
-                    'did': row[0],
-                    'mac': row[1].replace(':', ''),
-                    'model': row[2],
-                    'type': 'mesh'
-                }
-                devices.append(device)
+            # load Mesh groups
+            try:
+                mesh_groups = {}
+
+                rows = db.read_table('mesh_group')
+                for row in rows:
+                    # don't know if 8 bytes enougth
+                    mac = int(row[0]).to_bytes(8, 'big').hex()
+                    device = {
+                        'did': 'group.' + row[0],
+                        'mac': mac,
+                        'model': 0,
+                        'childs': [],
+                        'type': 'mesh'
+                    }
+                    mesh_groups[row[1]] = device
+
+                # load Mesh bulbs
+                rows = db.read_table('mesh_device')
+                for row in rows:
+                    group_addr = row[5]
+                    if group_addr in mesh_groups:
+                        # add bulb to group if exist
+                        mesh_groups[group_addr]['childs'].append(row[0])
+
+                    else:
+                        # add single bulb
+                        device = {
+                            'did': row[0],
+                            'mac': row[1].replace(':', ''),
+                            'model': row[2],
+                            'group_addr': group_addr,
+                            'type': 'mesh'
+                        }
+                        devices.append(device)
+
+                for device in mesh_groups.values():
+                    if device['childs']:
+                        devices.append(device)
+
+            except:
+                _LOGGER.exception("Can't read mesh devices")
 
         return devices
 
@@ -629,10 +661,6 @@ class Gateway3(Thread):
 
         data = bluetooth.parse_xiaomi_mesh(data)
         for did, payload in data.items():
-            device = self.devices.get(did)
-            if not device:
-                return
-
             if did in self.updates:
                 for handler in self.updates[did]:
                     handler(payload)
