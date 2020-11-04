@@ -4,7 +4,7 @@ from homeassistant.components import persistent_notification
 from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN, Gateway3Device, utils
 from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,6 +58,10 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             )
             persistent_notification.async_create(self.hass, text,
                                                  "Xiaomi Gateway 3")
+
+        elif 'removed_did' in data:
+            self.debug(f"Handle removed_did: {data['removed_did']}")
+            utils.remove_device(self.hass, data['removed_did'])
 
         elif 'network_pan_id' in data:
             self._attrs.update(data)
