@@ -29,7 +29,7 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
     def update(self, data: dict = None):
         if self._attr in data:
             self._state = data[self._attr] == 1
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
     def turn_on(self):
         self.gw.send(self.device, {self._attr: 1})

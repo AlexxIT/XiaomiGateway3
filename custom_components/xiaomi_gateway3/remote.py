@@ -62,7 +62,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         elif 'network_pan_id' in data:
             self._attrs.update(data)
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
     def turn_on(self):
         self.gw.send(self.device, {'pairing_start': 60})

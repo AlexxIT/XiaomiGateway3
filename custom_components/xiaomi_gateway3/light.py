@@ -58,7 +58,7 @@ class Gateway3Light(Gateway3Device, LightEntity):
         if 'color_temp' in data:
             self._color_temp = data['color_temp']
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
     def turn_on(self, **kwargs):
         payload = {}
@@ -142,7 +142,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
                 color.color_temperature_kelvin_to_mired(data['color_temp'])
 
         if did is None:
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
     def turn_on(self, **kwargs):
         payload = {}

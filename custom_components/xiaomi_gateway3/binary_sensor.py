@@ -39,8 +39,9 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
 
     def update(self, data: dict = None):
         if self._attr in data:
+            # gas and smoke => 1 and 2
             self._state = data[self._attr] == 1
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class Gateway3MotionSensor(Gateway3BinarySensor):
@@ -60,9 +61,8 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
 
     def update(self, data: dict = None):
         if self._attr in data:
-            # gas and smoke => 1 and 2
             self._state = data[self._attr] >= 1
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
         if self._state:
             if self._unsub_set_no_motion:

@@ -63,7 +63,7 @@ class Gateway3Sensor(Gateway3Device):
     def update(self, data: dict = None):
         if self._attr in data:
             self._state = data[self._attr]
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/converters/fromZigbee.js#L4738
@@ -136,4 +136,4 @@ class Gateway3Action(Gateway3Device):
 
             self._state = ''
 
-        self.async_schedule_update_ha_state()
+        self.async_write_ha_state()
