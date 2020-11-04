@@ -318,10 +318,11 @@ class Gateway3(Thread):
             if 'miio' in self._debug:
                 _LOGGER.debug(f"[MI] {msg.payload}")
 
-            if b'_async.ble_event' in msg.payload:
-                self.process_ble_event(msg.payload)
-            elif b'properties_changed' in msg.payload:
-                self.process_mesh_data(msg.payload)
+            if self.ble:
+                if b'_async.ble_event' in msg.payload:
+                    self.process_ble_event(msg.payload)
+                elif b'properties_changed' in msg.payload:
+                    self.process_mesh_data(msg.payload)
 
         elif msg.topic.endswith('/heartbeat'):
             payload = json.loads(msg.payload)
