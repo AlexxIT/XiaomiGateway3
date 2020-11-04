@@ -277,7 +277,6 @@ DEVICES = [{
     'params': [
         ['0.1.85', 'density', 'gas density', 'sensor'],
         ['13.1.85', 'alarm', 'gas', 'binary_sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
     'lumi.curtain': ["Aqara", "Curtain", "ZNCLDJ11LM"],
