@@ -58,6 +58,9 @@ class Gateway3(Thread):
         """Add handler to device update event."""
         self.updates.setdefault(did, []).append(handler)
 
+    def remove_update(self, did: str, handler):
+        self.updates.setdefault(did, []).remove(handler)
+
     def add_setup(self, domain: str, handler):
         """Add hass device setup funcion."""
         self.setups[domain] = handler

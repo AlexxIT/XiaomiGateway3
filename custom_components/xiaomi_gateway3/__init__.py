@@ -185,11 +185,22 @@ class Gateway3Device(Entity):
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
+    def debug(self, message: str):
+        _LOGGER.debug(f"{self.entity_id} | {message}")
+
     async def async_added_to_hass(self):
-        if 'init' in self.device:
+        if 'init' in self.device and self._state == STATE_UNKNOWN:
             self.update(self.device['init'])
 
         self.gw.add_update(self.device['did'], self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Also run when rename entity_id"""
+        self.gw.remove_update(self.device['did'], self.update)
+
+    # @property
+    # def entity_registry_enabled_default(self):
+    #     return False
 
     @property
     def should_poll(self) -> bool:
