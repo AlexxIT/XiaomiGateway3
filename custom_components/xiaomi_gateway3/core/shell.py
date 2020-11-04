@@ -18,7 +18,11 @@ UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware.bin"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 
 # use awk because buffer
-MIIO2MQTT = "(miio_client -l 4 -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
+MIIO_LESS = "-l 0 -o FILE_STORE -n 128"
+MIIO_MORE = "-l 4"
+MIIO2MQTT = "(miio_client -d /data/miio %s | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
+
+VERSION = "cat etc/rootfs_fw_info | grep 'version' | cut -d '=' -f 2"
 
 
 class TelnetShell(Telnet):
@@ -78,10 +82,11 @@ class TelnetShell(Telnet):
     def get_running_ps(self) -> str:
         return self.exec("ps")
 
-    def redirect_miio2mqtt(self, pattern: str):
+    def redirect_miio2mqtt(self, pattern: str, new_version=False):
         self.exec("killall daemon_miio.sh; killall miio_client")
         time.sleep(.5)
-        self.exec(MIIO2MQTT % pattern)
+        args = MIIO_LESS if new_version else MIIO_MORE
+        self.exec(MIIO2MQTT % (args, pattern))
         self.exec("daemon_miio.sh &")
 
     def run_public_zb_console(self):
@@ -106,3 +111,6 @@ class TelnetShell(Telnet):
         # run dummy process with same str in it
         self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
         self.exec("daemon_miio.sh &")
+
+    def version(self):
+        return self.exec(VERSION).split('\r\n')[1]

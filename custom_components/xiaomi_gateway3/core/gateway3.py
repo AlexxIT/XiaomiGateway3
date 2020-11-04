@@ -130,8 +130,9 @@ class Gateway3(Thread):
                 else "ble_event|properties_changed"
 
             if f"awk /{pattern} {{" not in ps:
-                self.debug("Redirect miio to MQTT")
-                shell.redirect_miio2mqtt(pattern)
+                new_version = 'FILE_STORE' in ps
+                self.debug(f"Redirect miio to MQTT, new: {new_version}")
+                shell.redirect_miio2mqtt(pattern, new_version)
 
             if self._disable_buzzer and "basic_gw -b" in ps:
                 _LOGGER.debug("Disable buzzer")
