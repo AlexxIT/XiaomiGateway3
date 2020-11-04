@@ -7,7 +7,10 @@ from typing import Optional
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.helpers.device_registry import DeviceRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import HomeAssistantType
+
+DOMAIN = 'xiaomi_gateway3'
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
 # https://slsys.io/action/devicelists.html
@@ -382,6 +385,20 @@ def remove_device(hass: HomeAssistantType, did: str):
     device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
     if device:
         registry.async_remove_device(device.id)
+
+
+def migrate_unique_id(hass: HomeAssistantType):
+    """New unique_id format: `mac_attr`, no leading `0x`, spaces and uppercase.
+    """
+    old_id = re.compile('(^0x|[ A-F])')
+
+    registry: EntityRegistry = hass.data['entity_registry']
+    for entity in registry.entities.values():
+        if entity.platform != DOMAIN or not old_id.search(entity.unique_id):
+            continue
+
+        uid = entity.unique_id.replace('0x', '').replace(' ', '_').lower()
+        registry.async_update_entity(entity.entity_id, new_unique_id=uid)
 
 
 TITLE = "Xiaomi Gateway 3 Debug"

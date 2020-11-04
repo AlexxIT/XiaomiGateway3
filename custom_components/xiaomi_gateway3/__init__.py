@@ -11,11 +11,10 @@ from homeassistant.util import sanitize_filename
 
 from .core import utils
 from .core.gateway3 import Gateway3
+from .core.utils import DOMAIN
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
-
-DOMAIN = 'xiaomi_gateway3'
 
 CONF_DEVICES = 'devices'
 CONF_DEBUG = 'debug'
@@ -47,6 +46,8 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     hass.data[DOMAIN] = {'config': config}
 
     await _handle_device_remove(hass)
+
+    # utils.migrate_unique_id(hass)
 
     return True
 
