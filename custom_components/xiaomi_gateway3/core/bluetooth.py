@@ -21,6 +21,8 @@ DEVICES = {
     996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
+    2007: ["Unknown", "Mesh Switch Controller", "2007"],
+    2257: ["PTX", "PTX Mesh Wall Double Switch", "PTX-SK2M"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
     # Mesh Group
