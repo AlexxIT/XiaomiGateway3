@@ -421,11 +421,17 @@ class Gateway3(Thread):
 
                 self.devices[device['did']] = device
 
-                # wait domain init
-                while 'light' not in self.setups:
-                    time.sleep(1)
+                if device['model'] in bluetooth.BLE_SWITCH_DEVICES:
+                    while 'switch' not in self.setups:
+                        time.sleep(1)
 
-                self.setups['light'](self, device, 'light')
+                    self.setups['switch'](self, device, 'switch')
+                else:
+                    # wait domain init
+                    while 'light' not in self.setups:
+                        time.sleep(1)
+
+                    self.setups['light'](self, device, 'light')
 
             elif device['type'] == 'ble':
                 # only save info for future
