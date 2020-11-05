@@ -28,7 +28,10 @@ DEVICES = {
     # Mesh Group
     0: ["Mesh", "Mesh Group"]
 }
-
+BLE_SWITCH_DEVICES = [
+    2007,
+    2257,
+]
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
     "Insufficient area", "Skin is too dry", "Skin is too wet"
