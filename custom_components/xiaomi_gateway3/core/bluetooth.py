@@ -284,21 +284,49 @@ def parse_xiaomi_mesh(data: list):
     return result
 
 
+def parse_xiaomi_mesh_raw(data: list):
+    """Can receive multiple properties from multiple devices."""
+    result = {}
+
+    for payload in data:
+        if payload.get('code', 0) != 0:
+            continue
+
+        did = payload['did']
+        key = payload['piid']
+        result.setdefault(did, {})[key] = payload['value']
+
+    return result
+
+
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
+    ''' map light properties '''
+    if isinstance(data, dict):
+        result = []
+        for k,v in data.items():
+            result.append({
+                'piid': MESH_PROPS.index(k),
+                'value': v
+            })
+        return pack_xiaomi_mesh_raw(did, 2, result)
+    else:
+        result = list(map(lambda k: MESH_PROPS.index(k), data))
+        return pack_xiaomi_mesh_raw(did, 2, result)
+
+def pack_xiaomi_mesh_raw(did: str, siid: int, data: Union[dict, list]):
     if isinstance(data, dict):
         return [{
             'did': did,
-            'siid': 2,
-            'piid': MESH_PROPS.index(k),
+            'siid': siid,
+            'piid': k,
             'value': v
         } for k, v in data.items()]
     else:
         return [{
             'did': did,
-            'siid': 2,
-            'piid': MESH_PROPS.index(k),
+            'siid': siid,
+            'piid': k,
         } for k in data]
-
 
 def get_device(pdid: int, default_name: str) -> Optional[dict]:
     if pdid in DEVICES:
