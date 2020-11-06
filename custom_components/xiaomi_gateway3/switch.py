@@ -13,7 +13,6 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        _LOGGER.debug(f"setup device: {device}")
         if attr == 'firmware lock':
             async_add_entities([FirmwareLock(gateway, device, attr)])
         elif device['type'] == 'mesh':
@@ -46,6 +45,8 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     _siid = 0
     _piid = 0
+    _on_value = None
+    _off_value = None
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
@@ -65,10 +66,12 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         super(Gateway3MeshSwitch, self).__init__(gateway, device, attr)
 
         mesh_prop = device['mesh_prop']
-        _LOGGER.debug(f"_init_ {mesh_prop}")
 
         self._siid = mesh_prop[0]
         self._piid = mesh_prop[1]
+        self._on_value = mesh_prop[3]
+        self._off_value = mesh_prop[4]
+        
 
         self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
         self._name = (self.device['device_name'] + ' ' +
@@ -93,7 +96,7 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
             try:
                 payload = [{'did': did,'siid': self._siid,'piid': self._piid,}]
                 resp = self.gw.miio.send('get_properties', payload)
-                _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
+                # _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
                 data = bluetooth.parse_xiaomi_mesh_raw(resp)[did]
             except Exception as e:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error: {e}")
@@ -114,12 +117,12 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         self._state = data[(self._siid, self._piid)]
         
     def turn_on(self):
-        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): True})
+        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): self._on_value})
         time.sleep(.5)  # delay before poll actual status
 
     def turn_off(self):
-        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): False})
-        time.sleep(.5)  # delay before poll actual statu
+        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): self._off_value})
+        time.sleep(.5)  # delay before poll actual status
 
 
 class FirmwareLock(Gateway3Switch):
