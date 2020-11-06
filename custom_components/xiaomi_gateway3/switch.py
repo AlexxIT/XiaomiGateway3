@@ -50,7 +50,7 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
-
+        
         if 'childs' in self.device:
             for did in self.device['childs']:
                 self.gw.add_update(did, self.update)
@@ -113,8 +113,10 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     def _update(self, data: dict):
         self.device['online'] = True
-        _LOGGER.debug(f"{self.gw.host} | {self.device['did']} _update {data}")
-        self._state = data[(self._siid, self._piid)]
+        # _LOGGER.debug(f"{self.gw.host} | {self.device['did']}_{self._siid}_{self._piid} _update: {data}")
+        key = (self._siid, self._piid)
+        if key in data:
+            self._state = data[key]
         
     def turn_on(self):
         self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): self._on_value})
