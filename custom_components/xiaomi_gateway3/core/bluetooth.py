@@ -28,10 +28,12 @@ DEVICES = {
     # Mesh Group
     0: ["Mesh", "Mesh Group"]
 }
+
 BLE_SWITCH_DEVICES = [
-    2007,
-    2257,
+	2007,
+	2257,
 ]
+
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
     "Insufficient area", "Skin is too dry", "Skin is too wet"
@@ -296,7 +298,8 @@ def parse_xiaomi_mesh_raw(data: list):
             continue
 
         did = payload['did']
-        key = payload['piid']
+        key = (payload['siid'], payload['piid'])
+        
         result.setdefault(did, {})[key] = payload['value']
 
     return result
@@ -311,24 +314,25 @@ def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
                 'piid': MESH_PROPS.index(k),
                 'value': v
             })
-        return pack_xiaomi_mesh_raw(did, 2, result)
+        return pack_xiaomi_mesh_raw(did, result)
     else:
         result = list(map(lambda k: MESH_PROPS.index(k), data))
-        return pack_xiaomi_mesh_raw(did, 2, result)
+        return pack_xiaomi_mesh_raw(did, result)
 
-def pack_xiaomi_mesh_raw(did: str, siid: int, data: Union[dict, list]):
+def pack_xiaomi_mesh_raw(did: str, data: Union[dict, list]):
     if isinstance(data, dict):
+        # k is a tuple of (siid, piid)
         return [{
             'did': did,
-            'siid': siid,
-            'piid': k,
+            'siid': k[0],
+            'piid': k[1],
             'value': v
         } for k, v in data.items()]
     else:
         return [{
             'did': did,
-            'siid': siid,
-            'piid': k,
+            'siid': k[0],
+            'piid': k[1],
         } for k in data]
 
 def get_device(pdid: int, default_name: str) -> Optional[dict]:

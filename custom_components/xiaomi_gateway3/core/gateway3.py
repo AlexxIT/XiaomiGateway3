@@ -665,7 +665,7 @@ class Gateway3(Thread):
         # not always Mesh devices
         self.debug(f"Process Mesh* {data}")
 
-        data = bluetooth.parse_xiaomi_mesh(data)
+        data = bluetooth.parse_xiaomi_mesh_raw(data)
         for did, payload in data.items():
             if did in self.updates:
                 for handler in self.updates[did]:
@@ -730,16 +730,11 @@ class Gateway3(Thread):
             mac = self.device['mac'][2:].upper()
             self.mqtt.publish(f"gw/{mac}/publishstate")
 
-    def send_mesh(self, device: dict, data: dict):
+    def send_mesh_raw(self, device: dict, data: dict):
         did = device['did']
-        payload = bluetooth.pack_xiaomi_mesh(did, data)
+        payload = bluetooth.pack_xiaomi_mesh_raw(did, data)
         return self.miio.send('set_properties', payload)
 
-    def send_mesh_switch(self, device: dict, data: dict):
-        did = device['did']
-        payload = bluetooth.pack_xiaomi_mesh_raw(did, 2, data)
-        return self.miio.send('set_properties', payload)
-        
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():
             if device.get('mac') == mac:
