@@ -425,7 +425,13 @@ class Gateway3(Thread):
                     while 'switch' not in self.setups:
                         time.sleep(1)
 
-                    self.setups['switch'](self, device, 'switch')
+                    props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(device['model'], bluetooth.DEFAULT_SWITCH_PROP)
+                    for prop in props:
+                        d = device.copy()
+                        d['mesh_prop'] = prop
+                        self.setups['switch'](self, d, 'switch')
+
+                    #self.setups['switch'](self, device, 'switch')
                 else:
                     # wait domain init
                     while 'light' not in self.setups:

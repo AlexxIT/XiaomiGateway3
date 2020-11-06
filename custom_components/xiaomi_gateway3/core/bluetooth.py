@@ -34,6 +34,22 @@ BLE_SWITCH_DEVICES = [
 	2257,
 ]
 
+# model: [
+#   [siid, piid, name],
+#   [siid, piid, name],
+#   ...
+# ]
+BLE_SWITCH_DEVICES_PROPS = {
+    2257: [
+        [2, 1, 'Left Switch'],
+        [3, 1, 'Right Switch'],
+        [8, 1, 'Backlight'],
+        [8, 2, 'Left - Always On'],
+        [8, 3, 'Right - Always On'],
+    ]
+}
+DEFAULT_SWITCH_PROP = [[2, 1, 'Switch']]
+
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
     "Insufficient area", "Skin is too dry", "Skin is too wet"
