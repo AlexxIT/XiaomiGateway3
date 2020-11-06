@@ -65,7 +65,6 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         super(Gateway3MeshSwitch, self).__init__(gateway, device, attr)
 
         mesh_prop = device['mesh_prop']
-        _LOGGER.debug(f"_init_ {mesh_prop}")
 
         self._siid = mesh_prop[0]
         self._piid = mesh_prop[1]
@@ -93,7 +92,7 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
             try:
                 payload = [{'did': did,'siid': self._siid,'piid': self._piid,}]
                 resp = self.gw.miio.send('get_properties', payload)
-                _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
+                # _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
                 data = bluetooth.parse_xiaomi_mesh_raw(resp)[did]
             except Exception as e:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error: {e}")
