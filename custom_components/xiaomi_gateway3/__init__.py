@@ -1,7 +1,6 @@
 import logging
 
 import voluptuous as vol
-from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
