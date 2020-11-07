@@ -429,17 +429,25 @@ class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
         self.text += f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}\n"
 
     async def get(self, request: web.Request):
-        reload = request.query.get('r', '')
+        try:
+            if 'q' in request.query or 't' in request.query:
+                lines = self.text.split('\n')
 
-        if 'q' in request.query:
-            try:
-                reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
-                body = '\n'.join([p for p in self.text.split('\n')
-                                  if reg.search(p)])
-            except:
-                return web.Response(status=500)
-        else:
-            body = self.text
+                if 'q' in request.query:
+                    reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
+                    lines = [p for p in lines if reg.search(p)]
 
-        return web.Response(text=HTML % (reload, body),
-                            content_type="text/html")
+                if 't' in request.query:
+                    tail = int(request.query['t'])
+                    lines = lines[-tail:]
+
+                body = '\n'.join(lines)
+            else:
+                body = self.text
+
+            reload = request.query.get('r', '')
+            return web.Response(text=HTML % (reload, body),
+                                content_type="text/html")
+
+        except:
+            return web.Response(status=500)
