@@ -1,7 +1,10 @@
 import logging
+import time
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, \
     DEVICE_CLASS_DOOR, DEVICE_CLASS_MOISTURE
+from homeassistant.config import DATA_CUSTOMIZE
+from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_call_later
 
@@ -14,6 +17,9 @@ DEVICE_CLASS = {
     'contact': DEVICE_CLASS_DOOR,
     'water_leak': DEVICE_CLASS_MOISTURE,
 }
+
+CONF_INVERT_STATE = 'invert_state'
+CONF_OCCUPANCY_TIMEOUT = 'occupancy_timeout'
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -30,8 +36,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
     @property
-    def is_on(self):
-        return self._state is True
+    def state(self):
+        return self._state
 
     @property
     def device_class(self):
@@ -39,34 +45,69 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
 
     def update(self, data: dict = None):
         if self._attr in data:
-            # gas and smoke => 1 and 2
-            self._state = data[self._attr] == 1
+            custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+            if not custom.get(CONF_INVERT_STATE):
+                # gas and smoke => 1 and 2
+                self._state = STATE_ON if data[self._attr] else STATE_OFF
+            else:
+                self._state = STATE_OFF if data[self._attr] else STATE_ON
+
         self.async_write_ha_state()
 
 
 class Gateway3MotionSensor(Gateway3BinarySensor):
-    _occupancy_timeout = None
+    _last_off = 0
+    _state = STATE_OFF
+    _timeout_pos = 0
     _unsub_set_no_motion = None
 
     async def async_added_to_hass(self):
-        self._occupancy_timeout = self.device.get('occupancy_timeout', 90)
+        # old version
+        delay = self.device.get(CONF_OCCUPANCY_TIMEOUT, 90)
+
+        custom: dict = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+        custom.setdefault(CONF_OCCUPANCY_TIMEOUT, delay)
 
         await super().async_added_to_hass()
 
     @callback
     def _set_no_motion(self, *args):
+        self.debug("Clear motion")
+
+        self._last_off = time.time()
+        self._timeout_pos = 0
         self._unsub_set_no_motion = None
-        self._state = False
+        self._state = STATE_OFF
         self.async_write_ha_state()
 
     def update(self, data: dict = None):
         if self._attr in data:
-            self._state = data[self._attr] >= 1
+            self._state = STATE_ON if data[self._attr] else STATE_OFF
+
+        # handle available change
         self.async_write_ha_state()
 
-        if self._state:
-            if self._unsub_set_no_motion:
-                self._unsub_set_no_motion()
+        # continue only if motion=1 arrived
+        if not data.get(self._attr):
+            return
 
-            _unsub_set_no_motion = async_call_later(
-                self.hass, self._occupancy_timeout, self._set_no_motion)
+        if self._unsub_set_no_motion:
+            self._unsub_set_no_motion()
+
+        custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+        timeout = custom.get(CONF_OCCUPANCY_TIMEOUT)
+        if timeout:
+            if isinstance(timeout, list):
+                pos = min(self._timeout_pos, len(timeout) - 1)
+                delay = timeout[pos]
+                self._timeout_pos += 1
+            else:
+                delay = timeout
+
+            if delay < 0 and time.time() + delay < self._last_off:
+                delay *= 2
+
+            self.debug(f"Extend delay: {delay} seconds")
+
+            self._unsub_set_no_motion = async_call_later(
+                self.hass, abs(delay), self._set_no_motion)
