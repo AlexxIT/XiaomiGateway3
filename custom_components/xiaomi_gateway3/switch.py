@@ -29,7 +29,7 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
 
     @property
     def is_on(self):
-        return self._attr == STATE_ON
+        return self._state == STATE_ON
 
     def update(self, data: dict = None):
         if self._attr in data:

@@ -39,7 +39,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
 
     @property
     def is_on(self):
-        return self._attr == STATE_ON
+        return self._state == STATE_ON
 
     @property
     def state_attributes(self):
