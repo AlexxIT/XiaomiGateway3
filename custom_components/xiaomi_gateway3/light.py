@@ -6,7 +6,6 @@ from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
 from homeassistant.util import color
 
 from . import DOMAIN, Gateway3Device
-from .core import bluetooth
 from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
@@ -16,9 +15,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
         if device['type'] == 'zigbee':
             async_add_entities([Gateway3Light(gateway, device, attr)])
+        elif 'childs' in device:
+            async_add_entities([Gateway3MeshGroup(gateway, device, attr)])
         else:
-            async_add_entities([Gateway3MeshLight(gateway, device, attr)],
-                               True)
+            async_add_entities([Gateway3MeshLight(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('light', setup)
@@ -90,20 +90,6 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
     _brightness = None
     _color_temp = None
 
-    async def async_added_to_hass(self):
-        await super().async_added_to_hass()
-
-        if 'childs' in self.device:
-            for did in self.device['childs']:
-                self.gw.add_update(did, self.update)
-
-    async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-
-        if 'childs' in self.device:
-            for did in self.device['childs']:
-                self.gw.remove_update(did, self.update)
-
     @property
     def should_poll(self) -> bool:
         return True
@@ -135,26 +121,21 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
 
     def update(self, data: dict = None):
         if data is None:
-            did = (self.device['childs'][0]
-                   if 'childs' in self.device
-                   else self.device['did'])
+            # process poll update
+            did = self.device['did']
+
             try:
                 payload = [{'did': did, 'siid': p[0], 'piid': p[1]}
                            for p in MESH_LIGHT_PROPS.values()]
                 resp = self.gw.miio.send('get_properties', payload)
-                data = bluetooth.parse_xiaomi_mesh_raw(resp)[did]
-                _LOGGER.debug(f'{self.gw.host} | {did} data = {data} ')
+                self.gw.process_mesh_data(resp)
             except:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error")
                 self.device['online'] = False
-                return
+                self.async_write_ha_state()
+            return
 
-            # _LOGGER.debug(f"{self.gw.host} | {did} poll mesh <= {data}")
-            self._update(data)
-
-        else:
-            self._update(data)
-            self.async_write_ha_state()
+        self._update(data)
 
     def _update(self, data: dict):
         self.device['online'] = True
@@ -168,6 +149,8 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
             # 2700..6500 => 370..153
             self._color_temp = \
                 color.color_temperature_kelvin_to_mired(data[MESH_LIGHT_PROPS['color_temp']])
+
+        self.async_write_ha_state()
 
     def turn_on(self, **kwargs):
         payload = {}
@@ -189,3 +172,26 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
     def turn_off(self):
         self.gw.send_mesh_raw(self.device, {MESH_LIGHT_PROPS[self._attr]: False})
         time.sleep(.5)  # delay before poll actual status
+
+
+class Gateway3MeshGroup(Gateway3MeshLight):
+    async def async_added_to_hass(self):
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.add_update(did, self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.remove_update(did, self.update)
+
+    @property
+    def should_poll(self):
+        return False
+
+    @property
+    def icon(self):
+        return 'mdi:lightbulb-group'
+
+    def update(self, data: dict = None):
+        self._update(data)
