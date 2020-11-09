@@ -21,6 +21,8 @@ DOMAIN = 'xiaomi_gateway3'
 DEVICES = [{
     'lumi.gateway.mgl03': ["Xiaomi", "Gateway 3", "ZNDMWG03LM"],
     'params': [
+        ['8.0.2012', None, 'power_tx', None],
+        ['8.0.2024', None, 'channel', None],
         ['8.0.2081', None, 'pairing_stop', None],
         ['8.0.2082', None, 'removed_did', None],
         ['8.0.2084', None, 'added_device', None],  # new devices added (info)
@@ -326,7 +328,6 @@ GLOBAL_PROP = {
     '8.0.2009': 'pv_state',
     '8.0.2010': 'cur_state',
     '8.0.2011': 'pre_state',
-    '8.0.2012': 'power_tx',
     '8.0.2013': 'CCA',
     '8.0.2014': 'protect',
     '8.0.2015': 'power',

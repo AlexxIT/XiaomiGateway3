@@ -87,6 +87,9 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
 
     async def async_send_command(self, command, **kwargs):
         for cmd in command:
+            args = cmd.split(' ')
+            cmd = args[0]
+
             # for testing purposes
             if cmd == 'ble':
                 raw = kwargs[ATTR_DEVICE].replace('\'', '"')
@@ -98,5 +101,9 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                 self.turn_on()
             elif cmd in ('reboot', 'ftp'):
                 self.gw.send_telnet(cmd)
+            elif cmd == 'power':
+                self.gw.send(self.device, {'power_tx': int(args[1])})
+            elif cmd == 'channel':
+                self.gw.send(self.device, {'channel': int(args[1])})
             elif cmd == 'publishstate':
                 self.gw.send_mqtt('publishstate')
