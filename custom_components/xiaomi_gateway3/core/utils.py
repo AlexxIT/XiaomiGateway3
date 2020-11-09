@@ -77,6 +77,7 @@ DEVICES = [{
         # [?, 'enable_motor_mode', 'interlock', None]
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -95,6 +96,7 @@ DEVICES = [{
         ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -104,6 +106,7 @@ DEVICES = [{
         ['4.2.85', 'channel 1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -116,6 +119,9 @@ DEVICES = [{
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
+        ['13.5.85', None, 'button_both_12', None],
+        ['13.6.85', None, 'button_both_13', None],
+        ['13.7.85', None, 'button_both_23', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -130,6 +136,9 @@ DEVICES = [{
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
+        ['13.5.85', None, 'button_both_12', None],
+        ['13.6.85', None, 'button_both_13', None],
+        ['13.7.85', None, 'button_both_23', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {

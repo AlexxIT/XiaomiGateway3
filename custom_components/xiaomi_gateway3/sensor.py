@@ -113,7 +113,7 @@ class Gateway3Action(Gateway3Device):
             if k == 'button':
                 data[self._attr] = BUTTON[v]
                 break
-            elif k == 'button_both':
+            elif k.startswith('button_both'):
                 data[self._attr] = k + '_' + BUTTON_BOTH[v]
                 break
             elif k.startswith('button'):
