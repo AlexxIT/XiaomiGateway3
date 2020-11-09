@@ -21,6 +21,8 @@ DOMAIN = 'xiaomi_gateway3'
 DEVICES = [{
     'lumi.gateway.mgl03': ["Xiaomi", "Gateway 3", "ZNDMWG03LM"],
     'params': [
+        ['8.0.2012', None, 'power_tx', None],
+        ['8.0.2024', None, 'channel', None],
         ['8.0.2081', None, 'pairing_stop', None],
         ['8.0.2082', None, 'removed_did', None],
         ['8.0.2084', None, 'added_device', None],  # new devices added (info)
@@ -77,6 +79,7 @@ DEVICES = [{
         # [?, 'enable_motor_mode', 'interlock', None]
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -95,6 +98,7 @@ DEVICES = [{
         ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -104,6 +108,7 @@ DEVICES = [{
         ['4.2.85', 'channel 1', 'channel 2', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -116,6 +121,9 @@ DEVICES = [{
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
+        ['13.5.85', None, 'button_both_12', None],
+        ['13.6.85', None, 'button_both_13', None],
+        ['13.7.85', None, 'button_both_23', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -130,6 +138,9 @@ DEVICES = [{
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
+        ['13.5.85', None, 'button_both_12', None],
+        ['13.6.85', None, 'button_both_13', None],
+        ['13.7.85', None, 'button_both_23', None],
         [None, None, 'action', 'sensor'],
     ]
 }, {
@@ -317,7 +328,6 @@ GLOBAL_PROP = {
     '8.0.2009': 'pv_state',
     '8.0.2010': 'cur_state',
     '8.0.2011': 'pre_state',
-    '8.0.2012': 'power_tx',
     '8.0.2013': 'CCA',
     '8.0.2014': 'protect',
     '8.0.2015': 'power',

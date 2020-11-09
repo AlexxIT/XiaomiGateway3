@@ -31,6 +31,10 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
     def state(self):
         return self._state
 
+    @property
+    def is_on(self):
+        return self._attr == STATE_ON
+
     def update(self, data: dict = None):
         if self._attr in data:
             self._state = STATE_ON if data[self._attr] else STATE_OFF
