@@ -1,7 +1,6 @@
 import logging
 
 import voluptuous as vol
-from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -172,7 +171,7 @@ async def _handle_device_remove(hass: HomeAssistant):
 
 
 class Gateway3Device(Entity):
-    _state = STATE_UNKNOWN
+    _state = None
 
     def __init__(self, gateway: Gateway3, device: dict, attr: str):
         self.gw = gateway
@@ -191,7 +190,8 @@ class Gateway3Device(Entity):
         _LOGGER.debug(f"{self.entity_id} | {message}")
 
     async def async_added_to_hass(self):
-        if 'init' in self.device and self._state == STATE_UNKNOWN:
+        """Also run when rename entity_id"""
+        if 'init' in self.device and self._state is None:
             self.update(self.device['init'])
 
         self.gw.add_update(self.device['did'], self.update)

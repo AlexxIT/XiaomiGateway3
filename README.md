@@ -204,13 +204,47 @@ If the integration is not in the list, you need to clear the browser cache.
 
 # Advanced config
 
-Support custom occupancy timeout for motion sensor. Default 90 seconds.
+Support custom occupancy timeout for motion sensor and invert state for door sensor (for DIY purposes).
+
+Config through built-in [customizing](https://www.home-assistant.io/docs/configuration/customizing-devices/) UI or YAML.
+
+[![Xiaomi Gateway 3 occupancy timeout settings in Home Assistant](https://img.youtube.com/vi/2EeKnF2uvjo/mqdefault.jpg)](https://www.youtube.com/watch?v=2EeKnF2uvjo)
+
+It's important to add these lines to your `configuration.yaml`. Otherwise, changes to the UI will not be read when you restart Home Assistant.
 
 ```yaml
-xiaomi_gateway3:
-  devices:
-    '0x158d00044c5dff':
-      occupancy_timeout: 90  # (optional) default 90 seconds
+homeassistant:
+  customize: !include customize.yaml
+```
+
+To enable customizing UI, you need to enable **Advanced Mode** in your user profile.
+
+**Occupancy timeout** for moving sensor.
+
+![](occupancy_timeout.png)
+
+- a **simple timer** starts every time a person moves
+- the **progressive timer** starts with a new value with each new movement of the person, the more you move - the longer the timer
+- **fast back timer** starts with doubled value if the person moves immediately after the timer is off
+
+```yaml
+# /config/customize.yaml
+binary_sensor.0x158d0003456789_motion:
+  occupancy_timeout: 180  # simple mode
+binary_sensor.0x158d0003456788_motion:
+  occupancy_timeout: -120  # fast back mode
+binary_sensor.0x158d0003456787_motion:
+  occupancy_timeout: [-120, 240, 300]  # progressive timer
+binary_sensor.0x158d0003456786_motion:
+  occupancy_timeout: 1  # for hacked 5 sec sensors
+```
+
+**Invert state** for contact sensor.
+
+```yaml
+# /config/customize.yaml
+binary_sensor.0x158d0003456789_contact:
+  invert_state: 1  # any non-empty value will reverse the logic
 ```
 
 # Add and remove Zigbee devices
@@ -474,8 +508,8 @@ xiaomi_gateway3:
   debug: true  # you will get HA notification with a link to the logs page
 ```
 
-You can filter data in the logs and enable auto refresh (in seconds).
+You can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
 
 ```
-http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2
+http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2&t=100
 ```

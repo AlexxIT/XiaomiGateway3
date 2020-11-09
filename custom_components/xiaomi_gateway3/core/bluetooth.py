@@ -5,6 +5,7 @@ DEVICES = {
     # BLE
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
+    839: ["Xiaomi", "Qingping TH Sensor", "CGG1"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1115: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD"],

@@ -281,26 +281,24 @@ class Gateway3(Thread):
                         'childs': [],
                         'type': 'mesh'
                     }
-                    mesh_groups[row[1]] = device
+                    group_addr = row[1]
+                    mesh_groups[group_addr] = device
 
                 # load Mesh bulbs
                 rows = db.read_table('mesh_device')
                 for row in rows:
+                    device = {
+                        'did': row[0],
+                        'mac': row[1].replace(':', ''),
+                        'model': row[2],
+                        'type': 'mesh'
+                    }
+                    devices.append(device)
+
                     group_addr = row[5]
                     if group_addr in mesh_groups:
                         # add bulb to group if exist
                         mesh_groups[group_addr]['childs'].append(row[0])
-
-                    else:
-                        # add single bulb
-                        device = {
-                            'did': row[0],
-                            'mac': row[1].replace(':', ''),
-                            'model': row[2],
-                            'group_addr': group_addr,
-                            'type': 'mesh'
-                        }
-                        devices.append(device)
 
                 for device in mesh_groups.values():
                     if device['childs']:
