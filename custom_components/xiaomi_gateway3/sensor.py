@@ -132,6 +132,11 @@ class Gateway3Action(Gateway3Device):
             self._state = data[self._attr]
             self.async_write_ha_state()
 
+            # repeat event from Aqara integration
+            self.hass.bus.async_fire('xiaomi_aqara.click', {
+                'entity_id': self.entity_id, 'click_type': self._state
+            })
+
             time.sleep(.1)
 
             self._state = ''

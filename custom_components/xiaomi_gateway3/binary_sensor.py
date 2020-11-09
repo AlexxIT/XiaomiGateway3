@@ -116,3 +116,8 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
 
             self._unsub_set_no_motion = async_call_later(
                 self.hass, abs(delay), self._set_no_motion)
+
+        # repeat event from Aqara integration
+        self.hass.bus.async_fire('xiaomi_aqara.motion', {
+            'entity_id': self.entity_id
+        })
