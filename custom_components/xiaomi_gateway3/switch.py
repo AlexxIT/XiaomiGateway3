@@ -3,6 +3,7 @@ import time
 from functools import partial
 
 from homeassistant.components import persistent_notification
+from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device
@@ -27,12 +28,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class Gateway3Switch(Gateway3Device, ToggleEntity):
     @property
-    def is_on(self) -> bool:
+    def state(self):
         return self._state
 
     def update(self, data: dict = None):
         if self._attr in data:
-            self._state = data[self._attr] == 1
+            self._state = STATE_ON if data[self._attr] else STATE_OFF
         self.async_write_ha_state()
 
     def turn_on(self):
@@ -73,7 +74,6 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         self._on_value = mesh_prop[3]
         self._off_value = mesh_prop[4]
         
-
         self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
         self._name = (self.device['device_name'] + ' ' +
                       mesh_prop[2].title())
@@ -135,7 +135,7 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
             for data in bluetooth.parse_xiaomi_mesh_callback(result):
                 _LOGGER.debug(f"{self.gw.host} | handle callback: {data}")
                 if data[0] == self.device['did'] and data[1] == self._siid and data[2] == self._piid:
-                    self._state = value
+                    self._state = STATE_ON if value == self._on_value else STATE_OFF
                     return
         except Exception as e:
             _LOGGER.debug(f"{self.gw.host} | failed to handle async command: {e}")
@@ -148,7 +148,7 @@ class FirmwareLock(Gateway3Switch):
 
     def turn_on(self):
         if self.gw.lock_firmware(enable=True):
-            self._state = True
+            self._state = STATE_ON
             self.async_write_ha_state()
 
             persistent_notification.async_create(
@@ -158,5 +158,5 @@ class FirmwareLock(Gateway3Switch):
 
     def turn_off(self):
         if self.gw.lock_firmware(enable=False):
-            self._state = False
+            self._state = STATE_OFF
             self.async_write_ha_state()
