@@ -40,6 +40,11 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
         return self._state
 
     @property
+    def is_on(self):
+        # don't know if is_on important for binary sensror
+        return self._state == STATE_ON
+
+    @property
     def device_class(self):
         return DEVICE_CLASS.get(self._attr, self._attr)
 
