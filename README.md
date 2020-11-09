@@ -472,13 +472,32 @@ To cancel this changes - disable this option and restart the gateway. The applic
 
 # Advanced commands
 
+**Reboot Gateway**
+
 ```yaml
 script:
   reboot_gateway:
     sequence:
     - service: remote.send_command
       entity_id: remote.0x0123456789abcdef_pair  # change to your gateway
-      command: reboot
+      data:
+        command: reboot
+```
+
+**Attention:** I don’t know if it’s safe to change the channel and power of the gateway. Use at your own risk.
+
+The information in the attributes of the pair object is updated within a minute!
+
+**Change Zigbee channel**
+
+```yaml
+command: channel 15  # I saw values: 11, 15, 20, 25
+```
+
+**Change Zigbee TX power**
+
+```yaml
+command: power 7  # I saw values: 0, 7, 30
 ```
 
 # How it works
