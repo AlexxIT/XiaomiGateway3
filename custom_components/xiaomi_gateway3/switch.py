@@ -1,5 +1,6 @@
 import logging
 import time
+from functools import partial
 
 from homeassistant.components import persistent_notification
 from homeassistant.helpers.entity import ToggleEntity
@@ -13,7 +14,6 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        _LOGGER.debug(f"setup device: {device}")
         if attr == 'firmware lock':
             async_add_entities([FirmwareLock(gateway, device, attr)])
         elif device['type'] == 'mesh':
@@ -46,10 +46,12 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     _siid = 0
     _piid = 0
+    _on_value = None
+    _off_value = None
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
-
+        
         if 'childs' in self.device:
             for did in self.device['childs']:
                 self.gw.add_update(did, self.update)
@@ -68,6 +70,9 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
         self._siid = mesh_prop[0]
         self._piid = mesh_prop[1]
+        self._on_value = mesh_prop[3]
+        self._off_value = mesh_prop[4]
+        
 
         self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
         self._name = (self.device['device_name'] + ' ' +
@@ -109,16 +114,31 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     def _update(self, data: dict):
         self.device['online'] = True
-        _LOGGER.debug(f"{self.gw.host} | {self.device['did']} _update {data}")
-        self._state = data[(self._siid, self._piid)]
+        # _LOGGER.debug(f"{self.gw.host} | {self.device['did']}_{self._siid}_{self._piid} _update: {data}")
+        key = (self._siid, self._piid)
+        if key in data:
+            self._state = data[key]
         
-    def turn_on(self):
-        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): True})
-        time.sleep(.5)  # delay before poll actual status
+    async def async_turn_on(self):
+        await self.async_send_mesh_command(self._on_value)
 
-    def turn_off(self):
-        self.gw.send_mesh_raw(self.device, {(self._siid, self._piid): False})
-        time.sleep(.5)  # delay before poll actual statu
+    async def async_turn_off(self):
+        await self.async_send_mesh_command(self._off_value)
+        
+    async def async_send_mesh_command(self, value):
+        try:
+            payload = {(self._siid, self._piid): value}
+            result = await self.hass.async_add_executor_job(
+                partial(self.gw.send_mesh_raw, self.device, payload))
+
+            # _LOGGER.debug(f"await send_mesh_raw | result = {result}")
+            for data in bluetooth.parse_xiaomi_mesh_callback(result):
+                _LOGGER.debug(f"{self.gw.host} | handle callback: {data}")
+                if data[0] == self.device['did'] and data[1] == self._siid and data[2] == self._piid:
+                    self._state = value
+                    return
+        except Exception as e:
+            _LOGGER.debug(f"{self.gw.host} | failed to handle async command: {e}")
 
 
 class FirmwareLock(Gateway3Switch):

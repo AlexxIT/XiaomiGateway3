@@ -35,20 +35,22 @@ BLE_SWITCH_DEVICES = [
 ]
 
 # model: [
-#   [siid, piid, name],
-#   [siid, piid, name],
+#   [siid, piid, name, on_value, off_value],
+#   [siid, piid, name, on_value, off_value],
 #   ...
 # ]
 BLE_SWITCH_DEVICES_PROPS = {
     2257: [
-        [2, 1, 'Left Switch'],
-        [3, 1, 'Right Switch'],
-        [8, 1, 'Backlight'],
-        [8, 2, 'Left - Always On'],
-        [8, 3, 'Right - Always On'],
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Left - Always On', 1, 0],
+        [8, 3, 'Right - Always On', 1, 0],
     ]
 }
-DEFAULT_SWITCH_PROP = [[2, 1, 'Switch']]
+DEFAULT_SWITCH_PROP = [
+	[2, 1, 'Switch', True, False]
+]
 
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
@@ -320,6 +322,18 @@ def parse_xiaomi_mesh_raw(data: list):
 
     return result
 
+def parse_xiaomi_mesh_callback(data: list):
+    result = []
+
+    for payload in data:
+        if payload.get('code', 1) != 1:
+            continue
+        
+        result.append([
+            payload['did'], payload['siid'], payload['piid'],
+        ])
+
+    return result
 
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
     ''' map light properties '''
