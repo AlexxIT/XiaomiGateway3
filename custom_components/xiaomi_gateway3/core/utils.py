@@ -61,7 +61,8 @@ DEVICES = [{
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
-        ['13.1.85', None, 'action', 'sensor'],
+        ['13.1.85', None, 'button', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off, power measurement
@@ -88,7 +89,8 @@ DEVICES = [{
     'lumi.switch.b1lacn02': ["Aqara", "D1 Wall Single Switch", "QBKG21LM"],
     'params': [
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # or neutral_0?
-        ['13.1.85', None, 'action', 'sensor'],
+        ['13.1.85', None, 'button', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # dual channel on/off
