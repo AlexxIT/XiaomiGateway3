@@ -586,11 +586,14 @@ class Gateway3(Thread):
             return
 
         # init entities if needed
+        init = device['init']
         for k in payload.keys():
-            if k in device['init']:
+            if k in init:
+                # update for retain
+                init[k] = payload[k]
                 continue
 
-            device['init'][k] = payload[k]
+            init[k] = payload[k]
 
             domain = bluetooth.get_ble_domain(k)
             if not domain:
@@ -606,7 +609,7 @@ class Gateway3(Thread):
             for handler in self.updates[did]:
                 handler(payload)
 
-        raw = json.dumps(device['init'], separators=(',', ':'))
+        raw = json.dumps(init, separators=(',', ':'))
         self.mqtt.publish(f"ble/{did}", raw, retain=True)
 
     def process_ble_retain(self, did: str, payload: dict):
