@@ -247,6 +247,14 @@ binary_sensor.0x158d0003456789_contact:
   invert_state: 1  # any non-empty value will reverse the logic
 ```
 
+**Ignore offline** device status.
+
+```yaml
+# /config/customize.yaml
+switch.0x158d0003456789_switch:
+  ignore_offline: 1  # any non-empty value
+```
+
 # Add and remove Zigbee devices
 
 To enter the pairing mode, turn on the switch **Xiaomi Gateway 3 Pair**. Pairing lasts 60 seconds.
