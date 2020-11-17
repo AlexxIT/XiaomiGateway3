@@ -20,7 +20,7 @@ RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 # use awk because buffer
 MIIO_LESS = "-l 0 -o FILE_STORE -n 128"
 MIIO_MORE = "-l 4"
-MIIO2MQTT = "(miio_client -d /data/miio %s | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
+MIIO2MQTT = "(miio_client %s -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
 
 VERSION = "cat etc/rootfs_fw_info | grep 'version' | cut -d '=' -f 2"
 
