@@ -317,17 +317,26 @@ Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.de
 
 # Handle Button Actions
 
+**Video DEMO**
+
 [![Handling Zigbee buttons with Xiaomi Gateway 3 in Home Assistant](https://img.youtube.com/vi/a8hsNlTErac/mqdefault.jpg)](https://www.youtube.com/watch?v=a8hsNlTErac)
 
-Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its state for a split second and returns to an empty state. The attributes contain useful data, they are not cleared after the event is triggered.
+Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its **state** for a split second and returns to an empty state. The **attributes** contain useful data, they are not cleared after the event is triggered.
+
+Depending on the button model, its state may be:
+- single button: `single`, `double`, `triple`, `quadruple`, `many`, `hold`, `release`, `shake`
+- double button: `button_1_single`, `button_2_single`, `button_both_single`, etc.
+- triple button: `button_1_single`, `button_12_single`, `button_23_single`, etc.
+
+Your button may not have all of these options! Check available values in `action`-sensor attributes when you interact with button.
 
 ```yaml
 automation:
 - alias: Turn off all lights
   trigger:
   - platform: state
-    entity_id: sensor.0x158d0002fa99fd_action
-    to: button_1_single
+    entity_id: sensor.0x158d0002fa99fd_action  # change to your button
+    to: button_1_single  # change to your button state
   action:
   - service: light.turn_off
     entity_id: all
