@@ -310,6 +310,7 @@ DEVICES = [{
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
+    'lumi.lock.aq1': ["Aqara", "Door Lock S1", "ZNMS11LM"],
     'lumi.lock.acn02': ["Aqara", "Door Lock S2", "ZNMS12LM"],
     'params': [
         ['13.1.85', None, 'key_id', 'sensor'],
