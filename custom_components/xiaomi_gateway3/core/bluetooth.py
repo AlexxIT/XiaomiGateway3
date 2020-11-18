@@ -19,6 +19,7 @@ DEVICES = {
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     # Mesh
     948: ["Yeelight", "Mesh Downlight", "YLSD01YL"],
+    995: ["Yeelight", "Mesh Bulb E14", "YLDP09YL"],
     996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
