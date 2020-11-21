@@ -317,6 +317,11 @@ DEVICES = [{
         ['13.20.85', 'lock_state', 'lock', 'binary_sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
+}, {
+    'lumi.airrtc.vrfegl01': ["Xiaomi", "VRF Air Conditioning"],
+    'params': [
+        ['13.1.85', None, 'channels', 'sensor']
+    ]
 }]
 
 GLOBAL_PROP = {
