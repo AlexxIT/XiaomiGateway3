@@ -17,7 +17,6 @@ _LOGGER = logging.getLogger(__name__)
 
 RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
 RE_MAC = re.compile('^0x0*')
-RE_JSON = re.compile(b'{.+}')
 # MAC reverse
 RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 
@@ -349,11 +348,18 @@ class Gateway3(Thread):
             if 'miio' in self._debug:
                 _LOGGER.debug(f"[MI] {msg.payload}")
 
-            if self.ble:
-                if b'_async.ble_event' in msg.payload:
-                    self.process_ble_event(msg.payload)
-                elif b'properties_changed' in msg.payload:
-                    self.process_mesh_data(msg.payload)
+            if self.ble and (
+                    b'_async.ble_event' in msg.payload or
+                    b'properties_changed' in msg.payload
+            ):
+                try:
+                    for raw in utils.extract_jsons(msg.payload):
+                        if b'_async.ble_event' in raw:
+                            self.process_ble_event(raw)
+                        elif b'properties_changed' in raw:
+                            self.process_mesh_data(raw)
+                except:
+                    _LOGGER.warning(f"Can't read BT: {msg.payload}")
 
         elif msg.topic.endswith('/heartbeat'):
             payload = json.loads(msg.payload)
@@ -537,18 +543,10 @@ class Gateway3(Thread):
         self.debug(f"{did} <= LQI {payload['linkQuality']}")
 
     def process_ble_event(self, raw: Union[bytes, str]):
-        try:
-            if isinstance(raw, bytes):
-                # fix two json bug
-                if b'}{' in raw:
-                    raw = raw[:raw.index(b'}{') + 1]
-                m = RE_JSON.search(raw)
-                data = json.loads(m[0])['params']
-            else:
-                data = json.loads(raw)
-        except:
-            self.debug(f"Wrong BLE input: {raw}")
-            return
+        if isinstance(raw, bytes):
+            data = json.loads(raw)['params']
+        else:
+            data = json.loads(raw)
 
         self.debug(f"Process BLE {data}")
 
@@ -644,18 +642,10 @@ class Gateway3(Thread):
                 handler(payload)
 
     def process_mesh_data(self, raw: Union[bytes, list]):
-        try:
-            if isinstance(raw, bytes):
-                # fix two json bug
-                if b'}{' in raw:
-                    raw = raw[:raw.index(b'}{') + 1]
-                m = RE_JSON.search(raw)
-                data = json.loads(m[0])['params']
-            else:
-                data = raw
-        except:
-            self.debug(f"Wrong Mesh* input: {raw}")
-            return
+        if isinstance(raw, bytes):
+            data = json.loads(raw)['params']
+        else:
+            data = raw
 
         # not always Mesh devices
         self.debug(f"Process Mesh* {data}")
