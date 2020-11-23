@@ -1,7 +1,7 @@
 import base64
 import logging
+import re
 import time
-
 from telnetlib import Telnet
 from typing import Union
 
@@ -22,7 +22,7 @@ MIIO_LESS = "-l 0 -o FILE_STORE -n 128"
 MIIO_MORE = "-l 4"
 MIIO2MQTT = "(miio_client %s -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
 
-VERSION = "cat etc/rootfs_fw_info | grep 'version' | cut -d '=' -f 2"
+RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 
 class TelnetShell(Telnet):
@@ -112,5 +112,7 @@ class TelnetShell(Telnet):
         self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
         self.exec("daemon_miio.sh &")
 
-    def version(self):
-        return self.exec(VERSION).split('\r\n')[1]
+    def get_version(self):
+        raw = self.read_file('/etc/rootfs_fw_info')
+        m = RE_VERSION.search(raw.decode())
+        return m[1]

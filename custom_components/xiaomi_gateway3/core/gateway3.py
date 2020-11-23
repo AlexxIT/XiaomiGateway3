@@ -21,7 +21,27 @@ RE_MAC = re.compile('^0x0*')
 RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 
 
-class Gateway3(Thread):
+class GatewayV:
+    """Handling different firmware versions."""
+    ver = None
+
+    @property
+    def ver_mesh_group(self) -> str:
+        return 'mesh_group_v1' if self.ver >= '1.4.6_0043' else 'mesh_group'
+
+    @property
+    def ver_zigbee_db(self) -> str:
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/14
+        # fw 1.4.6_0012 and below have one zigbee_gw.db file
+        # fw 1.4.6_0030 have many json files in this folder
+        return '*.json' if self.ver >= '1.4.6_0030' else 'zigbee_gw.db'
+
+    @property
+    def ver_miio(self) -> bool:
+        return self.ver >= '1.4.7_0063'
+
+
+class Gateway3(Thread, GatewayV):
     pair_model = None
     pair_payload = None
 
@@ -118,6 +138,10 @@ class Gateway3(Thread):
         self.debug("Prepare Gateway")
         try:
             shell = TelnetShell(self.host)
+
+            self.ver = shell.get_version()
+            self.debug(f"Version: {self.ver}")
+
             ps = shell.get_running_ps()
 
             if "mosquitto -d" not in ps:
@@ -129,9 +153,8 @@ class Gateway3(Thread):
                 else "ble_event|properties_changed"
 
             if f"awk /{pattern} {{" not in ps:
-                new_version = 'FILE_STORE' in ps
-                self.debug(f"Redirect miio to MQTT, new: {new_version}")
-                shell.redirect_miio2mqtt(pattern, new_version)
+                self.debug(f"Redirect miio to MQTT")
+                shell.redirect_miio2mqtt(pattern, self.ver_miio)
 
             if self._disable_buzzer and "basic_gw -b" in ps:
                 _LOGGER.debug("Disable buzzer")
@@ -206,10 +229,8 @@ class Gateway3(Thread):
 
         # 2. Read zigbee devices
         if not self.zha:
-            # https://github.com/AlexxIT/XiaomiGateway3/issues/14
-            # fw 1.4.6_0012 and below have one zigbee_gw.db file
-            # fw 1.4.6_0030 have many json files in this folder
-            raw = shell.read_file('/data/zigbee_gw/*', as_base64=True)
+            raw = shell.read_file('/data/zigbee_gw/' + self.ver_zigbee_db,
+                                  as_base64=True)
             if raw.startswith(b'unqlite'):
                 db = Unqlite(raw)
                 data = db.read_all()
@@ -269,7 +290,7 @@ class Gateway3(Thread):
             try:
                 mesh_groups = {}
 
-                rows = db.read_table('mesh_group')
+                rows = db.read_table(self.ver_mesh_group)
                 for row in rows:
                     # don't know if 8 bytes enougth
                     mac = int(row[0]).to_bytes(8, 'big').hex()
