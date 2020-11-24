@@ -226,6 +226,10 @@ class Gateway3Device(Entity):
         return self.device.get('online', True) or self._ignore_offline
 
     @property
+    def device_state_attributes(self):
+        return self._attrs
+
+    @property
     def device_info(self):
         """
         https://developers.home-assistant.io/docs/device_registry_index/

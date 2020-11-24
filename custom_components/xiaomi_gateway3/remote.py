@@ -42,10 +42,6 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         return self._state == STATE_ON
 
     @property
-    def state_attributes(self):
-        return self._attrs
-
-    @property
     def icon(self):
         return 'mdi:zigbee'
 
