@@ -418,13 +418,16 @@ def migrate_unique_id(hass: HomeAssistantType):
         registry.async_update_entity(entity.entity_id, new_unique_id=uid)
 
 
-RE_JSON = re.compile(b'{.+}')
+RE_JSON = re.compile(b'msg:(.+) length:(\d+) bytes$')
 
 
 def extract_jsons(raw) -> List[bytes]:
-    """There can be multiple concatenated json on one line."""
-    m = RE_JSON.search(raw)[0]
-    return m.replace(b'}{', b'}\n{').split(b'\n')
+    """There can be multiple concatenated json on one line. And sometimes the
+    length does not match the message."""
+    m = RE_JSON.search(raw)
+    length = int(m[2])
+    raw = m[1][:length]
+    return raw.replace(b'}{', b'}\n{').split(b'\n')
 
 
 TITLE = "Xiaomi Gateway 3 Debug"
