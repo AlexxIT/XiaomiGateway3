@@ -206,9 +206,9 @@ DEVICES = [{
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
         ['13.4.85', None, 'button_4', None],
-        ['13.5.85', None, 'button_both', None],
         ['13.6.85', None, 'button_5', None],
         ['13.7.85', None, 'button_6', None],
+        ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
@@ -428,6 +428,17 @@ def extract_jsons(raw) -> List[bytes]:
     length = int(m[2])
     raw = m[1][:length]
     return raw.replace(b'}{', b'}\n{').split(b'\n')
+
+
+def get_buttons(model: str):
+    model, _ = model.split(' ', 1)
+    for device in DEVICES:
+        if model in device:
+            return [
+                param[2] for param in device['params']
+                if param[2].startswith('button')
+            ]
+    return None
 
 
 TITLE = "Xiaomi Gateway 3 Debug"
