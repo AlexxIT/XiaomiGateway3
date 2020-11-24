@@ -318,6 +318,17 @@ DEVICES = [{
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/101
+    'lumi.airrtc.tcpecn02': ["Aqara", "Thermostat S2", "KTWKQ03ES"],
+    'params': [
+        ['3.1.85', None, 'power', None],
+        ['3.2.85', None, 'current_temperature', None],
+        ['14.2.85', None, 'climate', 'climate'],
+        ['14.8.85', None, 'mode', None],
+        ['14.9.85', None, 'target_temperature', None],
+        ['14.10.85', None, 'fan_mode', None],
+    ]
+}, {
     'lumi.airrtc.vrfegl01': ["Xiaomi", "VRF Air Conditioning"],
     'params': [
         ['13.1.85', None, 'channels', 'sensor']

@@ -327,6 +327,11 @@ class Gateway3(Thread, GatewayV):
             except:
                 _LOGGER.exception("Can't read mesh devices")
 
+        # for testing purposes
+        for k, v in self.default_devices.items():
+            if k[0] == '_':
+                devices.append(v)
+
         return devices
 
     def lock_firmware(self, enable: bool):

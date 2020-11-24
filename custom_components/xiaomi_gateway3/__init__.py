@@ -66,7 +66,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry):
 
     # init setup for each supported domains
     for domain in (
-            'binary_sensor', 'cover', 'light', 'remote', 'sensor', 'switch'
+            'binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
+            'switch'
     ):
         hass.async_create_task(hass.config_entries.async_forward_entry_setup(
             config_entry, domain))
