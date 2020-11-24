@@ -1,0 +1,60 @@
+{
+  "config": {
+    "error": {
+      "no_servers": "Пожалуйста, выберите хотя бы один сервер",
+      "cant_login": "Ошибка, проверьте имя пользователя и пароль"
+    },
+    "step": {
+      "user": {
+        "title": "Выберите действие",
+        "data": {
+          "action": "Действие"
+        }
+      },
+      "cloud": {
+        "title": "Добавить Mi Cloud аккаунт",
+        "description": "Выбирайте только те серверы, на которых у вас есть устройства",
+        "data": {
+          "username": "Email / Mi Account ID",
+          "password": "Пароль",
+          "servers": "Серверы"
+        }
+      },
+      "token": {
+        "description": "[Получите](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен. Используйте режим **ZHA** ТОЛЬКО если [знаете, что вы делаете](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) {error_text}",
+        "data": {
+          "host": "IP-адрес шлюза",
+          "token": "Токен",
+          "ble": "Поддержка BLE устройств",
+          "zha": "Режим Zigbee Home Automation (ZHA)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Информация о устройствах MiCloud",
+        "data": {
+          "did": "Устройство"
+        },
+        "description": "{device_info}"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "Нажатие кнопки",
+      "button_1": "Нажатие первой кнопки",
+      "button_2": "Нажатие второй кнопки",
+      "button_3": "Нажатие третьей кнопки",
+      "button_4": "Нажатие четвёртой кнопки",
+      "button_5": "Нажатие пятой кнопки",
+      "button_6": "Нажатие шестой кнопки",
+      "button_both": "Нажатие двух кнопок",
+      "button_both_12": "Нажатие первой и второй кнопок",
+      "button_both_13": "Нажатие первой и третей кнопок",
+      "button_both_23": "Нажатие второй и третьей кнопок"
+    }
+  }
+}
