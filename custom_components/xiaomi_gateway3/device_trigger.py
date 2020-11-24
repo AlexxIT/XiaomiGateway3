@@ -22,10 +22,13 @@ async def async_attach_trigger(hass, config, action, automation_info):
     entity_registry = await hass.helpers.entity_registry.async_get_registry()
 
     device_id = config[CONF_DEVICE_ID]
-    entry = next(
+    entry = next((
         entry for entry in entity_registry.entities.values() if
         entry.device_id == device_id and entry.unique_id.endswith('action')
-    )
+    ), None)
+
+    if not entry:
+        return None
 
     to_state = (
         config['action'] if config[CONF_TYPE] == 'button' else
