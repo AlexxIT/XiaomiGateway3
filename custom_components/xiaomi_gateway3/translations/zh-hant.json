@@ -1,0 +1,60 @@
+{
+  "config": {
+    "error": {
+      "no_servers": "請至少選擇一個伺服器",
+      "cant_login": "無法登入，請確認使用者名稱與密碼"
+    },
+    "step": {
+      "user": {
+        "title": "選擇動作",
+        "data": {
+          "action": "動作"
+        }
+      },
+      "cloud": {
+        "title": "新增小米雲服務帳號",
+        "description": "僅選擇已有設備榜定的伺服器",
+        "data": {
+          "username": "Email / 小米帳號 ID",
+          "password": "密碼",
+          "servers": "伺服器"
+        }
+      },
+      "token": {
+        "description": "[獲取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家智能家庭密鑰。只有當[確認操作行為](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) 情況下才使用 **ZHA** 模式 {error_text}",
+        "data": {
+          "host": "主機端",
+          "token": "密鑰",
+          "ble": "支援 BLE 設備",
+          "zha": "Zigbee Home Automation (ZHA) 模式"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "小米雲設備資訊",
+        "data": {
+          "did": "設備"
+        },
+        "description": "{device_info}"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "按鈕按下",
+      "button_1": "第 1 個按鈕按下",
+      "button_2": "第 2 個按鈕按下",
+      "button_3": "第 3 個按鈕按下",
+      "button_4": "第 4 個按鈕按下",
+      "button_5": "第 5 個按鈕按下",
+      "button_6": "第 6 個按鈕按下",
+      "button_both": "按鈕同時按下",
+      "button_both_12": "第 1 與第 2 個按鈕同時按下",
+      "button_both_13": "第 1 與第 3 個按鈕同時按下",
+      "button_both_23": "第 2 與第 3 個按鈕同時按下"
+    }
+  }
+}
