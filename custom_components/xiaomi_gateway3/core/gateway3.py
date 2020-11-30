@@ -549,14 +549,16 @@ class Gateway3(Thread, GatewayV):
             return
 
         if 'networkUp' in payload:
-            try:
-                payload = {
-                    'network_pan_id': payload['networkPanId'],
-                    'radio_tx_power': payload['radioTxPower'],
-                    'radio_channel': payload['radioChannel'],
-                }
-            except:
-                _LOGGER.warning(f"Wrong gw payload: {payload}")
+            # {"networkUp":false}
+            if not payload['networkUp']:
+                _LOGGER.warning("Network down")
+                return
+
+            payload = {
+                'network_pan_id': payload['networkPanId'],
+                'radio_tx_power': payload['radioTxPower'],
+                'radio_channel': payload['radioChannel'],
+            }
         elif 'online' in payload:
             self.device['online'] = payload['online']
 
