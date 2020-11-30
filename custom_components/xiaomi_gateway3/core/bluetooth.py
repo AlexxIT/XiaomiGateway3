@@ -131,7 +131,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
         return {'rssi': data[0]}
 
     elif eid == 0x1004 and length == 2:  # 4100
-        return {'temperature': int.from_bytes(data, 'little') / 10.0}
+        return {'temperature': int.from_bytes(data, 'little', signed=True) / 10.0}
 
     elif eid == 0x1006 and length == 2:  # 4102
         # Humidity percentage, ranging from 0-1000
@@ -155,7 +155,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
     elif eid == 0x100D and length == 4:  # 4109
         return {
-            'temperature': int.from_bytes(data[:2], 'little') / 10.0,
+            'temperature': int.from_bytes(data[:2], 'little', signed=True) / 10.0,
             'humidity': int.from_bytes(data[2:], 'little') / 10.0
         }
 
