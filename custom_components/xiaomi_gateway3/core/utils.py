@@ -333,6 +333,14 @@ DEVICES = [{
     'params': [
         ['13.1.85', None, 'channels', 'sensor']
     ]
+}, {
+    # without N
+    'lumi.switch.l0agl1': ["Aqara", "Relay T1", "DLKZMK12LM"],
+    # with N
+    'lumi.switch.n0agl1': ["Aqara", "Relay T1", "SSM-U01"],
+    'params': [
+        ['2.1', '2.1', 'switch', 'switch'],
+    ]
 }]
 
 GLOBAL_PROP = {
