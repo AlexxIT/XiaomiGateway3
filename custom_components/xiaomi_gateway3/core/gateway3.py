@@ -710,16 +710,24 @@ class Gateway3(Thread, GatewayV):
 
     def send(self, device: dict, data: dict):
         # convert hass prop to lumi prop
-        params = [{
-            'res_name': next(p[0] for p in device['params'] if p[2] == k),
-            'value': v
-        } for k, v in data.items()]
+        if '2.1' in data:
+            v = bool(data['2.1'])
+            payload = {
+                'cmd': 'write',
+                'did': device['did'],
+                'mi_spec': [{'siid': 2, 'piid': 1, 'value': v}],
+            }
+        else:
+            params = [{
+                'res_name': next(p[0] for p in device['params'] if p[2] == k),
+                'value': v
+            } for k, v in data.items()]
 
-        payload = {
-            'cmd': 'write',
-            'did': device['did'],
-            'params': params,
-        }
+            payload = {
+                'cmd': 'write',
+                'did': device['did'],
+                'params': params,
+            }
 
         self.debug(f"{device['did']} {device['model']} => {payload}")
         payload = json.dumps(payload, separators=(',', ':')).encode()
