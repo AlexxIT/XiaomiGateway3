@@ -712,8 +712,8 @@ class Gateway3(Thread, GatewayV):
 
     def send(self, device: dict, data: dict):
         # convert hass prop to lumi prop
-        if '2.1' in data:
-            v = bool(data['2.1'])
+        if device.get('model') in ('lumi.switch.l0agl1', 'lumi.switch.n0agl1'):
+            v = bool(data['switch'])
             payload = {
                 'cmd': 'write',
                 'did': device['did'],
