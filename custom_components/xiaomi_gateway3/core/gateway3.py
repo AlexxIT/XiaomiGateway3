@@ -3,6 +3,7 @@ import logging
 import re
 import socket
 import time
+from telnetlib import Telnet
 from threading import Thread
 from typing import Optional, Union
 
@@ -63,6 +64,7 @@ class Gateway3(Thread, GatewayV):
 
         self._debug = config['debug'] if 'debug' in config else ''
         self._disable_buzzer = config.get('buzzer') is False
+        self._config = config
         self.default_devices = config['devices']
 
         self.devices = {}
@@ -176,12 +178,15 @@ class Gateway3(Thread, GatewayV):
                     self.debug("Stop socat")
                     shell.stop_socat()
 
-                if "Lumi_Z3GatewayHost_MQTT" not in ps:
-                    self.debug("Run Lumi Zigbee")
-                    shell.run_lumi_zigbee()
-            # elif "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps:
-            #     self.debug("Run public Zigbee console")
-            #     shell.run_public_zb_console()
+                if 'zigbee_console' in self._config:
+                    if "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps:
+                        self.debug("Run public Zigbee console")
+                        shell.run_public_zb_console()
+
+                else:
+                    if "Lumi_Z3GatewayHost_MQTT" not in ps:
+                        self.debug("Run Lumi Zigbee")
+                        shell.run_lumi_zigbee()
 
             if with_devices:
                 self.debug("Get devices")
@@ -764,6 +769,66 @@ class Gateway3(Thread, GatewayV):
             if device.get('mac') == mac:
                 return device
         return None
+
+    def get_gateway_info(self):
+        telnet = Telnet(self.host, 4901)
+        telnet.read_until(b'Lumi_Z3GatewayHost')
+
+        telnet.write(b"option print-rx-msgs disable\r\n")
+        telnet.read_until(b'Lumi_Z3GatewayHost')
+
+        telnet.write(b"plugin device-table print\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m1 = re.findall(r'\d+ ([A-F0-9]{4}):  ([A-F0-9]{16}) 0  JOINED (\d+)',
+                        raw)
+
+        telnet.write(b"plugin stack-diagnostics child-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+        telnet.write(b"plugin stack-diagnostics neighbor-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+        telnet.write(b"plugin concentrator print-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
+        m4 = [i.replace('0x', '').split(' -> ') for i in m4]
+        m4 = {i[0]: i[1:] for i in m4}
+
+        md = ('nwk|eid64|ago|type|parent|name\n'
+              '---|-----|---|----|------|----')
+
+        for i in m1:
+            nid = i[0]
+            eid64 = i[1]
+            last_seen = i[2]
+            if eid64 in m2:
+                type_ = 'device'
+            elif eid64 in m3:
+                type_ = 'router'
+            else:
+                type_ = '-'
+
+            parent = m4[nid][0] if nid in m4 else '-'
+
+            did = 'lumi.' + re.sub(r'^0*', '', eid64).lower()
+            device = self.devices.get(did)
+            name = device['device_name'] if device else '-'
+
+            try:
+                md += '\n' + '|'.join([
+                    nid,
+                    eid64,
+                    last_seen,
+                    type_,
+                    parent,
+                    name
+                ])
+            except:
+                print()
+
+        return md
 
 
 def is_gw3(host: str, token: str) -> Optional[str]:

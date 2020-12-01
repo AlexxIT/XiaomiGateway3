@@ -91,8 +91,17 @@ class TelnetShell(Telnet):
 
     def run_public_zb_console(self):
         self.exec("killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT")
+        # run Gateway with open console port
         self.exec("Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v -p '/dev/ttyS2' "
-                  "-d '/data/silicon_zigbee_host/' &")
+                  "-d '/data/silicon_zigbee_host/' > /dev/null &")
+
+        # connect to console to start zigbee chip
+        self.write(b"nc localhost 4901\r\n")
+        time.sleep(1)
+        # exit console (ctrl+c)
+        self.write(b"\x03")
+        self.read_until(b"\r\n# ")
+
         self.exec("daemon_app.sh &")
 
     def read_file(self, filename: str, as_base64=False):
