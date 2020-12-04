@@ -115,10 +115,17 @@ class SQLite:
     def read_page(self, page_num: int):
         self.pos = 100 if page_num == 0 else self.page_size * page_num
 
+        # B-tree Page Header Format
         page_type = self.read(1)
-        # check if page is leaf table b-tree page
-        assert page_type == b'\x0D'
 
+        if page_type == b'\x0D':
+            return self._read_leaf_table(page_num)
+        elif page_type == b'\x05':
+            return self._read_interior_table(page_num)
+        else:
+            raise NotImplemented
+
+    def _read_leaf_table(self, page_num: int):
         first_block = self.read_int(2)
         cells_num = self.read_int(2)
         cells_pos = self.read_int(2)
@@ -171,6 +178,24 @@ class SQLite:
             rows.append(cells)
 
         return rows
+
+    def _read_interior_table(self, page_num: int):
+        first_block = self.read_int(2)
+        cells_num = self.read_int(2)
+        cells_pos = self.read_int(2)
+        fragmented_free_bytes = self.read_int(1)
+        last_page_num = self.read_int(4)
+
+        cells_pos = [self.read_int(2) for _ in range(cells_num)]
+        rows = []
+
+        for cell_pos in cells_pos:
+            self.pos = self.page_size * page_num + cell_pos
+            child_page_num = self.read_int(4)
+            rowid = self.read_varint()
+            rows += self.read_page(child_page_num - 1)
+
+        return rows + self.read_page(last_page_num - 1)
 
     def read_table(self, name: str):
         page = next(t[3] - 1 for t in self.tables if t[1] == name)
