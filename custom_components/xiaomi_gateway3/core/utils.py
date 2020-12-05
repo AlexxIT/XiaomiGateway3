@@ -437,15 +437,21 @@ def migrate_unique_id(hass: HomeAssistantType):
         registry.async_update_entity(entity.entity_id, new_unique_id=uid)
 
 
-RE_JSON = re.compile(b'msg:(.+) length:(\d+) bytes$')
+# new miio adds colors to logs
+RE_JSON1 = re.compile(b'msg:(.+) length:(\d+) bytes')
+RE_JSON2 = re.compile(b'{.+}')
 
 
 def extract_jsons(raw) -> List[bytes]:
     """There can be multiple concatenated json on one line. And sometimes the
     length does not match the message."""
-    m = RE_JSON.search(raw)
-    length = int(m[2])
-    raw = m[1][:length]
+    m = RE_JSON1.search(raw)
+    if m:
+        length = int(m[2])
+        raw = m[1][:length]
+    else:
+        m = RE_JSON2.search(raw)
+        raw = m[0]
     return raw.replace(b'}{', b'}\n{').split(b'\n')
 
 
