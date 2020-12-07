@@ -762,7 +762,11 @@ class Gateway3(Thread, GatewayV):
     def send_mesh(self, device: dict, data: dict):
         did = device['did']
         payload = bluetooth.pack_xiaomi_mesh(did, data)
-        return self.miio.send('set_properties', payload)
+        try:
+            return self.miio.send('set_properties', payload)
+        except:
+            self.debug(f"Can't send mesh {did} => {data}")
+            return None
 
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():
