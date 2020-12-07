@@ -18,6 +18,7 @@ DOMAIN = 'xiaomi_gateway3'
 #   https://github.com/rytilahti/python-miio/issues/699#issuecomment-643208618
 # Zigbee Model: [Manufacturer, Device Name, Device Model]
 # params: [lumi res name, xiaomi prop name, hass attr name, hass domain]
+# old devices uses params, new devices uses mi_spec
 DEVICES = [{
     'lumi.gateway.mgl03': ["Xiaomi", "Gateway 3", "ZNDMWG03LM"],
     'params': [
@@ -41,6 +42,7 @@ DEVICES = [{
     'lumi.plug.mmeu01': ["Xiaomi", "Plug EU", "ZNCZ04LM"],
     'lumi.plug.maus01': ["Xiaomi", "Plug US", "ZNCZ12LM"],
     'lumi.ctrl_86plug': ["Aqara", "Socket", "QBCZ11LM"],
+    # 'lumi.plug.maeu01': ["Aqara", "Plug EU", "SP-EUC01"],
     'params': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
@@ -274,7 +276,7 @@ DEVICES = [{
     ]
 }, {
     'lumi.sen_ill.mgl01': ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
-    'params': [
+    'mi_spec': [
         ['2.1', '2.1', 'illuminance', 'sensor'],
         ['3.1', '3.1', 'battery', 'sensor'],
     ]
@@ -338,7 +340,7 @@ DEVICES = [{
     'lumi.switch.l0agl1': ["Aqara", "Relay T1", "DLKZMK12LM"],
     # with N
     'lumi.switch.n0agl1': ["Aqara", "Relay T1", "SSM-U01"],
-    'params': [
+    'mi_spec': [
         ['2.1', '2.1', 'switch', 'switch'],
     ]
 }]
@@ -389,7 +391,8 @@ def get_device(zigbee_model: str) -> Optional[dict]:
                 'device_name': desc[0] + ' ' + desc[1],
                 'device_model': zigbee_model + ' ' + desc[2]
                 if len(desc) > 2 else zigbee_model,
-                'params': device['params']
+                'params': device.get('params'),
+                'mi_spec': device.get('mi_spec')
             }
 
     return None
