@@ -109,45 +109,54 @@ Component can block fw updates with **Lock Firmware** switch.
 
 Tested Devices:
 - Aqara Bulb (ZNLDP12LM)
-- Aqara Button (WXKG11LM,WXKG12LM)
-- Aqara Single Wall Button (WXKG03LM)
-- Aqara Double Wall Button (WXKG02LM)
+- Aqara Button (WXKG11LM)
 - Aqara Cube (MFKZQ01LM)
 - Aqara Curtain (ZNCLDJ11LM)
-- Aqara B1 Curtain (ZNCLDJ12LM)
+- Aqara Curtain B1 (ZNCLDJ12LM)
+- Aqara Door Lock S1 (ZNMS11LM)
+- Aqara Door Lock S2 (ZNMS12LM)
 - Aqara Door Sensor (MCCGQ11LM)
+- Aqara Double Wall Button (WXKG02LM)
+- Aqara Double Wall Button D1 (WXKG07LM)
+- Aqara Double Wall Switch (QBKG03LM,QBKG12LM)
+- Aqara Double Wall Switch D1 (QBKG22LM,QBKG24LM)
 - Aqara Motion Sensor (RTCGQ11LM)
+- Aqara Opple Four Button (WXCJKG12LM)
+- Aqara Opple MX480 (XDD13LM)
+- Aqara Opple MX650 (XDD12LM)
+- Aqara Opple Six Button (WXCJKG13LM)
+- Aqara Opple Two Button (WXCJKG11LM)
 - Aqara Relay (LLKZMK11LM)
+- Aqara Relay T1 (DLKZMK12LM) - don't works in Mi Home
 - Aqara Roller Shade (ZNGZDJ11LM)
+- Aqara Shake Button (WXKG12LM)
+- Aqara Single Wall Button (WXKG03LM)
+- Aqara Single Wall Button D1 (WXKG06LM)
+- Aqara Single Wall Switch (QBKG04LM,QBKG11LM)
+- Aqara Single Wall Switch D1 (QBKG21LM,QBKG23LM)
 - Aqara Socket (QBCZ11LM)
 - Aqara TH Sensor (WSDCGQ11LM,WSDCGQ12LM)
+- Aqara Thermostat S2 (KTWKQ03ES)
+- Aqara Triple Wall Switch D1 (QBKG25LM,QBKG26LM)
 - Aqara Vibration Sensor (DJT11LM)
-- Aqara Wall Single Switch (QBKG11LM,QBKG04LM)
-- Aqara Wall Double Switch (QBKG12LM,QBKG03LM)
 - Aqara Water Leak Sensor (SJCGQ11LM)
-- Aqara Opple Two Button (WXCJKG11LM)
-- Aqara Opple Four Button (WXCJKG12LM)
-- Aqara Opple Six Button (WXCJKG13LM)
-- Aqara D1 Single Wall Button (WXKG06LM)
-- Aqara D1 Double Wall Button (WXKG07LM)
-- Aqara D1 Wall Single Switch (QBKG21LM,QBKG23LM)
-- Aqara D1 Wall Double Switch (QBKG22LM,QBKG24LM)
-- Aqara D1 Wall Triple Switch (QBKG25LM,QBKG26LM)
 - Honeywell Gas Sensor (JTQJ-BF-01LM/BW)
 - Honeywell Smoke Sensor (JTYJ-GD-01LM/BW)
-- IKEA Bulb E14 400 lm (LED1536G5,LED1649C5)
+- IKEA Bulb E14 (LED1649C5)
+- IKEA Bulb E14 400 lm (LED1536G5)
+- IKEA Bulb E27 1000 lm (LED1623G12)
 - IKEA Bulb E27 950 lm (LED1546G12)
 - IKEA Bulb E27 980 lm (LED1545G12)
-- IKEA Bulb E27 1000 lm (LED1623G12)
-- IKEA Bulb GU10 400 lm (LED1650R5,LED1537R6)
+- IKEA Bulb GU10 400 lm (LED1537R6,LED1650R5)
 - Xiaomi Button (WXKG01LM)
 - Xiaomi Door Sensor (MCCGQ01LM)
 - Xiaomi Light Sensor (GZCGQ01LM)
 - Xiaomi Motion Sensor (RTCGQ01LM)
-- Xiaomi Plug (ZNCZ02LM,ZNCZ03LM,ZNCZ04LM,ZNCZ12LM)
+- Xiaomi Plug (ZNCZ02LM)
+- Xiaomi Plug EU (ZNCZ04LM)
+- Xiaomi Plug TW (ZNCZ03LM)
+- Xiaomi Plug US (ZNCZ12LM)
 - Xiaomi TH Sensor (WSDCGQ01LM)
-
-Currently supported, but not tested other Xiaomi and Aqara Zibee devices officially supported by the Gateway. Check list [here](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/utils.py).
 
 # Supported BLE Devices
 
@@ -160,13 +169,16 @@ Tested Devices:
 - Xiaomi Alarm Clock (CGD1)
 - Xiaomi Door Sensor 2 (MCCGQ02HL)
 - Xiaomi Flower Care (HHCCJCY01)
-- Xiaomi Loock Smart Lock
+- Xiaomi Magic Cube (XMMF01JQD) - don't sends edge info, only direction!
 - Xiaomi Mosquito Repellent (WX08ZM)
-- Xiaomi Rubik's Cube (XMMF01JQD) - don't sends edge info, only direction!
+- Xiaomi Night Light 2 (MJYD02YL-A)
+- Xiaomi Qingping TH Sensor (CGG1)
+- Xiaomi Safe Box (BGX-5/X1-3001)
 - Xiaomi TH Clock (LYWSD02MMC)
 - Xiaomi TH Sensor (LYWSDCGQ/01ZM)
 - Xiaomi TH Sensor 2 (LYWSD03MMC)
-- Xaiomi ZenMeasure Clock (MHO-C303)
+- Xiaomi ZenMeasure Clock (MHO-C303)
+- Yeelight Button S1 (YLAI003)
 
 Other BLE devices also maybe supported...
 
@@ -178,7 +190,12 @@ BLE devices and their attributes **don't appear immediately**! Data collected an
 
 Tested Devices:
 - Xiaomi Mesh Bulb (MJDP09YL)
+- Xiaomi Mesh Downlight (MJTS01YL)
+- Yeelight Mesh Bulb E14 (YLDP09YL)
+- Yeelight Mesh Bulb E27 (YLDP10YL)
 - Yeelight Mesh Bulb M2 (YLDP25YL/YLDP26YL)
+- Yeelight Mesh Downlight (YLSD01YL)
+- Yeelight Mesh Downlight M2 (YLTS02YL/YLTS04YL)
 
 Other Mesh devices also maybe supported...
 
