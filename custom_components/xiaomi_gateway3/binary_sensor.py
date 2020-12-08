@@ -65,6 +65,7 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
 
 
 class Gateway3MotionSensor(Gateway3BinarySensor):
+    _last_on = 0
     _last_off = 0
     _state = STATE_OFF
     _timeout_pos = 0
@@ -90,17 +91,29 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         self.async_write_ha_state()
 
     def update(self, data: dict = None):
-        if self._attr in data:
-            self._state = STATE_ON if data[self._attr] else STATE_OFF
-            if self._state:
-                self._attrs[ATTR_LAST_TRIGGERED] = now().strftime(DT_FORMAT)
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/135
+        if 'illumination' in data and len(data) == 1:
+            data[self._attr] = 1
+
+        if self._attr not in data:
+            # handle available change
+            self.async_write_ha_state()
+            return
+
+        # check only motion=1
+        assert data[self._attr] == 1, data
+
+        # don't trigger motion right after illumination
+        t = time.time()
+        if t - self._last_on < 1:
+            return
+
+        self._state = STATE_ON
+        self._attrs[ATTR_LAST_TRIGGERED] = now().strftime(DT_FORMAT)
+        self._last_on = t
 
         # handle available change
         self.async_write_ha_state()
-
-        # continue only if motion=1 arrived
-        if not data.get(self._attr):
-            return
 
         if self._unsub_set_no_motion:
             self._unsub_set_no_motion()
@@ -115,7 +128,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
             else:
                 delay = timeout
 
-            if delay < 0 and time.time() + delay < self._last_off:
+            if delay < 0 and t + delay < self._last_off:
                 delay *= 2
 
             self.debug(f"Extend delay: {delay} seconds")
