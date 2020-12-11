@@ -87,23 +87,27 @@ A. All button clicks are displayed in the status of that one entity.
 
 **Attention:** Starting from 2020.10, there is a high chance of buying any version of the gateway with "bad" firmware. Only soldering will be able to open Telnet.
 
-Instruction for downgrading firmware by soldering: [read more](https://github.com/AlexxIT/XiaomiGateway3/issues/87#issuecomment-719467858).
+If you have "bad" firmware and don't want to solder - try to use [HomeKit Controller](https://www.home-assistant.io/integrations/homekit_controller/) component. It has many limitations, but the popular Xiaomi Zigbee devices should work fine. BLE and Mesh devices won't work. 3rd party zigbee devices won't work. And you won't have many advanced features of this component.
+
+Instruction for soldering: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
 Component can block fw updates with **Lock Firmware** switch.
 
 [![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
 
 **ZNDMWG03LM (Chinese version, US plug)**
-- v1.4.4_0003 - factory firmware, supported
-- v1.4.5_0012 - factory firmware, supported
-- v1.4.5_0016 - safe to update, supported
+- v1.4.4_0003 - factory firmware, supported, not recomended
+- v1.4.5_0012 - factory firmware, supported, not recomended
+- v1.4.5_0016 - safe to update, supported, not recomended
 - v1.4.6_0012 - safe to update, supported
 - v1.4.6_0030 - was available in summer 2020, now unavailable, supported
-- v1.4.6_0043 - **factory firmware from 2020.10, not supported** (telnet has a password)
-- v1.4.7_0040, v1.4.7_0063, v1.4.7_0065 - **not supported** (telnet cannot be opened)
+- v1.4.6_0043 - **factory firmware from 2020.10, need to solder**
+- v1.4.7_0040 - **need to solder**
+- v1.4.7_0063 - **factory firmware from 2020.11, need to solder**
+- v1.4.7_0065 - **need to solder**
 
 **ZNDMWG02LM (Euro version, no plug)**
-- v1.4.6_0043 - factory firmware, **not supported** (telnet has a password)
+- v1.4.6_0043 - **factory firmware, need to solder** (telnet has a password)
 
 # Supported Zigbee Devices
 
