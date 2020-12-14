@@ -130,7 +130,22 @@ class GatewayMesh:
         self.mesh_ts = time.time() + 2
 
 
-class Gateway3(Thread, GatewayV, GatewayMesh):
+class GatewayInfo:
+    info: dict = None
+
+    def add_info(self, ieee: str, handler):
+        self.info[ieee] = handler
+
+    def remove_info(self, ieee: str, handler):
+        self.info.pop(ieee)
+
+    def process_zb_message(self, payload: dict):
+        ieee = payload['eui64']
+        if ieee in self.info:
+            self.info[ieee](payload)
+
+
+class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
     mesh_thread = None
     pair_model = None
     pair_payload = None
@@ -155,11 +170,13 @@ class Gateway3(Thread, GatewayV, GatewayMesh):
         self._debug = config['debug'] if 'debug' in config else ''
         self._disable_buzzer = config.get('buzzer') is False
         self._config = config
+        self._zigbee_info = config.get('zigbee_info')
         self.default_devices = config['devices']
 
         self.devices = {}
         self.updates = {}
         self.setups = {}
+        self.info = {}
 
     @property
     def device(self):
@@ -532,6 +549,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh):
                     attr = param[2]
                     self.setups[domain](self, device, attr)
 
+                if self._zigbee_info:
+                    self.setups['sensor'](self, device, self._zigbee_info)
+
             elif device['type'] == 'mesh':
                 desc = bluetooth.get_device(device['model'], 'Mesh')
                 device.update(desc)
@@ -664,14 +684,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh):
 
         for handler in self.updates['lumi.0']:
             handler(payload)
-
-    def process_zb_message(self, payload: dict):
-        did = 'lumi.' + RE_MAC.sub('', payload['eui64']).lower()
-        if did not in self.devices:
-            return
-        device = self.devices[did]
-        device['linq_quality'] = payload['linkQuality']
-        self.debug(f"{did} <= LQI {payload['linkQuality']}")
 
     def process_ble_event(self, raw: Union[bytes, str]):
         if isinstance(raw, bytes):
