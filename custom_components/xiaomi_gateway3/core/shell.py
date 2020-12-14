@@ -97,7 +97,7 @@ class TelnetShell(Telnet):
 
         # connect to console to start zigbee chip
         self.write(b"nc localhost 4901\r\n")
-        time.sleep(1)
+        time.sleep(2)
         # exit console (ctrl+c)
         self.write(b"\x03")
         self.read_until(b"\r\n# ")

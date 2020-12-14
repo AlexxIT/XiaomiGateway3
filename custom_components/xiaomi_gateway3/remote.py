@@ -104,5 +104,4 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
             elif cmd == 'publishstate':
                 self.gw.send_mqtt('publishstate')
             elif cmd == 'info':
-                raw = self.gw.get_gateway_info()
-                persistent_notification.async_create(self.hass, raw)
+                self.gw.get_gateway_info()

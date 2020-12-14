@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import timedelta
 
 from homeassistant.const import *
 from homeassistant.util.dt import now
@@ -73,7 +74,7 @@ class Gateway3Sensor(Gateway3Device):
 
 
 class Gateway3Info(Gateway3Device):
-    counter = None
+    last_seq = None
 
     def __init__(self, gateway: Gateway3, device: dict, attr: str):
         self.gw = gateway
@@ -105,19 +106,32 @@ class Gateway3Info(Gateway3Device):
         self.gw.remove_info(self._attrs['ieee'], self.update)
 
     def update(self, data: dict = None):
-        self._attrs['nwk'] = data['sourceAddress']
-        self._attrs['link_quality'] = data['linkQuality']
-        self._attrs['rssi'] = data['rssi']
-        self._attrs['last_seen'] = now().strftime(DT_FORMAT)
+        if 'sourceAddress' in data:
+            self._attrs['nwk'] = data['sourceAddress']
+            self._attrs['link_quality'] = data['linkQuality']
+            self._attrs['rssi'] = data['rssi']
+            self._attrs['last_seen'] = now().strftime(DT_FORMAT)
 
-        self._attrs['msg_received'] += 1
+            self._attrs['msg_received'] += 1
 
-        cnt = int(data['APSCounter'], 0)
-        if self.counter is not None and cnt - self.counter not in (1, 255):
-            self._attrs['msg_missed'] += 1
-        self.counter = cnt
+            new_seq = int(data['APSCounter'], 0)
+            if self.last_seq is not None:
+                miss = new_seq - self.last_seq - 1
+                if miss < 0:  # 0xFF => 0x00
+                    miss += 256
+                if miss:
+                    self._attrs['msg_missed'] += miss
+            self.last_seq = new_seq
 
-        self._state = self._attrs[self._attr]
+            self._state = self._attrs[self._attr]
+
+        elif 'parent' in data:
+            ago = timedelta(seconds=data.pop('ago'))
+            data['last_seen'] = (now() - ago).strftime(DT_FORMAT)
+            self._attrs.update(data)
+
+        elif data.get('deviceState') == 17:
+            self._attrs['unresponsive'] += 1
 
         self.async_write_ha_state()
 

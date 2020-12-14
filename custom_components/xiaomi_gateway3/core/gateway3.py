@@ -132,9 +132,17 @@ class GatewayMesh:
 
 class GatewayInfo:
     info: dict = None
+    host: str = None
+    info_ts: float = 0
+    info_loading: bool = False
+
+    def debug(self, message: str):
+        raise NotImplemented
 
     def add_info(self, ieee: str, handler):
         self.info[ieee] = handler
+        # 10 seconds later
+        self.info_ts = time.time() + 5
 
     def remove_info(self, ieee: str, handler):
         self.info.pop(ieee)
@@ -143,6 +151,64 @@ class GatewayInfo:
         ieee = payload['eui64']
         if ieee in self.info:
             self.info[ieee](payload)
+
+        if self.info_ts and time.time() > self.info_ts:
+            self.get_gateway_info()
+
+    def get_gateway_info(self):
+        if self.info_loading:
+            return
+        self.info_loading = True
+        Thread(target=self._info_loader_run).start()
+
+    def _info_loader_run(self):
+        self.debug("Update parent info table")
+
+        telnet = Telnet(self.host, 4901)
+        telnet.read_until(b'Lumi_Z3GatewayHost')
+
+        telnet.write(b"option print-rx-msgs disable\r\n")
+        telnet.read_until(b'Lumi_Z3GatewayHost')
+
+        telnet.write(b"plugin device-table print\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m1 = re.findall(r'\d+ ([A-F0-9]{4}):  ([A-F0-9]{16}) 0  \w+ (\d+)',
+                        raw)
+
+        telnet.write(b"plugin stack-diagnostics child-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+        telnet.write(b"plugin stack-diagnostics neighbor-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+        telnet.write(b"plugin concentrator print-table\r\n")
+        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
+        m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
+        m4 = [i.replace('0x', '').split(' -> ') for i in m4]
+        m4 = {i[0]: i[1:] for i in m4}
+
+        for i in m1:
+            ieee = '0x' + i[1]
+            if ieee not in self.info:
+                continue
+
+            nwk = i[0]
+            ago = int(i[2])
+            type_ = 'device' if i[1] in m2 else 'router' if i[1] in m3 else '-'
+            parent = '0x' + m4[nwk][0] if nwk in m4 else '-'
+
+            self.info[ieee]({
+                'nwk': '0x' + nwk,
+                'ago': ago,
+                'type': type_,
+                'parent': parent
+            })
+
+        self.info_loading = False
+        # one hour later
+        self.info_ts = time.time() + 3600
 
 
 class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
@@ -169,7 +235,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
 
         self._debug = config['debug'] if 'debug' in config else ''
         self._disable_buzzer = config.get('buzzer') is False
-        self._config = config
         self._zigbee_info = config.get('zigbee_info')
         self.default_devices = config['devices']
 
@@ -287,7 +352,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
                     self.debug("Stop socat")
                     shell.stop_socat()
 
-                if 'zigbee_console' in self._config:
+                if self._zigbee_info:
                     if "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps:
                         self.debug("Run public Zigbee console")
                         shell.run_public_zb_console()
@@ -504,7 +569,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
             payload = json.loads(msg.payload)
             self.process_gw_message(payload)
 
-        elif msg.topic.endswith('/MessageReceived'):
+        elif msg.topic.endswith(('/MessageReceived', '/devicestatechange')):
             payload = json.loads(msg.payload)
             self.process_zb_message(payload)
 
@@ -549,7 +614,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
                     attr = param[2]
                     self.setups[domain](self, device, attr)
 
-                if self._zigbee_info:
+                if self._zigbee_info and device['type'] != 'gateway':
                     self.setups['sensor'](self, device, self._zigbee_info)
 
             elif device['type'] == 'mesh':
@@ -860,66 +925,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayInfo):
             if device.get('mac') == mac:
                 return device
         return None
-
-    def get_gateway_info(self):
-        telnet = Telnet(self.host, 4901)
-        telnet.read_until(b'Lumi_Z3GatewayHost')
-
-        telnet.write(b"option print-rx-msgs disable\r\n")
-        telnet.read_until(b'Lumi_Z3GatewayHost')
-
-        telnet.write(b"plugin device-table print\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m1 = re.findall(r'\d+ ([A-F0-9]{4}):  ([A-F0-9]{16}) 0  JOINED (\d+)',
-                        raw)
-
-        telnet.write(b"plugin stack-diagnostics child-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
-
-        telnet.write(b"plugin stack-diagnostics neighbor-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
-
-        telnet.write(b"plugin concentrator print-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
-        m4 = [i.replace('0x', '').split(' -> ') for i in m4]
-        m4 = {i[0]: i[1:] for i in m4}
-
-        md = ('nwk|eid64|ago|type|parent|name\n'
-              '---|-----|---|----|------|----')
-
-        for i in m1:
-            nid = i[0]
-            eid64 = i[1]
-            last_seen = i[2]
-            if eid64 in m2:
-                type_ = 'device'
-            elif eid64 in m3:
-                type_ = 'router'
-            else:
-                type_ = '-'
-
-            parent = m4[nid][0] if nid in m4 else '-'
-
-            did = 'lumi.' + re.sub(r'^0*', '', eid64).lower()
-            device = self.devices.get(did)
-            name = device['device_name'] if device else '-'
-
-            try:
-                md += '\n' + '|'.join([
-                    nid,
-                    eid64,
-                    last_seen,
-                    type_,
-                    parent,
-                    name
-                ])
-            except:
-                print()
-
-        return md
 
 
 def is_gw3(host: str, token: str) -> Optional[str]:
