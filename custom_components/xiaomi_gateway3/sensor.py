@@ -73,6 +73,28 @@ class Gateway3Sensor(Gateway3Device):
         self.async_write_ha_state()
 
 
+CLUSTERS = {
+    0x0000: 'Basic',
+    0x0001: 'PowerCfg',
+    0x0003: 'Identify',
+    0x0006: 'OnOff',
+    0x0008: 'LevelCtrl',
+    0x000A: 'Time',
+    0x000C: 'AnalogInput',  # cube, gas
+    0x0012: 'Multistate',
+    0x0019: 'OTA',  # illuminance sensor
+    0x0101: 'DoorLock',
+    0x0400: 'Illuminance',
+    0x0402: 'Temperature',
+    0x0403: 'Pressure',
+    0x0405: 'Humidity',
+    0x0406: 'Occupancy',
+    0x0500: 'IasZone',
+    0x0B04: 'ElectrMeasur',
+    0xFCC0: 'Xiaomi'
+}
+
+
 class Gateway3Info(Gateway3Device):
     last_seq = None
 
@@ -111,6 +133,9 @@ class Gateway3Info(Gateway3Device):
             self._attrs['link_quality'] = data['linkQuality']
             self._attrs['rssi'] = data['rssi']
             self._attrs['last_seen'] = now().strftime(DT_FORMAT)
+
+            cid = int(data['clusterId'], 0)
+            self._attrs['last_msg'] = CLUSTERS.get(cid, cid)
 
             self._attrs['msg_received'] += 1
 
