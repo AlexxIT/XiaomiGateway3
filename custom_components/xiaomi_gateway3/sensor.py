@@ -202,16 +202,16 @@ class Gateway3Action(Gateway3Device):
     def update(self, data: dict = None):
         for k, v in data.items():
             if k == 'button':
-                data[self._attr] = BUTTON[v]
+                data[self._attr] = BUTTON.get(v, 'unknown')
                 break
             elif k.startswith('button_both'):
-                data[self._attr] = k + '_' + BUTTON_BOTH[v]
+                data[self._attr] = k + '_' + BUTTON_BOTH.get(v, 'unknown')
                 break
             elif k.startswith('button'):
-                data[self._attr] = k + '_' + BUTTON[v]
+                data[self._attr] = k + '_' + BUTTON.get(v, 'unknown')
                 break
             elif k == 'vibration' and v != 2:  # skip tilt and wait tilt_angle
-                data[self._attr] = VIBRATION[v]
+                data[self._attr] = VIBRATION.get(v, 'unknown')
                 break
             elif k == 'tilt_angle':
                 data = {'vibration': 2, 'angle': v, self._attr: 'tilt'}
