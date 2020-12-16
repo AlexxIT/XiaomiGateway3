@@ -110,6 +110,7 @@ class Gateway3Info(Gateway3Device):
             'nwk': None,
             'msg_received': 0,
             'msg_missed': 0,
+            'msg_missed2': 0,
             'unresponsive': 0
         }
 
@@ -146,6 +147,8 @@ class Gateway3Info(Gateway3Device):
                     miss += 256
                 if miss:
                     self._attrs['msg_missed'] += miss
+                if miss > 1:
+                    self._attrs['msg_missed2'] += 1
             self.last_seq = new_seq
 
             self._state = self._attrs[self._attr]
