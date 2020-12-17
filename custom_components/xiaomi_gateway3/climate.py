@@ -81,16 +81,28 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
         try:
             if 'power' in data:  # 0 - off, 1 - on
                 self._is_on = data['power']
-            if 'mode' in data:  # 0 - heat, 1 - cool
-                self._hvac_mode = HVAC_MODES[data['mode']]
-            if 'fan_mode' in data:  # 0 - low, 3 - auto
-                self._fan_mode = FAN_MODES[data['fan_mode']]
+
+                # with power off all data come with empty values
+                # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-747305596
+                if self._is_on:
+                    if 'mode' in data:  # 0 - heat, 1 - cool, 15 - off
+                        self._hvac_mode = HVAC_MODES[data['mode']]
+                    if 'fan_mode' in data:  # 0 - low, 3 - auto, 15 - off
+                        self._fan_mode = FAN_MODES[data['fan_mode']]
+                    if 'target_temperature' in data:  # 255 - off
+                        self._target_temp = data['target_temperature']
+
+                else:
+                    self._fan_mode = None
+                    self._hvac_mode = None
+                    self._target_temp = None
+
             if 'current_temperature' in data:
                 self._current_temp = data['current_temperature']
-            if 'target_temperature' in data:
-                self._target_temp = data['target_temperature']
+
             if self._attr in data:
                 self._state = bytearray(data[self._attr].to_bytes(4, 'big'))
+
         except:
             _LOGGER.exception(f"Can't read climate data: {data}")
 
