@@ -410,8 +410,7 @@ def fix_xiaomi_props(params) -> dict:
         elif k == 'battery' and v and v > 1000:
             params[k] = round((min(v, 3200) - 2500) / 7)
         elif k == 'run_state':
-            params[k] = ['offing', 'oning', 'stop',
-                         'hinder_stop'].index(v)
+            params[k] = ['offing', 'oning', 'stop', 'hander_stop'].index(v)
 
     return params
 
