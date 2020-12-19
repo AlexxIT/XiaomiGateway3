@@ -132,18 +132,22 @@ class SyncmiIO(BasemiIO):
         pack = []
         total_len = 0
 
-        for item in params:
-            item_len = len(str(item))
-            # approximate number, it seems to work
-            if total_len + item_len > 900:
-                result += self.send(method, pack)
-                pack = []
-                total_len = 0
+        try:
+            for item in params:
+                item_len = len(str(item))
+                # approximate number, it seems to work
+                if total_len + item_len > 900:
+                    result += self.send(method, pack)
+                    pack = []
+                    total_len = 0
 
-            pack.append(item)
-            total_len += item_len
+                pack.append(item)
+                total_len += item_len
 
-        return result + self.send(method, pack)
+            return result + self.send(method, pack)
+
+        except:
+            return None
 
     def info(self):
         """Get info about miIO device."""
