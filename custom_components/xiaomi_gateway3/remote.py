@@ -29,7 +29,8 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
 
-        if self.gw.zha and not self.hass.config_entries.async_entries('zha'):
+        zha = self.gw.options.get('zha')
+        if zha and not self.hass.config_entries.async_entries('zha'):
             persistent_notification.async_create(
                 self.hass,
                 "Integration: **Zigbee Home Automation**\n"
@@ -67,9 +68,6 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
         elif 'removed_did' in data:
             self.debug(f"Handle removed_did: {data['removed_did']}")
             utils.remove_device(self.hass, data['removed_did'])
-
-        elif 'network_pan_id' in data:
-            self._attrs.update(data)
 
         self.async_write_ha_state()
 

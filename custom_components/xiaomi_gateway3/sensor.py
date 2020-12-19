@@ -6,8 +6,8 @@ from homeassistant.const import *
 from homeassistant.util.dt import now
 
 from . import DOMAIN, Gateway3Device
-from .binary_sensor import DT_FORMAT
 from .core.gateway3 import Gateway3
+from .core.utils import CLUSTERS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,6 +23,11 @@ UNITS = {
     'gas density': '% LEL',
     'smoke density': '% obs/ft',
     'moisture': '%',
+    # 'link_quality': 'lqi',
+    # 'rssi': 'dBm',
+    # 'msg_received': 'msg',
+    # 'msg_missed': 'msg',
+    # 'unresponsive': 'times'
 }
 
 ICONS = {
@@ -31,6 +36,9 @@ ICONS = {
     'gas density': 'mdi:google-circles-communities',
     'moisture': 'mdi:water-percent',
     'smoke density': 'mdi:google-circles-communities',
+    'gateway': 'mdi:router-wireless',
+    'zigbee': 'mdi:zigbee',
+    'ble': 'mdi:bluetooth'
 }
 
 INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
@@ -41,8 +49,12 @@ async def async_setup_entry(hass, entry, add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
         if attr == 'action':
             add_entities([Gateway3Action(gateway, device, attr)])
-        elif attr in INFO:
-            add_entities([Gateway3Info(gateway, device, attr)])
+        elif attr == 'gateway':
+            add_entities([GatewaySensor(gateway, device, attr)])
+        elif attr == 'zigbee':
+            add_entities([ZigbeeSensor(gateway, device, attr)])
+        elif attr == 'ble':
+            add_entities([BLESensor(gateway, device, attr)])
         else:
             add_entities([Gateway3Sensor(gateway, device, attr)])
 
@@ -55,10 +67,6 @@ async def async_unload_entry(hass, entry):
 
 
 class Gateway3Sensor(Gateway3Device):
-    @property
-    def state(self):
-        return self._state
-
     @property
     def device_class(self):
         return self._attr
@@ -77,67 +85,69 @@ class Gateway3Sensor(Gateway3Device):
         self.async_write_ha_state()
 
 
-CLUSTERS = {
-    0x0000: 'Basic',
-    0x0001: 'PowerCfg',
-    0x0003: 'Identify',
-    0x0006: 'OnOff',
-    0x0008: 'LevelCtrl',
-    0x000A: 'Time',
-    0x000C: 'AnalogInput',  # cube, gas
-    0x0012: 'Multistate',
-    0x0019: 'OTA',  # illuminance sensor
-    0x0101: 'DoorLock',
-    0x0400: 'Illuminance',
-    0x0402: 'Temperature',
-    0x0403: 'Pressure',
-    0x0405: 'Humidity',
-    0x0406: 'Occupancy',
-    0x0500: 'IasZone',
-    0x0B04: 'ElectrMeasur',
-    0xFCC0: 'Xiaomi'
-}
-
-
-class Gateway3Info(Gateway3Device):
-    last_seq = None
-
-    def __init__(self, gateway: Gateway3, device: dict, attr: str):
-        self.gw = gateway
-        self.device = device
-
-        self._attr = attr
-
-        ieee = '0x' + device['did'][5:].rjust(16, '0').upper()
-        self._attrs = {
-            'ieee': ieee,
-            'nwk': None,
-            'msg_received': 0,
-            'msg_missed': 0,
-            'msg_missed2': 0,
-            'unresponsive': 0
-        }
-
-        self._unique_id = None
-        self._name = device['device_name']
-        self.entity_id = f"{DOMAIN}.{device['mac']}"
+class GatewaySensor(Gateway3Device):
+    @property
+    def icon(self):
+        return ICONS.get(self._attr)
 
     @property
-    def state(self):
-        return self._state
+    def device_class(self):
+        # don't use const to support older Hass version
+        return 'timestamp'
 
     async def async_added_to_hass(self):
-        self.gw.add_info(self._attrs['ieee'], self.update)
+        self.gw.add_stats('lumi.0', self.update)
+        # update available when added to Hass
+        self.update()
 
     async def async_will_remove_from_hass(self) -> None:
-        self.gw.remove_info(self._attrs['ieee'], self.update)
+        self.gw.remove_stats('lumi.0', self.update)
+
+    def update(self, data: dict = None):
+        # empty data - update state to available time
+        if not data:
+            self._state = now().isoformat(timespec='seconds') \
+                if self.gw.available else None
+        else:
+            self._attrs.update(data)
+
+        self.async_write_ha_state()
+
+
+class ZigbeeSensor(Gateway3Device):
+    last_seq = None
+
+    @property
+    def icon(self):
+        return ICONS.get(self._attr)
+
+    @property
+    def device_class(self):
+        # don't use const to support older Hass version
+        return 'timestamp'
+
+    async def async_added_to_hass(self):
+        if not self._attrs:
+            ieee = '0x' + self.device['did'][5:].rjust(16, '0').upper()
+            self._attrs = {
+                'ieee': ieee,
+                'nwk': None,
+                'msg_received': 0,
+                'msg_missed': 0,
+                'unresponsive': 0,
+                'last_missed': 0,
+            }
+
+        self.gw.add_stats(self._attrs['ieee'], self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        self.gw.remove_stats(self._attrs['ieee'], self.update)
 
     def update(self, data: dict = None):
         if 'sourceAddress' in data:
             self._attrs['nwk'] = data['sourceAddress']
             self._attrs['link_quality'] = data['linkQuality']
             self._attrs['rssi'] = data['rssi']
-            self._attrs['last_seen'] = now().strftime(DT_FORMAT)
 
             cid = int(data['clusterId'], 0)
             self._attrs['last_msg'] = CLUSTERS.get(cid, cid)
@@ -149,22 +159,50 @@ class Gateway3Info(Gateway3Device):
                 miss = new_seq - self.last_seq - 1
                 if miss < 0:  # 0xFF => 0x00
                     miss += 256
-                if miss:
-                    self._attrs['msg_missed'] += miss
-                if miss > 1:
-                    self._attrs['msg_missed2'] += 1
+                self._attrs['msg_missed'] += miss
+                self._attrs['last_missed'] = miss
             self.last_seq = new_seq
 
-            self._state = self._attrs[self._attr]
+            self._state = now().isoformat(timespec='seconds')
 
         elif 'parent' in data:
             ago = timedelta(seconds=data.pop('ago'))
-            data['last_seen'] = (now() - ago).strftime(DT_FORMAT)
+            self._state = (now() - ago).isoformat(timespec='seconds')
             self._attrs.update(data)
 
         elif data.get('deviceState') == 17:
             self._attrs['unresponsive'] += 1
 
+        self.async_write_ha_state()
+
+
+class BLESensor(Gateway3Device):
+    last_seq = None
+
+    @property
+    def icon(self):
+        return ICONS.get(self._attr)
+
+    @property
+    def device_class(self):
+        # don't use const to support older Hass version
+        return 'timestamp'
+
+    async def async_added_to_hass(self):
+        if not self._attrs:
+            self._attrs = {
+                'mac': self.device['mac'],
+                'msg_received': 0,
+            }
+
+        self.gw.add_stats(self.device['did'], self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        self.gw.remove_stats(self.device['did'], self.update)
+
+    def update(self, data: dict = None):
+        self._attrs['msg_received'] += 1
+        self._state = now().isoformat(timespec='seconds')
         self.async_write_ha_state()
 
 

@@ -23,8 +23,6 @@ DEVICE_CLASS = {
 CONF_INVERT_STATE = 'invert_state'
 CONF_OCCUPANCY_TIMEOUT = 'occupancy_timeout'
 
-DT_FORMAT = '%Y-%m-%dT%H:%M:%S'
-
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
@@ -109,7 +107,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
             return
 
         self._state = STATE_ON
-        self._attrs[ATTR_LAST_TRIGGERED] = now().strftime(DT_FORMAT)
+        self._attrs[ATTR_LAST_TRIGGERED] = now().isoformat(timespec='seconds')
         self._last_on = t
 
         # handle available change
