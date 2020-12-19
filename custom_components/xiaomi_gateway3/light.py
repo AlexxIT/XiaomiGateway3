@@ -130,7 +130,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
         if 'brightness' in data:
             # 0...65535
             self._brightness = data['brightness'] / 65535.0 * 255.0
-        if 'color_temp' in data:
+        if 'color_temp' in data and data['color_temp']:
             # 2700..6500 => 370..153
             self._color_temp = \
                 color.color_temperature_kelvin_to_mired(data['color_temp'])
