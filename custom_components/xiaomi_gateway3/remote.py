@@ -19,6 +19,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('remote', setup)
 
 
+async def async_unload_entry(hass, entry):
+    return True
+
+
 class Gateway3Entity(Gateway3Device, ToggleEntity):
     _state = STATE_OFF
 

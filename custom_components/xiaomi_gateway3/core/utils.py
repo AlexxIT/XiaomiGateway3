@@ -469,6 +469,12 @@ def get_buttons(model: str):
     return None
 
 
+def migrate_options(data):
+    data = dict(data)
+    options = {k: data.pop(k) for k in ('ble', 'zha') if k in data}
+    return {'data': data, 'options': options}
+
+
 TITLE = "Xiaomi Gateway 3 Debug"
 NOTIFY_TEXT = '<a href="%s" target="_blank">Open Log<a>'
 HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'

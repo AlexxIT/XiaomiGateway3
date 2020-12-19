@@ -2,7 +2,9 @@
   "config": {
     "error": {
       "no_servers": "Please select at least one server",
-      "cant_login": "Can't login, check username and password"
+      "cant_login": "Can't login, check username and password",
+      "cant_connect": "Can't connect to gateway",
+      "wrong_model": "Unsupported gateway model"
     },
     "step": {
       "user": {
@@ -21,24 +23,36 @@
         }
       },
       "token": {
-        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token. Use **ZHA** mode ONLY if you [know what you doing](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) {error_text}",
+        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token.\nNote: Gateway with firmware **1.4.6_0043** higher are supported only after [soldering](https://github.com/AlexxIT/XiaomiGateway3/wiki)",
         "data": {
           "host": "Host",
-          "token": "Token",
-          "ble": "Support BLE Devices",
-          "zha": "Zigbee Home Automation (ZHA) Mode"
+          "token": "Token"
         }
       }
     }
   },
   "options": {
     "step": {
-      "init": {
+      "cloud": {
         "title": "MiCloud devices info",
         "data": {
           "did": "Device"
         },
         "description": "{device_info}"
+      },
+      "user": {
+        "title": "Gateway Config",
+        "data": {
+          "host": "Host",
+          "token": "Token",
+          "ble": "Support BLE Devices",
+          "stats": "Enable stats entities",
+          "debug": "Debug",
+          "buzzer": "Disable buzzer [PRO]",
+          "parent": "Parent devices in stats [PRO]",
+          "zha": "Mode [PRO]"
+        },
+        "description": "Change **PRO** options ONLY if you know what you doing"
       }
     }
   },

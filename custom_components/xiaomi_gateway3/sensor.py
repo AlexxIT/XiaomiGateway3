@@ -50,6 +50,10 @@ async def async_setup_entry(hass, entry, add_entities):
     gw.add_setup('sensor', setup)
 
 
+async def async_unload_entry(hass, entry):
+    return True
+
+
 class Gateway3Sensor(Gateway3Device):
     @property
     def state(self):

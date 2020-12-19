@@ -32,6 +32,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('climate', setup)
 
 
+async def async_unload_entry(hass, entry):
+    return True
+
+
 class Gateway3Climate(Gateway3Device, ClimateEntity):
     _current_hvac = None
     _current_temp = None

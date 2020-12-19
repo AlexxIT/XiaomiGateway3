@@ -115,6 +115,9 @@ class TelnetShell(Telnet):
             self.read_until(b"\r\n")  # skip command
             return self.read_until(b"# ")[:-2]
 
+    def run_buzzer(self):
+        self.exec("killall basic_gw")
+
     def stop_buzzer(self):
         self.exec("killall daemon_miio.sh; killall -9 basic_gw")
         # run dummy process with same str in it

@@ -24,6 +24,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('light', setup)
 
 
+async def async_unload_entry(hass, entry):
+    return True
+
+
 class Gateway3Light(Gateway3Device, LightEntity):
     _brightness = None
     _color_temp = None
