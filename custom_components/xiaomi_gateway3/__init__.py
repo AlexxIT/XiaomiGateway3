@@ -283,6 +283,10 @@ class Gateway3Device(Entity):
         return self._name
 
     @property
+    def state(self):
+        return self._state
+
+    @property
     def available(self) -> bool:
         return self.device.get('online', True) or self._ignore_offline
 

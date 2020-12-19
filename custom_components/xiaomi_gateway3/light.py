@@ -2,6 +2,7 @@ import logging
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP
+from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.util import color
 
 from . import DOMAIN, Gateway3Device
@@ -57,7 +58,7 @@ class Gateway3Light(Gateway3Device, LightEntity):
 
     def update(self, data: dict = None):
         if self._attr in data:
-            self._state = data[self._attr] == 1
+            self._state = STATE_ON if data[self._attr] == 1 else STATE_OFF
         if 'brightness' in data:
             self._brightness = data['brightness'] / 100.0 * 255.0
         if 'color_temp' in data:
@@ -125,7 +126,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
         self.device['online'] = True
 
         if self._attr in data:
-            self._state = data[self._attr]
+            self._state = STATE_ON if data[self._attr] else STATE_OFF
         if 'brightness' in data:
             # 0...65535
             self._brightness = data['brightness'] / 65535.0 * 255.0
