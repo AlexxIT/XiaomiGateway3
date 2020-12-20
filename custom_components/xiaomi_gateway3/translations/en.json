@@ -46,7 +46,7 @@
           "host": "Host",
           "token": "Token",
           "ble": "Support BLE Devices",
-          "stats": "Enable stats entities",
+          "stats": "Zigbee and BLE performance data",
           "debug": "Debug",
           "buzzer": "Disable buzzer [PRO]",
           "parent": "Parent devices in stats [PRO]",

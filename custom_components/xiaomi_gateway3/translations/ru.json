@@ -2,7 +2,9 @@
   "config": {
     "error": {
       "no_servers": "Пожалуйста, выберите хотя бы один сервер",
-      "cant_login": "Ошибка, проверьте имя пользователя и пароль"
+      "cant_login": "Ошибка, проверьте имя пользователя и пароль",
+      "cant_connect": "Не получается подключиться к шлюзу",
+      "wrong_model": "Модель шлюза неподдерживается"
     },
     "step": {
       "user": {
@@ -21,24 +23,36 @@
         }
       },
       "token": {
-        "description": "[Получите](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен. Используйте режим **ZHA** ТОЛЬКО если [знаете, что вы делаете](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) {error_text}",
+        "description": "[Получите](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен. Шлюз с прошивкой **1.4.6_0043** и выше поддерживается только после [перепрошивки](https://github.com/AlexxIT/XiaomiGateway3/wiki)",
         "data": {
-          "host": "IP-адрес шлюза",
-          "token": "Токен",
-          "ble": "Поддержка BLE устройств",
-          "zha": "Режим Zigbee Home Automation (ZHA)"
+          "host": "IP-адрес",
+          "token": "Токен"
         }
       }
     }
   },
   "options": {
     "step": {
-      "init": {
+      "cloud": {
         "title": "Информация о устройствах MiCloud",
         "data": {
           "did": "Устройство"
         },
         "description": "{device_info}"
+      },
+      "user": {
+        "title": "Настройка шлюза",
+        "data": {
+          "host": "IP-адрес",
+          "token": "Токен",
+          "ble": "Поддержка BLE устройств",
+          "stats": "Детализация работы Zigbee и BLE",
+          "debug": "Отладка",
+          "buzzer": "Выключить пищалку [PRO]",
+          "parent": "Родительские устройства в статистике [PRO]",
+          "zha": "Режим работы [PRO]"
+        },
+        "description": "Изменяйте **PRO** настройки ТОЛЬКО если знаете, что вы делаете"
       }
     }
   },
