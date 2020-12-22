@@ -13,8 +13,8 @@ RUN_SOCAT = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
 
 CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
 DOWNLOAD_BUSYBOX = "(curl -k -o /data/busybox https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel && chmod +x /data/busybox)"
-LOCK_FIRMWARE = "/data/busybox chattr +i /data/firmware.bin"
-UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware.bin"
+LOCK_FIRMWARE = "/data/busybox chattr +i"
+UNLOCK_FIRMWARE = "/data/busybox chattr -i"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 
 # use awk because buffer
@@ -23,6 +23,8 @@ MIIO_MORE = "-l 4"
 MIIO2MQTT = "(miio_client %s -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
 
 RE_VERSION = re.compile(r'version=([0-9._]+)')
+
+FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
 
 
 class TelnetShell(Telnet):
@@ -58,12 +60,17 @@ class TelnetShell(Telnet):
 
     def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
-        raw = self.exec("touch /data/firmware.bin")
-        return "Permission denied" in raw
+        self.exec("mkdir -p /data/firmware")
+        locked = [
+            "Permission denied" in self.exec("touch " + path)
+            for path in FIRMWARE_PATHS
+        ]
+        return all(locked)
 
     def lock_firmware(self, enable: bool):
         command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
-        self.exec(f"{CHECK_BUSYBOX} && {command}")
+        for path in FIRMWARE_PATHS:
+            self.exec(f"{CHECK_BUSYBOX} && {command} " + path)
 
     def run_ftp(self):
         self.exec(f"{CHECK_BUSYBOX} && {RUN_FTP}")
