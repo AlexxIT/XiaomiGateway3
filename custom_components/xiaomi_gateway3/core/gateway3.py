@@ -701,6 +701,11 @@ class Gateway3(Thread, GatewayV):
         # not always Mesh devices
         self.debug(f"Process Mesh* {data}")
 
+        for msg in data:
+            device = self.devices[msg['did']]
+            if device:
+                msg['model'] = device['model']
+
         data = bluetooth.parse_xiaomi_mesh(data)
         for did, payload in data.items():
             if did in self.updates:

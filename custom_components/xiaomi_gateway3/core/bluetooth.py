@@ -312,7 +312,7 @@ def parse_xiaomi_mesh(data: list):
             continue
 
         did = payload['did']
-        if did in BLE_MESH_SWITCHES:
+        if payload['model'] in BLE_MESH_SWITCHES:
             # handle response for BLE mesh switches
             # a tuple of (siid, piid) is used as the key
             key = (payload['siid'], payload['piid'])
