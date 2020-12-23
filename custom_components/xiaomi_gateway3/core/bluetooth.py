@@ -327,6 +327,20 @@ def parse_xiaomi_mesh(data: list):
     return result
 
 
+def parse_xiaomi_mesh_callback(data: list):
+    result = []
+
+    for payload in data:
+        if payload.get('code', 1) != 1:
+            continue
+    
+        result.append([
+            payload['did'], payload['siid'], payload['piid'],
+        ])
+
+    return result
+    
+
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
     if isinstance(data, dict):
         return [{
