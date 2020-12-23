@@ -1,7 +1,7 @@
 import logging
 import time
-from functools import partial
 
+from functools import partial
 from homeassistant.components import persistent_notification
 from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.helpers.entity import ToggleEntity
@@ -33,7 +33,7 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
 
     @property
     def is_on(self):
-        return self._attr == STATE_ON
+        return self._state == STATE_ON
 
     def update(self, data: dict = None):
         if self._attr in data:
@@ -78,9 +78,9 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         self._on_value = mesh_prop[3]
         self._off_value = mesh_prop[4]
         
-        self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
+        self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}"
         self._name = (self.device['device_name'] + ' ' +
-                      mesh_prop[2].title())
+                      mesh_prop[2].title()) if mesh_prop[2] is not None else self.device['device_name']
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
@@ -94,26 +94,20 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     def update(self, data: dict = None):
         if data is None:
-            did = (self.device['childs'][0]
-                   if 'childs' in self.device
-                   else self.device['did'])
-
+            did = self.device['did']
             try:
                 payload = [{'did': did,'siid': self._siid,'piid': self._piid,}]
                 resp = self.gw.miio.send('get_properties', payload)
                 # _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
-                data = bluetooth.parse_xiaomi_mesh_raw(resp)[did]
+                self.gw.process_mesh_data(resp)
+
             except Exception as e:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error: {e}")
                 self.device['online'] = False
-                return
+                self.async_write_ha_state()
+            return
 
-            # _LOGGER.debug(f"{self.gw.host} | {did} poll mesh <= {data}")
-            self._update(data)
-
-        else:
-            self._update(data)
-            self.async_write_ha_state()
+        self._update(data)
 
 
     def _update(self, data: dict):
@@ -121,28 +115,17 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         # _LOGGER.debug(f"{self.gw.host} | {self.device['did']}_{self._siid}_{self._piid} _update: {data}")
         key = (self._siid, self._piid)
         if key in data:
-            self._state = data[key]
+            self._state = data[key] == self._on_value
         
-    async def async_turn_on(self):
-        await self.async_send_mesh_command(self._on_value)
+        self.async_write_ha_state()
 
-    async def async_turn_off(self):
-        await self.async_send_mesh_command(self._off_value)
-        
-    async def async_send_mesh_command(self, value):
-        try:
-            payload = {(self._siid, self._piid): value}
-            result = await self.hass.async_add_executor_job(
-                partial(self.gw.send_mesh_raw, self.device, payload))
-
-            # _LOGGER.debug(f"await send_mesh_raw | result = {result}")
-            for data in bluetooth.parse_xiaomi_mesh_callback(result):
-                _LOGGER.debug(f"{self.gw.host} | handle callback: {data}")
-                if data[0] == self.device['did'] and data[1] == self._siid and data[2] == self._piid:
-                    self._state = STATE_ON if value == self._on_value else STATE_OFF
-                    return
-        except Exception as e:
-            _LOGGER.debug(f"{self.gw.host} | failed to handle async command: {e}")
+    def turn_on(self, **kwargs):
+        self.gw.send_mesh(self.device, {(self._siid, self._piid): self._on_value})
+        time.sleep(.5)  # delay before poll actual status
+    
+    def turn_off(self, **kwargs):
+        self.gw.send_mesh(self.device, {(self._siid, self._piid): self._off_value})
+        time.sleep(.5)  # delay before poll actual status
 
 
 class FirmwareLock(Gateway3Switch):

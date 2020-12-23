@@ -8,7 +8,7 @@
       "user": {
         "title": "Select Action",
         "data": {
-          "action": "action"
+          "action": "Action"
         }
       },
       "cloud": {
@@ -21,12 +21,12 @@
         }
       },
       "token": {
-        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token {error_text}",
+        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token. Use **ZHA** mode ONLY if you [know what you doing](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) {error_text}",
         "data": {
           "host": "Host",
           "token": "Token",
           "ble": "Support BLE Devices",
-          "zha": "Zigbee Home Automation Mode"
+          "zha": "Zigbee Home Automation (ZHA) Mode"
         }
       }
     }
@@ -40,6 +40,21 @@
         },
         "description": "{device_info}"
       }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "Button press",
+      "button_1": "1st button press",
+      "button_2": "2nd button press",
+      "button_3": "3rd button press",
+      "button_4": "4th button press",
+      "button_5": "5th button press",
+      "button_6": "6th button press",
+      "button_both": "Both button press",
+      "button_both_12": "1st and 2nd button press",
+      "button_both_13": "1st and 3rd button press",
+      "button_both_23": "2nd and 3rd button press"
     }
   }
 }

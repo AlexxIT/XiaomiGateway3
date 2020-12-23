@@ -101,10 +101,6 @@ class Gateway3Action(Gateway3Device):
         return self._state
 
     @property
-    def state_attributes(self):
-        return self._attrs
-
-    @property
     def icon(self):
         return 'mdi:bell'
 
@@ -131,6 +127,11 @@ class Gateway3Action(Gateway3Device):
             self._attrs = data
             self._state = data[self._attr]
             self.async_write_ha_state()
+
+            # repeat event from Aqara integration
+            self.hass.bus.async_fire('xiaomi_aqara.click', {
+                'entity_id': self.entity_id, 'click_type': self._state
+            })
 
             time.sleep(.1)
 

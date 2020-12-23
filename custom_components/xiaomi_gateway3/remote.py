@@ -39,11 +39,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
 
     @property
     def is_on(self):
-        return self._attr == STATE_ON
-
-    @property
-    def state_attributes(self):
-        return self._attrs
+        return self._state == STATE_ON
 
     @property
     def icon(self):
@@ -107,3 +103,6 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                 self.gw.send(self.device, {'channel': int(args[1])})
             elif cmd == 'publishstate':
                 self.gw.send_mqtt('publishstate')
+            elif cmd == 'info':
+                raw = self.gw.get_gateway_info()
+                persistent_notification.async_create(self.hass, raw)

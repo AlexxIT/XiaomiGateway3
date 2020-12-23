@@ -1,7 +1,7 @@
 import base64
 import logging
+import re
 import time
-
 from telnetlib import Telnet
 from typing import Union
 
@@ -20,9 +20,9 @@ RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 # use awk because buffer
 MIIO_LESS = "-l 0 -o FILE_STORE -n 128"
 MIIO_MORE = "-l 4"
-MIIO2MQTT = "(miio_client -d /data/miio %s | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
+MIIO2MQTT = "(miio_client %s -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
 
-VERSION = "cat etc/rootfs_fw_info | grep 'version' | cut -d '=' -f 2"
+RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 
 class TelnetShell(Telnet):
@@ -91,8 +91,17 @@ class TelnetShell(Telnet):
 
     def run_public_zb_console(self):
         self.exec("killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT")
+        # run Gateway with open console port
         self.exec("Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v -p '/dev/ttyS2' "
-                  "-d '/data/silicon_zigbee_host/' &")
+                  "-d '/data/silicon_zigbee_host/' > /dev/null &")
+
+        # connect to console to start zigbee chip
+        self.write(b"nc localhost 4901\r\n")
+        time.sleep(1)
+        # exit console (ctrl+c)
+        self.write(b"\x03")
+        self.read_until(b"\r\n# ")
+
         self.exec("daemon_app.sh &")
 
     def read_file(self, filename: str, as_base64=False):
@@ -112,5 +121,7 @@ class TelnetShell(Telnet):
         self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
         self.exec("daemon_miio.sh &")
 
-    def version(self):
-        return self.exec(VERSION).split('\r\n')[1]
+    def get_version(self):
+        raw = self.read_file('/etc/rootfs_fw_info')
+        m = RE_VERSION.search(raw.decode())
+        return m[1]

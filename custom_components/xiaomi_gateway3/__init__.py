@@ -1,6 +1,7 @@
 import logging
 
 import voluptuous as vol
+from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -65,7 +66,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry):
 
     # init setup for each supported domains
     for domain in (
-            'binary_sensor', 'cover', 'light', 'remote', 'sensor', 'switch'
+            'binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
+            'switch'
     ):
         hass.async_create_task(hass.config_entries.async_forward_entry_setup(
             config_entry, domain))
@@ -171,6 +173,7 @@ async def _handle_device_remove(hass: HomeAssistant):
 
 
 class Gateway3Device(Entity):
+    _ignore_offline = None
     _state = None
 
     def __init__(self, gateway: Gateway3, device: dict, attr: str):
@@ -191,6 +194,9 @@ class Gateway3Device(Entity):
 
     async def async_added_to_hass(self):
         """Also run when rename entity_id"""
+        custom: dict = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+        self._ignore_offline = custom.get('ignore_offline')
+
         if 'init' in self.device and self._state is None:
             self.update(self.device['init'])
 
@@ -218,7 +224,11 @@ class Gateway3Device(Entity):
 
     @property
     def available(self) -> bool:
-        return self.device.get('online', True)
+        return self.device.get('online', True) or self._ignore_offline
+
+    @property
+    def device_state_attributes(self):
+        return self._attrs
 
     @property
     def device_info(self):

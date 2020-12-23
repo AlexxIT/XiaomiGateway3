@@ -19,20 +19,26 @@ DEVICES = {
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     # Mesh
     948: ["Yeelight", "Mesh Downlight", "YLSD01YL"],
+    995: ["Yeelight", "Mesh Bulb E14", "YLDP09YL"],
     996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
-    2007: ["Unknown", "Mesh Switch Controller", "2007"],
-    2257: ["PTX", "PTX Mesh Wall Double Switch", "PTX-SK2M"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    # Mesh Switches
+    1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
+    2007: ["Unknown", "Mesh Switch Controller", "2007"],
+    2093: ["PTX", "PTX Mesh Wall Triple Switch","PTX-TK3/M"],
+    2257: ["PTX", "PTX Mesh Wall Double Switch", "PTX-SK2M"],
     # Mesh Group
     0: ["Mesh", "Mesh Group"]
 }
 
-BLE_SWITCH_DEVICES = [
+BLE_MESH_SWITCHES = [
+    1946,
 	2007,
-	2257,
+    2093,
+	2257
 ]
 
 # model: [
@@ -41,6 +47,10 @@ BLE_SWITCH_DEVICES = [
 #   ...
 # ]
 BLE_SWITCH_DEVICES_PROPS = {
+    1946: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+    ],
     2257: [
         [2, 1, 'Left Switch', True, False],
         [3, 1, 'Right Switch', True, False],
@@ -50,7 +60,11 @@ BLE_SWITCH_DEVICES_PROPS = {
     ]
 }
 DEFAULT_SWITCH_PROP = [
+<<<<<<< HEAD
 	[2, 1, 'Switch', True, False]
+=======
+	[2, 1, None, True, False]
+>>>>>>> mesh
 ]
 
 BLE_FINGERPRINT_ACTION = [
@@ -155,7 +169,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
         return {'rssi': data[0]}
 
     elif eid == 0x1004 and length == 2:  # 4100
-        return {'temperature': int.from_bytes(data, 'little') / 10.0}
+        return {'temperature': int.from_bytes(data, 'little', signed=True) / 10.0}
 
     elif eid == 0x1006 and length == 2:  # 4102
         # Humidity percentage, ranging from 0-1000
@@ -179,7 +193,7 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
     elif eid == 0x100D and length == 4:  # 4109
         return {
-            'temperature': int.from_bytes(data[:2], 'little') / 10.0,
+            'temperature': int.from_bytes(data[:2], 'little', signed=True) / 10.0,
             'humidity': int.from_bytes(data[2:], 'little') / 10.0
         }
 
@@ -298,30 +312,24 @@ def parse_xiaomi_mesh(data: list):
     result = {}
 
     for payload in data:
-        if payload['siid'] != 2 or payload.get('code', 0) != 0:
-            continue
-
-        did = payload['did']
-        key = MESH_PROPS[payload['piid']]
-        result.setdefault(did, {})[key] = payload['value']
-
-    return result
-
-
-def parse_xiaomi_mesh_raw(data: list):
-    """Can receive multiple properties from multiple devices."""
-    result = {}
-
-    for payload in data:
         if payload.get('code', 0) != 0:
             continue
 
         did = payload['did']
-        key = (payload['siid'], payload['piid'])
-        
-        result.setdefault(did, {})[key] = payload['value']
+        if payload['model'] in BLE_MESH_SWITCHES:
+            # handle response for BLE mesh switches
+            # a tuple of (siid, piid) is used as the key
+            key = (payload['siid'], payload['piid'])
+            result.setdefault(did, {})[key] = payload['value']
+        else:
+            if payload['siid'] != 2:
+                continue
+
+            key = MESH_PROPS[payload['piid']]
+            result.setdefault(did, {})[key] = payload['value']
 
     return result
+
 
 def parse_xiaomi_mesh_callback(data: list):
     result = []
@@ -329,12 +337,13 @@ def parse_xiaomi_mesh_callback(data: list):
     for payload in data:
         if payload.get('code', 1) != 1:
             continue
-        
+    
         result.append([
             payload['did'], payload['siid'], payload['piid'],
         ])
 
     return result
+    
 
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
     ''' map light properties '''
@@ -352,7 +361,15 @@ def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
 
 def pack_xiaomi_mesh_raw(did: str, data: Union[dict, list]):
     if isinstance(data, dict):
-        # k is a tuple of (siid, piid)
+        if data['is_switch'] == True:
+            # for mesh switches, key of the dict is a tuple of (siid, piid)
+            return [{
+                'did': did,
+                'siid': k[0],
+                'piid': k[1],
+                'value': v
+            } for k, v in data.items() if k != 'is_switch']
+
         return [{
             'did': did,
             'siid': k[0],
