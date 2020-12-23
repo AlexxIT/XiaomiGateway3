@@ -60,11 +60,7 @@ BLE_SWITCH_DEVICES_PROPS = {
     ]
 }
 DEFAULT_SWITCH_PROP = [
-<<<<<<< HEAD
-	[2, 1, 'Switch', True, False]
-=======
 	[2, 1, None, True, False]
->>>>>>> mesh
 ]
 
 BLE_FINGERPRINT_ACTION = [
@@ -330,36 +326,7 @@ def parse_xiaomi_mesh(data: list):
 
     return result
 
-
-def parse_xiaomi_mesh_callback(data: list):
-    result = []
-
-    for payload in data:
-        if payload.get('code', 1) != 1:
-            continue
-    
-        result.append([
-            payload['did'], payload['siid'], payload['piid'],
-        ])
-
-    return result
-    
-
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
-    ''' map light properties '''
-    if isinstance(data, dict):
-        result = []
-        for k,v in data.items():
-            result.append({
-                'piid': MESH_PROPS.index(k),
-                'value': v
-            })
-        return pack_xiaomi_mesh_raw(did, result)
-    else:
-        result = list(map(lambda k: MESH_PROPS.index(k), data))
-        return pack_xiaomi_mesh_raw(did, result)
-
-def pack_xiaomi_mesh_raw(did: str, data: Union[dict, list]):
     if isinstance(data, dict):
         if data['is_switch'] == True:
             # for mesh switches, key of the dict is a tuple of (siid, piid)
@@ -372,15 +339,15 @@ def pack_xiaomi_mesh_raw(did: str, data: Union[dict, list]):
 
         return [{
             'did': did,
-            'siid': k[0],
-            'piid': k[1],
+            'siid': 2,
+            'piid': MESH_PROPS.index(k),
             'value': v
         } for k, v in data.items()]
     else:
         return [{
             'did': did,
-            'siid': k[0],
-            'piid': k[1],
+            'siid': 2,
+            'piid': MESH_PROPS.index(k),
         } for k in data]
 
 def get_device(pdid: int, default_name: str) -> Optional[dict]:
