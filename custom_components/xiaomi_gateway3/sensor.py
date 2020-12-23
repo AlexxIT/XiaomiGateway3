@@ -247,6 +247,9 @@ class Gateway3Action(Gateway3Device):
     def update(self, data: dict = None):
         for k, v in data.items():
             if k == 'button':
+                # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
+                if 'voltage' in data:
+                    return
                 data[self._attr] = BUTTON.get(v, 'unknown')
                 break
             elif k.startswith('button_both'):
