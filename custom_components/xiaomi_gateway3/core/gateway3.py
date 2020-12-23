@@ -324,7 +324,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 continue
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
-            if not self._mqtt_connect() and not self._prepeare_gateway():
+            if not self._mqtt_connect() or not self._prepeare_gateway():
                 time.sleep(60)
                 continue
 
@@ -355,8 +355,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         try:
             shell = TelnetShell(self.host)
 
-            self.ver = shell.get_version()
-            self.debug(f"Version: {self.ver}")
+            if self.ver is None:
+                self.ver = shell.get_version()
+                self.debug(f"Version: {self.ver}")
 
             ps = shell.get_running_ps()
 
