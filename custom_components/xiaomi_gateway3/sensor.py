@@ -150,7 +150,7 @@ class ZigbeeSensor(Gateway3Device):
             self._attrs['rssi'] = data['rssi']
 
             cid = int(data['clusterId'], 0)
-            self._attrs['last_msg'] = CLUSTERS.get(cid, cid)
+            self._attrs['last_msg'] = cluster = CLUSTERS.get(cid, cid)
 
             self._attrs['msg_received'] += 1
 
@@ -161,6 +161,9 @@ class ZigbeeSensor(Gateway3Device):
                     miss += 256
                 self._attrs['msg_missed'] += miss
                 self._attrs['last_missed'] = miss
+                if miss:
+                    self.debug(f"Msg missed: {self.last_seq} => {new_seq} "
+                               f"({cluster})")
             self.last_seq = new_seq
 
             self._state = now().isoformat(timespec='seconds')
