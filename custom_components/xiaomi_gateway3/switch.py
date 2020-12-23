@@ -78,9 +78,9 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         self._on_value = mesh_prop[3]
         self._off_value = mesh_prop[4]
         
-        self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
+        self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}"
         self._name = (self.device['device_name'] + ' ' +
-                      mesh_prop[2].title())
+                      mesh_prop[2].title()) if mesh_prop[2] is not None else self.device['device_name']
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
