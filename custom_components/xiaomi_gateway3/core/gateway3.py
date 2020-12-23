@@ -294,10 +294,12 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
     def stop(self):
         self.enabled = False
-        self.mqtt.loop_stop()
+        self.mqtt._thread_terminate = True
 
     def run(self):
         """Main thread loop."""
+        self.debug("Start main thread")
+
         self.enabled = True
         while self.enabled:
             # if not telnet - enable it
@@ -324,6 +326,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 continue
 
             self.mqtt.loop_forever()
+
+        self.debug("Stop main thread")
 
     def _check_port(self, port: int):
         """Check if gateway port open."""
