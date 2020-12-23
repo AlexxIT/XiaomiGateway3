@@ -769,6 +769,10 @@ class Gateway3(Thread, GatewayV):
 
     def send_mesh(self, device: dict, data: dict):
         did = device['did']
+
+        if device['model'] in bluetooth.BLE_MESH_SWITCHES:
+            data['is_switch'] = True
+            
         payload = bluetooth.pack_xiaomi_mesh(did, data)
         try:
             return self.miio.send('set_properties', payload)
