@@ -145,7 +145,7 @@ class GatewayStats:
     def add_stats(self, ieee: str, handler):
         self.stats[ieee] = handler
 
-        if self.parent_scan_interval:
+        if self.parent_scan_interval > 0:
             self.info_ts = time.time() + 5
 
     def remove_stats(self, ieee: str, handler):
@@ -241,7 +241,7 @@ class GatewayStats:
 
         self.info_loading = False
         # one hour later
-        if self.parent_scan_interval:
+        if self.parent_scan_interval > 0:
             self.info_ts = time.time() + self.parent_scan_interval * 60
 
 
@@ -266,7 +266,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
         self._ble = options.get('ble')  # for fast access
         self._debug = options.get('debug', '')  # for fast access
-        self.parent_scan_interval = options.get('parent')  # for fast access
+        self.parent_scan_interval = options.get('parent', -1)
         self.default_devices = config['devices']
 
         self.devices = {}
@@ -390,7 +390,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     self.debug("Stop socat")
                     shell.stop_socat()
 
-                if (self.parent_scan_interval is not None and
+                if (self.parent_scan_interval >= 1 and
                         "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps):
                     self.debug("Run public Zigbee console")
                     shell.run_public_zb_console()
