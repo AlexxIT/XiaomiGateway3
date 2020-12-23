@@ -60,11 +60,7 @@ BLE_SWITCH_DEVICES_PROPS = {
     ]
 }
 DEFAULT_SWITCH_PROP = [
-<<<<<<< HEAD
-	[2, 1, 'Switch', True, False]
-=======
 	[2, 1, None, True, False]
->>>>>>> mesh
 ]
 
 BLE_FINGERPRINT_ACTION = [
