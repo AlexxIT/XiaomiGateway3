@@ -1,10 +1,12 @@
 import logging
 
+from functools import partial
 from homeassistant.components import persistent_notification
 from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device
+from .core import bluetooth
 from .core.gateway3 import Gateway3
 
 _LOGGER = logging.getLogger(__name__)
@@ -12,11 +14,12 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        async_add_entities([
-            FirmwareLock(gateway, device, attr)
-            if attr == 'firmware lock' else
-            Gateway3Switch(gateway, device, attr)
-        ])
+        if attr == 'firmware lock':
+            async_add_entities([FirmwareLock(gateway, device, attr)])
+        elif device['type'] == 'mesh':
+            async_add_entities([Gateway3MeshSwitch(gateway, device, attr)])
+        else:
+            async_add_entities([Gateway3Switch(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('switch', setup)
@@ -41,6 +44,102 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
 
     def turn_off(self):
         self.gw.send(self.device, {self._attr: 0})
+
+
+class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
+
+    _siid = 0
+    _piid = 0
+    _on_value = None
+    _off_value = None
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.add_update(did, self.update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
+
+        if 'childs' in self.device:
+            for did in self.device['childs']:
+                self.gw.remove_update(did, self.update)
+
+    def __init__(self, gateway: Gateway3, device: dict, attr: str):
+        super(Gateway3MeshSwitch, self).__init__(gateway, device, attr)
+
+        mesh_prop = device['mesh_prop']
+
+        self._siid = mesh_prop[0]
+        self._piid = mesh_prop[1]
+        self._on_value = mesh_prop[3]
+        self._off_value = mesh_prop[4]
+        
+        self._unique_id = f"{self.device['mac']}_{self._siid}_{self._piid}_{self._attr}"
+        self._name = (self.device['device_name'] + ' ' +
+                      mesh_prop[2].title())
+
+        self.entity_id = f"{DOMAIN}.{self._unique_id}"
+
+    @property
+    def should_poll(self) -> bool:
+        return True
+
+    @property
+    def is_on(self) -> bool:
+        return self._state
+
+    def update(self, data: dict = None):
+        if data is None:
+            did = (self.device['childs'][0]
+                   if 'childs' in self.device
+                   else self.device['did'])
+
+            try:
+                payload = [{'did': did,'siid': self._siid,'piid': self._piid,}]
+                resp = self.gw.miio.send('get_properties', payload)
+                # _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
+                data = bluetooth.parse_xiaomi_mesh(resp)[did]
+            except Exception as e:
+                _LOGGER.debug(f"{self.gw.host} | {did} poll error: {e}")
+                self.device['online'] = False
+                return
+
+            self._update(data)
+
+        else:
+            self._update(data)
+            self.async_write_ha_state()
+
+
+    def _update(self, data: dict):
+        self.device['online'] = True
+        # _LOGGER.debug(f"{self.gw.host} | {self.device['did']}_{self._siid}_{self._piid} _update: {data}")
+        key = (self._siid, self._piid)
+        if key in data:
+            self._state = data[key] == self._on_value
+        
+    async def async_turn_on(self):
+        await self.async_send_mesh_command(self._on_value)
+
+    async def async_turn_off(self):
+        await self.async_send_mesh_command(self._off_value)
+        
+    async def async_send_mesh_command(self, value):
+        try:
+            payload = {(self._siid, self._piid): value}
+            result = await self.hass.async_add_executor_job(
+                partial(self.gw.send_mesh, self.device, payload))
+
+            for data in bluetooth.parse_xiaomi_mesh_callback(result):
+                _LOGGER.debug(f"{self.gw.host} | handle callback: {data}")
+                if data[0] == self.device['did'] and data[1] == self._siid and data[2] == self._piid:
+                    self._state = value == self._on_value
+                    return
+        except Exception as e:
+            _LOGGER.debug(f"{self.gw.host} | failed to handle async command: {e}")
 
 
 class FirmwareLock(Gateway3Switch):
