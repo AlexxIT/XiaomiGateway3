@@ -25,9 +25,43 @@ DEVICES = {
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    # Mesh Switches
+    1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
+    2007: ["Unknown", "Mesh Switch Controller", "2007"],
+    2093: ["PTX", "PTX Mesh Wall Triple Switch","PTX-TK3/M"],
+    2257: ["PTX", "PTX Mesh Wall Double Switch", "PTX-SK2M"],
     # Mesh Group
     0: ["Mesh", "Mesh Group"]
 }
+
+BLE_MESH_SWITCHES = [
+    1946,
+	2007,
+    2093,
+	2257
+]
+
+# model: [
+#   [siid, piid, name, on_value, off_value],
+#   [siid, piid, name, on_value, off_value],
+#   ...
+# ]
+BLE_SWITCH_DEVICES_PROPS = {
+    1946: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+    ],
+    2257: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Left - Always On', 1, 0],
+        [8, 3, 'Right - Always On', 1, 0],
+    ]
+}
+DEFAULT_SWITCH_PROP = [
+	[2, 1, 'Switch', True, False]
+]
 
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
