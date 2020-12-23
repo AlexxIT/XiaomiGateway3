@@ -455,12 +455,23 @@ class Gateway3(Thread, GatewayV):
                 device['online'] = False
 
                 self.devices[device['did']] = device
+                
+                model = device['model']
+
+                domain = 'switch' if model in bluetooth.BLE_MESH_SWITCHES else 'light'
 
                 # wait domain init
-                while 'light' not in self.setups:
+                while domain not in self.setups:
                     time.sleep(1)
 
-                self.setups['light'](self, device, 'light')
+                if domain == 'switch':
+                    props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(device['model'], bluetooth.DEFAULT_SWITCH_PROP)
+                    for prop in props:
+                        switch_device = {'mesh_prop': prop}
+                        switch_device.update(device)
+                        self.setups[domain](self, switch_device, domain)
+                else:
+                    self.setups[domain](self, device, domain)
 
             elif device['type'] == 'ble':
                 # only save info for future
@@ -772,7 +783,7 @@ class Gateway3(Thread, GatewayV):
 
         if device['model'] in bluetooth.BLE_MESH_SWITCHES:
             data['is_switch'] = True
-            
+
         payload = bluetooth.pack_xiaomi_mesh(did, data)
         try:
             return self.miio.send('set_properties', payload)
