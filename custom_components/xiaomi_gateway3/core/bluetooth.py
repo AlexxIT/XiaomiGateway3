@@ -350,7 +350,7 @@ def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
                 'siid': k[0],
                 'piid': k[1],
                 'value': v
-            } for k, v in data.items()]
+            } for k, v in data.items() if k != 'is_switch']
 
         return [{
             'did': did,
