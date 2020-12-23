@@ -2,7 +2,6 @@ import logging
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP
-from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.util import color
 
 from . import DOMAIN, Gateway3Device

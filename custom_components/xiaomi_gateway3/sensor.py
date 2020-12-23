@@ -50,11 +50,11 @@ async def async_setup_entry(hass, entry, add_entities):
         if attr == 'action':
             add_entities([Gateway3Action(gateway, device, attr)])
         elif attr == 'gateway':
-            add_entities([GatewaySensor(gateway, device, attr)])
+            add_entities([GatewayStats(gateway, device, attr)])
         elif attr == 'zigbee':
-            add_entities([ZigbeeSensor(gateway, device, attr)])
+            add_entities([ZigbeeStats(gateway, device, attr)])
         elif attr == 'ble':
-            add_entities([BLESensor(gateway, device, attr)])
+            add_entities([BLEStats(gateway, device, attr)])
         else:
             add_entities([Gateway3Sensor(gateway, device, attr)])
 
@@ -67,6 +67,10 @@ async def async_unload_entry(hass, entry):
 
 
 class Gateway3Sensor(Gateway3Device):
+    @property
+    def state(self):
+        return self._state
+
     @property
     def device_class(self):
         return self._attr
@@ -85,11 +89,7 @@ class Gateway3Sensor(Gateway3Device):
         self.async_write_ha_state()
 
 
-class GatewaySensor(Gateway3Device):
-    @property
-    def icon(self):
-        return ICONS.get(self._attr)
-
+class GatewayStats(Gateway3Sensor):
     @property
     def device_class(self):
         # don't use const to support older Hass version
@@ -114,12 +114,8 @@ class GatewaySensor(Gateway3Device):
         self.async_write_ha_state()
 
 
-class ZigbeeSensor(Gateway3Device):
+class ZigbeeStats(Gateway3Sensor):
     last_seq = None
-
-    @property
-    def icon(self):
-        return ICONS.get(self._attr)
 
     @property
     def device_class(self):
@@ -179,12 +175,8 @@ class ZigbeeSensor(Gateway3Device):
         self.async_write_ha_state()
 
 
-class BLESensor(Gateway3Device):
+class BLEStats(Gateway3Sensor):
     last_seq = None
-
-    @property
-    def icon(self):
-        return ICONS.get(self._attr)
 
     @property
     def device_class(self):

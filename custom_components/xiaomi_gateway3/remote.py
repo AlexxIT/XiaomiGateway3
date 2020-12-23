@@ -2,7 +2,6 @@ import logging
 
 from homeassistant.components import persistent_notification
 from homeassistant.components.remote import ATTR_DEVICE
-from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN, Gateway3Device, utils
@@ -24,8 +23,6 @@ async def async_unload_entry(hass, entry):
 
 
 class Gateway3Entity(Gateway3Device, ToggleEntity):
-    _state = STATE_OFF
-
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
 
@@ -39,12 +36,8 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                 "Speed: `115200`", "Please create manually")
 
     @property
-    def state(self):
-        return self._state
-
-    @property
     def is_on(self):
-        return self._state == STATE_ON
+        return self._state
 
     @property
     def icon(self):
@@ -52,10 +45,10 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
 
     def update(self, data: dict = None):
         if 'pairing_start' in data:
-            self._state = STATE_ON
+            self._state = True
 
         elif 'pairing_stop' in data:
-            self._state = STATE_OFF
+            self._state = False
             self.gw.pair_model = None
 
         elif 'added_device' in data:
