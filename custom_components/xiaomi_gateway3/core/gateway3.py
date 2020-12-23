@@ -5,7 +5,7 @@ import socket
 import time
 from telnetlib import Telnet
 from threading import Thread
-from typing import Optional, Union
+from typing import Optional
 
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils
@@ -167,11 +167,14 @@ class GatewayStats:
                     'radio_channel': payload.get('radioChannel'),
                 }
             elif 'free_mem' in payload:
-                payload.pop('ip')
-                payload.pop('ssid')
-                s = payload.pop('run_time')
+                s = payload['run_time']
                 h, m, s = s // 3600, s % 3600 // 60, s % 60
-                payload['uptime'] = f"{h:02}:{m:02}:{s:02}"
+                payload = {
+                    'free_mem': payload['free_mem'],
+                    'load_avg': payload['load_avg'],
+                    'rssi': -payload['rssi'],
+                    'uptime': f"{h:02}:{m:02}:{s:02}",
+                }
 
         self.stats['lumi.0'](payload)
 
