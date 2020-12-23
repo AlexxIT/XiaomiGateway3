@@ -1,4 +1,5 @@
 import logging
+import time
 
 from functools import partial
 from homeassistant.components import persistent_notification
@@ -93,25 +94,20 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
     def update(self, data: dict = None):
         if data is None:
-            did = (self.device['childs'][0]
-                   if 'childs' in self.device
-                   else self.device['did'])
-
+            did = self.device['did']
             try:
                 payload = [{'did': did,'siid': self._siid,'piid': self._piid,}]
                 resp = self.gw.miio.send('get_properties', payload)
                 # _LOGGER.debug(f"{self.gw.host} | {did} resp = {resp}")
-                data = bluetooth.parse_xiaomi_mesh(resp)[did]
+                self.gw.process_mesh_data(resp)
+
             except Exception as e:
                 _LOGGER.debug(f"{self.gw.host} | {did} poll error: {e}")
                 self.device['online'] = False
-                return
+                self.async_write_ha_state()
+            return
 
-            self._update(data)
-
-        else:
-            self._update(data)
-            self.async_write_ha_state()
+        self._update(data)
 
 
     def _update(self, data: dict):
@@ -121,25 +117,15 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         if key in data:
             self._state = data[key] == self._on_value
         
-    async def async_turn_on(self):
-        await self.async_send_mesh_command(self._on_value)
+        self.async_write_ha_state()
 
-    async def async_turn_off(self):
-        await self.async_send_mesh_command(self._off_value)
-        
-    async def async_send_mesh_command(self, value):
-        try:
-            payload = {(self._siid, self._piid): value}
-            result = await self.hass.async_add_executor_job(
-                partial(self.gw.send_mesh, self.device, payload))
-
-            for data in bluetooth.parse_xiaomi_mesh_callback(result):
-                _LOGGER.debug(f"{self.gw.host} | handle callback: {data}")
-                if data[0] == self.device['did'] and data[1] == self._siid and data[2] == self._piid:
-                    self._state = value == self._on_value
-                    return
-        except Exception as e:
-            _LOGGER.debug(f"{self.gw.host} | failed to handle async command: {e}")
+    def turn_on(self, **kwargs):
+        self.gw.send_mesh(self.device, {(self._siid, self._piid): self._on_value})
+        time.sleep(.5)  # delay before poll actual status
+    
+    def turn_off(self, **kwargs):
+        self.gw.send_mesh(self.device, {(self._siid, self._piid): self._off_value})
+        time.sleep(.5)  # delay before poll actual status
 
 
 class FirmwareLock(Gateway3Switch):
