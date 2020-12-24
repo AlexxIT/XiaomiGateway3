@@ -115,7 +115,7 @@ class SyncmiIO(BasemiIO):
             raw = self._pack_raw(method, params)
             self.sock.sendto(raw, self.addr)
 
-            # can receive more than 1024 bytes
+            # can receive more than 1024 bytes (1056 approximate maximum)
             raw = self.sock.recv(10240)
             data = self._unpack_raw(raw)
 
@@ -128,24 +128,14 @@ class SyncmiIO(BasemiIO):
         """Sends a command with a large number of parameters. Splits into
         multiple requests when the size of one request is exceeded.
         """
-        result = []
-        pack = []
-        total_len = 0
-
         try:
-            for item in params:
-                item_len = len(str(item))
-                # approximate number, it seems to work
-                if total_len + item_len > 900:
-                    result += self.send(method, pack)
-                    pack = []
-                    total_len = 0
-
-                pack.append(item)
-                total_len += item_len
-
-            return result + self.send(method, pack)
-
+            result = []
+            # Chunk of 15 is seems like the best size. Because request should
+            # be lower than 1024 and response should be not more than 1056.
+            # {'did':'1234567890','siid': 2,'piid': 1,'value': False,'code': 0}
+            for i in range(0, len(params), 15):
+                result += self.send(method, params[i:i + 15])
+            return result
         except:
             return None
 
@@ -213,22 +203,13 @@ class AsyncmiIO(BasemiIO, BaseProtocol):
         """Sends a command with a large number of parameters. Splits into
         multiple requests when the size of one request is exceeded.
         """
-        result = []
-        pack = []
-        total_len = 0
-
-        for item in params:
-            item_len = len(str(item))
-            # approximate number, it seems to work
-            if total_len + item_len > 900:
-                result += await self.send(method, pack)
-                pack = []
-                total_len = 0
-
-            pack.append(item)
-            total_len += item_len
-
-        return result + await self.send(method, pack)
+        try:
+            result = []
+            for i in range(0, len(params), 15):
+                result += await self.send(method, params[i:i + 15])
+            return result
+        except:
+            return None
 
     async def info(self):
         """Get info about miIO device."""
