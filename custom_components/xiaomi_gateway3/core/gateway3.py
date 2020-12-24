@@ -458,15 +458,14 @@ class Gateway3(Thread, GatewayV):
                 
                 model = device['model']
 
-                domain = 'switch' if model in bluetooth.BLE_MESH_SWITCHES else 'light'
+                domain = 'switch' if model in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys() else 'light'
 
                 # wait domain init
                 while domain not in self.setups:
                     time.sleep(1)
 
                 if domain == 'switch':
-                    props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(device['model'], bluetooth.DEFAULT_SWITCH_PROP)
-                    for prop in props:
+                    for prop in bluetooth.BLE_SWITCH_DEVICES_PROPS[model]:
                         switch_device = {'mesh_prop': prop}
                         switch_device.update(device)
                         self.setups[domain](self, switch_device, domain)
@@ -786,7 +785,7 @@ class Gateway3(Thread, GatewayV):
     def send_mesh(self, device: dict, data: dict):
         did = device['did']
 
-        if device['model'] in bluetooth.BLE_MESH_SWITCHES:
+        if device['model'] in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
             data['is_switch'] = True
 
         payload = bluetooth.pack_xiaomi_mesh(did, data)
