@@ -753,7 +753,13 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     if p[0] == prop
                 ), prop)
 
-            if prop in ('temperature', 'humidity', 'pressure'):
+            # https://github.com/Koenkk/zigbee2mqtt/issues/798
+            # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
+            if prop == 'temperature' and -4000 < param['value'] < 12500:
+                payload[prop] = param['value'] / 100.0
+            elif prop == 'humidity' and 0 <= param['value'] <= 10000:
+                payload[prop] = param['value'] / 100.0
+            elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0
             elif prop == 'battery' and param['value'] > 1000:
                 # xiaomi light sensor
