@@ -28,8 +28,8 @@ DEVICES = {
     # Mesh Switches
     1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
     2007: ["Unknown", "Mesh Switch Controller", "2007"],
-    2093: ["PTX", "PTX Mesh Wall Triple Switch","PTX-TK3/M"],
-    2257: ["PTX", "PTX Mesh Wall Double Switch", "PTX-SK2M"],
+    2093: ["PTX", "Mesh Wall Triple Switch","PTX-TK3/M"],
+    2257: ["PTX", "Mesh Wall Double Switch", "PTX-SK2M"],
     # Mesh Group
     0: ["Mesh", "Mesh Group"]
 }
