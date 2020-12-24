@@ -91,7 +91,7 @@ If you have "bad" firmware and don't want to solder - try to use [HomeKit Contro
 
 Instruction for soldering: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
-Component can block fw updates with **Lock Firmware** switch.
+Component can block fw updates with **Lock Firmware** switch. Mi Home app will continue to offer you update. But won't be able to install it. It should fail at 0%.
 
 [![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
 
