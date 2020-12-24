@@ -12,7 +12,7 @@ DEVICES = {
     1371: ["Xiaomi", "TH Sensor 2", "LYWSD03MMC"],
     1398: ["Xiaomi", "Alarm Clock", "CGD1"],
     1694: ["Aqara", "Door Lock N100", "ZNMS16LM"],
-    1747: ["Xaiomi", "ZenMeasure Clock", "MHO-C303"],
+    1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     1983: ["Yeelight", "Button S1", "YLAI003"],
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
