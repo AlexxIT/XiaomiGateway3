@@ -105,6 +105,7 @@ Component can block fw updates with **Lock Firmware** switch.
 - v1.4.7_0040 - **need to solder**
 - v1.4.7_0063 - **factory firmware from 2020.11, need to solder**
 - v1.4.7_0065 - **need to solder**
+- v1.4.7_0115 - **need to solder**
 
 **ZNDMWG02LM (Euro version, no plug)**
 - v1.4.6_0043 - **factory firmware, need to solder** (telnet has a password)
