@@ -51,6 +51,15 @@ BLE_SWITCH_DEVICES_PROPS = {
         [2, 1, 'Left Switch', True, False],
         [3, 1, 'Right Switch', True, False],
     ],
+    2093: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Middle Switch', True, False],
+        [4, 1, 'Right Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Left - Always On', 1, 0],
+        [8, 3, 'Middle - Always On', 1, 0],
+        [8, 4, 'Right - Always On', 1, 0]
+    ],
     2257: [
         [2, 1, 'Left Switch', True, False],
         [3, 1, 'Right Switch', True, False],
