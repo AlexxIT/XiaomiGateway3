@@ -352,7 +352,7 @@ def parse_xiaomi_mesh_callback(data: list):
 
 def pack_xiaomi_mesh(did: str, data: Union[dict, list]):
     if isinstance(data, dict):
-        if data['is_switch'] == True:
+        if data.get('is_switch', False):
             # for mesh switches, key of the dict is a tuple of (siid, piid)
             return [{
                 'did': did,
