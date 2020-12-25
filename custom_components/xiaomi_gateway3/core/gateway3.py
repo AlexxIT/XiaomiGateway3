@@ -60,12 +60,20 @@ class GatewayMesh:
         raise NotImplemented
 
     def mesh_start(self):
-        self.mesh_params = [
-            {'did': device['did'], 'siid': 2, 'piid': 1}
-            for device in self.devices.values()
-            # cannot get state of mesh group
-            if device['type'] == 'mesh' and 'childs' not in device
-        ]
+        params = []
+        for device in self.devices.values():
+            if device['type'] == 'mesh' and 'childs' not in device:
+                model = device['model']
+                if model in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
+                    for prop in bluetooth.BLE_SWITCH_DEVICES_PROPS[model]:
+                        params.append({
+                            'did': device['did'],
+                            'siid': prop[0],
+                            'piid': prop[1]
+                        })
+                else:
+                    params.append({'did': device['did'], 'siid': 2, 'piid': 1})
+        self.mesh_params = params
 
         if self.mesh_params:
             self.mesh_ts = time.time() + 30
