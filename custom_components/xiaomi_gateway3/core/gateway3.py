@@ -41,6 +41,10 @@ class GatewayV:
     def ver_miio(self) -> bool:
         return self.ver >= '1.4.7_0063'
 
+    @property
+    def ver_z3(self) -> bool:
+        return self.ver >= '1.4.7_0063'
+
 
 class GatewayMesh:
     enabled: bool = None
@@ -132,6 +136,9 @@ class GatewayStats:
     info_ts: float = 0
     info_loading: bool = False
 
+    mqtt: Client = None
+    gw_topic: str = None
+
     # if mqtt connected
     available: bool = None
 
@@ -197,55 +204,71 @@ class GatewayStats:
         self.info_loading = True
         Thread(target=self._info_loader_run).start()
 
+    def _mqtt_cli(self, command: str):
+        payload = {'commands': [{'commandcli': command}]}
+        payload = json.dumps(payload, separators=(',', ':'))
+        self.mqtt.publish(self.gw_topic + 'commands', payload)
+
     def _info_loader_run(self):
         self.debug("Update parent info table")
 
-        telnet = Telnet(self.host, 4901)
-        telnet.read_until(b'Lumi_Z3GatewayHost')
+        try:
+            # zigbee console input disabled on v1.4.7, we will use mqtt for
+            # input in all firmware versions and telnet from output
+            telnet = Telnet(self.host, 4901)
 
-        telnet.write(b"option print-rx-msgs disable\r\n")
-        telnet.read_until(b'Lumi_Z3GatewayHost')
+            self._mqtt_cli("option print-rx-msgs disable")
+            telnet.read_until(b'CLI command executed', 2)
 
-        telnet.write(b"plugin device-table print\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m1 = re.findall(r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}\w+ (\d+)',
-                        raw)
+            self._mqtt_cli("plugin device-table print")
+            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            m1 = re.findall(r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}\w+ '
+                            r'(\d+)', raw)
 
-        telnet.write(b"plugin stack-diagnostics child-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+            self._mqtt_cli("plugin stack-diagnostics child-table")
+            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
-        telnet.write(b"plugin stack-diagnostics neighbor-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+            self._mqtt_cli("plugin stack-diagnostics neighbor-table")
+            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
-        telnet.write(b"plugin concentrator print-table\r\n")
-        raw = telnet.read_until(b'Lumi_Z3GatewayHost').decode()
-        m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
-        m4 = [i.replace('0x', '').split(' -> ') for i in m4]
-        m4 = {i[0]: i[1:] for i in m4}
+            self._mqtt_cli("plugin concentrator print-table")
+            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
+            m4 = [i.replace('0x', '').split(' -> ') for i in m4]
+            m4 = {i[0]: i[1:] for i in m4}
 
-        for i in m1:
-            ieee = '0x' + i[1]
-            if ieee not in self.stats:
-                continue
+            for i in m1:
+                ieee = '0x' + i[1]
 
-            nwk = i[0]
-            ago = int(i[2])
-            type_ = 'device' if i[1] in m2 else 'router' if i[1] in m3 else '-'
-            parent = '0x' + m4[nwk][0] if nwk in m4 else '-'
+                nwk = i[0]
+                ago = int(i[2])
+                type_ = 'device' if i[1] in m2 else \
+                    'router' if i[1] in m3 else '-'
+                parent = '0x' + m4[nwk][0] if nwk in m4 else '-'
 
-            self.stats[ieee]({
-                'nwk': '0x' + nwk,
-                'ago': ago,
-                'type': type_,
-                'parent': parent
-            })
+                payload = {
+                    'nwk': '0x' + nwk,
+                    'ago': ago,
+                    'type': type_,
+                    'parent': parent
+                }
+
+                if ieee in self.stats:
+                    self.stats[ieee](payload)
+                else:
+                    self.debug(f"Unknown zigbee device {ieee}: {payload}")
+
+            # one hour later
+            if self.parent_scan_interval > 0:
+                self.info_ts = time.time() + self.parent_scan_interval * 60
+
+        except Exception as e:
+            self.debug(f"Can't update parents: {e}")
+            self.info_ts = time.time() + 30
 
         self.info_loading = False
-        # one hour later
-        if self.parent_scan_interval > 0:
-            self.info_ts = time.time() + self.parent_scan_interval * 60
 
 
 # noinspection PyUnusedLocal
@@ -312,6 +335,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
             devices = self._prepeare_gateway(with_devices=True)
             if devices:
+                self.gw_topic = f"gw/{devices[0]['mac'][2:].upper()}/"
                 self.setup_devices(devices)
                 break
 
@@ -401,7 +425,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 if (self.parent_scan_interval >= 1 and
                         "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps):
                     self.debug("Run public Zigbee console")
-                    shell.run_public_zb_console()
+                    shell.run_public_zb_console(self.ver_z3)
 
                 elif "Lumi_Z3GatewayHost_MQTT" not in ps:
                     self.debug("Run Lumi Zigbee")
@@ -906,8 +930,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
         # send model response "from device"
         elif b'zdo active ' in raw:
-            mac = self.device['mac'][2:].upper()
-            self.mqtt.publish(f"gw/{mac}/MessageReceived", self.pair_payload)
+            self.mqtt.publish(self.gw_topic + 'MessageReceived',
+                              self.pair_payload)
 
     def send(self, device: dict, data: dict):
         payload = {'cmd': 'write', 'did': device['did']}
@@ -954,8 +978,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
     def send_mqtt(self, cmd: str):
         if cmd == 'publishstate':
-            mac = self.device['mac'][2:].upper()
-            self.mqtt.publish(f"gw/{mac}/publishstate")
+            self.mqtt.publish(self.gw_topic + 'publishstate')
 
     def get_device(self, mac: str) -> Optional[dict]:
         for device in self.devices.values():

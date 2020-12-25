@@ -96,11 +96,12 @@ class TelnetShell(Telnet):
         self.exec(MIIO2MQTT % (args, pattern))
         self.exec("daemon_miio.sh &")
 
-    def run_public_zb_console(self):
+    def run_public_zb_console(self, new_version=False):
         self.exec("killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT")
-        # run Gateway with open console port
+        # run Gateway with open console port (`-v` param)
+        arg = " -r 'c'" if new_version else ''
         self.exec("Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v -p '/dev/ttyS2' "
-                  "-d '/data/silicon_zigbee_host/' > /dev/null &")
+                  f"-d '/data/silicon_zigbee_host/'{arg} > /dev/null &")
 
         # connect to console to start zigbee chip
         self.write(b"nc localhost 4901\r\n")
