@@ -90,20 +90,21 @@ class GatewayMesh:
             try:
                 resp = self.miio.send_bulk('get_properties', self.mesh_params)
                 if resp:
-                    # get turn on bulbs
-                    params = [
-                        {'did': item['did'], 'siid': 2, 'piid': 2}
-                        for item in resp if item.get('value')
-                    ]
+                    params = []
+                    for item in resp:
+                        if item.get('value'):
+                            # no need get additional properties for switches
+                            if self.devices.get(item['did'])['model'] in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
+                                continue
 
-                    if params:
-                        params += [
-                            {'did': item['did'], 'siid': 2, 'piid': 3}
-                            for item in params
-                        ]
-                        resp2 = self.miio.send_bulk('get_properties', params)
-                        if resp2:
-                            resp += resp2
+                            params += [
+                                {'did': item['did'], 'siid': 2, 'piid': 2},
+                                {'did': item['did'], 'siid': 2, 'piid': 3}
+                            ]
+
+                    resp2 = self.miio.send_bulk('get_properties', params)
+                    if resp2:
+                        resp += resp2
 
                     self.debug(f"Pull Mesh {resp}")
                     self.process_mesh_data(resp)
