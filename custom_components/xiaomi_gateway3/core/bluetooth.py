@@ -26,8 +26,50 @@ DEVICES = {
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    # Mesh Switches
+    1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
+    2007: ["Unknown", "Mesh Switch Controller", "2007"],
+    2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
+    2257: ["PTX", "Mesh Wall Double Switch", "PTX-SK2M"],
+    2258: ["PTX", "Mesh Wall Single Switch", "PTX-SK1M"],
     # Mesh Group
     0: ["Xiaomi", "Mesh Group", "Mesh Group"]
+}
+
+# model: [
+#   [siid, piid, name, on_value, off_value],
+#   [siid, piid, name, on_value, off_value],
+#   ...
+# ]
+BLE_SWITCH_DEVICES_PROPS = {
+    1946: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+    ],
+    2007: [
+        [2, 1, None, True, False]
+    ],
+    2093: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Middle Switch', True, False],
+        [4, 1, 'Right Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Left - Always On', 1, 0],
+        [8, 3, 'Middle - Always On', 1, 0],
+        [8, 4, 'Right - Always On', 1, 0]
+    ],
+    2257: [
+        [2, 1, 'Left Switch', True, False],
+        [3, 1, 'Right Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Left - Always On', 1, 0],
+        [8, 3, 'Right - Always On', 1, 0],
+    ],
+    2258: [
+        [2, 1, 'Switch', True, False],
+        [8, 1, 'Backlight', 1, 0],
+        [8, 2, 'Always On', 1, 0],
+    ]
 }
 
 BLE_FINGERPRINT_ACTION = [
