@@ -317,12 +317,21 @@ def parse_xiaomi_mesh(data: list):
     result = {}
 
     for payload in data:
-        if payload['siid'] != 2 or payload.get('code', 0) != 0:
+        if payload.get('code', 0) != 0:
             continue
 
         did = payload['did']
-        key = MESH_PROPS[payload['piid']]
-        result.setdefault(did, {})[key] = payload['value']
+        if payload['model'] in BLE_SWITCH_DEVICES_PROPS.keys():
+            # handle response for BLE mesh switches
+            # a tuple of (siid, piid) is used as the key
+            key = (payload['siid'], payload['piid'])
+            result.setdefault(did, {})[key] = payload['value']
+        else:
+            if payload['siid'] != 2:
+                continue
+
+            key = MESH_PROPS[payload['piid']]
+            result.setdefault(did, {})[key] = payload['value']
 
     return result
 
