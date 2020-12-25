@@ -134,7 +134,7 @@ class GatewayMesh:
 
         if device['model'] in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
             data['is_switch'] = True
-            
+
         payload = bluetooth.pack_xiaomi_mesh(did, data)
         try:
             # 2 seconds are selected experimentally
@@ -714,7 +714,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     self.setups[domain](self, device, attr)
 
             elif device['type'] == 'mesh':
-                desc = bluetooth.get_device(device['model'], 'Mesh')
+                model = device['model']
+                desc = bluetooth.get_device(model, 'Mesh')
                 device.update(desc)
 
                 self.debug(f"Setup Mesh device {device}")
@@ -729,10 +730,17 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 self.devices[device['did']] = device
 
                 # wait domain init
-                while 'light' not in self.setups:
+                domain = 'switch' if model in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys() else 'light'
+                while domain not in self.setups:
                     time.sleep(1)
 
-                self.setups['light'](self, device, 'light')
+                if domain == 'switch':
+                    for prop in bluetooth.BLE_SWITCH_DEVICES_PROPS[model]:
+                        switch_device = {'mesh_prop': prop}
+                        switch_device.update(device)
+                        self.setups[domain](self, switch_device, domain)
+                else:
+                    self.setups[domain](self, device, domain)
 
             elif device['type'] == 'ble':
                 # only save info for future
