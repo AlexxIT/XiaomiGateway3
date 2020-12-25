@@ -118,6 +118,11 @@ class GatewayMesh:
             self.mesh_ts = time.time() + 30
 
     def process_mesh_data(self, data: list):
+        for msg in data:
+            device = self.devices[msg['did']]
+            if device:
+                msg['model'] = device['model']
+
         data = bluetooth.parse_xiaomi_mesh(data)
         for did, payload in data.items():
             if did in self.updates:
@@ -126,6 +131,10 @@ class GatewayMesh:
 
     def send_mesh(self, device: dict, data: dict):
         did = device['did']
+
+        if device['model'] in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
+            data['is_switch'] = True
+            
         payload = bluetooth.pack_xiaomi_mesh(did, data)
         try:
             # 2 seconds are selected experimentally
