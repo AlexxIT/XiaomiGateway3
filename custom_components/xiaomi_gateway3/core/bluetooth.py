@@ -18,6 +18,7 @@ DEVICES = {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
+    2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],
     # Mesh
     948: ["Yeelight", "Mesh Downlight", "YLSD01YL"],
     995: ["Yeelight", "Mesh Bulb E14", "YLDP09YL"],
