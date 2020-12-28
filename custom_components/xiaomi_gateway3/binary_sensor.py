@@ -82,6 +82,10 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         self.async_write_ha_state()
 
     def update(self, data: dict = None):
+        # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
+        if 'voltage' in data:
+            return
+
         # https://github.com/AlexxIT/XiaomiGateway3/issues/135
         if 'illumination' in data and len(data) == 1:
             data[self._attr] = 1
