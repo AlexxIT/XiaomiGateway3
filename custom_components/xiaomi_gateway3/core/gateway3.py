@@ -777,8 +777,15 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             if param.get('error_code', 0) != 0:
                 continue
 
-            prop = param['res_name'] if 'res_name' in param else \
-                f"{param['siid']}.{param['piid']}"
+            if 'res_name' in param:
+                prop = param['res_name']
+            elif 'piid' in param:
+                prop = f"{param['siid']}.{param['piid']}"
+            elif 'eiid' in param:
+                prop = f"{param['siid']}.{param['eiid']}"
+            else:
+                _LOGGER.warning(f"Unsupported param: {data}")
+                return
 
             if prop in GLOBAL_PROP:
                 prop = GLOBAL_PROP[prop]
@@ -810,8 +817,13 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 payload[prop] = param['value'] / 1000.0
             elif prop in ('consumption', 'power'):
                 payload[prop] = round(param['value'], 2)
-            else:
+            elif 'value' in param:
                 payload[prop] = param['value']
+            elif 'arguments' in param:
+                if prop == 'motion':
+                    payload[prop] = 1
+                else:
+                    payload[prop] = param['arguments']
 
         self.debug(f"{device['did']} {device['model']} <= {payload}")
 
