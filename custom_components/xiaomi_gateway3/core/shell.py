@@ -76,6 +76,7 @@ class TelnetShell(Telnet):
         self.exec(f"{CHECK_BUSYBOX} && {RUN_FTP}")
 
     def sniff_bluetooth(self):
+        """Deprecated"""
         self.write(b"killall silabs_ncp_bt; silabs_ncp_bt /dev/ttyS1 1\r\n")
 
     def run_public_mosquitto(self):
@@ -97,18 +98,18 @@ class TelnetShell(Telnet):
         self.exec("daemon_miio.sh &")
 
     def run_public_zb_console(self, new_version=False):
-        self.exec("killall daemon_app.sh; killall Lumi_Z3GatewayHost_MQTT")
+        # `killall tail` will also stop Lumi_Z3GatewayHost_MQTT
+        self.exec("killall daemon_app.sh; killall tail")
+
         # run Gateway with open console port (`-v` param)
         arg = " -r 'c'" if new_version else ''
-        self.exec("Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v -p '/dev/ttyS2' "
-                  f"-d '/data/silicon_zigbee_host/'{arg} > /dev/null &")
 
-        # connect to console to start zigbee chip
-        self.write(b"nc localhost 4901\r\n")
-        time.sleep(2)
-        # exit console (ctrl+c)
-        self.write(b"\x03")
-        self.read_until(b"\r\n# ")
+        # use `tail` because input for Z3 is required;
+        # add `-l 0` to disable all output, we'll enable it later with
+        # `debugprint on 1` command
+        self.exec("tail -f /dev/null | Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 "
+                  f"-l 0 -p '/dev/ttyS2' -d '/data/silicon_zigbee_host/'{arg} "
+                  "| mosquitto_pub -t log/z3 -l &")
 
         self.exec("daemon_app.sh &")
 

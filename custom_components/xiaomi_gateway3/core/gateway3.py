@@ -3,7 +3,6 @@ import logging
 import re
 import socket
 import time
-from telnetlib import Telnet
 from threading import Thread
 from typing import Optional
 
@@ -134,7 +133,6 @@ class GatewayStats:
     stats: dict = None
     host: str = None
     info_ts: float = 0
-    info_loading: bool = False
 
     mqtt: Client = None
     gw_topic: str = None
@@ -143,8 +141,11 @@ class GatewayStats:
     available: bool = None
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
-    # None - disabled
+    # -1 - disabled
     parent_scan_interval: Optional[int] = None
+
+    # collected data from MQTT topic log/z3 (zigbee console)
+    z3buffer: Optional[dict] = None
 
     def debug(self, message: str):
         raise NotImplemented
@@ -198,46 +199,55 @@ class GatewayStats:
         if did in self.stats:
             self.stats[did](payload)
 
-    def get_gateway_info(self):
-        if self.info_loading:
-            return
-        self.info_loading = True
-        Thread(target=self._info_loader_run).start()
+    def process_z3(self, payload: str):
+        if payload.startswith("CLI command executed"):
+            cmd = payload[22:-1]
+            if cmd == "debugprint all_on" or self.z3buffer is None:
+                # reset all buffers
+                self.z3buffer = {}
+            else:
+                self.z3buffer[cmd] = self.z3buffer['buffer']
 
-    def _mqtt_cli(self, command: str):
-        payload = {'commands': [{'commandcli': command}]}
+            self.z3buffer['buffer'] = ''
+
+            if cmd == "plugin concentrator print-table":
+                self._process_gateway_info()
+
+        elif self.z3buffer:
+            self.z3buffer['buffer'] += payload
+
+    def get_gateway_info(self):
+        payload = {'commands': [
+            {'commandcli': "debugprint all_on"},
+            {'commandcli': "plugin device-table print"},
+            {'commandcli': "plugin stack-diagnostics child-table"},
+            {'commandcli': "plugin stack-diagnostics neighbor-table"},
+            {'commandcli': "plugin concentrator print-table"},
+            {'commandcli': "debugprint all_off"},
+        ]}
         payload = json.dumps(payload, separators=(',', ':'))
         self.mqtt.publish(self.gw_topic + 'commands', payload)
 
-    def _info_loader_run(self):
+    def _process_gateway_info(self):
         self.debug("Update parent info table")
 
         try:
-            # zigbee console input disabled on v1.4.7, we will use mqtt for
-            # input in all firmware versions and telnet from output
-            telnet = Telnet(self.host, 4901)
-
-            self._mqtt_cli("option print-rx-msgs disable")
-            telnet.read_until(b'CLI command executed', 2)
-
-            self._mqtt_cli("plugin device-table print")
-            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            raw = self.z3buffer["plugin device-table print"]
             m1 = re.findall(r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}\w+ '
                             r'(\d+)', raw)
 
-            self._mqtt_cli("plugin stack-diagnostics child-table")
-            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            raw = self.z3buffer["plugin stack-diagnostics child-table"]
             m2 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
-            self._mqtt_cli("plugin stack-diagnostics neighbor-table")
-            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            raw = self.z3buffer["plugin stack-diagnostics neighbor-table"]
             m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
-            self._mqtt_cli("plugin concentrator print-table")
-            raw = telnet.read_until(b'CLI command executed', 2).decode()
+            raw = self.z3buffer["plugin concentrator print-table"]
             m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
             m4 = [i.replace('0x', '').split(' -> ') for i in m4]
             m4 = {i[0]: i[1:] for i in m4}
+
+            self.debug(f"Total zigbee devices: {len(m1)}")
 
             for i in m1:
                 ieee = '0x' + i[1]
@@ -267,8 +277,6 @@ class GatewayStats:
         except Exception as e:
             self.debug(f"Can't update parents: {e}")
             self.info_ts = time.time() + 30
-
-        self.info_loading = False
 
 
 # noinspection PyUnusedLocal
@@ -422,8 +430,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     self.debug("Stop socat")
                     shell.stop_socat()
 
-                if (self.parent_scan_interval >= 1 and
-                        "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -v" not in ps):
+                if (self.parent_scan_interval >= 0 and
+                        "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps):
                     self.debug("Run public Zigbee console")
                     shell.run_public_zb_console(self.ver_z3)
 
@@ -643,6 +651,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                             self.process_gw_stats(payload)
                 except:
                     _LOGGER.warning(f"Can't read BT: {msg.payload}")
+
+        elif msg.topic == 'log/z3':
+            self.process_z3(msg.payload.decode())
 
         elif msg.topic.endswith('/heartbeat'):
             payload = json.loads(msg.payload)
