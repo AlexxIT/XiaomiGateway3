@@ -296,12 +296,11 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.mqtt.on_connect = self.on_connect
         self.mqtt.on_disconnect = self.on_disconnect
         self.mqtt.on_message = self.on_message
-        self.mqtt.connect_async(host)
 
         self._ble = options.get('ble')  # for fast access
         self._debug = options.get('debug', '')  # for fast access
         self.parent_scan_interval = options.get('parent', -1)
-        self.default_devices = config['devices']
+        self.default_devices = config['devices'] if config else None
 
         self.devices = {}
         self.updates = {}
@@ -333,6 +332,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
     def run(self):
         """Main thread loop."""
         self.debug("Start main thread")
+
+        self.mqtt.connect_async(self.host)
 
         self.enabled = True
         while self.enabled:
