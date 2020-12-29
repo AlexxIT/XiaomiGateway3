@@ -1,10 +1,7 @@
-# 0 1F0C: 00158D000398D2A7 0 JOINED 882
-# 1 5B05: 00158D0003F27CC2 0 JOINED 335
-# 2 E265: 00158D00035A9935 0 JOINED 247
 from custom_components.xiaomi_gateway3.core.gateway3 import Gateway3
 
 
-def test_0065():
+def test_console():
     def handler(payload: dict):
         assert payload == {
             'nwk': '0x131E', 'ago': 335, 'type': 'router', 'parent': '0x1F0C'
