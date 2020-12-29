@@ -65,12 +65,12 @@ class GatewayMesh:
             if device['type'] == 'mesh' and 'childs' not in device:
                 model = device['model']
                 if model in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
-                    for prop in bluetooth.BLE_SWITCH_DEVICES_PROPS[model]:
-                        params.append({
-                            'did': device['did'],
-                            'siid': prop[0],
-                            'piid': prop[1]
-                        })
+                    prop = bluetooth.BLE_SWITCH_DEVICES_PROPS[model][0]
+                    params.append({
+                        'did': device['did'],
+                        'siid': prop[0],
+                        'piid': prop[1]
+                    })
                 else:
                     params.append({'did': device['did'], 'siid': 2, 'piid': 1})
         self.mesh_params = params
@@ -93,14 +93,20 @@ class GatewayMesh:
                     params = []
                     for item in resp:
                         if item.get('value'):
-                            # no need get additional properties for switches
-                            if self.devices.get(item['did'])['model'] in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
-                                continue
-
-                            params += [
-                                {'did': item['did'], 'siid': 2, 'piid': 2},
-                                {'did': item['did'], 'siid': 2, 'piid': 3}
-                            ]
+                            model = self.devices.get(item['did']).get('model')
+                            switch_props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(model)
+                            if switch_props:
+                                params += [
+                                    {
+                                        'did': item['did'],
+                                        'siid': prop[0],
+                                        'piid': prop[1]
+                                    } for prop in switch_props if prop != switch_props[0]]
+                            else:
+                                params += [
+                                    {'did': item['did'], 'siid': 2, 'piid': 2},
+                                    {'did': item['did'], 'siid': 2, 'piid': 3}
+                                ]
 
                     resp2 = self.miio.send_bulk('get_properties', params)
                     if resp2:
