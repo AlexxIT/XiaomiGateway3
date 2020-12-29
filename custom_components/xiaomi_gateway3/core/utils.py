@@ -348,7 +348,7 @@ DEVICES = [{
 }, {
     'lumi.motion.agl04': ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
     'mi_spec': [
-        ['2.1', None, 'motion', 'binary_sensor'],
+        ['4.1', None, 'motion', 'binary_sensor'],
         ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }]

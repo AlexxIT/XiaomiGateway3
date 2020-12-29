@@ -95,6 +95,10 @@ class GatewayStats(Gateway3Sensor):
         # don't use const to support older Hass version
         return 'timestamp'
 
+    @property
+    def available(self):
+        return True
+
     async def async_added_to_hass(self):
         self.gw.add_stats('lumi.0', self.update)
         # update available when added to Hass
@@ -121,6 +125,10 @@ class ZigbeeStats(Gateway3Sensor):
     def device_class(self):
         # don't use const to support older Hass version
         return 'timestamp'
+
+    @property
+    def available(self):
+        return True
 
     async def async_added_to_hass(self):
         if not self._attrs:
@@ -182,6 +190,10 @@ class BLEStats(Gateway3Sensor):
     def device_class(self):
         # don't use const to support older Hass version
         return 'timestamp'
+
+    @property
+    def available(self):
+        return True
 
     async def async_added_to_hass(self):
         if not self._attrs:
