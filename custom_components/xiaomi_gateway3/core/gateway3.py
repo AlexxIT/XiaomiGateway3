@@ -243,7 +243,7 @@ class GatewayStats:
             m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
             raw = self.z3buffer["plugin concentrator print-table"]
-            m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
+            m4 = re.findall(r': ([A-F0-9x> -]{16,}) -> 0x0000', raw)
             m4 = [i.replace('0x', '').split(' -> ') for i in m4]
             m4 = {i[0]: i[1:] for i in m4}
 
