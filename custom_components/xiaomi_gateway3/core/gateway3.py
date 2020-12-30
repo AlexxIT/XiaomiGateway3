@@ -357,7 +357,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 continue
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
-            if not self._mqtt_connect() or not self._prepeare_gateway():
+            if not self._prepeare_gateway() or not self._mqtt_connect():
                 time.sleep(60)
                 continue
 
