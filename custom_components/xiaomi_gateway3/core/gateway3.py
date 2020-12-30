@@ -217,6 +217,7 @@ class GatewayStats:
             self.z3buffer['buffer'] += payload
 
     def get_gateway_info(self):
+        self.debug("Update zigbee network info")
         payload = {'commands': [
             {'commandcli': "debugprint all_on"},
             {'commandcli': "plugin device-table print"},
