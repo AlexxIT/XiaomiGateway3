@@ -33,6 +33,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Supported Bluetooth Mesh Devices](#supported-bluetooth-mesh-devices)
 - [Install](#install)
 - [Config](#config)
+- [Zigbee and BLE performance table](#zigbee-and-ble-performance-table)
 - [Advanced config](#advanced-config)
 - [Add and remove Zigbee devices](#add-and-remove-zigbee-devices)
 - [Add third-party Zigbee devices](#add-third-party-zigbee-devices)
@@ -120,6 +121,7 @@ Tested Devices:
 - Aqara Curtain B1 (ZNCLDJ12LM)
 - Aqara Door Lock S1 (ZNMS11LM)
 - Aqara Door Lock S2 (ZNMS12LM)
+- Aqara Door Lock S2 Pro (ZNMS12LM)
 - Aqara Door Sensor (MCCGQ11LM)
 - Aqara Double Wall Button (WXKG02LM)
 - Aqara Double Wall Button D1 (WXKG07LM)
@@ -131,8 +133,9 @@ Tested Devices:
 - Aqara Opple MX650 (XDD12LM)
 - Aqara Opple Six Button (WXCJKG13LM)
 - Aqara Opple Two Button (WXCJKG11LM)
+- Aqara Precision Motion Sensor (RTCGQ13LM)
 - Aqara Relay (LLKZMK11LM)
-- Aqara Relay T1 (DLKZMK12LM) - don't works in Mi Home
+- Aqara Relay T1 (SSM-U01,SSM-U02)
 - Aqara Roller Shade (ZNGZDJ11LM)
 - Aqara Shake Button (WXKG12LM)
 - Aqara Single Wall Button (WXKG03LM)
@@ -171,11 +174,13 @@ Tested Devices:
 
 Tested Devices:
 - Aqara Door Lock N100 (ZNMS16LM)
+- Aqara Door Lock N200 (ZNMS17LM)
 - Xiaomi Alarm Clock (CGD1)
 - Xiaomi Door Sensor 2 (MCCGQ02HL)
 - Xiaomi Flower Care (HHCCJCY01)
 - Xiaomi Magic Cube (XMMF01JQD) - don't sends edge info, only direction!
 - Xiaomi Mosquito Repellent (WX08ZM)
+- Xiaomi Motion Sensor 2 (RTCGQ02LM)
 - Xiaomi Night Light 2 (MJYD02YL-A)
 - Xiaomi Qingping TH Sensor (CGG1)
 - Xiaomi Safe Box (BGX-5/X1-3001)
@@ -201,6 +206,7 @@ Tested Devices:
 - Yeelight Mesh Bulb M2 (YLDP25YL/YLDP26YL)
 - Yeelight Mesh Downlight (YLSD01YL)
 - Yeelight Mesh Downlight M2 (YLTS02YL/YLTS04YL)
+- Yeelight Mesh Spotlight (YLSD04YL)
 
 Other Mesh devices also maybe supported...
 
@@ -223,6 +229,36 @@ Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.c
 With GUI. Configuration > Integration > Xiaomi Gateway 3.
 
 If the integration is not in the list, you need to clear the browser cache.
+
+# Zigbee and BLE performance table
+
+![](zigbee_table.png)
+
+1. To enable stats sensors go to:
+
+   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Zigbee and BLE performance data
+   
+   Optional you can enable pereodical updates about device parent routers.
+   
+   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Parent devices in stats: Hourly
+   
+2. Install [Flex Table](https://github.com/custom-cards/flex-table-card) from HACS
+
+3. Add new Lovelace tab with **Panel Mode**
+
+4. Add new Lovelace card:
+   - [example 1](https://gist.github.com/AlexxIT/120f20eef4f39071e67f698207490db9)
+   - [example 2](https://github.com/avbor/HomeAssisnantConfig/blob/master/lovelace/views/vi_radio_quality_gw3.yaml)
+
+How it works:
+
+- for each Zigbee and BLE device, a sensor will be created with the time of receiving the last message from this sensor
+- there will also be a lot of useful information in the sensor attributes
+- for the Gateway, the sensor state shows the uptime of the gateway connection, so you can check the stability of your Wi-Fi
+- the `uptime` in gateway sensor attributes means time after reboot gateway
+- the `msg_missed` may not always show correct data if you reboot the gate or device
+- dash in the `type` means that the device is not directly connected to the hub
+- the `parent` can be updated within a few hours
 
 # Advanced config
 
@@ -329,11 +365,13 @@ You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/iss
 
 When you turn on ZHA mode - zigbee devices in Mi Home will stop working. Bluetooth devices will continue to work.
 
-To switch the mode - delete the old integration and configure the new one in a different mode. Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them again with ZHA.
+To switch the mode go to:
 
-You can change the operating mode at any time. Just remove the old integration and set up the new one. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
+> Configuration > Integrations > Xiaomi Gateway 3 > Options > Mode
 
-When switching from ZHA to Mi Home mode - restart the gateway. When switching from Mi Home to ZHA - no reboot required.
+Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them again with ZHA.
+
+You can change the operating mode at any time. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
 
 Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
 
@@ -502,12 +540,9 @@ The gateway has an application that handle the **button, LED and beeper**. This 
 
 **Attention:** I don't know what else this app does and will the gateway work fine without it.
 
-```yaml
-xiaomi_gateway3:
-  buzzer: off
-```
+To disable buzzer:
 
-To cancel this changes - disable this option and restart the gateway. The application will continue to work again.
+> Configuration > Integrations > Xiaomi Gateway 3 > Options > Disable buzzer
 
 # Advanced commands
 
@@ -551,20 +586,9 @@ After rebooting the device, all changes will be reset. The component will launch
 
 # Debug mode
 
-Component support debug mode. Shows only component logs. The link to the logs is always random.
+Component support debug mode. Shows only component logs. The link to the logs is always random and will apear in Notifications.
 
-Demo video of my other component, but the idea is the same:
-
-[![Control Sonoff Devices with eWeLink firmware over LAN from Home Assistant](https://img.youtube.com/vi/Lt5fT4N5Pm8/mqdefault.jpg)](https://www.youtube.com/watch?v=Lt5fT4N5Pm8)
-
-With `debug: bluetooth` or debug `debug: mqtt` option you will get advanced log for raw BLE and MQTT data.
-
-With `debug: true` option you will get usual component logs.
-
-```yaml
-xiaomi_gateway3:
-  debug: true  # you will get HA notification with a link to the logs page
-```
+> Configuration > Integrations > Xiaomi Gateway 3 > Options > Debug
 
 You can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
 
