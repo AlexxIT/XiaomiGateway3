@@ -1,6 +1,7 @@
 import json
 
 from custom_components.xiaomi_gateway3.core import utils
+from custom_components.xiaomi_gateway3.core.gateway3 import Gateway3
 
 
 def test_ble_normal_message():
@@ -33,3 +34,20 @@ def test_ble_147_miio_rpc():
 def test_ble_147_ots():
     raw = b'\x1b[0;32m2020:12:05:01:47:03.530 [D] ots: ots_up_rpc_delegate_out_cb(), 289, {"method":"_async.ble_event","params":{"dev":{"did":"blt.3.iambledevice0","mac":"AA:BB:CC:DD:EE:FF","pdid":426},"evt":[{"eid":4100,"edata":"ea00"}],"frmCnt":44,"gwts":1607104023},"id":1234}\x1b[0m'
     assert len([json.loads(item) for item in utils.extract_jsons(raw)]) == 1
+
+
+def test_motion2():
+    device = {'init': {'motion': 0, 'light': 0}}
+
+    def handler(payload: dict):
+        assert payload == {'motion': 1, 'light': 0}
+
+    gw = Gateway3('', '', {})
+    gw.devices = {'blt.xxx': device}
+    gw.add_update('blt.xxx', handler)
+
+    payload = {
+        "dev": {'did': 'blt.xxx', 'mac': 'AA:BB:CC:DD:EE:FF', 'pdid': 2701},
+        "evt": [{"eid": 15, "edata": "0000"}],
+    }
+    gw.process_ble_event(payload)

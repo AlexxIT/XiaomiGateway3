@@ -243,6 +243,7 @@ class GatewayStats:
             self.z3buffer['buffer'] += payload
 
     def get_gateway_info(self):
+        self.debug("Update zigbee network info")
         payload = {'commands': [
             {'commandcli': "debugprint all_on"},
             {'commandcli': "plugin device-table print"},
@@ -269,7 +270,7 @@ class GatewayStats:
             m3 = re.findall(r'\(>\)([A-F0-9]{16})', raw)
 
             raw = self.z3buffer["plugin concentrator print-table"]
-            m4 = re.findall(r': (.{16,}) -> 0x0000', raw)
+            m4 = re.findall(r': ([A-F0-9x> -]{16,}) -> 0x0000', raw)
             m4 = [i.replace('0x', '').split(' -> ') for i in m4]
             m4 = {i[0]: i[1:] for i in m4}
 
@@ -322,12 +323,11 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.mqtt.on_connect = self.on_connect
         self.mqtt.on_disconnect = self.on_disconnect
         self.mqtt.on_message = self.on_message
-        self.mqtt.connect_async(host)
 
         self._ble = options.get('ble')  # for fast access
         self._debug = options.get('debug', '')  # for fast access
         self.parent_scan_interval = options.get('parent', -1)
-        self.default_devices = config['devices']
+        self.default_devices = config['devices'] if config else None
 
         self.devices = {}
         self.updates = {}
@@ -360,6 +360,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         """Main thread loop."""
         self.debug("Start main thread")
 
+        self.mqtt.connect_async(self.host)
+
         self.enabled = True
         while self.enabled:
             # if not telnet - enable it
@@ -382,7 +384,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 continue
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
-            if not self._mqtt_connect() or not self._prepeare_gateway():
+            if not self._prepeare_gateway() or not self._mqtt_connect():
                 time.sleep(60)
                 continue
 
@@ -831,10 +833,12 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
             # https://github.com/Koenkk/zigbee2mqtt/issues/798
             # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
-            if prop == 'temperature' and -4000 < param['value'] < 12500:
-                payload[prop] = param['value'] / 100.0
-            elif prop == 'humidity' and 0 <= param['value'] <= 10000:
-                payload[prop] = param['value'] / 100.0
+            if prop == 'temperature':
+                if -4000 < param['value'] < 12500:
+                    payload[prop] = param['value'] / 100.0
+            elif prop == 'humidity':
+                if 0 <= param['value'] <= 10000:
+                    payload[prop] = param['value'] / 100.0
             elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0
             elif prop == 'battery' and param['value'] > 1000:
