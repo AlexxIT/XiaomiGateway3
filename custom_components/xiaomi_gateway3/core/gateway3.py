@@ -62,13 +62,12 @@ class GatewayMesh:
         params = []
         for device in self.devices.values():
             if device['type'] == 'mesh' and 'childs' not in device:
-                model = device['model']
-                if model in bluetooth.BLE_SWITCH_DEVICES_PROPS.keys():
-                    prop = bluetooth.BLE_SWITCH_DEVICES_PROPS[model][0]
+                props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(device['model'])
+                if props:
                     params.append({
                         'did': device['did'],
-                        'siid': prop[0],
-                        'piid': prop[1]
+                        'siid': props[0][0],
+                        'piid': props[0][1]
                     })
                 else:
                     params.append({'did': device['did'], 'siid': 2, 'piid': 1})
@@ -100,14 +99,16 @@ class GatewayMesh:
                                         'did': item['did'],
                                         'siid': prop[0],
                                         'piid': prop[1]
-                                    } for prop in switch_props if prop != switch_props[0]]
+                                    } for prop in switch_props if switch_props.index(prop) > 1]
                             else:
                                 params += [
                                     {'did': item['did'], 'siid': 2, 'piid': 2},
                                     {'did': item['did'], 'siid': 2, 'piid': 3}
                                 ]
 
+                    _LOGGER.debug(f"Step-2 Params = {params}")
                     resp2 = self.miio.send_bulk('get_properties', params)
+                    _LOGGER.deubg(f"Step-2 Resp = {resp2}")
                     if resp2:
                         resp += resp2
 
@@ -124,12 +125,13 @@ class GatewayMesh:
 
     def process_mesh_data(self, data: list):
         for msg in data:
-            device = self.devices[msg['did']]
+            device = self.devices.get(msg['did'])
             if device:
                 msg['model'] = device['model']
 
         data = bluetooth.parse_xiaomi_mesh(data)
         for did, payload in data.items():
+            _LOGGER.debug(f"Process Mesh Data for {did}: {payload}")
             if did in self.updates:
                 for handler in self.updates[did]:
                     handler(payload)
