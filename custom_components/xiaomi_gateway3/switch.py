@@ -102,9 +102,9 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         _LOGGER.debug(f"{self.gw.host} | {did} data = {data}")
 
         key = (self._siid, self._piid)
-        self._state = data.get(key) == self._on_value
-
-        self.async_write_ha_state()
+        if key in data:
+            self._state = data[key] == self._on_value
+            self.async_write_ha_state()
 
     def turn_on(self, **kwargs):
         self.gw.send_mesh(self.device, {(self._siid, self._piid): self._on_value})

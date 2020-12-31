@@ -90,27 +90,29 @@ class GatewayMesh:
                 if resp:
                     params = []
                     for item in resp:
-                        if item.get('value'):
-                            model = self.devices.get(item['did']).get('model')
-                            switch_props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(model)
+                        value = item.get('value')
+                        if value is not None:
+                            device = self.devices.get(item['did'])
+                            switch_props = bluetooth.BLE_SWITCH_DEVICES_PROPS.get(device['model'])
                             if switch_props:
+                                # get properties for switches, properties are independent from each other
                                 params += [
                                     {
                                         'did': item['did'],
                                         'siid': prop[0],
                                         'piid': prop[1]
-                                    } for prop in switch_props if switch_props.index(prop) > 1]
-                            else:
-                                params += [
-                                    {'did': item['did'], 'siid': 2, 'piid': 2},
-                                    {'did': item['did'], 'siid': 2, 'piid': 3}
-                                ]
+                                    } for prop in switch_props if switch_props.index(prop) > 0]
+                        elif value:
+                            # color_temperature/brightness are only valid when the lights are on
+                            params += [
+                                {'did': item['did'], 'siid': 2, 'piid': 2},
+                                {'did': item['did'], 'siid': 2, 'piid': 3}
+                            ]
 
-                    _LOGGER.debug(f"Step-2 Params = {params}")
-                    resp2 = self.miio.send_bulk('get_properties', params)
-                    _LOGGER.deubg(f"Step-2 Resp = {resp2}")
-                    if resp2:
-                        resp += resp2
+                    if params:
+                        resp2 = self.miio.send_bulk('get_properties', params)
+                        if resp2:
+                            resp += resp2
 
                     self.debug(f"Pull Mesh {resp}")
                     self.process_mesh_data(resp)
