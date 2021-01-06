@@ -53,7 +53,7 @@ DEVICES = [{
     'params': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'consumption', 'sensor'],
-        ['4.1.85', 'channel_0', 'switch', 'switch'],  # to4ko
+        ['4.1.85', 'channel_0', 'switch', 'switch'],  # @to4ko
     ]
 }, {
     'lumi.ctrl_ln1': ["Aqara", "Single Wall Switch", "QBKG11LM"],
@@ -86,8 +86,14 @@ DEVICES = [{
         [None, None, 'action', 'sensor'],
     ]
 }, {
-    # on/off
     'lumi.ctrl_neutral1': ["Aqara", "Single Wall Switch", "QBKG04LM"],
+    'params': [
+        ['4.1.85', 'neutral_0', 'switch', 'switch'],  # @vturekhanov
+        ['13.1.85', None, 'button', None],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
+    # on/off
     'lumi.switch.b1lacn02': ["Aqara", "Single Wall Switch D1", "QBKG21LM"],
     'params': [
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # or neutral_0?
@@ -98,8 +104,8 @@ DEVICES = [{
     # dual channel on/off
     'lumi.ctrl_neutral2': ["Aqara", "Double Wall Switch", "QBKG03LM"],
     'params': [
-        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
-        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # @to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],  # @to4ko
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.5.85', None, 'button_both', None],
@@ -119,9 +125,9 @@ DEVICES = [{
     # triple channel on/off, no neutral wire
     'lumi.switch.l3acn3': ["Aqara", "Triple Wall Switch D1", "QBKG25LM"],
     'params': [
-        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # to4ko
-        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],
-        ['4.3.85', 'neutral_2', 'channel 3', 'switch'],
+        ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # @to4ko
+        ['4.2.85', 'neutral_1', 'channel 2', 'switch'],  # @to4ko
+        ['4.3.85', 'neutral_2', 'channel 3', 'switch'],  # @to4ko
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
