@@ -119,7 +119,8 @@ class GatewayStats(Gateway3Sensor):
 
 
 class ZigbeeStats(Gateway3Sensor):
-    last_seq = None
+    last_seq1 = None
+    last_seq2 = None
 
     @property
     def device_class(self):
@@ -158,17 +159,22 @@ class ZigbeeStats(Gateway3Sensor):
 
             self._attrs['msg_received'] += 1
 
-            new_seq = int(data['APSCounter'], 0)
-            if self.last_seq is not None:
-                miss = new_seq - self.last_seq - 1
-                if miss < 0:  # 0xFF => 0x00
-                    miss += 256
+            new_seq1 = int(data['APSCounter'], 0)
+            raw = data['APSPlayload']
+            manufact_specific = (int(raw[2:4], 16) >> 2) & 1
+            new_seq2 = int(raw[8:10] if manufact_specific else raw[4:6], 16)
+            if self.last_seq1 is not None:
+                miss = min(
+                    (new_seq1 - self.last_seq1 - 1) & 0xFF,
+                    (new_seq2 - self.last_seq2 - 1) & 0xFF
+                )
                 self._attrs['msg_missed'] += miss
                 self._attrs['last_missed'] = miss
                 if miss:
-                    self.debug(f"Msg missed: {self.last_seq} => {new_seq} "
-                               f"({cluster})")
-            self.last_seq = new_seq
+                    self.debug(f"Msg missed: {self.last_seq1} => {new_seq1}, "
+                               f"{self.last_seq2} => {new_seq2}, {cluster}")
+            self.last_seq1 = new_seq1
+            self.last_seq2 = new_seq2
 
             self._state = now().isoformat(timespec='seconds')
 
@@ -184,8 +190,6 @@ class ZigbeeStats(Gateway3Sensor):
 
 
 class BLEStats(Gateway3Sensor):
-    last_seq = None
-
     @property
     def device_class(self):
         # don't use const to support older Hass version
