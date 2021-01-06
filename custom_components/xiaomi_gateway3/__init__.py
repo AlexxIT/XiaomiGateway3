@@ -250,7 +250,7 @@ class Gateway3Device(Entity):
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
     def debug(self, message: str):
-        _LOGGER.debug(f"{self.entity_id} | {message}")
+        self.gw.debug(f"{self.entity_id} | {message}")
 
     async def async_added_to_hass(self):
         """Also run when rename entity_id"""
