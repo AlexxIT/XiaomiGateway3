@@ -810,9 +810,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             elif prop == 'battery' and param['value'] > 1000:
                 # xiaomi light sensor
                 payload[prop] = round((min(param['value'], 3200) - 2500) / 7)
-            elif prop == 'alive':
-                # {'res_name':'8.0.2102','value':{'status':'online','time':0}}
-                device['online'] = (param['value']['status'] == 'online')
+            elif prop == 'alive' and param['value']['status'] == 'offline':
+                device['online'] = False
             elif prop == 'angle':
                 # xiaomi cube 100 points = 360 degrees
                 payload[prop] = param['value'] * 4
@@ -830,6 +829,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     payload[prop] = param['arguments']
 
         self.debug(f"{device['did']} {device['model']} <= {payload}")
+
+        if payload:
+            device['online'] = True
 
         for handler in self.updates[did]:
             handler(payload)
