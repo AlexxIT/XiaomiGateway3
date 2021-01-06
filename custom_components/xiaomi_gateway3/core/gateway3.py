@@ -622,23 +622,25 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.process_gw_stats()
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
-        if 'mqtt' in self._debug:
-            self.debug(f"[MQ] {msg.topic} {msg.payload.decode()}")
+        try:
+            topic = msg.topic
 
-        if msg.topic == 'zigbee/send':
-            payload = json.loads(msg.payload)
-            self.process_message(payload)
+            if 'mqtt' in self._debug:
+                self.debug(f"[MQ] {topic} {msg.payload.decode()}")
 
-        elif msg.topic == 'log/miio':
-            if 'miio' in self._debug:
-                self.debug(f"[MI] {msg.payload}")
+            if topic == 'zigbee/send':
+                payload = json.loads(msg.payload)
+                self.process_message(payload)
 
-            if self._ble and (
-                    b'_async.ble_event' in msg.payload or
-                    b'properties_changed' in msg.payload or
-                    b'event.gw.heartbeat' in msg.payload
-            ):
-                try:
+            elif topic == 'log/miio':
+                if 'miio' in self._debug:
+                    self.debug(f"[MI] {msg.payload}")
+
+                if self._ble and (
+                        b'_async.ble_event' in msg.payload or
+                        b'properties_changed' in msg.payload or
+                        b'event.gw.heartbeat' in msg.payload
+                ):
                     for raw in utils.extract_jsons(msg.payload):
                         if b'_async.ble_event' in raw:
                             data = json.loads(raw)['params']
@@ -651,27 +653,28 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                         elif b'event.gw.heartbeat' in raw:
                             payload = json.loads(raw)['params'][0]
                             self.process_gw_stats(payload)
-                except:
-                    _LOGGER.warning(f"Can't read BT: {msg.payload}")
 
-        elif msg.topic == 'log/z3':
-            self.process_z3(msg.payload.decode())
+            elif topic == 'log/z3':
+                self.process_z3(msg.payload.decode())
 
-        elif msg.topic.endswith('/heartbeat'):
-            payload = json.loads(msg.payload)
-            self.process_gw_stats(payload)
+            elif topic.endswith('/heartbeat'):
+                payload = json.loads(msg.payload)
+                self.process_gw_stats(payload)
 
-        elif msg.topic.endswith(('/MessageReceived', '/devicestatechange')):
-            payload = json.loads(msg.payload)
-            self.process_zb_stats(payload)
+            elif topic.endswith(('/MessageReceived', '/devicestatechange')):
+                payload = json.loads(msg.payload)
+                self.process_zb_stats(payload)
 
-        # read only retained ble
-        elif msg.topic.startswith('ble') and msg.retain:
-            payload = json.loads(msg.payload)
-            self.process_ble_retain(msg.topic[4:], payload)
+            # read only retained ble
+            elif topic.startswith('ble') and msg.retain:
+                payload = json.loads(msg.payload)
+                self.process_ble_retain(topic[4:], payload)
 
-        elif self.pair_model and msg.topic.endswith('/commands'):
-            self.process_pair(msg.payload)
+            elif self.pair_model and topic.endswith('/commands'):
+                self.process_pair(msg.payload)
+
+        except:
+            _LOGGER.exception(f"Processing MQTT: {msg.topic} {msg.payload}")
 
     def setup_devices(self, devices: list):
         """Add devices to hass."""
