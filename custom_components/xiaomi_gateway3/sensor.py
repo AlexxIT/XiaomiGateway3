@@ -159,9 +159,11 @@ class ZigbeeStats(Gateway3Sensor):
 
             self._attrs['msg_received'] += 1
 
+            # for some devices better works APSCounter, for other - sequence
+            # number in payload
             new_seq1 = int(data['APSCounter'], 0)
             raw = data['APSPlayload']
-            manufact_specific = (int(raw[2:4], 16) >> 2) & 1
+            manufact_specific = int(raw[2:4], 16) & 4
             new_seq2 = int(raw[8:10] if manufact_specific else raw[4:6], 16)
             if self.last_seq1 is not None:
                 miss = min(
