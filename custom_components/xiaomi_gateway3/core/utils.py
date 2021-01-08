@@ -417,10 +417,12 @@ CLUSTERS = {
     0xFCC0: 'Xiaomi'
 }
 
+RE_ZIGBEE_MODEL_TAIL = re.compile(r'\.v\d$')
+
 
 def get_device(zigbee_model: str) -> Optional[dict]:
-    # the model has an extra tail when added
-    if zigbee_model.endswith(('.v1', '.v2')):
+    # the model has an extra tail when added (v1, v2, v3)
+    if RE_ZIGBEE_MODEL_TAIL.search(zigbee_model):
         zigbee_model = zigbee_model[:-3]
 
     for device in DEVICES:
