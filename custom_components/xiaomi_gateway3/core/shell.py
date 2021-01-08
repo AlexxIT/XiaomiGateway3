@@ -107,9 +107,12 @@ class TelnetShell(Telnet):
         # use `tail` because input for Z3 is required;
         # add `-l 0` to disable all output, we'll enable it later with
         # `debugprint on 1` command
-        self.exec("tail -f /dev/null | Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 "
-                  f"-l 0 -p '/dev/ttyS2' -d '/data/silicon_zigbee_host/'{arg} "
-                  "| mosquitto_pub -t log/z3 -l &")
+        self.exec(
+            "nohup tail -f /dev/null 2>&1 | "
+            "nohup Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 "
+            f"-p '/dev/ttyS2' -d '/data/silicon_zigbee_host/'{arg} 2>&1 | "
+            "mosquitto_pub -t log/z3 -l &"
+        )
 
         self.exec("daemon_app.sh &")
 
