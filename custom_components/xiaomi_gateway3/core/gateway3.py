@@ -192,6 +192,9 @@ class GatewayStats:
             self.stats[ieee](payload)
 
         if self.info_ts and time.time() > self.info_ts:
+            # block any auto updates in 30 seconds
+            self.info_ts = time.time() + 30
+
             self.get_gateway_info()
 
     def process_ble_stats(self, payload: dict):
@@ -277,7 +280,6 @@ class GatewayStats:
 
         except Exception as e:
             self.debug(f"Can't update parents: {e}")
-            self.info_ts = time.time() + 30
 
 
 # noinspection PyUnusedLocal
