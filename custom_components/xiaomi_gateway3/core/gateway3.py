@@ -232,6 +232,11 @@ class GatewayStats:
         payload = json.dumps(payload, separators=(',', ':'))
         self.mqtt.publish(self.gw_topic + 'commands', payload)
 
+    def send_zigbee_cli(self, commands: list):
+        payload = {'commands': [{'commandcli': cmd} for cmd in commands]}
+        payload = json.dumps(payload, separators=(',', ':'))
+        self.mqtt.publish(self.gw_topic + 'commands', payload)
+
     def _process_gateway_info(self):
         self.debug("Update parent info table")
 
@@ -489,6 +494,19 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
         # 2. Read zigbee devices
         if not self.options.get('zha'):
+            # read Silicon devices DB
+            nwks = {}
+            try:
+                raw = shell.read_file('/data/silicon_zigbee_host/devices.txt')
+                raw = raw.decode().split(' ')
+                for i in range(0, len(raw) - 1, 32):
+                    ieee = reversed(raw[i + 3:i + 11])
+                    ieee = ''.join(f"{i:>02s}" for i in ieee)
+                    nwks[ieee] = f"{raw[i]:>04s}"
+            except:
+                _LOGGER.exception("Can't read Silicon devices DB")
+
+            # read Xiaomi devices DB
             raw = shell.read_file('/data/zigbee_gw/' + self.ver_zigbee_db,
                                   as_base64=True)
             if raw.startswith(b'unqlite'):
@@ -519,9 +537,12 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     if p[1] is not None
                 }
 
+                ieee = f"{data[did + '.mac']:>016s}"
                 device = {
                     'did': did,
                     'mac': '0x' + data[did + '.mac'],
+                    'ieee': ieee,
+                    'nwk': nwks.get(ieee),
                     'model': data[did + '.model'],
                     'type': 'zigbee',
                     'zb_ver': data[did + '.version'],
