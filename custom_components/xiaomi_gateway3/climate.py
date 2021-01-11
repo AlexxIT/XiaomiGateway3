@@ -43,7 +43,9 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
     _hvac_mode = None
     _is_on = None
     _state: Optional[bytearray] = None
-    _target_temp = None
+    # fix scenes with turned off climate
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
+    _target_temp = 0
 
     @property
     def precision(self) -> float:
@@ -99,7 +101,7 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
                 else:
                     self._fan_mode = None
                     self._hvac_mode = None
-                    self._target_temp = None
+                    self._target_temp = 0
 
             if 'current_temperature' in data:
                 self._current_temp = data['current_temperature']
@@ -113,7 +115,8 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
         self.async_write_ha_state()
 
     def set_temperature(self, **kwargs) -> None:
-        if not self._state:
+        if not self._state or kwargs[ATTR_TEMPERATURE] == 0:
+            self.debug(f"Can't set climate temperature: {self._state}")
             return
         self._state[2] = int(kwargs[ATTR_TEMPERATURE])
         state = int.from_bytes(self._state, 'big')
