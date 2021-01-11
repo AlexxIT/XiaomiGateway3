@@ -107,7 +107,21 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
                 self._current_temp = data['current_temperature']
 
             if self._attr in data:
-                self._state = bytearray(data[self._attr].to_bytes(4, 'big'))
+                self._state = bytearray(
+                    int(data[self._attr]).to_bytes(4, 'big')
+                )
+
+                # only first time when retain from gateway
+                if isinstance(data[self._attr], str):
+                    self._hvac_mode = next(
+                        k for k, v in AC_STATE_HVAC.items()
+                        if v == self._state[0]
+                    )
+                    self._fan_mode = next(
+                        k for k, v in AC_STATE_FAN.items()
+                        if v == self._state[1]
+                    )
+                    self._target_temp = self._state[2]
 
         except:
             _LOGGER.exception(f"Can't read climate data: {data}")
