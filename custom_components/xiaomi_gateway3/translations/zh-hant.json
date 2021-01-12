@@ -2,7 +2,9 @@
   "config": {
     "error": {
       "no_servers": "請至少選擇一個伺服器",
-      "cant_login": "無法登入，請確認使用者名稱與密碼"
+      "cant_login": "無法登入，請確認使用者名稱與密碼",
+      "cant_connect": "無法連線至網關",
+      "wrong_model": "網關型號不支援"
     },
     "step": {
       "user": {
@@ -21,24 +23,36 @@
         }
       },
       "token": {
-        "description": "[獲取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家智能家庭密鑰。只有當[確認操作行為](https://github.com/AlexxIT/XiaomiGateway3#zigbee-home-automation-mode) 情況下才使用 **ZHA** 模式 {error_text}",
+        "description": "[獲取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家智能家庭密鑰。\n注意：網關韌體版本高於 **1.4.6_0043** 版以上，請先參考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 後方能支援",
         "data": {
           "host": "主機端",
-          "token": "密鑰",
-          "ble": "支援 BLE 設備",
-          "zha": "Zigbee Home Automation (ZHA) 模式"
+          "token": "密鑰"
         }
       }
     }
   },
   "options": {
     "step": {
-      "init": {
+      "cloud": {
         "title": "小米雲設備資訊",
         "data": {
-          "did": "設備"
+          "did": "裝置"
         },
         "description": "{device_info}"
+      },
+      "user": {
+        "title": "網關設定",
+        "data": {
+          "host": "主機端",
+          "token": "密鑰",
+          "ble": "支援 BLE 設備",
+          "stats": "Zigbee 與 BLE 效能資料",
+          "debug": "Debug",
+          "buzzer": "關閉蜂鳴器 [PRO]",
+          "parent": "統計上端裝置 [PRO]",
+          "zha": "模式 [PRO]"
+        },
+        "description": "僅於您了解風險後，才建議變更 **PRO** 選項"
       }
     }
   },
