@@ -363,7 +363,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.setups[domain] = handler
 
     def debug(self, message: str):
-        _LOGGER.debug(f"{self.host} | {message}")
+        # basic logs
+        if 'true' in self._debug:
+            _LOGGER.debug(f"{self.host} | {message}")
 
     def stop(self):
         self.enabled = False
