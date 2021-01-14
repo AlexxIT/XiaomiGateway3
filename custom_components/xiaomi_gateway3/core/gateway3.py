@@ -408,11 +408,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 self.setup_devices(devices)
                 break
 
-        gw_time = ntp_time(self.host)
-        if gw_time:
-            self.time_offset = gw_time - time.time()
-            self.debug(f"Gateway time offset: {self.time_offset}")
-
+        self.update_time_offset()
         self.mesh_start()
 
         while self.enabled:
@@ -429,6 +425,12 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             self.mqtt.loop_forever()
 
         self.debug("Stop main thread")
+
+    def update_time_offset(self):
+        gw_time = ntp_time(self.host)
+        if gw_time:
+            self.time_offset = gw_time - time.time()
+            self.debug(f"Gateway time offset: {self.time_offset}")
 
     def _check_port(self, port: int):
         """Check if gateway port open."""
@@ -729,6 +731,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     elif b'event.gw.heartbeat' in raw:
                         payload = json.loads(raw)['params'][0]
                         self.process_gw_stats(payload)
+                        # time offset may changed right after gw.heartbeat
+                        self.update_time_offset()
 
             elif topic == 'log/z3':
                 self.process_z3(msg.payload.decode())
