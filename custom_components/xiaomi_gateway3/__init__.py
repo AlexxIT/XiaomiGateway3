@@ -189,16 +189,17 @@ async def _handle_device_remove(hass: HomeAssistant):
         if not hass_device or not hass_device.identifiers:
             return
 
-        domain, mac = next(iter(hass_device.identifiers))
+        identifier = next(iter(hass_device.identifiers))
+
         # handle only our devices
-        if domain != DOMAIN or hass_device.name_by_user != 'delete':
+        if identifier[0] != DOMAIN or hass_device.name_by_user != 'delete':
             return
 
         # remove from Mi Home
         for gw in hass.data[DOMAIN].values():
             if not isinstance(gw, Gateway3):
                 continue
-            gw_device = gw.get_device(mac)
+            gw_device = gw.get_device(identifier[1])
             if not gw_device:
                 continue
             gw.debug(f"Remove device: {gw_device['did']}")
