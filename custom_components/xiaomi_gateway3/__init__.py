@@ -201,7 +201,7 @@ async def _handle_device_remove(hass: HomeAssistant):
             gw_device = gw.get_device(mac)
             if not gw_device:
                 continue
-            _LOGGER.debug(f"{gw.host} | Remove device: {gw_device['did']}")
+            gw.debug(f"Remove device: {gw_device['did']}")
             gw.miio.send('remove_device', [gw_device['did']])
             break
 
