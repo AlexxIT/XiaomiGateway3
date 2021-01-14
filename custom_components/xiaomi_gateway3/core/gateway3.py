@@ -382,7 +382,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 time.sleep(30)
                 continue
 
-            devices = self._prepeare_gateway(with_devices=True)
+            devices = self._prepare_gateway(with_devices=True)
             if devices:
                 self.gw_topic = f"gw/{devices[0]['mac'][2:].upper()}/"
                 self.setup_devices(devices)
@@ -397,7 +397,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 continue
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
-            if not self._prepeare_gateway() or not self._mqtt_connect():
+            if not self._prepare_gateway() or not self._mqtt_connect():
                 time.sleep(60)
                 continue
 
@@ -420,7 +420,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             return False
         return True
 
-    def _prepeare_gateway(self, with_devices: bool = False):
+    def _prepare_gateway(self, with_devices: bool = False):
         """Launching the required utilities on the hub, if they are not already
         running.
         """
