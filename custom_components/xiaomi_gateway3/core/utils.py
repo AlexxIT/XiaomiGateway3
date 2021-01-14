@@ -554,6 +554,9 @@ class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
 
     async def get(self, request: web.Request):
         try:
+            if 'c' in request.query:
+                self.text = ''
+
             if 'q' in request.query or 't' in request.query:
                 lines = self.text.split('\n')
 
