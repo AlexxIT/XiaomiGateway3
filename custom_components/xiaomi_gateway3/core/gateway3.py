@@ -9,7 +9,7 @@ from typing import Optional
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils
 from .mini_miio import SyncmiIO
-from .shell import TelnetShell
+from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
 from .utils import GLOBAL_PROP
 
@@ -317,6 +317,7 @@ class GatewayStats:
 
 # noinspection PyUnusedLocal
 class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
+    time_offset = 0
     pair_model = None
     pair_payload = None
 
@@ -390,6 +391,11 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 self.setup_devices(devices)
                 break
 
+        gw_time = ntp_time(self.host)
+        if gw_time:
+            self.time_offset = gw_time - time.time()
+            self.debug(f"Gateway time offset: {self.time_offset}")
+
         self.mesh_start()
 
         while self.enabled:
@@ -439,6 +445,10 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             if "mosquitto -d" not in ps:
                 self.debug("Run public mosquitto")
                 shell.run_public_mosquitto()
+
+            if "ntpd" not in ps:
+                # run NTPd for sync time
+                shell.run_ntpd()
 
             # all data or only necessary events
             pattern = '\\{"' if 'miio' in self._debug \
@@ -839,6 +849,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         if did not in self.updates:
             return
 
+        ts = time.time()
+
         device = self.devices[did]
         payload = {}
 
@@ -896,7 +908,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 else:
                     payload[prop] = param['arguments']
 
-        self.debug(f"{device['did']} {device['model']} <= {payload}")
+        ts = round(ts - data['time'] * 0.001 + self.time_offset, 2)
+        self.debug(f"{device['did']} {device['model']} <= {payload} [{ts}]")
 
         if payload:
             device['online'] = True
