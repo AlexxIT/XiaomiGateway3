@@ -86,6 +86,7 @@ class SyncmiIO(BasemiIO):
     def __init__(self, host: str, token: str, timeout: float = 2):
         super().__init__(host, token)
 
+        self.debug = False
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(timeout)
 
@@ -125,11 +126,12 @@ class SyncmiIO(BasemiIO):
             except:
                 pass
         else:
-            _LOGGER.debug(f"Can't send {method} {params}")
+            _LOGGER.warning(f"Can't send {method} {params}")
             return None
 
-        _LOGGER.debug(f"Send {method} {len(raw_send)}B, recv {len(raw_recv)}B "
-                      f"in {t:.1f} sec and {times} try")
+        if self.debug:
+            _LOGGER.debug(f"Send {method} {len(raw_send)}B, recv "
+                          f"{len(raw_recv)}B in {t:.1f} sec and {times} try")
 
         return json.loads(data.rstrip(b'\x00'))['result']
 

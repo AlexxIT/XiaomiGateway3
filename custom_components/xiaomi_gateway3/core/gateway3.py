@@ -339,6 +339,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                                      else options['parent'])
         self.default_devices = config['devices'] if config else None
 
+        if 'true' in self._debug:
+            self.miio.debug = True
+
         self.devices = {}
         self.updates = {}
         self.setups = {}
