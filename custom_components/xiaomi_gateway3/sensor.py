@@ -159,24 +159,30 @@ class ZigbeeStats(Gateway3Sensor):
 
             self._attrs['msg_received'] += 1
 
-            # for some devices better works APSCounter, for other - sequence
-            # number in payload
-            new_seq1 = int(data['APSCounter'], 0)
-            raw = data['APSPlayload']
-            manufact_specific = int(raw[2:4], 16) & 4
-            new_seq2 = int(raw[8:10] if manufact_specific else raw[4:6], 16)
-            if self.last_seq1 is not None:
-                miss = min(
-                    (new_seq1 - self.last_seq1 - 1) & 0xFF,
-                    (new_seq2 - self.last_seq2 - 1) & 0xFF
-                )
-                self._attrs['msg_missed'] += miss
-                self._attrs['last_missed'] = miss
-                if miss:
-                    self.debug(f"Msg missed: {self.last_seq1} => {new_seq1}, "
-                               f"{self.last_seq2} => {new_seq2}, {cluster}")
-            self.last_seq1 = new_seq1
-            self.last_seq2 = new_seq2
+            # For some devices better works APSCounter, for other - sequence
+            # number in payload. Sometimes broken messages arrived.
+            try:
+                new_seq1 = int(data['APSCounter'], 0)
+                raw = data['APSPlayload']
+                manufact_spec = int(raw[2:4], 16) & 4
+                new_seq2 = int(raw[8:10] if manufact_spec else raw[4:6], 16)
+                if self.last_seq1 is not None:
+                    miss = min(
+                        (new_seq1 - self.last_seq1 - 1) & 0xFF,
+                        (new_seq2 - self.last_seq2 - 1) & 0xFF
+                    )
+                    self._attrs['msg_missed'] += miss
+                    self._attrs['last_missed'] = miss
+                    if miss:
+                        self.debug(
+                            f"Msg missed: {self.last_seq1} => {new_seq1}, "
+                            f"{self.last_seq2} => {new_seq2}, {cluster}"
+                        )
+                self.last_seq1 = new_seq1
+                self.last_seq2 = new_seq2
+
+            except:
+                pass
 
             self._state = now().isoformat(timespec='seconds')
 
