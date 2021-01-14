@@ -1,0 +1,74 @@
+{
+  "config": {
+    "error": {
+      "no_servers": "請至少選擇一個伺服器",
+      "cant_login": "無法登入，請確認使用者名稱與密碼",
+      "cant_connect": "無法連線至網關",
+      "wrong_model": "網關型號不支援"
+    },
+    "step": {
+      "user": {
+        "title": "選擇動作",
+        "data": {
+          "action": "動作"
+        }
+      },
+      "cloud": {
+        "title": "新增小米雲服務帳號",
+        "description": "僅選擇已有設備榜定的伺服器",
+        "data": {
+          "username": "Email / 小米帳號 ID",
+          "password": "密碼",
+          "servers": "伺服器"
+        }
+      },
+      "token": {
+        "description": "[獲取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家智能家庭密鑰。\n注意：網關韌體版本高於 **1.4.6_0043** 版以上，請先參考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 後方能支援",
+        "data": {
+          "host": "主機端",
+          "token": "密鑰"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "cloud": {
+        "title": "小米雲設備資訊",
+        "data": {
+          "did": "裝置"
+        },
+        "description": "{device_info}"
+      },
+      "user": {
+        "title": "網關設定",
+        "data": {
+          "host": "主機端",
+          "token": "密鑰",
+          "ble": "支援 BLE 設備",
+          "stats": "Zigbee 與 BLE 效能資料",
+          "debug": "Debug",
+          "buzzer": "關閉蜂鳴器 [PRO]",
+          "parent": "統計上端裝置 [PRO]",
+          "zha": "模式 [PRO]"
+        },
+        "description": "僅於您了解風險後，才建議變更 **PRO** 選項"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "按鈕按下",
+      "button_1": "第 1 個按鈕按下",
+      "button_2": "第 2 個按鈕按下",
+      "button_3": "第 3 個按鈕按下",
+      "button_4": "第 4 個按鈕按下",
+      "button_5": "第 5 個按鈕按下",
+      "button_6": "第 6 個按鈕按下",
+      "button_both": "按鈕同時按下",
+      "button_both_12": "第 1 與第 2 個按鈕同時按下",
+      "button_both_13": "第 1 與第 3 個按鈕同時按下",
+      "button_both_23": "第 2 與第 3 個按鈕同時按下"
+    }
+  }
+}
