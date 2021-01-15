@@ -23,7 +23,7 @@
 				}
 			},
 			"token": {
-				"description": "[获得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家 token {error_text}",
+				"description": "[获得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家 token。\n注意：网关固件版本高于 **1.4.6_0043** 版以上，请参考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 后才能支持",
 				"data": {
 					"host": "主机",
 					"token": "Token",
