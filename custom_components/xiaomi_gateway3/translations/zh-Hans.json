@@ -1,0 +1,76 @@
+{
+	"config": {
+		"error": {
+			"no_servers": "请选择至少一个服务器",
+			"cant_login": "无法登陆，检查用户名和密码",
+			"cant_connect": "无法连接到网络",
+			"wrong_model": "网关型号不支持"
+		},
+		"step": {
+			"user": {
+				"title": "选择动作",
+				"data": {
+					"action": "动作"
+				}
+			},
+			"cloud": {
+				"title": "添加小米云账号",
+				"description": "选择你设备所属的服务器",
+				"data": {
+					"username": "邮箱/小米ID",
+					"password": "密码",
+					"servers": "服务器"
+				}
+			},
+			"token": {
+				"description": "[获得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家 token。\n注意：网关固件版本高于 **1.4.6_0043** 版以上，请参考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 后才能支持",
+				"data": {
+					"host": "主机",
+					"token": "Token",
+					"ble": "支持的 BLE 设备",
+					"zha": "Zigbee Home Automation 模式"
+				}
+			}
+		}
+	},
+	"options": {
+		"step": {
+			"init": {
+				"title": "小米云的设备信息",
+				"data": {
+					"did": "设备"
+				},
+				"description": "{device_info}"
+			},
+			"user": {
+				"title": "网关设定",
+				"data": {
+					"host": "主机端",
+					"token": "密钥",
+					"ble": "支持 BLE 设备",
+					"stats": "Zigbee 和 BLE 效能数据",
+					"debug": "Debug",
+					"buzzer": "关闭蜂鸣器 [PRO]",
+					"parent": "统计上端装置 [PRO]",
+					"zha": "模式 [PRO]"
+				},
+				"description": "您必须了解风险后，才建议变更 **PRO** 选项"
+			}
+		}
+	},
+	"device_automation": {
+		"trigger_type": {
+			"button": "按下按钮",
+			"button_1": "第 1 个按钮按下",
+			"button_2": "第 2 个按钮按下",
+			"button_3": "第 3 个按钮按下",
+			"button_4": "第 4 个按钮按下",
+			"button_5": "第 5 个按钮按下",
+			"button_6": "第 6 个按钮按下",
+			"button_both": "同时按下按钮",
+			"button_both_12": "第 1 与第 2 个按钮同时按下",
+			"button_both_13": "第 1 与第 3 个按钮同时按下",
+			"button_both_23": "第 2 与第 3 个按钮同时按下"
+		}
+	}
+}
