@@ -1,7 +1,9 @@
 import json
 import logging
+import random
 import re
 import socket
+import string
 import time
 from threading import Thread
 from typing import Optional
@@ -1117,3 +1119,18 @@ def is_gw3(host: str, token: str) -> Optional[str]:
         return 'wrong_model'
 
     return None
+
+
+def get_lan_key(device: dict):
+    device = SyncmiIO(device['localip'], device['token'])
+    resp = device.send('get_lumi_dpf_aes_key')
+    if resp is None:
+        return "Can't connect to gateway"
+    if len(resp[0]) == 16:
+        return resp[0]
+    key = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                  for _ in range(16))
+    resp = device.send('set_lumi_dpf_aes_key', [key])
+    if resp[0] == 'ok':
+        return key
+    return "Can't update gateway key"

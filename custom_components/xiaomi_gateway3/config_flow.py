@@ -148,6 +148,9 @@ class OptionsFlowHandler(OptionsFlow):
                 f"MAC: {device['mac']}\n"
                 f"Token: {device['token']}"
             )
+            if device['model'] == 'lumi.gateway.v3':
+                device_info += "\nLAN key: " + gateway3.get_lan_key(device)
+
         elif not self.hass.data[DOMAIN].get('devices'):
             device_info = "No devices in account"
         else:
