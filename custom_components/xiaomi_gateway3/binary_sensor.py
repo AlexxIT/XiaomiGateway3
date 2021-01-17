@@ -88,7 +88,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
             return
 
         # https://github.com/AlexxIT/XiaomiGateway3/issues/135
-        if 'illumination' in data and len(data) == 1:
+        if 'illuminance' in data and len(data) == 1:
             data[self._attr] = 1
 
         if self._attr not in data:
