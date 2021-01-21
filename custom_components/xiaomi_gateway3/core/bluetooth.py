@@ -147,7 +147,7 @@ ACTIONS = {
 def get_ble_domain(param: str) -> Optional[str]:
     if param in (
             'sleep', 'lock', 'opening', 'water_leak', 'smoke', 'gas', 'light',
-            'contact'):
+            'contact', 'motion'):
         return 'binary_sensor'
 
     elif param in (
