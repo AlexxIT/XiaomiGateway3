@@ -133,6 +133,9 @@ class SyncmiIO(BasemiIO):
             _LOGGER.debug(f"Send {method} {len(raw_send)}B, recv "
                           f"{len(raw_recv)}B in {t:.1f} sec and {times} try")
 
+        if data == b'\x00':
+            return None
+
         return json.loads(data.rstrip(b'\x00'))['result']
 
     def send_bulk(self, method: str, params: list):
