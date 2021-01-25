@@ -248,7 +248,7 @@ If the integration is not in the list, you need to clear the browser cache.
 
 4. Add new Lovelace card:
    - [example 1](https://gist.github.com/AlexxIT/120f20eef4f39071e67f698207490db9)
-   - [example 2](https://github.com/avbor/HomeAssisnantConfig/blob/master/lovelace/views/vi_radio_quality_gw3.yaml)
+   - [example 2](https://github.com/avbor/HomeAssistantConfig/blob/master/lovelace/views/vi_radio_quality_gw3.yaml)
 
 How it works:
 
