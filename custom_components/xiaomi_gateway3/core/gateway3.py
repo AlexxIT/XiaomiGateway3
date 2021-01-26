@@ -1011,11 +1011,14 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
         # init entities if needed
         for k in payload.keys():
-            # don't retain action
-            if k in device['init'] or k == 'action':
+            # don't retain action and motion
+            if k in device['init']:
                 continue
 
-            device['init'][k] = payload[k]
+            if k in ('action', 'motion'):
+                device['init'][k] = ''
+            else:
+                device['init'][k] = payload[k]
 
             domain = bluetooth.get_ble_domain(k)
             if not domain:
