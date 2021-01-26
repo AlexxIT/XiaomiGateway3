@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 # Bluetooth Model: [Manufacturer, Device Name, Device Model]
 # params: [siid, piid, hass attr name, hass domain]
@@ -191,8 +191,14 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
         return {'humidity': int.from_bytes(data, 'little') / 10.0}
 
     elif eid == 0x1007 and length == 3:  # 4103
+        value = int.from_bytes(data, 'little')
+
+        if pdid == 2038:
+            # Night Light 2: 1 - no light, 100 - light
+            return {'light': int(value >= 100)}
+
         # Range: 0-120000, lux
-        return {'illuminance': int.from_bytes(data, 'little')}
+        return {'illuminance': value}
 
     elif eid == 0x1008 and length == 1:  # 4104
         # Humidity percentage, range: 0-100
@@ -316,9 +322,10 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
     elif eid == 0x0F:  # 15
         # Night Light 2: 1 - moving no light, 100 - moving with light
         # Motion Sensor 2: 0 - moving no light, 256 - moving with light
+        value = int.from_bytes(data, 'little')
         return {
             'motion': 1,
-            'light': 1 if int.from_bytes(data, 'little') >= 100 else 0
+            'light': int(value >= 100)
         }
 
     return None
