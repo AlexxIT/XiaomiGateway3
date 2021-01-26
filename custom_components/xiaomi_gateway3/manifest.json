@@ -5,6 +5,7 @@
   "documentation": "https://github.com/AlexxIT/XiaomiGateway3",
   "issue_tracker": "https://github.com/AlexxIT/XiaomiGateway3/issues",
   "dependencies": [
+    "http"
   ],
   "codeowners": [
     "@AlexxIT"
