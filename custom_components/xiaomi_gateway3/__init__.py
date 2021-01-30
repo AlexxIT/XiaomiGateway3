@@ -140,6 +140,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
             hass.config_entries.async_update_entry(config_entry, data=data)
 
             devices = await cloud.get_total_devices(data['servers'])
+            hass.data[DOMAIN]['cloud_instance'] = cloud
             if devices is None:
                 _LOGGER.error("Can't load devices from MiCloud")
 
@@ -167,8 +168,15 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         hass.data[DOMAIN]['devices'] += devices
 
     default_devices = hass.data[DOMAIN]['config']['devices']
+    gw_list = []
     for device in devices:
         default_devices[device['did']] = {'device_name': device['name']}
+        if device['model'] == 'lumi.gateway.mgl03':
+            gw_list.append(device)
+
+    hass.data[DOMAIN]['gateway_list'] = gw_list
+    hass.async_create_task(hass.config_entries.async_forward_entry_setup(
+            config_entry, 'alarm_control_panel'))
 
     return True
 
