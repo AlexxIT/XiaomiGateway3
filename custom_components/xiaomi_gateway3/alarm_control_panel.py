@@ -35,16 +35,16 @@ XIAOMI_STATE_ALARM_ARMED_NIGHT = 3
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Xiaomi Gateway Alarm from a config entry."""
-    entities = []
-    gateway = hass.data[DOMAIN]['gateway_list'][0]
+    gateways = hass.data[DOMAIN]['gateway_list']
     cloud = hass.data[DOMAIN]['cloud_instance']
-    entity = XiaomiGateway3Alarm(
-        gateway,
-        f"{gateway['name']} Alarm",
-        cloud,
-        config_entry.data.get("servers")
-    )
-    entities.append(entity)
+    entities = [
+        XiaomiGateway3Alarm(
+            gateway,
+            f"{gateway['name']} Alarm",
+            cloud,
+            config_entry.data.get("servers")
+        ) for gateway in gateways
+    ]
     async_add_entities(entities, update_before_add=True)
 
 class XiaomiGateway3Alarm(AlarmControlPanelEntity):
@@ -76,9 +76,11 @@ class XiaomiGateway3Alarm(AlarmControlPanelEntity):
 
     @property
     def device_info(self):
-        """Return the device info of the gateway."""
         return {
-            "identifiers": {(DOMAIN, self._gateway_device_id)},
+            'identifiers': {(DOMAIN, self._gateway['mac'])},  # TODO
+            'manufacturer': "Xiaomi",
+            'model': self._gateway['model'],
+            'name': self._gateway['name']
         }
 
     @property

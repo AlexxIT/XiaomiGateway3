@@ -175,8 +175,9 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
             gw_list.append(device)
 
     hass.data[DOMAIN]['gateway_list'] = gw_list
-    hass.async_create_task(hass.config_entries.async_forward_entry_setup(
-            config_entry, 'alarm_control_panel'))
+    if gw_list:
+        hass.async_create_task(hass.config_entries.async_forward_entry_setup(
+                config_entry, 'alarm_control_panel'))
 
     return True
 
