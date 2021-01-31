@@ -919,7 +919,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 else:
                     payload[prop] = param['arguments']
 
-        ts = round(ts - data['time'] * 0.001 + self.time_offset, 2)
+        # no time in device add command
+        ts = round(ts - data['time'] * 0.001 + self.time_offset, 2) \
+            if 'time' in data else '?'
         self.debug(f"{device['did']} {device['model']} <= {payload} [{ts}]")
 
         if payload:
