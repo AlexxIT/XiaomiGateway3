@@ -97,6 +97,10 @@ async def async_update_options(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    # check unload cloud integration
+    if entry.entry_id not in hass.data[DOMAIN]:
+        return
+
     # remove all stats entities if disable stats
     if not entry.options.get('stats'):
         suffix = ('_gateway', '_zigbee')
