@@ -18,11 +18,12 @@ DEVICES = [{
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     1983: ["Yeelight", "Button S1", "YLAI003"],
-    2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],
+    2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
-    2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],
+    # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
+    2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
 }, {
     # Mesh Light
     0: ["Xiaomi", "Mesh Group", "Mesh Group"],
