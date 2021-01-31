@@ -313,6 +313,13 @@ switch.0x158d0003456789_switch:
   ignore_offline: 1  # any non-empty value
 ```
 
+**Zigbee bulb default transition**.
+
+```yaml
+light.0x86bd7fffe000000_light:
+  default_transition: 5
+```
+
 # Add and remove Zigbee devices
 
 To enter the pairing mode, turn on the switch **Xiaomi Gateway 3 Pair**. Pairing lasts 60 seconds.
