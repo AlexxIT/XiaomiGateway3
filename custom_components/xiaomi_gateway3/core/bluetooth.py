@@ -50,7 +50,7 @@ DEVICES = [{
 }, {
     2007: ["Unknown", "Mesh Switch Controller", "2007"],
     'params': [
-        [2, 1, None, 'switch']
+        [2, 1, 'switch', 'switch']
     ]
 }, {
     2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
