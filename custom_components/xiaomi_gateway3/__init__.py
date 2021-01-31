@@ -19,7 +19,7 @@ from .core.xiaomi_cloud import MiCloud
 _LOGGER = logging.getLogger(__name__)
 
 DOMAINS = ['binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
-           'switch']
+           'switch', 'alarm_control_panel']
 
 CONF_DEVICES = 'devices'
 CONF_DEBUG = 'debug'

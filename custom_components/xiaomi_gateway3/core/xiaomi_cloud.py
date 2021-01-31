@@ -152,6 +152,45 @@ class MiCloud:
 
         return None
 
+    async def request_miot_api(self, server: str, api: str, params: list):
+        """Request MIoT API, for gateway alarm control. By Haoyu, 2021"""
+        assert server in SERVERS, "Wrong server: " + server
+        baseurl = 'https://api.io.mi.com/app' if server == 'cn' \
+            else f"https://{server}.api.io.mi.com/app"
+
+        url = '/miotspec' + api
+        data = json.dumps({'params': params}, separators=(',', ':'))
+
+        nonce = gen_nonce()
+        signed_nonce = gen_signed_nonce(self.auth['ssecurity'], nonce)
+        signature = gen_signature(url, signed_nonce, nonce, data)
+
+        try:
+            r = await self.session.post(baseurl + url, cookies={
+                'userId': self.auth['user_id'],
+                'serviceToken': self.auth['service_token'],
+                'locale': 'en_US'
+            }, headers={
+                'User-Agent': UA,
+                'x-xiaomi-protocal-flag-cli': 'PROTOCAL-HTTP2'
+            }, data={
+                'signature': signature,
+                '_nonce': nonce,
+                'data': data
+            }, timeout=10)
+
+            resp = await r.json(content_type=None)
+            _LOGGER.debug(f"Response from MIoT API {api}: {resp}")
+            assert resp['code'] == 0, resp
+            return resp['result']
+
+        except asyncio.TimeoutError:
+            _LOGGER.error(f"Timeout while requesting MIoT api {api}")
+        except:
+            _LOGGER.exception(f"Can't request MIoT API {api}")
+
+        return None
+
 
 def get_random_string(length: int):
     seq = string.ascii_uppercase + string.digits

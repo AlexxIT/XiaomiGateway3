@@ -544,6 +544,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         """Load devices info for Coordinator, Zigbee and Mesh."""
 
         # 1. Read coordinator info
+        raw = shell.read_file('/data/miio/device.conf').decode()
+        m = re.search(r'did=(\d+)', raw)
+
         raw = shell.read_file('/data/zigbee/coordinator.info')
         device = json.loads(raw)
         devices = [{
@@ -552,7 +555,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             'mac': device['mac'],
             'type': 'gateway',
             'init': {
-                'firmware lock': shell.check_firmware_lock()
+                'firmware lock': shell.check_firmware_lock(),
+                'alarm_did': m[1]
             }
         }]
 

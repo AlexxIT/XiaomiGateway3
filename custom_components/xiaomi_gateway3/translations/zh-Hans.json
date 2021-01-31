@@ -2,7 +2,7 @@
 	"config": {
 		"error": {
 			"no_servers": "请选择至少一个服务器",
-			"cant_login": "无法登陆，检查用户名和密码",
+			"cant_login": "无法登录，请检查用户名和密码",
 			"cant_connect": "无法连接到网络",
 			"wrong_model": "网关型号不支持"
 		},
@@ -15,19 +15,19 @@
 			},
 			"cloud": {
 				"title": "添加小米云账号",
-				"description": "选择你设备所属的服务器",
+				"description": "选择设备所属的服务器",
 				"data": {
-					"username": "邮箱/小米ID",
+					"username": "邮箱/小米 ID",
 					"password": "密码",
 					"servers": "服务器"
 				}
 			},
 			"token": {
-				"description": "[获得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家 token。\n注意：网关固件版本高于 **1.4.6_0043** 版以上，请参考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 后才能支持",
+				"description": "需要[获取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md)米家 token。\n注意：若网关固件版本高于 **1.4.6_0043** ，需要先[焊接](https://github.com/AlexxIT/XiaomiGateway3/wiki)才能支持。",
 				"data": {
 					"host": "主机",
 					"token": "Token",
-					"ble": "支持的 BLE 设备",
+					"ble": "支持 BLE 设备",
 					"zha": "Zigbee Home Automation 模式"
 				}
 			}
@@ -45,32 +45,32 @@
 			"user": {
 				"title": "网关设定",
 				"data": {
-					"host": "主机端",
-					"token": "密钥",
+					"host": "主机",
+					"token": "Token",
 					"ble": "支持 BLE 设备",
 					"stats": "Zigbee 和 BLE 效能数据",
-					"debug": "Debug",
+					"debug": "调试信息",
 					"buzzer": "关闭蜂鸣器 [PRO]",
 					"parent": "统计上端装置 [PRO]",
 					"zha": "模式 [PRO]"
 				},
-				"description": "您必须了解风险后，才建议变更 **PRO** 选项"
+				"description": "如果您不清楚了解带有 **PRO** 选项的作用，建议不要更改它们。"
 			}
 		}
 	},
 	"device_automation": {
 		"trigger_type": {
-			"button": "按下按钮",
-			"button_1": "第 1 个按钮按下",
-			"button_2": "第 2 个按钮按下",
-			"button_3": "第 3 个按钮按下",
-			"button_4": "第 4 个按钮按下",
-			"button_5": "第 5 个按钮按下",
-			"button_6": "第 6 个按钮按下",
-			"button_both": "同时按下按钮",
-			"button_both_12": "第 1 与第 2 个按钮同时按下",
-			"button_both_13": "第 1 与第 3 个按钮同时按下",
-			"button_both_23": "第 2 与第 3 个按钮同时按下"
+			"button": "按下按键",
+			"button_1": "按下第 1 键",
+			"button_2": "按下第 2 键",
+			"button_3": "按下第 3 键",
+			"button_4": "按下第 4 键",
+			"button_5": "按下第 5 键",
+			"button_6": "按下第 6 键",
+			"button_both": "两键同时按下",
+			"button_both_12": "同时按下第 1、2 键",
+			"button_both_13": "同时按下第 1、3 键",
+			"button_both_23": "同时按下第 2、3 键"
 		}
 	}
 }
