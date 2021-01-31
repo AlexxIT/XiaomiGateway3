@@ -132,7 +132,7 @@ class TelnetShell(Telnet):
             return self.read_until(b"# ")[:-2]
 
     def run_buzzer(self):
-        self.exec("killall basic_gw")
+        self.exec("kill $(ps | grep dummy:basic_gw | awk '{print $1}')")
 
     def stop_buzzer(self):
         self.exec("killall daemon_miio.sh; killall -9 basic_gw")

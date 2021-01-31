@@ -480,7 +480,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 shell.redirect_miio2mqtt(pattern, self.ver_miio)
 
             if self.options.get('buzzer'):
-                if "basic_gw -b" in ps:
+                if "dummy:basic_gw" not in ps:
                     self.debug("Disable buzzer")
                     shell.stop_buzzer()
             else:
