@@ -465,7 +465,6 @@ def fix_xiaomi_props(params) -> dict:
 
 def remove_device(hass: HomeAssistantType, did: str):
     """Remove device by did from Hass"""
-    assert did.startswith('lumi.'), did
     # lumi.1234567890 => 0x1234567890
     mac = '0x' + did[5:]
     registry: DeviceRegistry = hass.data['device_registry']
