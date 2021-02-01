@@ -59,10 +59,11 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                                                  "Xiaomi Gateway 3")
 
         elif 'removed_did' in data:
-            did = data['removed_did']
-            # did not always string:
             # https://github.com/AlexxIT/XiaomiGateway3/issues/122
-            if isinstance(did, str) and did.startswith('lumi.'):
+            did = data['removed_did']['did'] \
+                if isinstance(data['removed_did'], dict) \
+                else data['removed_did']
+            if did.startswith('lumi.'):
                 self.debug(f"Handle removed_did: {did}")
                 utils.remove_device(self.hass, did)
 
