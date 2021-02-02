@@ -15,7 +15,7 @@
       },
       "cloud": {
         "title": "新增小米雲服務帳號",
-        "description": "僅選擇已有設備榜定的伺服器",
+        "description": "僅選擇已榜定設備的伺服器",
         "data": {
           "username": "Email / 小米帳號 ID",
           "password": "密碼",
@@ -23,7 +23,7 @@
         }
       },
       "token": {
-        "description": "[獲取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 米家智能家庭密鑰。\n注意：網關韌體版本高於 **1.4.6_0043** 版以上，請先參考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 後方能支援",
+        "description": "[如何取得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md)米家智能家庭密鑰 Token。\n注意：網關韌體版本高於 **1.4.6_0043** 版以上，請先參考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 後方能支援",
         "data": {
           "host": "主機端",
           "token": "密鑰"
@@ -52,7 +52,7 @@
           "parent": "統計上端裝置 [PRO]",
           "zha": "模式 [PRO]"
         },
-        "description": "僅於您了解風險後，才建議變更 **PRO** 選項"
+        "description": "僅於了解可能之風險後，才建議變更 **PRO** 選項"
       }
     }
   },
