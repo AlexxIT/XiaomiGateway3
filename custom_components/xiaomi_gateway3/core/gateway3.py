@@ -581,7 +581,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 db = Unqlite(raw)
                 data = db.read_all()
             else:
-                raw = re.sub(br'}\s+{', b',', raw)
+                raw = re.sub(br'}\s*{', b',', raw)
                 data = json.loads(raw)
 
             # data = {} or data = {'dev_list': 'null'}
