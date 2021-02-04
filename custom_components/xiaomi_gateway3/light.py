@@ -70,7 +70,8 @@ class Gateway3Light(Gateway3Device, LightEntity):
                 kwargs[ATTR_TRANSITION] = custom[CONF_DEFAULT_TRANSITION]
 
         # transition works only with raw zigbee commands
-        if ATTR_TRANSITION in kwargs:
+        # nwk empty for new device, it reloads only after restart integration
+        if ATTR_TRANSITION in kwargs and 'nwk' in self.device:
             # is the amount of time, in tenths of a second
             tr = int(kwargs[ATTR_TRANSITION] * 10.0)
             commands = []
@@ -117,7 +118,7 @@ class Gateway3Light(Gateway3Device, LightEntity):
                 kwargs[ATTR_TRANSITION] = custom[CONF_DEFAULT_TRANSITION]
 
         # transition works only with raw zigbee commands
-        if ATTR_TRANSITION in kwargs:
+        if ATTR_TRANSITION in kwargs and 'nwk' in self.device:
             # is the amount of time, in tenths of a second
             tr = int(kwargs[ATTR_TRANSITION] * 10.0)
             commands = [
