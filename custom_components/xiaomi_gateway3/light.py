@@ -76,21 +76,21 @@ class Gateway3Light(Gateway3Device, LightEntity):
             tr = int(kwargs[ATTR_TRANSITION] * 10.0)
             commands = []
 
-            if ATTR_COLOR_TEMP in kwargs:
-                ct = int(kwargs[ATTR_COLOR_TEMP])
-                commands += [
-                    f"zcl color-control movetocolortemp {ct} {tr} 0 0",
-                    f"send 0x{self.device['nwk']} 1 1"
-                ]
-
             # if only turn_on with transition restore last brightness
-            if ATTR_BRIGHTNESS not in kwargs and not commands:
+            if ATTR_BRIGHTNESS not in kwargs and ATTR_COLOR_TEMP not in kwargs:
                 kwargs[ATTR_BRIGHTNESS] = self.brightness or 255
 
             if ATTR_BRIGHTNESS in kwargs:
                 br = int(kwargs[ATTR_BRIGHTNESS])
                 commands += [
                     f"zcl level-control o-mv-to-level {br} {tr}",
+                    f"send 0x{self.device['nwk']} 1 1"
+                ]
+
+            if ATTR_COLOR_TEMP in kwargs:
+                ct = int(kwargs[ATTR_COLOR_TEMP])
+                commands += [
+                    f"zcl color-control movetocolortemp {ct} {tr} 0 0",
                     f"send 0x{self.device['nwk']} 1 1"
                 ]
 
