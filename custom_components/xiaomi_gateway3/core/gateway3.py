@@ -851,7 +851,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         elif data['cmd'] == 'report':
             pkey = 'params' if 'params' in data else 'mi_spec'
         elif data['cmd'] in ('write_rsp', 'read_rsp'):
-            pkey = 'results'
+            pkey = 'results' if 'params' in data else 'mi_spec'
         elif data['cmd'] == 'write_ack':
             return
         else:
@@ -1073,7 +1073,9 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 if k == 'switch':
                     v = bool(v)
                 k = next(p[0] for p in device['mi_spec'] if p[2] == k)
-                params.append({'siid': k[0], 'piid': k[1], 'value': v})
+                params.append({
+                    'siid': int(k[0]), 'piid': int(k[2]), 'value': v
+                })
 
             payload['mi_spec'] = params
         else:
