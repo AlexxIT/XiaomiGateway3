@@ -71,7 +71,8 @@ class Unqlite:
             while next_offset:
                 self.pos = page_offset + next_offset
                 k, v, next_offset = self.read_cell()
-                result[k.decode()] = v.decode()
+                # data sometimes corrupted: b'lumi.158d0004\xb4f9abb.prop'
+                result[k.decode(errors='replace')] = v.decode(errors='replace')
             page_offset += self.page_size
 
         return result
