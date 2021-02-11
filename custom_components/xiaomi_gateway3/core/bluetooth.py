@@ -19,6 +19,7 @@ DEVICES = [{
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     1983: ["Yeelight", "Button S1", "YLAI003"],
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
+    2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
