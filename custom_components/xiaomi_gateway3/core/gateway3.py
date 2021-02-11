@@ -577,6 +577,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             # read Xiaomi devices DB
             raw = shell.read_file('/data/zigbee_gw/' + self.ver_zigbee_db,
                                   as_base64=True)
+            # self.debug(f"Devices RAW: {raw}")
             if raw.startswith(b'unqlite'):
                 db = Unqlite(raw)
                 data = db.read_all()
@@ -1041,10 +1042,11 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 handler(payload)
 
     def process_pair(self, raw: bytes):
+        _LOGGER.debug(f"!!! {raw}")
         # get shortID and eui64 of paired device
         if b'lumi send-nwk-key' in raw:
             # create model response
-            payload = f"0x18010105000042{len(self.pair_model):02x}" \
+            payload = f"0x08020105000042{len(self.pair_model):02x}" \
                       f"{self.pair_model.encode().hex()}"
             m = RE_NWK_KEY.search(raw.decode())
             self.pair_payload = json.dumps({
@@ -1057,9 +1059,21 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 'APSCounter': '0x01',
                 'APSPlayload': payload
             }, separators=(',', ':'))
+            self.pair_payload2 = json.dumps({
+                'sourceAddress': m[1],
+                'eui64': '0x' + m[2],
+                'profileId': '0x0104',
+                'clusterId': '0x0000',
+                'sourceEndpoint': '0x01',
+                'destinationEndpoint': '0x01',
+                'APSCounter': '0x01',
+                'APSPlayload': '0x0801010100002001'
+            }, separators=(',', ':'))
 
         # send model response "from device"
         elif b'zdo active ' in raw:
+            self.mqtt.publish(self.gw_topic + 'MessageReceived',
+                              self.pair_payload2)
             self.mqtt.publish(self.gw_topic + 'MessageReceived',
                               self.pair_payload)
 
