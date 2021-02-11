@@ -718,7 +718,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             topic = msg.topic
 
             if 'mqtt' in self._debug:
-                self.debug(f"[MQ] {topic} {msg.payload.decode()}")
+                _LOGGER.debug(f"{self.host} | MQTT | {topic} {msg.payload}")
 
             if topic == 'zigbee/send':
                 payload = json.loads(msg.payload)
