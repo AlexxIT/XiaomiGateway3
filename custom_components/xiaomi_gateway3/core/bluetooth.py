@@ -142,7 +142,8 @@ BLE_LOCK_ERROR = {
 
 ACTIONS = {
     1249: ['right', 'left'],
-    1983: ['single', 'double', 'hold']
+    1983: ['single', 'double', 'hold'],
+    2147: ['single'],
 }
 
 
