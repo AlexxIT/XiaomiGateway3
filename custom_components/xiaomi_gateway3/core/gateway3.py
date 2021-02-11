@@ -851,7 +851,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         elif data['cmd'] == 'report':
             pkey = 'params' if 'params' in data else 'mi_spec'
         elif data['cmd'] in ('write_rsp', 'read_rsp'):
-            pkey = 'results' if 'params' in data else 'mi_spec'
+            pkey = 'results' if 'results' in data else 'mi_spec'
         elif data['cmd'] == 'write_ack':
             return
         else:
@@ -860,8 +860,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
         did = data['did']
 
-        # skip without callback
-        if did not in self.updates:
+        # skip without callback and without data
+        if did not in self.updates or pkey not in data:
             return
 
         ts = time.time()
