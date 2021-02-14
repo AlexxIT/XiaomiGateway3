@@ -192,7 +192,11 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
     elif eid == 0x1006 and length == 2:  # 4102
         # Humidity percentage, ranging from 0-1000
-        return {'humidity': int.from_bytes(data, 'little') / 10.0}
+        value = int.from_bytes(data, 'little') / 10.0
+        if pdid in (903, 1371):
+            # two models has bug, they increase humidity on each data by 0.1
+            value = int(value)
+        return {'humidity': value}
 
     elif eid == 0x1007 and length == 3:  # 4103
         value = int.from_bytes(data, 'little')
