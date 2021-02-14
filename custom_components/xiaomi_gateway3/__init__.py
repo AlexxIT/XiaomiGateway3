@@ -313,7 +313,7 @@ class Gateway3Device(Entity):
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
                 'name': self.device['device_name'],
-                'sw_version': self.device['zb_ver'],
+                'sw_version': self.device.get('fw_ver'),
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
         else:  # ble and mesh

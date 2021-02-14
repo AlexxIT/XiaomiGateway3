@@ -614,7 +614,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     'nwk': nwks.get(ieee),
                     'model': data[did + '.model'],
                     'type': 'zigbee',
-                    'zb_ver': data[did + '.version'],
+                    'fw_ver': retain.get('fw_ver'),
                     'init': utils.fix_xiaomi_props(params),
                     'online': retain.get('alive', 1) == 1
                 }
