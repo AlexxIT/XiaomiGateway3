@@ -15,19 +15,27 @@ for k, v in sorted(zigbee.items(), key=lambda kv: kv[0]):
     models = ','.join(sorted(set(v)))
     print(f"- {k} ({models})")
 
-ble = []
-mesh = []
+print(
+    'BLE\n' + '\n'.join(sorted([
+        f"- {v[0]} {v[1]} ({v[2]})"
+        for k, v in BT[0].items()
+        if len(v) == 3
+    ]))
+)
 
-for v in BT.values():
-    if len(v) < 3:
-        continue
-    name = f"- {v[0]} {v[1]} ({v[2]})"
-    if 'Mesh' in name:
-        mesh.append(name)
-    else:
-        ble.append(name)
+print(
+    'Mesh Bulbs\n' + '\n'.join(sorted([
+        f"- {v[0]} {v[1]} ({v[2]})"
+        for k, v in BT[1].items()
+        if len(v) == 3 and k != 'params'
+    ]))
+)
 
-print('BLE')
-print('\n'.join(sorted(ble)))
-print('Mesh')
-print('\n'.join(sorted(mesh)))
+print(
+    'Mesh Switches\n' + '\n'.join(sorted([
+        f"- {v[0]} {v[1]} ({v[2]})"
+        for d in BT[2:]
+        for k, v in d.items()
+        if len(v) == 3 and k != 'params'
+    ]))
+)

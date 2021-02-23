@@ -1,12 +1,10 @@
 # Xiaomi Gateway 3 integration for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 [![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
 [![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/41001428278477)
 
-Control Zigbee devices from Home Assistant with **Xiaomi Gateway 3 (ZNDMWG03LM)** on original firmware.
-
-**ATTENTION:** The component **does not work with new firmware versions**. Don't update your gateway! Check [supported firmwares](#supported-firmwares).
+Control Zigbee devices from Home Assistant with **Xiaomi Gateway 3 (ZNDMWG03LM and ZNDMWG02LM)** on original firmware.
 
 Gateway support **Zigbee 3**, **Bluetooth Mesh** and **HomeKit**.
 
@@ -16,7 +14,7 @@ This method does not change the device firmware. Gateway continues to work with 
 
 <img src="integrations.png" width="758">
 
-Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on this device.
+Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
 
 **Important:** This component does not work with:
  - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
@@ -52,7 +50,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 A. Yes, they can and are already doing it. But if you have a worked hub and you do not update it, it will continue to work. Component can block fw updates with **Lock Firmware** switch.
 
 **Q. Does this integration support hubs DGNWG02LM, DGNWG05LM, Aqara Hub...?**  
-A. No. The integration only supports ZNDMWG03LM.
+A. No. The integration only supports ZNDMWG03LM (China version) and ZNDMWG02LM (Euro version).
 
 **Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**  
 A. No. The integration does not support Xiaomi Wi-Fi devices.
@@ -70,7 +68,7 @@ A. Yes. If you do not enable ZHA mode, the devices will continue to work in Mi H
 A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
 
 **Q. Should I open or solder the hub?**  
-A. Depends on the firmware version. Read [supported firmwares](#supported-firmwares) section.
+A. No. Read [supported firmwares](#supported-firmwares) section.
 
 **Q. Should I use ZHA mode?**  
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best not to enable ZHA. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
@@ -86,30 +84,27 @@ A. All button clicks are displayed in the status of that one entity.
 
 # Supported Firmwares
 
-**Attention:** Starting from 2020.10, there is a high chance of buying any version of the gateway with "bad" firmware. Only soldering will be able to open Telnet.
+Supported firmwares with default open telnet command:
 
-If you have "bad" firmware and don't want to solder - try to use [HomeKit Controller](https://www.home-assistant.io/integrations/homekit_controller/) component. It has many limitations, but the popular Xiaomi Zigbee devices should work fine. BLE and Mesh devices won't work. 3rd party zigbee devices won't work. And you won't have many advanced features of this component.
+- v1.4.4_0003 - factory firmware, not recomended
+- v1.4.5_0012 - factory firmware, not recomended
+- v1.4.5_0016 - not recomended
+- v1.4.6_0012
+- v1.4.6_0030 - was available in summer 2020, now unavailable
 
-Instruction for soldering: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
+Supported firmwares with [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)
+
+- v1.4.6_0043 - factory firmware from 2020.10
+- v1.4.7_0040
+- v1.4.7_0063
+- v1.4.7_0065
+- v1.4.7_0115
+
+Optionally you can flash gateway with custom firmware: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
 Component can block fw updates with **Lock Firmware** switch. Mi Home app will continue to offer you update. But won't be able to install it. It should fail at 0%.
 
 [![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
-
-**ZNDMWG03LM (Chinese version, US plug)**
-- v1.4.4_0003 - factory firmware, supported, not recomended
-- v1.4.5_0012 - factory firmware, supported, not recomended
-- v1.4.5_0016 - safe to update, supported, not recomended
-- v1.4.6_0012 - safe to update, supported
-- v1.4.6_0030 - was available in summer 2020, now unavailable, supported
-- v1.4.6_0043 - **factory firmware from 2020.10, need to solder**
-- v1.4.7_0040 - **need to solder**
-- v1.4.7_0063 - **factory firmware from 2020.11, need to solder**
-- v1.4.7_0065 - **need to solder**
-- v1.4.7_0115 - **need to solder**
-
-**ZNDMWG02LM (Euro version, no plug)**
-- v1.4.6_0043 - **factory firmware, need to solder** (telnet has a password)
 
 # Supported Zigbee Devices
 
@@ -178,7 +173,7 @@ Tested Devices:
 - Xiaomi Alarm Clock (CGD1)
 - Xiaomi Door Sensor 2 (MCCGQ02HL)
 - Xiaomi Flower Care (HHCCJCY01)
-- Xiaomi Magic Cube (XMMF01JQD) - don't sends edge info, only direction!
+- Xiaomi Magic Cube (XMMF01JQD)
 - Xiaomi Mosquito Repellent (WX08ZM)
 - Xiaomi Motion Sensor 2 (RTCGQ02LM)
 - Xiaomi Night Light 2 (MJYD02YL-A)
@@ -190,6 +185,8 @@ Tested Devices:
 - Xiaomi ZenMeasure Clock (MHO-C303)
 - Yeelight Button S1 (YLAI003)
 
+XMMF01JQD don't sends edge info, only direction!
+
 Other BLE devices also maybe supported...
 
 Kettles and scooters are not BLE devices. It is not known whether the gateway can work with them. Currently not supported.
@@ -198,15 +195,22 @@ BLE devices and their attributes **don't appear immediately**! Data collected an
 
 # Supported Bluetooth Mesh Devices
 
-Tested Devices:
+Tested Mesh Lights:
 - Xiaomi Mesh Bulb (MJDP09YL)
 - Xiaomi Mesh Downlight (MJTS01YL)
+- Xiaomi Mesh Group (Mesh Group)
 - Yeelight Mesh Bulb E14 (YLDP09YL)
 - Yeelight Mesh Bulb E27 (YLDP10YL)
 - Yeelight Mesh Bulb M2 (YLDP25YL/YLDP26YL)
 - Yeelight Mesh Downlight (YLSD01YL)
 - Yeelight Mesh Downlight M2 (YLTS02YL/YLTS04YL)
 - Yeelight Mesh Spotlight (YLSD04YL)
+
+Tested Mesh Switches:
+- PTX Mesh Wall Double Switch (PTX-SK2M)
+- PTX Mesh Wall Single Switch (PTX-SK1M)
+- PTX Mesh Wall Triple Switch (PTX-TK3/M)
+- Xiaomi Mesh Wall Double Switch (DHKG02ZM)
 
 Other Mesh devices also maybe supported...
 
@@ -216,7 +220,7 @@ Other Mesh devices also maybe supported...
 
 [![Xiaomi Gateway 3 control from Home Assistant](https://img.youtube.com/vi/CQVSFISC9CE/mqdefault.jpg)](https://www.youtube.com/watch?v=CQVSFISC9CE)
 
-You can install component with HACS custom repo ([example](https://github.com/AlexxIT/SonoffLAN#install-with-hacs)): `AlexxIT/XiaomiGateway3`.
+You can install component with [HACS](https://hacs.xyz/). Available in default integration list.
 
 Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.com/AlexxIT/XiaomiGateway3/releases/latest) to `custom_components` folder in your config folder.
 

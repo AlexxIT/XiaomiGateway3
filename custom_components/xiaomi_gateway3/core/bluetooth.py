@@ -52,7 +52,7 @@ DEVICES = [{
         [3, 1, 'right_switch', 'switch'],
     ]
 }, {
-    2007: ["Unknown", "Mesh Switch Controller", "2007"],
+    2007: ["Unknown", "Mesh Switch Controller"],
     'params': [
         [2, 1, 'switch', 'switch']
     ]
