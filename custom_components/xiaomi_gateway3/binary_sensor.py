@@ -88,7 +88,8 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
             return
 
         # https://github.com/AlexxIT/XiaomiGateway3/issues/135
-        if 'illuminance' in data and len(data) == 1:
+        if 'illuminance' in data and ('lumi.sensor_motion.aq2' in
+                                      self.device['device_model']):
             data[self._attr] = 1
 
         # check only motion=1
