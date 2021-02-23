@@ -8,6 +8,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
 from .core import gateway3
+from .core.gateway3 import TELNET_CMD
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
@@ -56,8 +57,8 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                     data_schema=vol.Schema({
                         vol.Required('host', default=device['localip']): str,
                         vol.Required('token', default=device['token']): str,
+                        vol.Required('telnet_cmd', default=TELNET_CMD): str,
                     }),
-                    description_placeholders={'error_text': ''}
                 )
 
         if DOMAIN in self.hass.data and 'devices' in self.hass.data[DOMAIN]:
@@ -116,6 +117,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required('host'): str,
                 vol.Required('token'): str,
+                vol.Required('telnet_cmd', default=TELNET_CMD): str,
             }),
             errors={'base': error} if error else None
         )
@@ -180,6 +182,7 @@ class OptionsFlowHandler(OptionsFlow):
 
         host = self.entry.options['host']
         token = self.entry.options['token']
+        telnet_cmd = self.entry.options.get('telnet_cmd')
         ble = self.entry.options.get('ble', True)
         stats = self.entry.options.get('stats', False)
         debug = self.entry.options.get('debug', [])
@@ -192,6 +195,7 @@ class OptionsFlowHandler(OptionsFlow):
             data_schema=vol.Schema({
                 vol.Required('host', default=host): str,
                 vol.Required('token', default=token): str,
+                vol.Optional('telnet_cmd', default=telnet_cmd): str,
                 vol.Required('ble', default=ble): bool,
                 vol.Required('stats', default=stats): bool,
                 vol.Optional('debug', default=debug): cv.multi_select(

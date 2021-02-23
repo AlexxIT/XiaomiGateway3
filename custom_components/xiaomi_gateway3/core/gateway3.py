@@ -22,6 +22,8 @@ RE_MAC = re.compile('^0x0*')
 # MAC reverse
 RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 
+TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
+
 
 class GatewayV:
     """Handling different firmware versions."""
@@ -339,6 +341,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
     time_offset = 0
     pair_model = None
     pair_payload = None
+    telnet_cmd = None
 
     def __init__(self, host: str, token: str, config: dict, **options):
         super().__init__(daemon=True)
@@ -358,6 +361,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.parent_scan_interval = (-1 if options.get('parent') is None
                                      else options['parent'])
         self.default_devices = config['devices'] if config else None
+
+        self.telnet_cmd = options.get('telnet_cmd') or TELNET_CMD
 
         if 'true' in self._debug:
             self.miio.debug = True
@@ -444,7 +449,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
     def _enable_telnet(self):
         """Enable telnet with miio protocol."""
-        if self.miio.send("enable_telnet_service") != 'ok':
+        raw = json.loads(self.telnet_cmd)
+        if self.miio.send(raw['method'], raw.get('params')) != 'ok':
             self.debug(f"Can't enable telnet")
             return False
         return True

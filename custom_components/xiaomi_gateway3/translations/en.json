@@ -23,10 +23,11 @@
         }
       },
       "token": {
-        "description": "[Obtain](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home token.\nNote: Gateway with firmware **1.4.6_0043** higher are supported only after [soldering](https://github.com/AlexxIT/XiaomiGateway3/wiki)",
+        "description": "You can obtain Mi Home token automatically with [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) or [manually](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Check supported firmwares info in [component docs](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
         "data": {
           "host": "Host",
-          "token": "Token"
+          "token": "Token",
+          "telnet_cmd": "Open Telnet command"
         }
       }
     }
@@ -45,6 +46,7 @@
         "data": {
           "host": "Host",
           "token": "Token",
+          "telnet_cmd": "Open Telnet command",
           "ble": "Support BLE Devices",
           "stats": "Zigbee and BLE performance data",
           "debug": "Debug",

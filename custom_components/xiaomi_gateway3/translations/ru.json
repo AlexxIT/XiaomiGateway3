@@ -23,10 +23,11 @@
         }
       },
       "token": {
-        "description": "[Получите](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен. Шлюз с прошивкой **1.4.6_0043** и выше поддерживается только после [перепрошивки](https://github.com/AlexxIT/XiaomiGateway3/wiki)",
+        "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) или [вручную](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Ознакомьтесь с поддерживаемыми версиями прошивок в [документации компонента](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
         "data": {
           "host": "IP-адрес",
-          "token": "Токен"
+          "token": "Токен",
+          "telnet_cmd": "Команда для открытия Telnet"
         }
       }
     }
@@ -45,6 +46,7 @@
         "data": {
           "host": "IP-адрес",
           "token": "Токен",
+          "telnet_cmd": "Команда для открытия Telnet",
           "ble": "Поддержка BLE устройств",
           "stats": "Детализация работы Zigbee и BLE",
           "debug": "Отладка",
