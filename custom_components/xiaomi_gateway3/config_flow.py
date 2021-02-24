@@ -182,7 +182,7 @@ class OptionsFlowHandler(OptionsFlow):
 
         host = self.entry.options['host']
         token = self.entry.options['token']
-        telnet_cmd = self.entry.options.get('telnet_cmd')
+        telnet_cmd = self.entry.options.get('telnet_cmd', '')
         ble = self.entry.options.get('ble', True)
         stats = self.entry.options.get('stats', False)
         debug = self.entry.options.get('debug', [])
