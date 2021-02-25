@@ -23,10 +23,11 @@
         }
       },
       "token": {
-        "description": "[如何取得](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md)米家智能家庭密鑰 Token。\n注意：網關韌體版本高於 **1.4.6_0043** 版以上，請先參考 [焊接方法](https://github.com/AlexxIT/XiaomiGateway3/wiki) 後方能支援",
+        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得米家智能家庭設備密鑰Token。請參閱 [元件文件](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 以了解支援的韌體版本。",
         "data": {
           "host": "主機端",
           "token": "密鑰"
+          "telnet_cmd": "開啟 Telnet 命令"
         }
       }
     }
@@ -45,6 +46,7 @@
         "data": {
           "host": "主機端",
           "token": "密鑰",
+          "telnet_cmd": "開啟 Telnet 命令",
           "ble": "支援 BLE 設備",
           "stats": "Zigbee 與 BLE 效能資料",
           "debug": "Debug",
