@@ -356,7 +356,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.mqtt.on_disconnect = self.on_disconnect
         self.mqtt.on_message = self.on_message
 
-        self._ble = options.get('ble')  # for fast access
+        self._ble = options.get('ble', True)  # for fast access
         self._debug = options.get('debug', '')  # for fast access
         self.parent_scan_interval = (-1 if options.get('parent') is None
                                      else options['parent'])
