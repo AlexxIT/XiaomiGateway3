@@ -26,7 +26,7 @@
         "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得米家智能家庭設備密鑰Token。請參閱 [元件文件](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 以了解支援的韌體版本。",
         "data": {
           "host": "主機端",
-          "token": "密鑰"
+          "token": "密鑰",
           "telnet_cmd": "開啟 Telnet 命令"
         }
       }
