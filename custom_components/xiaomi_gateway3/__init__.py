@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import voluptuous as vol
@@ -72,21 +73,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     await _setup_logger(hass)
 
-    config = hass.data[DOMAIN]['config']
-
-    hass.data[DOMAIN][entry.entry_id] = \
-        gw = Gateway3(**entry.options, config=config)
-
     # add options handler
     if not entry.update_listeners:
         entry.add_update_listener(async_update_options)
 
-    # init setup for each supported domains
-    for domain in DOMAINS:
-        hass.async_create_task(hass.config_entries.async_forward_entry_setup(
-            entry, domain))
+    config = hass.data[DOMAIN]['config']
+    hass.data[DOMAIN][entry.entry_id] = \
+        Gateway3(**entry.options, config=config)
 
-    gw.start()
+    hass.async_create_task(_setup_domains(hass, entry))
 
     return True
 
@@ -120,6 +115,17 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.config_entries.async_forward_entry_unload(entry, domain)
         for domain in DOMAINS
     ])
+
+
+async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
+    # init setup for each supported domains
+    await asyncio.gather(*[
+        hass.config_entries.async_forward_entry_setup(entry, domain)
+        for domain in DOMAINS
+    ])
+
+    gw: Gateway3 = hass.data[DOMAIN][entry.entry_id]
+    gw.start()
 
 
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):

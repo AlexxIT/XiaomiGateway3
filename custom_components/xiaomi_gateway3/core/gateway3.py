@@ -796,10 +796,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     if not domain:
                         continue
 
-                    # wait domain init
-                    while domain not in self.setups:
-                        time.sleep(1)
-
                     self.setups[domain](self, device, param[2])
 
             elif device['type'] == 'mesh':
@@ -822,10 +818,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                     if not domain:
                         continue
 
-                    # wait domain init
-                    while domain not in self.setups:
-                        time.sleep(1)
-
                     self.setups[domain](self, device, param[2])
 
             elif device['type'] == 'ble':
@@ -843,8 +835,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 device['init'] = {}
 
             if self.options.get('stats') and device['type'] != 'mesh':
-                while 'sensor' not in self.setups:
-                    time.sleep(1)
                 self.setups['sensor'](self, device, device['type'])
 
     def process_message(self, data: dict):
@@ -999,10 +989,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             if not domain:
                 continue
 
-            # wait domain init
-            while domain not in self.setups:
-                time.sleep(1)
-
             self.setups[domain](self, device, k)
 
         if did in self.updates:
@@ -1035,10 +1021,6 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             domain = bluetooth.get_ble_domain(k)
             if not domain:
                 continue
-
-            # wait domain init
-            while domain not in self.setups:
-                time.sleep(1)
 
             self.setups[domain](self, device, k)
 
