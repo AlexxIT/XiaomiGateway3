@@ -43,6 +43,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Advanced commands](#advanced-commands)
 - [How it works](#how-it-works)
 - [Debug mode](#debug-mode)
+- [Useful links](#userful-links)
 
 # FAQ
 
@@ -606,3 +607,11 @@ You can filter data in the logs, enable auto refresh (in seconds) and tail last 
 ```
 http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2&t=100
 ```
+
+# Useful links
+
+- [Russian Telegram Community](https://t.me/xiaomi_gw_v3_hack)
+- [Italian Telegram Community](https://t.me/HassioHelp)
+- [Russian video about instal integration](https://youtu.be/FVWfjE5tx2g)
+- [Russian article about flash gateway](https://simple-ha.ru/posts/261)
+- [Home Assistant Community](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586)
