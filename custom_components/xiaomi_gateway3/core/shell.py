@@ -8,12 +8,17 @@ from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
 
+# We should use HTTP-link because wget don't support HTTPS and curl removed in
+# lastest fw. But it's not a problem because we check md5
+
 CHECK_SOCAT = "(md5sum /data/socat | grep 92b77e1a93c4f4377b4b751a5390d979)"
-DOWNLOAD_SOCAT = "(curl -o /data/socat http://pkg.musl.cc/socat/mipsel-linux-musln32/bin/socat && chmod +x /data/socat)"
+# original link http://pkg.musl.cc/socat/mipsel-linux-musln32/bin/socat
+DOWNLOAD_SOCAT = "(wget -O /data/socat http://pkg.simple-ha.ru/mipsel/socat && chmod +x /data/socat)"
 RUN_SOCAT = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
 
 CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
-DOWNLOAD_BUSYBOX = "(curl -k -o /data/busybox https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel && chmod +x /data/busybox)"
+# original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
+DOWNLOAD_BUSYBOX = "(wget -O /data/busybox http://pkg.simple-ha.ru/mipsel/busybox && chmod +x /data/busybox)"
 LOCK_FIRMWARE = "/data/busybox chattr +i"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
