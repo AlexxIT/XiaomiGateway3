@@ -100,6 +100,7 @@ Supported firmwares with [custom open telnet command](https://gist.github.com/zv
 - v1.4.7_0063
 - v1.4.7_0065
 - v1.4.7_0115
+- v1.4.7_0160
 
 Optionally you can flash gateway with custom firmware: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
