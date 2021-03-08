@@ -241,7 +241,7 @@ class GatewayStats:
             self.get_gateway_info()
 
     def process_ble_stats(self, payload: dict):
-        did = payload['dev']['did']
+        did = payload['dev']['did'] if 'dev' in payload else payload['did']
         if did in self.stats:
             self.stats[did](payload)
 
@@ -471,11 +471,30 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 # run NTPd for sync time
                 shell.run_ntpd()
 
-            # all data or only necessary events
-            pattern = '\\{"' if 'miio' in self._debug \
-                else "ble_event|properties_changed|heartbeat"
+            bt_fix = shell.check_bt()
+            if bt_fix is None:
+                self.debug("Fixed BT don't supported")
 
-            if f"awk /{pattern} {{" not in ps:
+            elif bt_fix is False:
+                self.debug("Download fixed BT")
+                shell.download_bt()
+
+                # check after download
+                if shell.check_bt():
+                    self.debug("Run fixed BT")
+                    shell.run_bt()
+
+            elif "log/ble" not in ps:
+                self.debug("Run fixed BT")
+                shell.run_bt()
+
+            if "log/miio" not in ps:
+                # all data or only necessary events
+                pattern = (
+                    '\\{"' if 'miio' in self._debug else
+                    "ot_agent_recv_handler_one.+"
+                    "ble_event|properties_changed|heartbeat"
+                )
                 self.debug(f"Redirect miio to MQTT")
                 shell.redirect_miio2mqtt(pattern)
 
@@ -744,6 +763,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                         # time offset may changed right after gw.heartbeat
                         self.update_time_offset()
 
+            elif topic == 'log/ble':
+                payload = json.loads(msg.payload)
+                self.process_ble_event_fix(payload)
+
             elif topic == 'log/z3':
                 self.process_z3(msg.payload.decode())
 
@@ -963,6 +986,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         else:
             device = self.devices[did]
 
+        if device.get('seq') == data['frmCnt']:
+            return
+        device['seq'] = data['frmCnt']
+
         if isinstance(data['evt'], list):
             # check if only one
             assert len(data['evt']) == 1, data
@@ -972,9 +999,26 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         else:
             payload = None
 
-        if payload is None:
-            self.debug(f"Unsupported BLE {data}")
+        self._process_ble_event(device, payload)
+
+    def process_ble_event_fix(self, data: dict):
+        self.debug(f"Process BLE Fix {data}")
+
+        did = data['did']
+        if did not in self.devices:
+            self.debug(f"Unregistered BLE device {did}")
             return
+
+        device = self.devices[did]
+        if device.get('seq') == data['seq']:
+            return
+        device['seq'] = data['seq']
+
+        payload = bluetooth.parse_xiaomi_ble(data, data['pdid'])
+        self._process_ble_event(device, payload)
+
+    def _process_ble_event(self, device: dict, payload: dict):
+        did = device['did']
 
         # init entities if needed
         init = device['init']

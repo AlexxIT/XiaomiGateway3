@@ -11,14 +11,14 @@ _LOGGER = logging.getLogger(__name__)
 # We should use HTTP-link because wget don't support HTTPS and curl removed in
 # lastest fw. But it's not a problem because we check md5
 
-CHECK_SOCAT = "(md5sum /data/socat | grep 92b77e1a93c4f4377b4b751a5390d979)"
 # original link http://pkg.musl.cc/socat/mipsel-linux-musln32/bin/socat
-DOWNLOAD_SOCAT = "(wget -O /data/socat http://pkg.simple-ha.ru/mipsel/socat && chmod +x /data/socat)"
+# original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
+DOWNLOAD = "(wget -O /data/{0} http://master.dl.sourceforge.net/project/mgl03/{1}/{0}?viasf=1 && chmod +x /data/{0})"
+
+CHECK_SOCAT = "(md5sum /data/socat | grep 92b77e1a93c4f4377b4b751a5390d979)"
 RUN_SOCAT = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
 
 CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
-# original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
-DOWNLOAD_BUSYBOX = "(wget -O /data/busybox http://pkg.simple-ha.ru/mipsel/busybox && chmod +x /data/busybox)"
 LOCK_FIRMWARE = "/data/busybox chattr +i"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
@@ -31,6 +31,13 @@ MIIO2MQTT = " | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
+
+BT_MD5 = {
+    '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
+    '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
+    '1.4.7_0115': 'be4724fbc5223fcde60aff7f58ffea28',
+    '1.4.7_0160': '9290241cd9f1892d2ba84074f07391d4',
+}
 
 
 class TelnetShell(Telnet):
@@ -49,7 +56,8 @@ class TelnetShell(Telnet):
 
     def check_or_download_socat(self):
         """Download socat if needed."""
-        return self.exec(f"{CHECK_SOCAT} || {DOWNLOAD_SOCAT}")
+        download = DOWNLOAD.format('socat', 'bin')
+        return self.exec(f"{CHECK_SOCAT} || {download}")
 
     def run_socat(self):
         self.exec(f"{CHECK_SOCAT} && {RUN_SOCAT} &")
@@ -64,7 +72,27 @@ class TelnetShell(Telnet):
         self.exec("killall daemon_app.sh Lumi_Z3GatewayHost_MQTT")
 
     def check_or_download_busybox(self):
-        return self.exec(f"{CHECK_BUSYBOX} || {DOWNLOAD_BUSYBOX}")
+        download = DOWNLOAD.format('busybox', 'bin')
+        return self.exec(f"{CHECK_BUSYBOX} || {download}")
+
+    def check_bt(self):
+        md5 = BT_MD5.get(self.ver)
+        if not md5:
+            return None
+        return md5 in self.exec("md5sum /data/silabs_ncp_bt")
+
+    def download_bt(self):
+        self.exec("rm /data/silabs_ncp_bt")
+        md5 = BT_MD5.get(self.ver)
+        # we use same name for bt utis so gw can kill it in case of update etc.
+        self.exec(DOWNLOAD.format('silabs_ncp_bt', md5))
+
+    def run_bt(self):
+        self.exec(
+            "killall silabs_ncp_bt; pkill -f log/ble; "
+            "/data/silabs_ncp_bt /dev/ttyS1 1 2>&1 >/dev/null | "
+            "mosquitto_pub -t log/ble -l &"
+        )
 
     def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
@@ -99,7 +127,7 @@ class TelnetShell(Telnet):
         self.exec("ntpd -l")
 
     def get_running_ps(self) -> str:
-        return self.exec("ps")
+        return self.exec("ps -w")
 
     def redirect_miio2mqtt(self, pattern: str):
         self.exec("killall daemon_miio.sh miio_client; pkill -f log/miio")
