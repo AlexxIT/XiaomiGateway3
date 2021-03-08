@@ -144,9 +144,9 @@ BLE_LOCK_ERROR = {
 }
 
 ACTIONS = {
-    1249: ['right', 'left'],
-    1983: ['single', 'double', 'hold'],
-    2147: ['single'],
+    1249: {0: 'right', 1: 'left'},
+    1983: {0: 'single', 0x010000: 'double', 0x020000: 'hold'},
+    2147: {0: 'single'},
 }
 
 
@@ -174,10 +174,12 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
     length = len(data)
 
     if eid == 0x1001 and length == 3:  # 4097
-        if pdid in ACTIONS and data[0] < len(ACTIONS[pdid]):
-            return {'action': ACTIONS[pdid][data[0]]}
-        else:
-            return {'action': data[0]}
+        value = int.from_bytes(data, 'little')
+        return {
+            'action': ACTIONS[pdid][value]
+            if pdid in ACTIONS and value in ACTIONS[pdid]
+            else value
+        }
 
     elif eid == 0x1002 and length == 1:  # 4098
         # No sleep (0x00), falling asleep (0x01)
