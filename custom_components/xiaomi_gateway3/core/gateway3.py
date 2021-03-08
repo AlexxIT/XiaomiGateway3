@@ -6,7 +6,7 @@ import socket
 import string
 import time
 from threading import Thread
-from typing import Optional
+from typing import Optional, Dict
 
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils
@@ -25,7 +25,27 @@ RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
 
-class GatewayMesh:
+class DevicesRegistry:
+    """Global registry for all gateway devices. Because BLE devices updates
+    from all gateway simultaniosly.
+
+    Key - device did, `numb` for wifi and mesh devices, `lumi.ieee` for zigbee
+    devices, `blt.3.alphanum` for ble devices, `group.numb` for mesh groups.
+
+    Dict: did, model, mac, type, init(dict)
+    """
+    devices: Dict[str, dict] = {}
+    updates: Dict[str, list] = {}
+
+    def add_update(self, did: str, handler):
+        """Add handler to device update event."""
+        self.updates.setdefault(did, []).append(handler)
+
+    def remove_update(self, did: str, handler):
+        self.updates[did].remove(handler)
+
+
+class GatewayMesh(DevicesRegistry):
     enabled: bool = None
 
     miio: SyncmiIO = None
@@ -341,8 +361,6 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         if 'true' in self._debug:
             self.miio.debug = True
 
-        self.devices = {}
-        self.updates = {}
         self.setups = {}
         self.stats = {}
 
@@ -350,16 +368,21 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     def device(self):
         return self.devices[self.did]
 
-    def add_update(self, did: str, handler):
-        """Add handler to device update event."""
-        self.updates.setdefault(did, []).append(handler)
-
-    def remove_update(self, did: str, handler):
-        self.updates.setdefault(did, []).remove(handler)
-
     def add_setup(self, domain: str, handler):
         """Add hass device setup funcion."""
         self.setups[domain] = handler
+
+    def setup_entry(self, domain: str, device: dict, attr: str):
+        if 'setup' not in device:
+            # setup first entry
+            device['setup'] = [attr]
+        elif attr in device['setup']:
+            # skip duplicate entry
+            return
+        else:
+            device['setup'].append(attr)
+
+        self.setups[domain](self, device, attr)
 
     def debug(self, message: str):
         # basic logs
@@ -742,6 +765,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     def setup_devices(self, devices: list):
         """Add devices to hass."""
         for device in devices:
+            if device['did'] in self.devices:
+                continue
+
             if device['type'] in ('gateway', 'zigbee'):
                 desc = utils.get_device(device['model'])
                 if not desc:
@@ -767,7 +793,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                     if not domain:
                         continue
 
-                    self.setups[domain](self, device, param[2])
+                    self.setup_entry(domain, device, param[2])
 
             elif device['type'] == 'mesh':
                 desc = bluetooth.get_device(device['model'], 'Mesh')
@@ -789,7 +815,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                     if not domain:
                         continue
 
-                    self.setups[domain](self, device, param[2])
+                    self.setup_entry(domain, device, param[2])
 
             elif device['type'] == 'ble':
                 # only save info for future
@@ -806,7 +832,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 device['init'] = {}
 
             if self.options.get('stats') and device['type'] != 'mesh':
-                self.setups['sensor'](self, device, device['type'])
+                self.setup_entry('sensor', device, device['type'])
 
     def process_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
@@ -960,7 +986,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             if not domain:
                 continue
 
-            self.setups[domain](self, device, k)
+            self.setup_entry(domain, device, k)
 
         if did in self.updates:
             for handler in self.updates[did]:
@@ -993,7 +1019,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             if not domain:
                 continue
 
-            self.setups[domain](self, device, k)
+            self.setup_entry(domain, device, k)
 
         if did in self.updates:
             for handler in self.updates[did]:
