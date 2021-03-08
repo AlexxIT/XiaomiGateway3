@@ -198,7 +198,9 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
                 color.color_temperature_mired_to_kelvin(self._color_temp)
 
         if not payload:
-            payload[self._attr] = self._state = True
+            payload[self._attr] = True
+
+        self._state = True
 
         self.gw.send_mesh(self.device, payload)
 
