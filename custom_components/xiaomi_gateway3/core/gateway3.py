@@ -25,35 +25,8 @@ RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
 
-class GatewayV:
-    """Handling different firmware versions."""
-    ver = None
-
-    @property
-    def ver_mesh_group(self) -> str:
-        return 'mesh_group_v1' if self.ver >= '1.4.6_0043' else 'mesh_group'
-
-    @property
-    def ver_zigbee_db(self) -> str:
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/14
-        # fw 1.4.6_0012 and below have one zigbee_gw.db file
-        # fw 1.4.6_0030 have many json files in this folder
-        return '*.json' if self.ver >= '1.4.6_0030' else 'zigbee_gw.db'
-
-    @property
-    def ver_miio(self) -> bool:
-        return self.ver >= '1.4.7_0063'
-
-    @property
-    def ver_z3(self) -> bool:
-        return self.ver >= '1.4.7_0063'
-
-
 class GatewayMesh:
     enabled: bool = None
-
-    devices: dict = None
-    updates: dict = None
 
     miio: SyncmiIO = None
     mesh_params: list = None
@@ -338,7 +311,7 @@ class GatewayStats:
 
 
 # noinspection PyUnusedLocal
-class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
+class Gateway3(Thread, GatewayMesh, GatewayStats):
     did = None
     time_offset = 0
     pair_model = None
@@ -463,10 +436,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         self.debug("Prepare Gateway")
         try:
             shell = TelnetShell(self.host)
-
-            if self.ver is None:
-                self.ver = shell.get_version()
-                self.debug(f"Version: {self.ver}")
+            self.debug(f"Version: {shell.ver}")
 
             ps = shell.get_running_ps()
 
@@ -484,7 +454,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
             if f"awk /{pattern} {{" not in ps:
                 self.debug(f"Redirect miio to MQTT")
-                shell.redirect_miio2mqtt(pattern, self.ver_miio)
+                shell.redirect_miio2mqtt(pattern)
 
             if self.options.get('buzzer'):
                 if "dummy:basic_gw" not in ps:
@@ -514,7 +484,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 if (self.parent_scan_interval >= 0 and
                         "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps):
                     self.debug("Run public Zigbee console")
-                    shell.run_public_zb_console(self.ver_z3)
+                    shell.run_public_zb_console()
 
                 elif "Lumi_Z3GatewayHost_MQTT" not in ps:
                     self.debug("Run Lumi Zigbee")
@@ -582,8 +552,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                 _LOGGER.exception("Can't read Silicon devices DB")
 
             # read Xiaomi devices DB
-            raw = shell.read_file('/data/zigbee_gw/' + self.ver_zigbee_db,
-                                  as_base64=True)
+            raw = shell.read_file(shell.zigbee_db, as_base64=True)
             # self.debug(f"Devices RAW: {raw}")
             if raw.startswith(b'unqlite'):
                 db = Unqlite(raw)
@@ -647,7 +616,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             try:
                 mesh_groups = {}
 
-                rows = db.read_table(self.ver_mesh_group)
+                rows = db.read_table(shell.mesh_group_table)
                 for row in rows:
                     # don't know if 8 bytes enougth
                     mac = int(row[0]).to_bytes(8, 'big').hex()

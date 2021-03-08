@@ -24,9 +24,9 @@ UNLOCK_FIRMWARE = "/data/busybox chattr -i"
 RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
 
 # use awk because buffer
-MIIO_LESS = "-l 0 -o FILE_STORE -n 128"
-MIIO_MORE = "-l 4"
-MIIO2MQTT = "(miio_client %s -d /data/miio | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &)"
+MIIO_147 = "miio_client -l 0 -o FILE_STORE -n 128 -d /data/miio"
+MIIO_146 = "miio_client -l 4 -d /data/miio"
+MIIO2MQTT = " | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 
 RE_VERSION = re.compile(r'version=([0-9._]+)')
 
@@ -38,6 +38,8 @@ class TelnetShell(Telnet):
         super().__init__(host, timeout=5)
         self.read_until(b"login: ")
         self.exec('admin')
+
+        self.ver = self.get_version()
 
     def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
@@ -99,20 +101,20 @@ class TelnetShell(Telnet):
     def get_running_ps(self) -> str:
         return self.exec("ps")
 
-    def redirect_miio2mqtt(self, pattern: str, new_version=False):
-        self.exec("killall daemon_miio.sh; killall miio_client")
+    def redirect_miio2mqtt(self, pattern: str):
+        self.exec("killall daemon_miio.sh miio_client; pkill -f log/miio")
         time.sleep(.5)
-        args = MIIO_LESS if new_version else MIIO_MORE
-        self.exec(MIIO2MQTT % (args, pattern))
+        cmd = MIIO_147 if self.ver >= '1.4.7_0063' else MIIO_146
+        self.exec(cmd + MIIO2MQTT % pattern)
         self.exec("daemon_miio.sh &")
 
-    def run_public_zb_console(self, new_version=False):
+    def run_public_zb_console(self):
         # Z3 starts with tail on old fw and without it on new fw from 1.4.7
         self.exec("killall daemon_app.sh; killall tail; "
                   "killall Lumi_Z3GatewayHost_MQTT")
 
         # run Gateway with open console port (`-v` param)
-        arg = " -r 'c'" if new_version else ''
+        arg = " -r 'c'" if self.ver >= '1.4.7_0063' else ''
 
         # use `tail` because input for Z3 is required;
         # add `-l 0` to disable all output, we'll enable it later with
@@ -150,6 +152,18 @@ class TelnetShell(Telnet):
         raw = self.read_file('/etc/rootfs_fw_info')
         m = RE_VERSION.search(raw.decode())
         return m[1]
+
+    @property
+    def mesh_group_table(self) -> str:
+        return 'mesh_group_v1' if self.ver >= '1.4.6_0043' else 'mesh_group'
+
+    @property
+    def zigbee_db(self) -> str:
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/14
+        # fw 1.4.6_0012 and below have one zigbee_gw.db file
+        # fw 1.4.6_0030 have many json files in this folder
+        return '/data/zigbee_gw/*.json' if self.ver >= '1.4.6_0030' \
+            else '/data/zigbee_gw/zigbee_gw.db'
 
 
 NTP_DELTA = 2208988800  # 1970-01-01 00:00:00
