@@ -182,7 +182,19 @@ class TelnetShell(Telnet):
 
     @property
     def mesh_group_table(self) -> str:
-        return 'mesh_group_v1' if self.ver >= '1.4.6_0043' else 'mesh_group'
+        if self.ver >= '1.4.7_0160':
+            return 'mesh_group_v3'
+        elif self.ver >= '1.4.6_0043':
+            return 'mesh_group_v1'
+        else:
+            return 'mesh_group'
+
+    @property
+    def mesh_device_table(self) -> str:
+        if self.ver >= '1.4.7_0160':
+            return 'mesh_device_v3'
+        else:
+            return 'mesh_device'
 
     @property
     def zigbee_db(self) -> str:

@@ -673,7 +673,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                     mesh_groups[group_addr] = device
 
                 # load Mesh bulbs
-                rows = db.read_table('mesh_device')
+                rows = db.read_table(shell.mesh_device_table)
                 for row in rows:
                     device = {
                         'did': row[0],
