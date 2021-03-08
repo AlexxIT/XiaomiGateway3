@@ -725,6 +725,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 self.process_message(payload)
 
             elif topic == 'log/miio':
+                # don't need to process another data
+                if b'ot_agent_recv_handler_one' not in msg.payload:
+                    return
+
                 for raw in utils.extract_jsons(msg.payload):
                     if self._ble and b'_async.ble_event' in raw:
                         data = json.loads(raw)['params']
