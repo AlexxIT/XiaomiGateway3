@@ -7,6 +7,7 @@ import socket
 import time
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
+from socket import timeout
 from typing import Union, Optional
 
 from cryptography.hazmat.backends import default_backend
@@ -48,10 +49,11 @@ class BasemiIO:
         unpadder = padding.PKCS7(128).unpadder()
         return unpadder.update(padded_plaintext) + unpadder.finalize()
 
-    def _pack_raw(self, method: str, params: Union[dict, list] = None):
+    def _pack_raw(self, msg_id: int, method: str,
+                  params: Union[dict, list] = None):
         # latest zero unnecessary
         payload = json.dumps({
-            'id': random.randint(100000000, 999999999),
+            'id': msg_id,
             'method': method, 'params': params or []
         }, separators=(',', ':')).encode() + b'\x00'
 
@@ -109,34 +111,44 @@ class SyncmiIO(BasemiIO):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
         """
-        if not self.device_id and not self.ping():
-            return None
-
         for times in range(1, 4):
             try:
+                # need device_id for send command, can get it from ping cmd
+                if not self.device_id and not self.ping():
+                    _LOGGER.debug(f"{self.addr[0]} | ping")
+                    continue
+
                 # pack each time for new message id
-                raw_send = self._pack_raw(method, params)
+                msg_id = random.randint(100000000, 999999999)
+                raw_send = self._pack_raw(msg_id, method, params)
                 t = time.monotonic()
                 self.sock.sendto(raw_send, self.addr)
                 # can receive more than 1024 bytes (1056 approximate maximum)
                 raw_recv = self.sock.recv(10240)
                 t = time.monotonic() - t
                 data = self._unpack_raw(raw_recv)
-                break
-            except:
+
+                data = json.loads(data.rstrip(b'\x00'))
+                # check if we received response for our cmd
+                if data['id'] == msg_id:
+                    break
+                _LOGGER.debug(f"{self.addr[0]} | wrong ID")
+            except timeout:
+                _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]} | exception {e}")
                 pass
         else:
-            _LOGGER.warning(f"Can't send {method} {params}")
+            _LOGGER.warning(f"{self.addr[0]} | Can't send {method} {params}")
             return None
 
         if self.debug:
-            _LOGGER.debug(f"Send {method} {len(raw_send)}B, recv "
-                          f"{len(raw_recv)}B in {t:.1f} sec and {times} try")
+            _LOGGER.debug(
+                f"{self.addr[0]} | Send {method} {len(raw_send)}B, "
+                f"recv {len(raw_recv)}B in {t:.1f} sec and {times} try"
+            )
 
-        if data == b'\x00':
-            return None
-
-        return json.loads(data.rstrip(b'\x00'))['result']
+        return data['result'] if 'result' in data else None
 
     def send_bulk(self, method: str, params: list):
         """Sends a command with a large number of parameters. Splits into
