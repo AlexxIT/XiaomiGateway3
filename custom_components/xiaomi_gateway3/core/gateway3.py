@@ -179,6 +179,7 @@ class GatewayMesh:
 
 # noinspection PyUnusedLocal
 class GatewayStats:
+    did: str = None
     stats: dict = None
     host: str = None
     info_ts: float = 0
@@ -212,7 +213,7 @@ class GatewayStats:
         # empty payload - update available state
         self.debug(f"gateway <= {payload or self.available}")
 
-        if 'lumi.0' not in self.stats:
+        if self.did not in self.stats:
             return
 
         if payload:
@@ -233,7 +234,7 @@ class GatewayStats:
                     'uptime': f"{h:02}:{m:02}:{s:02}",
                 }
 
-        self.stats['lumi.0'](payload)
+        self.stats[self.did](payload)
 
     def process_zb_stats(self, payload: dict):
         ieee = payload['eui64']
@@ -338,6 +339,7 @@ class GatewayStats:
 
 # noinspection PyUnusedLocal
 class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
+    did = None
     time_offset = 0
     pair_model = None
     pair_payload = None
@@ -373,7 +375,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
 
     @property
     def device(self):
-        return self.devices['lumi.0']
+        return self.devices[self.did]
 
     def add_update(self, did: str, handler):
         """Add handler to device update event."""
@@ -551,17 +553,17 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
         # 1. Read coordinator info
         raw = shell.read_file('/data/miio/device.conf').decode()
         m = re.search(r'did=(\d+)', raw)
+        self.did = m[1]
 
         raw = shell.read_file('/data/zigbee/coordinator.info')
         device = json.loads(raw)
         devices = [{
-            'did': 'lumi.0',
+            'did': self.did,
             'model': 'lumi.gateway.mgl03',
             'mac': device['mac'],
             'type': 'gateway',
             'init': {
                 'firmware lock': shell.check_firmware_lock(),
-                'alarm_did': m[1]
             }
         }]
 
@@ -854,7 +856,7 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
             _LOGGER.warning(f"Unsupported cmd: {data}")
             return
 
-        did = data['did']
+        did = data['did'] if data['did'] != 'lumi.0' else self.did
 
         # skip without callback and without data
         if did not in self.updates or pkey not in data:
@@ -1065,7 +1067,8 @@ class Gateway3(Thread, GatewayV, GatewayMesh, GatewayStats):
                               self.pair_payload)
 
     def send(self, device: dict, data: dict):
-        payload = {'cmd': 'write', 'did': device['did']}
+        did = device['did'] if device['did'] != self.did else 'lumi.0'
+        payload = {'cmd': 'write', 'did': did}
 
         # convert hass prop to lumi prop
         if device['mi_spec']:

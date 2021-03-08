@@ -38,7 +38,7 @@ async def async_unload_entry(hass, entry):
 class Gateway3Alarm(Gateway3Device, AlarmControlPanelEntity):
     @property
     def miio_did(self):
-        return self.device['init']['alarm_did']
+        return self.device['did']
 
     @property
     def should_poll(self):

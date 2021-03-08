@@ -100,12 +100,12 @@ class GatewayStats(Gateway3Sensor):
         return True
 
     async def async_added_to_hass(self):
-        self.gw.add_stats('lumi.0', self.update)
+        self.gw.add_stats(self.device['did'], self.update)
         # update available when added to Hass
         self.update()
 
     async def async_will_remove_from_hass(self) -> None:
-        self.gw.remove_stats('lumi.0', self.update)
+        self.gw.remove_stats(self.device['did'], self.update)
 
     def update(self, data: dict = None):
         # empty data - update state to available time
