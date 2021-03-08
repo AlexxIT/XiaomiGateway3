@@ -83,7 +83,7 @@ class BasemiIO:
 class SyncmiIO(BasemiIO):
     """Synchronous miIO protocol."""
 
-    def __init__(self, host: str, token: str, timeout: float = 2):
+    def __init__(self, host: str, token: str, timeout: float = 3):
         super().__init__(host, token)
 
         self.debug = False
