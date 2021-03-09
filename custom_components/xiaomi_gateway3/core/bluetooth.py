@@ -5,6 +5,7 @@ from typing import Optional
 # params: [siid, piid, hass attr name, hass domain]
 DEVICES = [{
     # BLE
+    131: ["Xiaomi", "Kettle", "YM-K1501"],
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
     794: ["Xiaomi", "Door Lock", "MJZNMS02LM"],
@@ -153,7 +154,7 @@ ACTIONS = {
 def get_ble_domain(param: str) -> Optional[str]:
     if param in (
             'sleep', 'lock', 'opening', 'water_leak', 'smoke', 'gas', 'light',
-            'contact', 'motion'):
+            'contact', 'motion', 'power'):
         return 'binary_sensor'
 
     elif param in (
@@ -193,6 +194,10 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
         return {
             'temperature': int.from_bytes(data, 'little', signed=True) / 10.0
         }
+
+    elif eid == 0x1005 and length == 2:  # 4101
+        # Kettle, thanks https://github.com/custom-components/ble_monitor/
+        return {'power': data[0], 'temperature': data[1]}
 
     elif eid == 0x1006 and length == 2:  # 4102
         # Humidity percentage, ranging from 0-1000

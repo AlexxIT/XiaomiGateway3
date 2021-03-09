@@ -25,11 +25,12 @@ CONF_OCCUPANCY_TIMEOUT = 'occupancy_timeout'
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        async_add_entities([
-            Gateway3MotionSensor(gateway, device, attr)
-            if attr == 'motion' else
-            Gateway3BinarySensor(gateway, device, attr)
-        ])
+        if attr == 'motion':
+            async_add_entities([Gateway3MotionSensor(gateway, device, attr)])
+        elif attr == 'power':
+            async_add_entities([Gateway3KettleSensor(gateway, device, attr)])
+        else:
+            async_add_entities([Gateway3BinarySensor(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('binary_sensor', setup)
@@ -52,6 +53,25 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
                 self._state = bool(data[self._attr])
             else:
                 self._state = not data[self._attr]
+
+        self.async_write_ha_state()
+
+
+KETTLE = {
+    0: 'idle',
+    1: 'heat',
+    2: 'cool_down',
+    3: 'warm_up',
+}
+
+
+class Gateway3KettleSensor(Gateway3BinarySensor):
+    def update(self, data: dict = None):
+        if self._attr in data:
+            value = data[self._attr]
+            self._state = bool(value)
+            self._attrs['action_id'] = value
+            self._attrs['action'] = KETTLE[value]
 
         self.async_write_ha_state()
 
