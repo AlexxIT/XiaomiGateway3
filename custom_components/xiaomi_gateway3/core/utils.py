@@ -534,7 +534,8 @@ class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
     name = "xiaomi_debug"
     requires_auth = False
 
-    text = ''
+    # https://waymoot.org/home/python_string/
+    text = []
 
     def __init__(self, hass: HomeAssistantType):
         super().__init__()
@@ -549,19 +550,19 @@ class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
     def handle(self, rec: logging.LogRecord) -> None:
         dt = datetime.fromtimestamp(rec.created).strftime("%Y-%m-%d %H:%M:%S")
         module = 'main' if rec.module == '__init__' else rec.module
-        self.text += f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}\n"
+        self.text.append(f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}")
 
     async def get(self, request: web.Request):
         try:
             if 'c' in request.query:
-                self.text = ''
+                self.text.clear()
 
             if 'q' in request.query or 't' in request.query:
-                lines = self.text.split('\n')
+                lines = self.text
 
                 if 'q' in request.query:
                     reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
-                    lines = [p for p in lines if reg.search(p)]
+                    lines = [p for p in self.text if reg.search(p)]
 
                 if 't' in request.query:
                     tail = int(request.query['t'])
@@ -569,7 +570,7 @@ class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
 
                 body = '\n'.join(lines)
             else:
-                body = self.text
+                body = '\n'.join(self.text[:10000])
 
             reload = request.query.get('r', '')
             return web.Response(text=HTML % (reload, body),
