@@ -180,6 +180,11 @@ class TelnetShell(Telnet):
         m = RE_VERSION.search(raw.decode())
         return m[1]
 
+    def get_wlan_mac(self) -> str:
+        raw = self.read_file('/sys/class/net/wlan0/address')
+
+        return raw.decode().rstrip().upper()
+
     @property
     def mesh_group_table(self) -> str:
         if self.ver >= '1.4.7_0160':
