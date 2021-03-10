@@ -85,6 +85,12 @@ DEVICES = [{
         [8, 1, 'backlight', 'switch'],
         [8, 2, 'smart', 'switch'],
     ]
+},{
+    3083: ["Xiaomi", "Mi Smart Electrical Outlet", "ZNCZ01ZM"],
+    'params': [
+        [2, 1, 'outlet', 'switch'],
+        [4, 1, 'backlight', 'switch'],
+    ]
 }]
 
 BLE_FINGERPRINT_ACTION = [
