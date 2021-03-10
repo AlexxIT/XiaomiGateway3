@@ -54,6 +54,11 @@ DEVICES = [{
         [3, 1, 'right_switch', 'switch'],
     ]
 }, {
+    1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
+    'params': [
+        [2, 1, 'switch', 'switch']
+    ],
+}, {
     2007: ["Unknown", "Mesh Switch Controller"],
     'params': [
         [2, 1, 'switch', 'switch']
