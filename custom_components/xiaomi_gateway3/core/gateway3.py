@@ -573,6 +573,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             'did': self.did,
             'model': 'lumi.gateway.mgl03',
             'mac': device['mac'],
+            'wlan_mac': shell.get_wlan_mac(),
             'type': 'gateway',
             'init': {
                 'firmware lock': shell.check_firmware_lock(),
