@@ -29,7 +29,7 @@ DEVICES = [{
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
     2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
-    2888: ["Xiaomi", "Qingping Temp & RH Monitor", "CGG1"],
+    2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
 }, {
     # Mesh Light
     0: ["Xiaomi", "Mesh Group", "Mesh Group"],
