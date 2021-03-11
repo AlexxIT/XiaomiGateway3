@@ -41,6 +41,7 @@ DEVICES = [{
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
     'params': [
         [2, 1, 'light', 'light'],
         [2, 2, 'brightness', None],
@@ -86,6 +87,11 @@ DEVICES = [{
         [8, 2, 'smart', 'switch'],
     ]
 }]
+
+# if color temp not default 2700..6500
+COLOR_TEMP = {
+    2584: [3000, 6400],
+}
 
 BLE_FINGERPRINT_ACTION = [
     "Match successful", "Match failed", "Timeout", "Low quality",
@@ -359,7 +365,9 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
                 'device_manufacturer': desc[0],
                 'device_name': desc[0] + ' ' + desc[1],
                 'device_model': desc[2] if len(desc) > 2 else pdid,
-                'params': device.get('params')
+                'params': device.get('params'),
+                # if color temp not default 2700..6500
+                'color_temp': COLOR_TEMP.get(pdid),
             }
 
     return {
