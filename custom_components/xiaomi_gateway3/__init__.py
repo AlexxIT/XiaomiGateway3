@@ -8,6 +8,7 @@ from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 
@@ -307,6 +308,7 @@ class Gateway3Device(Entity):
         type_ = self.device['type']
         if type_ == 'gateway':
             return {
+                'connections': {(CONNECTION_NETWORK_MAC, self.device['wlan_mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device['device_manufacturer'],
                 'model': self.device['device_model'],
