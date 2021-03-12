@@ -484,11 +484,11 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                     self.debug("Run fixed BT")
                     shell.run_bt()
 
-            elif "log/ble" not in ps:
+            elif "-t log/ble" not in ps:
                 self.debug("Run fixed BT")
                 shell.run_bt()
 
-            if "log/miio" not in ps:
+            if "-t log/miio" not in ps:
                 # all data or only necessary events
                 pattern = (
                     '\\{"' if 'miio' in self._debug else
