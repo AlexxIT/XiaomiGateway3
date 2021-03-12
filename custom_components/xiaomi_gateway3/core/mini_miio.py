@@ -87,18 +87,16 @@ class SyncmiIO(BasemiIO):
 
     def __init__(self, host: str, token: str, timeout: float = 3):
         super().__init__(host, token)
-
         self.debug = False
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.settimeout(timeout)
+        self.timeout = timeout
 
-    def ping(self) -> bool:
+    def ping(self, sock: socket) -> bool:
         """Returns `true` if the connection to the miio device is working. The
         token is not verified at this stage.
         """
         try:
-            self.sock.sendto(HELLO, self.addr)
-            raw = self.sock.recv(1024)
+            sock.sendto(HELLO, self.addr)
+            raw = sock.recv(1024)
             if raw[:2] == b'\x21\x31':
                 self.device_id = int.from_bytes(raw[8:12], 'big')
                 self.delta_ts = time.time() - int.from_bytes(raw[12:16], 'big')
@@ -113,8 +111,14 @@ class SyncmiIO(BasemiIO):
         """
         for times in range(1, 4):
             try:
+                # create socket every time for reset connection, because we can
+                # reseive answer on previous request or request from another
+                # thread
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock.settimeout(self.timeout)
+
                 # need device_id for send command, can get it from ping cmd
-                if not self.device_id and not self.ping():
+                if not self.device_id and not self.ping(sock):
                     _LOGGER.debug(f"{self.addr[0]} | ping")
                     continue
 
@@ -122,13 +126,17 @@ class SyncmiIO(BasemiIO):
                 msg_id = random.randint(100000000, 999999999)
                 raw_send = self._pack_raw(msg_id, method, params)
                 t = time.monotonic()
-                self.sock.sendto(raw_send, self.addr)
+                sock.sendto(raw_send, self.addr)
                 # can receive more than 1024 bytes (1056 approximate maximum)
-                raw_recv = self.sock.recv(10240)
+                raw_recv = sock.recv(10240)
                 t = time.monotonic() - t
-                data = self._unpack_raw(raw_recv)
+                data = self._unpack_raw(raw_recv).rstrip(b'\x00')
 
-                data = json.loads(data.rstrip(b'\x00'))
+                if data == b'':
+                    _LOGGER.debug(f"{self.addr[0]} | receive empty data")
+                    continue
+
+                data = json.loads(data)
                 # check if we received response for our cmd
                 if data['id'] == msg_id:
                     break
@@ -137,7 +145,10 @@ class SyncmiIO(BasemiIO):
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
             except Exception as e:
                 _LOGGER.debug(f"{self.addr[0]} | exception {e}")
-                pass
+
+            # init ping again
+            self.device_id = None
+
         else:
             _LOGGER.warning(f"{self.addr[0]} | Can't send {method} {params}")
             return None
@@ -148,7 +159,11 @@ class SyncmiIO(BasemiIO):
                 f"recv {len(raw_recv)}B in {t:.1f} sec and {times} try"
             )
 
-        return data['result'] if 'result' in data else None
+        if 'result' in data:
+            return data['result']
+        else:
+            _LOGGER.debug(f"{self.addr[0]} | {data}")
+            return None
 
     def send_bulk(self, method: str, params: list):
         """Sends a command with a large number of parameters. Splits into
