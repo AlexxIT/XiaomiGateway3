@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 DOWNLOAD = "(wget -O /data/{0} http://master.dl.sourceforge.net/project/mgl03/{1}/{0}?viasf=1 && chmod +x /data/{0})"
 
 CHECK_SOCAT = "(md5sum /data/socat | grep 92b77e1a93c4f4377b4b751a5390d979)"
-RUN_SOCAT = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
+RUN_ZIGBEE_TCP = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
 
 CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
 LOCK_FIRMWARE = "/data/busybox chattr +i"
@@ -59,11 +59,11 @@ class TelnetShell(Telnet):
         download = DOWNLOAD.format('socat', 'bin')
         return self.exec(f"{CHECK_SOCAT} || {download}")
 
-    def run_socat(self):
-        self.exec(f"{CHECK_SOCAT} && {RUN_SOCAT} &")
+    def run_zigbee_tcp(self):
+        self.exec(f"{CHECK_SOCAT} && {RUN_ZIGBEE_TCP} &")
 
-    def stop_socat(self):
-        self.exec(f"killall socat")
+    def stop_zigbee_tcp(self):
+        self.exec("pkill -f 'tcp-l:8888'")
 
     def run_lumi_zigbee(self):
         self.exec("daemon_app.sh &")
