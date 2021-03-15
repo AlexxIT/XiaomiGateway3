@@ -42,9 +42,14 @@ BT_MD5 = {
 
 class TelnetShell(Telnet):
     def __init__(self, host: str):
-        super().__init__(host, timeout=5)
+        super().__init__(host, timeout=3)
+
         self.read_until(b"login: ")
-        self.exec('admin')
+        self.write(b"admin\r\n")
+
+        raw = self.read_until(b"\r\n# ", timeout=3)
+        if b'Password:' in raw:
+            raise Exception("Telnet with password don't supported")
 
         self.ver = self.get_version()
 
@@ -178,6 +183,14 @@ class TelnetShell(Telnet):
     def get_version(self):
         raw = self.read_file('/etc/rootfs_fw_info')
         m = RE_VERSION.search(raw.decode())
+        return m[1]
+
+    def get_token(self):
+        return self.read_file('/data/miio/device.token').rstrip().hex()
+
+    def get_did(self):
+        raw = self.read_file('/data/miio/device.conf').decode()
+        m = re.search(r'did=(\d+)', raw)
         return m[1]
 
     def get_wlan_mac(self) -> str:

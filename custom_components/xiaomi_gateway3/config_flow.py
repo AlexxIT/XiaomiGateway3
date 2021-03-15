@@ -105,7 +105,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_token(self, user_input=None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         if user_input is not None:
-            error = gateway3.is_gw3(user_input['host'], user_input['token'])
+            error = gateway3.check_mgl03(**user_input)
             if error:
                 return await self.async_step_token(error=error)
 

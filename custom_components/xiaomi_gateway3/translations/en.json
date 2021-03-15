@@ -4,7 +4,9 @@
       "no_servers": "Please select at least one server",
       "cant_login": "Can't login, check username and password",
       "cant_connect": "Can't connect to gateway",
-      "wrong_model": "Unsupported gateway model"
+      "wrong_model": "Unsupported gateway model",
+      "wrong_token": "Wrong Mi Home token",
+      "wrong_telnet": "Wrong open telnet command"
     },
     "step": {
       "user": {

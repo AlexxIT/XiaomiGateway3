@@ -1164,17 +1164,38 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         return None
 
 
-def is_gw3(host: str, token: str) -> Optional[str]:
-    device = SyncmiIO(host, token)
-    info = device.info()
+def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
+        -> Optional[str]:
+    try:
+        # 1. try connect with telnet (custom firmware)?
+        shell = TelnetShell(host)
+        # 1.1. check token with telnet
+        return None if shell.get_token() == token else 'wrong_token'
+    except:
+        if not telnet_cmd:
+            return 'cant_connect'
 
-    if not info:
-        return 'cant_connect'
+    # 2. try connect with miio
+    miio = SyncmiIO(host, token)
+    info = miio.info()
+    # fw 1.4.6_0012 without cloud will respond with a blank string reply
+    if info is None:
+        # if device_id not None - device works but not answer on commands
+        return 'wrong_token' if miio.device_id else 'cant_connect'
 
-    if info['model'] != 'lumi.gateway.mgl03':
+    # 3. check if right model
+    if info and info['model'] != 'lumi.gateway.mgl03':
         return 'wrong_model'
 
-    return None
+    raw = json.loads(telnet_cmd)
+    # fw 1.4.6_0043+ won't answer on cmd without cloud, so don't check answer
+    miio.send(raw['method'], raw.get('params'))
+
+    try:
+        # 4. check if telnet command helps
+        TelnetShell(host)
+    except:
+        return 'wrong_telnet'
 
 
 def get_lan_key(device: dict):
