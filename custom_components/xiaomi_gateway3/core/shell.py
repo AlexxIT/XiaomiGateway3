@@ -21,7 +21,7 @@ RUN_SOCAT = "/data/socat tcp-l:8888,reuseaddr,fork /dev/ttyS2"
 CHECK_BUSYBOX = "(md5sum /data/busybox | grep 099137899ece96f311ac5ab554ea6fec)"
 LOCK_FIRMWARE = "/data/busybox chattr +i"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i"
-RUN_FTP = "(/data/busybox tcpsvd -vE 0.0.0.0 21 /data/busybox ftpd -w &)"
+RUN_FTP = "(/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &)"
 
 # use awk because buffer
 MIIO_147 = "miio_client -l 0 -o FILE_STORE -n 128 -d /data/miio"
