@@ -133,14 +133,18 @@ class SyncmiIO(BasemiIO):
                 data = self._unpack_raw(raw_recv).rstrip(b'\x00')
 
                 if data == b'':
-                    _LOGGER.debug(f"{self.addr[0]} | receive empty data")
-                    continue
+                    # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
+                    # command with empty answer
+                    data = {'result': ''}
+                    break
 
                 data = json.loads(data)
                 # check if we received response for our cmd
                 if data['id'] == msg_id:
                     break
+
                 _LOGGER.debug(f"{self.addr[0]} | wrong ID")
+
             except timeout:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
             except Exception as e:
@@ -180,8 +184,15 @@ class SyncmiIO(BasemiIO):
         except:
             return None
 
-    def info(self):
-        """Get info about miIO device."""
+    def info(self) -> Union[dict, str, None]:
+        """Get info about miIO device.
+
+        Response dict - device ok, token ok
+        Response empty string - device ok, token ok (mgl03 on fw 1.4.6_0012
+            without cloud connection)
+        Response None, device_id not None - device ok, token wrong
+        Response None, device_id None - device offline
+        """
         return self.send('miIO.info')
 
 
