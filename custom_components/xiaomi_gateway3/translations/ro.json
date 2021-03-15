@@ -1,0 +1,76 @@
+{
+  "config": {
+    "error": {
+      "no_servers": "Te rog sa selectezi macar un server!",
+      "cant_login": "Nu ma pot conecta. Mai verifica o data username-ul sau parola!",
+      "cant_connect": "Nu ma pot conecta la gateway!",
+      "wrong_model": "Modelul tau de gateway nu este suportat!"
+    },
+    "step": {
+      "user": {
+        "title": "Selecteaza actiunea",
+        "data": {
+          "action": "Actiune"
+        }
+      },
+      "cloud": {
+        "title": "Adauga un cont Mi Cloud",
+        "description": "Selecteaza doar serverul unde ai dispozitivele",
+        "data": {
+          "username": "Email / ID-ul contului Mi",
+          "password": "Parola",
+          "servers": "Servere"
+        }
+      },
+      "token": {
+        "description": "Poti obtine tokenul Mi Home in mod automat prin [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) sau [manual](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Verifica versiunile de firmware suportate in [component docs](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "data": {
+          "host": "IP Gateway",
+          "token": "Token",
+          "telnet_cmd": "Comanda de deschidere Telnet"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "cloud": {
+        "title": "Informatii despre dispozitivele din MiCloud",
+        "data": {
+          "did": "Dispozitiv"
+        },
+        "description": "{device_info}"
+      },
+      "user": {
+        "title": "Configurare Gateway",
+        "data": {
+          "host": "IP Gateway",
+          "token": "Token",
+          "telnet_cmd": "Comanda de deschidere Telnet",
+          "ble": "Dispozitive BLE suportate",
+          "stats": "Date despre performanta dispozitivelor Zigbee si BLE",
+          "debug": "Debug",
+          "buzzer": "Dezactiveaza buzzer [PRO]",
+          "parent": "Afiseaza dispozitivele tip parinte in statistici [PRO]",
+          "zha": "Mod [PRO]"
+        },
+        "description": "Nu schimba optiunile **PRO** DECAT daca stii ce fac!"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "Apasare Buton",
+      "button_1": "Prima apasare de buton",
+      "button_2": "A 2-a apasare de buton",
+      "button_3": "A 3-a apasare de buton",
+      "button_4": "A 4-a apasare de buton",
+      "button_5": "A 5-a apasare de buton",
+      "button_6": "A 6-a apasare de buton",
+      "button_both": "Ambele butoane apasate",
+      "button_both_12": "Primul si al 2-lea 2nd buton apasat",
+      "button_both_13": "Primul si al 3-lea buton apasat",
+      "button_both_23": "Al 2-lea si al 3-lea buton apasat"
+    }
+  }
+}
