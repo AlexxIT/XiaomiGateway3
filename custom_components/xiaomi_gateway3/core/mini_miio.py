@@ -109,6 +109,7 @@ class SyncmiIO(BasemiIO):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
         """
+        pings = 0
         for times in range(1, 4):
             try:
                 # create socket every time for reset connection, because we can
@@ -118,8 +119,8 @@ class SyncmiIO(BasemiIO):
                 sock.settimeout(self.timeout)
 
                 # need device_id for send command, can get it from ping cmd
-                if not self.device_id and not self.ping(sock):
-                    _LOGGER.debug(f"{self.addr[0]} | ping")
+                if self.delta_ts is None and not self.ping(sock):
+                    pings += 1
                     continue
 
                 # pack each time for new message id
@@ -151,10 +152,14 @@ class SyncmiIO(BasemiIO):
                 _LOGGER.debug(f"{self.addr[0]} | exception {e}")
 
             # init ping again
-            self.device_id = None
+            self.delta_ts = None
 
         else:
-            _LOGGER.warning(f"{self.addr[0]} | Can't send {method} {params}")
+            _LOGGER.warning(
+                f"{self.addr[0]} | Device offline"
+                if pings >= 2 else
+                f"{self.addr[0]} | Can't send {method} {params}"
+            )
             return None
 
         if self.debug:
