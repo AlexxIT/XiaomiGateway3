@@ -126,7 +126,7 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
         except:
             _LOGGER.exception(f"Can't read climate data: {data}")
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def set_temperature(self, **kwargs) -> None:
         if not self._state or kwargs[ATTR_TEMPERATURE] == 0:

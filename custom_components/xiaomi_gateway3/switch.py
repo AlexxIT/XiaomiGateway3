@@ -34,7 +34,7 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
     def update(self, data: dict = None):
         if self._attr in data:
             self._state = bool(data[self._attr])
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_on(self):
         self.gw.send(self.device, {self._attr: 1})
@@ -62,21 +62,21 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
         if self._attr in data:
             self._state = bool(data[self._attr])
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         self._state = True
 
         self.gw.send_mesh(self.device, {self._attr: True})
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_off(self, **kwargs):
         self._state = False
 
         self.gw.send_mesh(self.device, {self._attr: False})
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class FirmwareLock(Gateway3Switch):
@@ -87,9 +87,9 @@ class FirmwareLock(Gateway3Switch):
     def turn_on(self):
         if self.gw.lock_firmware(enable=True):
             self._state = True
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
-            persistent_notification.async_create(
+            persistent_notification.create(
                 self.hass, "Firmware update is locked. You can sleep well.",
                 "Xiaomi Gateway 3"
             )
@@ -97,4 +97,4 @@ class FirmwareLock(Gateway3Switch):
     def turn_off(self):
         if self.gw.lock_firmware(enable=False):
             self._state = False
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()

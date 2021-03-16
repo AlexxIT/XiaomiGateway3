@@ -86,7 +86,7 @@ class Gateway3Sensor(Gateway3Device):
     def update(self, data: dict = None):
         if self._attr in data:
             self._state = data[self._attr]
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class GatewayStats(Gateway3Sensor):
@@ -115,7 +115,7 @@ class GatewayStats(Gateway3Sensor):
         else:
             self._attrs.update(data)
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class ZigbeeStats(Gateway3Sensor):
@@ -194,7 +194,7 @@ class ZigbeeStats(Gateway3Sensor):
         elif data.get('deviceState') == 17:
             self._attrs['unresponsive'] += 1
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class BLEStats(Gateway3Sensor):
@@ -222,7 +222,7 @@ class BLEStats(Gateway3Sensor):
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1
         self._state = now().isoformat(timespec='seconds')
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/converters/fromZigbee.js#L4738
@@ -288,10 +288,10 @@ class Gateway3Action(Gateway3Device):
             # TODO: fix me
             self._attrs = data
             self._state = data[self._attr]
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
             # repeat event from Aqara integration
-            self.hass.bus.async_fire('xiaomi_aqara.click', {
+            self.hass.bus.fire('xiaomi_aqara.click', {
                 'entity_id': self.entity_id, 'click_type': self._state
             })
 
@@ -299,4 +299,4 @@ class Gateway3Action(Gateway3Device):
 
             self._state = ''
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()

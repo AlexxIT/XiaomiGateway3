@@ -61,7 +61,7 @@ class Gateway3Light(Gateway3Device, LightEntity):
         if 'color_temp' in data:
             self._color_temp = int(data['color_temp'])
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         if ATTR_TRANSITION not in kwargs:
@@ -191,7 +191,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
             self._color_temp = \
                 color.color_temperature_kelvin_to_mired(data['color_temp'])
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         # instantly change the HA state, and after 2 seconds check the actual
@@ -218,7 +218,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
 
         self.gw.send_mesh(self.device, payload)
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_off(self):
         # instantly change the HA state, and after 2 seconds check the actual
@@ -227,7 +227,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
 
         self.gw.send_mesh(self.device, {self._attr: False})
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class Gateway3MeshGroup(Gateway3MeshLight):

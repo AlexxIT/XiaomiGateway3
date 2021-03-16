@@ -54,7 +54,7 @@ class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
             else:
                 self._state = not data[self._attr]
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 KETTLE = {
@@ -73,7 +73,7 @@ class Gateway3KettleSensor(Gateway3BinarySensor):
             self._attrs['action_id'] = value
             self._attrs['action'] = KETTLE[value]
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
 
 class Gateway3MotionSensor(Gateway3BinarySensor):
@@ -100,7 +100,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         self._timeout_pos = 0
         self._unsub_set_no_motion = None
         self._state = False
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def update(self, data: dict = None):
         # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
@@ -115,7 +115,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         # check only motion=1
         if data.get(self._attr) != 1:
             # handle available change
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
             return
 
         # don't trigger motion right after illumination
@@ -128,7 +128,7 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         self._last_on = t
 
         # handle available change
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
         if self._unsub_set_no_motion:
             self._unsub_set_no_motion()
@@ -154,6 +154,6 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
                 self.hass, abs(delay), self._set_no_motion)
 
         # repeat event from Aqara integration
-        self.hass.bus.async_fire('xiaomi_aqara.motion', {
+        self.hass.bus.fire('xiaomi_aqara.motion', {
             'entity_id': self.entity_id
         })

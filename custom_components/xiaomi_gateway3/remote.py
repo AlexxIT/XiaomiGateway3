@@ -67,7 +67,7 @@ class Gateway3Entity(Gateway3Device, ToggleEntity):
                 self.debug(f"Handle removed_did: {did}")
                 utils.remove_device(self.hass, did)
 
-        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     def turn_on(self):
         # work for any device model, dev_type: 0 - zb1, 1 - zb3, don't matter
