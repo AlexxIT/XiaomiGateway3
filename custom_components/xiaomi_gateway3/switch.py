@@ -32,6 +32,20 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
         return self._state
 
     def update(self, data: dict = None):
+        # thread.run > mqtt.loop_forever > ... > thread.on_message
+        #   > entity.update
+        #   > entity.schedule_update_ha_state *
+        #   > hass.add_job *
+        #   > loop.call_soon_threadsafe *
+        #   > hass.async_add_job *
+        #   > hass.async_add_hass_job *
+        #   > loop.create_task *
+        #   > entity.async_update_ha_state *
+        #   > entyty._async_write_ha_state
+        #   > hass.states.async_set
+        #   > bus.async_fire
+        #   > hass.async_add_hass_job
+        #   > loop.call_soon
         if self._attr in data:
             self._state = bool(data[self._attr])
         self.schedule_update_ha_state()
