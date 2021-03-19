@@ -637,7 +637,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                         'model': data[did + '.model'],
                         'type': 'zigbee',
                         'fw_ver': retain.get('fw_ver'),
-                        'init': zigbee.fix_xiaomi_props(params),
+                        'init': zigbee.fix_xiaomi_props(model, params),
                         'online': retain.get('alive', 1) == 1
                     }
                     devices.append(device)
@@ -908,10 +908,12 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             # https://github.com/Koenkk/zigbee2mqtt/issues/798
             # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
             if prop == 'temperature':
-                if -4000 < param['value'] < 12500:
+                if (-4000 < param['value'] < 12500 and
+                        device['model'] != 'lumi.airmonitor.acn01'):
                     payload[prop] = param['value'] / 100.0
             elif prop == 'humidity':
-                if 0 <= param['value'] <= 10000:
+                if (0 <= param['value'] <= 10000 and
+                        device['model'] != 'lumi.airmonitor.acn01'):
                     payload[prop] = param['value'] / 100.0
             elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0

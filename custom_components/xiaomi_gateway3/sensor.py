@@ -24,6 +24,7 @@ UNITS = {
     'gas density': '% LEL',
     'smoke density': '% obs/ft',
     'moisture': '%',
+    'tvoc': CONCENTRATION_PARTS_PER_BILLION,
     # 'link_quality': 'lqi',
     # 'rssi': 'dBm',
     # 'msg_received': 'msg',
@@ -39,7 +40,8 @@ ICONS = {
     'smoke density': 'mdi:google-circles-communities',
     'gateway': 'mdi:router-wireless',
     'zigbee': 'mdi:zigbee',
-    'ble': 'mdi:bluetooth'
+    'ble': 'mdi:bluetooth',
+    'tvoc': 'mdi:cloud',
 }
 
 INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
