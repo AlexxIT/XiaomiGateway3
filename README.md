@@ -87,16 +87,15 @@ A. All button clicks are displayed in the status of that one entity.
 
 Supported firmwares with default open telnet command:
 
-- v1.4.4_0003 - factory firmware, not recomended
-- v1.4.5_0012 - factory firmware, not recomended
-- v1.4.5_0016 - not recomended
-- v1.4.6_0012
-- v1.4.6_0030 - was available in summer 2020, now unavailable
+- v1.4.4_0003 - factory firmware, **not recomended**, better to upgrade
+- v1.4.5_0012 - factory firmware, **not recomended**, better to upgrade
+- v1.4.5_0016 - **not recomended**, better to upgrade
+- v1.4.6_0012 - **recomended** and less problem firmware
+- v1.4.6_0030
 
 Supported firmwares with [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)
 
 - v1.4.6_0043 - factory firmware from 2020.10
-- v1.4.7_0040
 - v1.4.7_0063
 - v1.4.7_0065
 - v1.4.7_0115
