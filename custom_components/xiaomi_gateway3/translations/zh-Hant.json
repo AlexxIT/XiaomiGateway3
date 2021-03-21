@@ -4,7 +4,9 @@
       "no_servers": "請至少選擇一個伺服器",
       "cant_login": "無法登入，請確認使用者名稱與密碼",
       "cant_connect": "無法連線至網關",
-      "wrong_model": "網關型號不支援"
+      "wrong_model": "網關型號不支援",
+      "wrong_token": "小米智能家庭權杖錯誤",
+      "wrong_telnet": "開啟 Telnet 指令錯誤"
     },
     "step": {
       "user": {
@@ -23,11 +25,11 @@
         }
       },
       "token": {
-        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得米家智能家庭設備密鑰Token。請參閱 [元件文件](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 以了解支援的韌體版本。",
+        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得米家智能家庭設備權杖 Token。請參閱 [元件文件](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 以了解支援的韌體版本。",
         "data": {
           "host": "主機端",
-          "token": "密鑰",
-          "telnet_cmd": "開啟 Telnet 命令"
+          "token": "權杖",
+          "telnet_cmd": "開啟 Telnet 指令"
         }
       }
     }
@@ -46,7 +48,7 @@
         "data": {
           "host": "主機端",
           "token": "密鑰",
-          "telnet_cmd": "開啟 Telnet 命令",
+          "telnet_cmd": "開啟 Telnet 指令",
           "ble": "支援 BLE 設備",
           "stats": "Zigbee 與 BLE 效能資料",
           "debug": "Debug",
