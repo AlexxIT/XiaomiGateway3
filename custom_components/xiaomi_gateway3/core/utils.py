@@ -356,6 +356,7 @@ DEVICES = [{
     'lumi.plug.maeu01': ["Aqara", "Plug", "SP-EUC01"],
     'mi_spec': [
         ['2.1', '2.1', 'switch', 'switch'],
+        ['3.1', '3.1', 'consumption', 'sensor'],
         ['3.2', '3.2', 'power', 'sensor'],
         # ['5.7', '5.7', 'voltage', 'sensor'],
     ]
