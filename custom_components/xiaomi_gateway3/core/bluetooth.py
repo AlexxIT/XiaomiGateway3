@@ -100,7 +100,7 @@ DEVICES = [{
         [6, 1, 'humidity', 'sensor'],
         [6, 7, 'temperature', 'sensor'],
     ]
-},{
+}, {
     3083: ["Xiaomi", "Mi Smart Electrical Outlet", "ZNCZ01ZM"],
     'params': [
         [2, 1, 'outlet', 'switch'],

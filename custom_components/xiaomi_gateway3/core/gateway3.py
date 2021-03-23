@@ -345,6 +345,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     time_offset = 0
     pair_model = None
     pair_payload = None
+    pair_payload2 = None
     telnet_cmd = None
 
     def __init__(self, host: str, token: str, config: dict, **options):

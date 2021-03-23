@@ -99,8 +99,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
         remove = [
             entity.entity_id
             for entity in list(registry.entities.values())
-            if entity.config_entry_id == entry.entry_id and
-               entity.unique_id.endswith(suffix)
+            if (entity.config_entry_id == entry.entry_id and
+                entity.unique_id.endswith(suffix))
         ]
         for entity_id in remove:
             registry.async_remove(entity_id)

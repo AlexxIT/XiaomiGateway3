@@ -7,7 +7,6 @@ import socket
 import time
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
-from socket import timeout
 from typing import Union, Optional
 
 from cryptography.hazmat.backends import default_backend
@@ -146,7 +145,7 @@ class SyncmiIO(BasemiIO):
 
                 _LOGGER.debug(f"{self.addr[0]} | wrong ID")
 
-            except timeout:
+            except socket.timeout:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
             except Exception as e:
                 _LOGGER.debug(f"{self.addr[0]} | exception {e}")
@@ -201,6 +200,7 @@ class SyncmiIO(BasemiIO):
         return self.send('miIO.info')
 
 
+# noinspection PyMethodMayBeStatic,PyTypeChecker
 class AsyncmiIO(BasemiIO, BaseProtocol):
     response = None
     sock: Optional[DatagramTransport] = None
