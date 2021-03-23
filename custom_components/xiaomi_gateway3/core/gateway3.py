@@ -1,19 +1,18 @@
 import json
 import logging
-import random
 import re
 import socket
-import string
 import time
 from threading import Thread
-from typing import Optional, Dict
+from typing import Optional, Dict, Callable
 
 from paho.mqtt.client import Client, MQTTMessage
-from . import bluetooth, utils
+
+from . import bluetooth, utils, zigbee
+from .helpers import XiaomiEntity
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
-from .utils import GLOBAL_PROP
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,18 +30,28 @@ class DevicesRegistry:
 
     Key - device did, `numb` for wifi and mesh devices, `lumi.ieee` for zigbee
     devices, `blt.3.alphanum` for ble devices, `group.numb` for mesh groups.
-
-    Dict: did, model, mac, type, init(dict)
     """
     devices: Dict[str, dict] = {}
-    updates: Dict[str, list] = {}
+    setups: Dict[str, Callable] = None
 
-    def add_update(self, did: str, handler):
-        """Add handler to device update event."""
-        self.updates.setdefault(did, []).append(handler)
+    @staticmethod
+    def async_added_to_hass(entity: XiaomiEntity):
+        device = entity.device
+        if entity.attr not in device['entities']:
+            device['entities'].append(entity.attr)
+            device['updates'].append(entity.update)
 
-    def remove_update(self, did: str, handler):
-        self.updates[did].remove(handler)
+    @staticmethod
+    def async_will_remove_from_hass(entity: XiaomiEntity):
+        device = entity.device
+        if entity.attr in device['entities']:
+            device['entities'].remove(entity.attr)
+            device['updates'].remove(entity.update)
+
+    def add_entity(self, domain: str, device: dict, attr: str):
+        if domain is None or domain in device['entities']:
+            return
+        self.setups[domain](self, device, attr)
 
 
 class GatewayMesh(DevicesRegistry):
@@ -122,7 +131,7 @@ class GatewayMesh(DevicesRegistry):
                 continue
 
             did = param['did']
-            if did not in self.updates:
+            if did not in self.devices:
                 continue
 
             device = self.devices[did]
@@ -141,7 +150,7 @@ class GatewayMesh(DevicesRegistry):
 
         for did, payload in bulk.items():
             self.debug(f"Process Mesh Data for {did}: {payload}")
-            for handler in self.updates[did]:
+            for handler in self.devices[did]['updates']:
                 handler(payload)
 
     def send_mesh(self, device: dict, data: dict):
@@ -559,6 +568,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 'mac': device['mac'],
                 'wlan_mac': shell.get_wlan_mac(),
                 'type': 'gateway',
+                'fw_ver': shell.ver,
+                'online': True,
                 'init': {
                     'firmware lock': shell.check_firmware_lock(),
                 }
@@ -594,7 +605,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
 
                 for did in dev_list:
                     model = data[did + '.model']
-                    desc = utils.get_device(model)
+                    desc = zigbee.get_device(model)
 
                     # skip unknown model
                     if desc is None:
@@ -619,7 +630,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                         'model': data[did + '.model'],
                         'type': 'zigbee',
                         'fw_ver': retain.get('fw_ver'),
-                        'init': utils.fix_xiaomi_props(params),
+                        'init': zigbee.fix_xiaomi_props(params),
                         'online': retain.get('alive', 1) == 1
                     }
                     devices.append(device)
@@ -637,7 +648,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                         'did': row[4],
                         'mac': RE_REVERSE.sub(r'\6\5\4\3\2\1', row[1]),
                         'model': row[2],
-                        'type': 'ble'
+                        'type': 'ble',
+                        'online': True,
+                        'init': {}
                     }
                     devices.append(device)
 
@@ -654,7 +667,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                             'mac': mac,
                             'model': 0,
                             'childs': [],
-                            'type': 'mesh'
+                            'type': 'mesh',
+                            'online': False
                         }
                         group_addr = row[1]
                         mesh_groups[group_addr] = device
@@ -666,7 +680,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                             'did': row[0],
                             'mac': row[1].replace(':', ''),
                             'model': row[2],
-                            'type': 'mesh'
+                            'type': 'mesh',
+                            'online': False
                         }
                         devices.append(device)
 
@@ -786,20 +801,23 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     def setup_devices(self, devices: list):
         """Add devices to hass."""
         for device in devices:
-            if device['did'] in self.devices:
-                continue
+            did = device['did']
+            type_ = device['type']
 
-            if device['type'] == 'gateway':
-                self.did = device['did']
-                self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
+            # if device already exists - take it from registry
+            if did not in self.devices:
+                if type_ == 'gateway':
+                    self.did = device['did']
+                    self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
 
-            if device['type'] in ('gateway', 'zigbee'):
-                desc = utils.get_device(device['model'])
-                if not desc:
-                    self.debug(f"Unsupported model: {device}")
-                    continue
-
-                self.debug(f"Setup Zigbee device {device}")
+                if type_ in ('gateway', 'zigbee'):
+                    desc = zigbee.get_device(device['model'])
+                elif type_ == 'mesh':
+                    desc = bluetooth.get_device(device['model'], 'Mesh')
+                elif type_ == 'ble':
+                    desc = bluetooth.get_device(device['model'], 'BLE')
+                else:
+                    raise NotImplemented
 
                 device.update(desc)
 
@@ -811,53 +829,21 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 if default_config:
                     device.update(default_config)
 
-                self.devices[device['did']] = device
+                self.debug(f"Setup {type_} device {device}")
 
+                device['entities'] = []
+                device['updates'] = []
+                self.devices[did] = device
+
+            else:
+                device = self.devices[did]
+
+            if type_ in ('gateway', 'zigbee', 'mesh'):
                 for param in (device['params'] or device['mi_spec']):
-                    domain = param[3]
-                    if not domain:
-                        continue
+                    self.add_entity(param[3], device, param[2])
 
-                    self.setup_entry(domain, device, param[2])
-
-            elif device['type'] == 'mesh':
-                desc = bluetooth.get_device(device['model'], 'Mesh')
-                device.update(desc)
-
-                self.debug(f"Setup Mesh device {device}")
-
-                # update params from config
-                default_config = self.default_devices.get(device['did'])
-                if default_config:
-                    device.update(default_config)
-
-                device['online'] = False
-
-                self.devices[device['did']] = device
-
-                for param in device['params']:
-                    domain = param[3]
-                    if not domain:
-                        continue
-
-                    self.setup_entry(domain, device, param[2])
-
-            elif device['type'] == 'ble':
-                # only save info for future
-                desc = bluetooth.get_device(device['model'], 'BLE')
-                device.update(desc)
-
-                # update params from config
-                default_config = self.default_devices.get(device['did'])
-                if default_config:
-                    device.update(default_config)
-
-                self.devices[device['did']] = device
-
-                device['init'] = {}
-
-            if self.options.get('stats') and device['type'] != 'mesh':
-                self.setup_entry('sensor', device, device['type'])
+            if self.options.get('stats') and type_ != 'mesh':
+                self.add_entity('sensor', device, device['type'])
 
     def process_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
@@ -879,7 +865,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         did = data['did'] if data['did'] != 'lumi.0' else self.did
 
         # skip without callback and without data
-        if did not in self.updates or pkey not in data:
+        if did not in self.devices or pkey not in data:
             return
 
         ts = time.time()
@@ -902,8 +888,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 _LOGGER.warning(f"Unsupported param: {data}")
                 return
 
-            if prop in GLOBAL_PROP:
-                prop = GLOBAL_PROP[prop]
+            if prop in zigbee.GLOBAL_PROP:
+                prop = zigbee.GLOBAL_PROP[prop]
             else:
                 prop = next((
                     p[2] for p in (device['params'] or device['mi_spec'])
@@ -952,9 +938,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         if payload:
             device['online'] = True
 
-        for handler in self.updates[did]:
+        for handler in device['updates']:
             handler(payload)
 
+        # TODO: move code earlier!!!
         if 'added_device' in payload:
             # {'did': 'lumi.fff', 'mac': 'fff', 'model': 'lumi.sen_ill.mgl01',
             # 'version': '21', 'zb_ver': '3.0'}
@@ -1032,14 +1019,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             init[k] = payload[k]
 
             domain = bluetooth.get_ble_domain(k)
-            if not domain:
-                continue
+            self.add_entity(domain, device, k)
 
-            self.setup_entry(domain, device, k)
-
-        if did in self.updates:
-            for handler in self.updates[did]:
-                handler(payload)
+        for handler in device['updates']:
+            handler(payload)
 
         raw = json.dumps(init, separators=(',', ':'))
         self.mqtt.publish(f"ble/{did}", raw, retain=True)
@@ -1056,7 +1039,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         # init entities if needed
         for k in payload.keys():
             # don't retain action and motion
-            if k in device['init']:
+            if k in device['entities']:
                 continue
 
             if k in ('action', 'motion'):
@@ -1065,14 +1048,10 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 device['init'][k] = payload[k]
 
             domain = bluetooth.get_ble_domain(k)
-            if not domain:
-                continue
+            self.add_entity(domain, device, k)
 
-            self.setup_entry(domain, device, k)
-
-        if did in self.updates:
-            for handler in self.updates[did]:
-                handler(payload)
+        for handler in device['updates']:
+            handler(payload)
 
     def process_pair(self, raw: bytes):
         _LOGGER.debug(f"!!! {raw}")

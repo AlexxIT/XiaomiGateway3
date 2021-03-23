@@ -1,8 +1,9 @@
 from homeassistant.components.climate import *
 from homeassistant.components.climate.const import *
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN
 from .core.gateway3 import Gateway3
+from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,9 +25,7 @@ AC_STATE_FAN = {
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        async_add_entities([
-            Gateway3Climate(gateway, device, attr)
-        ])
+        async_add_entities([XiaomiClimate(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('climate', setup)
@@ -36,7 +35,8 @@ async def async_unload_entry(hass, entry):
     return True
 
 
-class Gateway3Climate(Gateway3Device, ClimateEntity):
+# noinspection PyAbstractClass
+class XiaomiClimate(XiaomiEntity, ClimateEntity):
     _current_hvac = None
     _current_temp = None
     _fan_mode = None
@@ -106,13 +106,13 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
             if 'current_temperature' in data:
                 self._current_temp = data['current_temperature']
 
-            if self._attr in data:
+            if self.attr in data:
                 self._state = bytearray(
-                    int(data[self._attr]).to_bytes(4, 'big')
+                    int(data[self.attr]).to_bytes(4, 'big')
                 )
 
                 # only first time when retain from gateway
-                if isinstance(data[self._attr], str):
+                if isinstance(data[self.attr], str):
                     self._hvac_mode = next(
                         k for k, v in AC_STATE_HVAC.items()
                         if v == self._state[0]
@@ -134,18 +134,18 @@ class Gateway3Climate(Gateway3Device, ClimateEntity):
             return
         self._state[2] = int(kwargs[ATTR_TEMPERATURE])
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self._attr: state})
+        self.gw.send(self.device, {self.attr: state})
 
     def set_fan_mode(self, fan_mode: str) -> None:
         if not self._state:
             return
         self._state[1] = AC_STATE_FAN[fan_mode]
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self._attr: state})
+        self.gw.send(self.device, {self.attr: state})
 
     def set_hvac_mode(self, hvac_mode: str) -> None:
         if not self._state:
             return
         self._state[0] = AC_STATE_HVAC[hvac_mode]
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self._attr: state})
+        self.gw.send(self.device, {self.attr: state})

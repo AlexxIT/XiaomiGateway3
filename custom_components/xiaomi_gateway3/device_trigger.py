@@ -7,7 +7,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from . import DOMAIN
-from .core import utils
+from .core import zigbee
 from .sensor import BUTTON
 
 TRIGGER_SCHEMA = TRIGGER_BASE_SCHEMA.extend(
@@ -50,7 +50,7 @@ async def async_attach_trigger(hass, config, action, automation_info):
 async def async_get_triggers(hass, device_id):
     device_registry = await hass.helpers.device_registry.async_get_registry()
     device: DeviceEntry = device_registry.async_get(device_id)
-    buttons = utils.get_buttons(device.model)
+    buttons = zigbee.get_buttons(device.model)
     if not buttons:
         return None
 

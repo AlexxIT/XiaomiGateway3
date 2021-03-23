@@ -5,8 +5,9 @@ from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.util import color
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN
 from .core.gateway3 import Gateway3
+from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -16,12 +17,11 @@ CONF_DEFAULT_TRANSITION = 'default_transition'
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
         if device['type'] == 'zigbee':
-            async_add_entities([Gateway3Light(gateway, device, attr)])
+            async_add_entities([XiaomiZigbeeLight(gateway, device, attr)])
         elif 'childs' in device:
-            async_add_entities([Gateway3MeshGroup(gateway, device, attr)])
+            async_add_entities([XiaomiMeshGroup(gateway, device, attr)])
         else:
-            async_add_entities([Gateway3MeshLight(gateway, device, attr)],
-                               True)
+            async_add_entities([XiaomiMeshLight(gateway, device, attr)], True)
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('light', setup)
@@ -31,7 +31,7 @@ async def async_unload_entry(hass, entry):
     return True
 
 
-class Gateway3Light(Gateway3Device, LightEntity):
+class XiaomiZigbeeLight(XiaomiEntity, LightEntity):
     _brightness = None
     _color_temp = None
 
@@ -53,8 +53,8 @@ class Gateway3Light(Gateway3Device, LightEntity):
         return SUPPORT_BRIGHTNESS | SUPPORT_COLOR_TEMP
 
     def update(self, data: dict = None):
-        if self._attr in data:
-            self._state = bool(data[self._attr])
+        if self.attr in data:
+            self._state = bool(data[self.attr])
         # sometimes brightness and color_temp stored as string in Xiaomi DB
         if 'brightness' in data:
             self._brightness = int(data['brightness']) / 100.0 * 255.0
@@ -107,7 +107,7 @@ class Gateway3Light(Gateway3Device, LightEntity):
             payload['color_temp'] = kwargs[ATTR_COLOR_TEMP]
 
         if not payload:
-            payload[self._attr] = 1
+            payload[self.attr] = 1
 
         self.gw.send(self.device, payload)
 
@@ -128,10 +128,10 @@ class Gateway3Light(Gateway3Device, LightEntity):
             self.gw.send_zigbee_cli(commands)
             return
 
-        self.gw.send(self.device, {self._attr: 0})
+        self.gw.send(self.device, {self.attr: 0})
 
 
-class Gateway3MeshLight(Gateway3Device, LightEntity):
+class XiaomiMeshLight(XiaomiEntity, LightEntity):
     _brightness = None
     _color_temp = None
     _min_mireds = int(1000000 / 6500)
@@ -181,8 +181,8 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
 
         self.device['online'] = True
 
-        if self._attr in data:
-            self._state = bool(data[self._attr])
+        if self.attr in data:
+            self._state = bool(data[self.attr])
         if 'brightness' in data:
             # 0...65535
             self._brightness = data['brightness'] / 65535.0 * 255.0
@@ -212,7 +212,7 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
                 color.color_temperature_mired_to_kelvin(self._color_temp)
 
         if not payload:
-            payload[self._attr] = True
+            payload[self.attr] = True
 
         self._state = True
 
@@ -225,21 +225,21 @@ class Gateway3MeshLight(Gateway3Device, LightEntity):
         # state of the lamp (optimistic change state)
         self._state = False
 
-        self.gw.send_mesh(self.device, {self._attr: False})
+        self.gw.send_mesh(self.device, {self.attr: False})
 
         self.schedule_update_ha_state()
 
 
-class Gateway3MeshGroup(Gateway3MeshLight):
+class XiaomiMeshGroup(XiaomiMeshLight):
     async def async_added_to_hass(self):
         if 'childs' in self.device:
             for did in self.device['childs']:
-                self.gw.add_update(did, self.update)
+                self.gw.devices[did]['updates'].append(self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         if 'childs' in self.device:
             for did in self.device['childs']:
-                self.gw.remove_update(did, self.update)
+                self.gw.devices[did]['updates'].remove(self.update)
 
     @property
     def should_poll(self):

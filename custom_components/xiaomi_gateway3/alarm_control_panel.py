@@ -13,9 +13,9 @@ from homeassistant.const import (
     STATE_ALARM_DISARMED,
 )
 
-from . import Gateway3Device
+from . import DOMAIN
 from .core.gateway3 import Gateway3
-from .core.utils import DOMAIN
+from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ ALARM_STATES = [STATE_ALARM_DISARMED, STATE_ALARM_ARMED_HOME,
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        async_add_entities([Gateway3Alarm(gateway, device, attr)], True)
+        async_add_entities([XiaomiAlarm(gateway, device, attr)], True)
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('alarm_control_panel', setup)
@@ -35,7 +35,7 @@ async def async_unload_entry(hass, entry):
     return True
 
 
-class Gateway3Alarm(Gateway3Device, AlarmControlPanelEntity):
+class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
     @property
     def miio_did(self):
         return self.device['did']

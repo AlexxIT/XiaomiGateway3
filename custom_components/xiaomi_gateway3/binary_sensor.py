@@ -9,8 +9,9 @@ from homeassistant.core import callback
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util.dt import now
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN
 from .core.gateway3 import Gateway3
+from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,33 +27,33 @@ CONF_OCCUPANCY_TIMEOUT = 'occupancy_timeout'
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
         if attr == 'motion':
-            async_add_entities([Gateway3MotionSensor(gateway, device, attr)])
+            async_add_entities([XiaomiMotionSensor(gateway, device, attr)])
         elif attr == 'power':
-            async_add_entities([Gateway3KettleSensor(gateway, device, attr)])
+            async_add_entities([XiaomiKettleSensor(gateway, device, attr)])
         else:
-            async_add_entities([Gateway3BinarySensor(gateway, device, attr)])
+            async_add_entities([XiaomiBinarySensor(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('binary_sensor', setup)
 
 
-class Gateway3BinarySensor(Gateway3Device, BinarySensorEntity):
+class XiaomiBinarySensor(XiaomiEntity, BinarySensorEntity):
     @property
     def is_on(self):
         return self._state
 
     @property
     def device_class(self):
-        return DEVICE_CLASS.get(self._attr, self._attr)
+        return DEVICE_CLASS.get(self.attr, self.attr)
 
     def update(self, data: dict = None):
-        if self._attr in data:
+        if self.attr in data:
             custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
             if not custom.get(CONF_INVERT_STATE):
                 # gas and smoke => 1 and 2
-                self._state = bool(data[self._attr])
+                self._state = bool(data[self.attr])
             else:
-                self._state = not data[self._attr]
+                self._state = not data[self.attr]
 
         self.schedule_update_ha_state()
 
@@ -65,10 +66,10 @@ KETTLE = {
 }
 
 
-class Gateway3KettleSensor(Gateway3BinarySensor):
+class XiaomiKettleSensor(XiaomiBinarySensor):
     def update(self, data: dict = None):
-        if self._attr in data:
-            value = data[self._attr]
+        if self.attr in data:
+            value = data[self.attr]
             self._state = bool(value)
             self._attrs['action_id'] = value
             self._attrs['action'] = KETTLE[value]
@@ -76,7 +77,7 @@ class Gateway3KettleSensor(Gateway3BinarySensor):
         self.schedule_update_ha_state()
 
 
-class Gateway3MotionSensor(Gateway3BinarySensor):
+class XiaomiMotionSensor(XiaomiBinarySensor):
     _default_delay = None
     _last_on = 0
     _last_off = 0
@@ -110,10 +111,10 @@ class Gateway3MotionSensor(Gateway3BinarySensor):
         # https://github.com/AlexxIT/XiaomiGateway3/issues/135
         if 'illuminance' in data and ('lumi.sensor_motion.aq2' in
                                       self.device['device_model']):
-            data[self._attr] = 1
+            data[self.attr] = 1
 
         # check only motion=1
-        if data.get(self._attr) != 1:
+        if data.get(self.attr) != 1:
             # handle available change
             self.schedule_update_ha_state()
             return

@@ -3,8 +3,9 @@ import logging
 from homeassistant.components import persistent_notification
 from homeassistant.helpers.entity import ToggleEntity
 
-from . import DOMAIN, Gateway3Device
+from . import DOMAIN
 from .core.gateway3 import Gateway3
+from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,9 +15,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if attr == 'firmware lock':
             async_add_entities([FirmwareLock(gateway, device, attr)])
         elif device['type'] == 'mesh':
-            async_add_entities([Gateway3MeshSwitch(gateway, device, attr)])
+            async_add_entities([XiaomiMeshSwitch(gateway, device, attr)])
         else:
-            async_add_entities([Gateway3Switch(gateway, device, attr)])
+            async_add_entities([XiaomiZigbeeSwitch(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('switch', setup)
@@ -26,7 +27,7 @@ async def async_unload_entry(hass, entry):
     return True
 
 
-class Gateway3Switch(Gateway3Device, ToggleEntity):
+class XiaomiZigbeeSwitch(XiaomiEntity, ToggleEntity):
     @property
     def is_on(self):
         return self._state
@@ -46,18 +47,18 @@ class Gateway3Switch(Gateway3Device, ToggleEntity):
         #   > bus.async_fire
         #   > hass.async_add_hass_job
         #   > loop.call_soon
-        if self._attr in data:
-            self._state = bool(data[self._attr])
+        if self.attr in data:
+            self._state = bool(data[self.attr])
         self.schedule_update_ha_state()
 
     def turn_on(self):
-        self.gw.send(self.device, {self._attr: 1})
+        self.gw.send(self.device, {self.attr: 1})
 
     def turn_off(self):
-        self.gw.send(self.device, {self._attr: 0})
+        self.gw.send(self.device, {self.attr: 0})
 
 
-class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
+class XiaomiMeshSwitch(XiaomiEntity, ToggleEntity):
     @property
     def should_poll(self):
         return False
@@ -73,27 +74,27 @@ class Gateway3MeshSwitch(Gateway3Device, ToggleEntity):
 
         self.device['online'] = True
 
-        if self._attr in data:
-            self._state = bool(data[self._attr])
+        if self.attr in data:
+            self._state = bool(data[self.attr])
 
         self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         self._state = True
 
-        self.gw.send_mesh(self.device, {self._attr: True})
+        self.gw.send_mesh(self.device, {self.attr: True})
 
         self.schedule_update_ha_state()
 
     def turn_off(self, **kwargs):
         self._state = False
 
-        self.gw.send_mesh(self.device, {self._attr: False})
+        self.gw.send_mesh(self.device, {self.attr: False})
 
         self.schedule_update_ha_state()
 
 
-class FirmwareLock(Gateway3Switch):
+class FirmwareLock(XiaomiZigbeeSwitch):
     @property
     def icon(self):
         return 'mdi:cloud-lock'
