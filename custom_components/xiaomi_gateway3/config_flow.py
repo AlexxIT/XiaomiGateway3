@@ -7,7 +7,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
-from .core import gateway3
+from .core import utils
 from .core.gateway3 import TELNET_CMD
 from .core.xiaomi_cloud import MiCloud
 
@@ -105,7 +105,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_token(self, user_input=None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         if user_input is not None:
-            error = gateway3.check_mgl03(**user_input)
+            error = utils.check_mgl03(**user_input)
             if error:
                 return await self.async_step_token(error=error)
 
@@ -143,28 +143,51 @@ class OptionsFlowHandler(OptionsFlow):
             did = user_input['did']
             device = next(d for d in self.hass.data[DOMAIN]['devices']
                           if d['did'] == did)
-            device_info = (
-                f"Name: {device['name']}\n"
-                f"Model: {device['model']}\n"
-                f"IP: {device['localip']}\n"
-                f"MAC: {device['mac']}\n"
-                f"Token: {device['token']}"
-            )
+
+            if device['pid'] != '6':
+                device_info = (
+                    f"Name: {device['name']}\n"
+                    f"Model: {device['model']}\n"
+                    f"IP: {device['localip']}\n"
+                    f"MAC: {device['mac']}\n"
+                    f"Token: {device['token']}"
+                )
+            else:
+                bindkey = await utils.get_bindkey(
+                    self.hass.data[DOMAIN]['cloud'], did
+                )
+                device_info = (
+                    f"Name: {device['name']}\n"
+                    f"Model: {device['model']}\n"
+                    f"MAC: {device['mac']}\n"
+                    f"Bindkey: {bindkey}\n"
+                )
+
             if device['model'] == 'lumi.gateway.v3':
-                device_info += "\nLAN key: " + gateway3.get_lan_key(device)
+                device_info += "\nLAN key: " + utils.get_lan_key(
+                    device['localip'], device['token']
+                )
+            elif '.vacuum.' in device['model']:
+                device_info += "\nRooms: " + await utils.get_room_mapping(
+                    self.hass.data[DOMAIN]['cloud'],
+                    device['localip'], device['token'],
+                )
 
         elif not self.hass.data[DOMAIN].get('devices'):
             device_info = "No devices in account"
         else:
-            # noinspection SqlResolve
-            device_info = "SELECT device FROM list"
+            device_info = "Choose a device from the list"
 
-        devices = {
-            device['did']: f"{device['name']} ({device['localip']})"
-            for device in self.hass.data[DOMAIN].get('devices', [])
-            # 0 - wifi, 8 - wifi+ble
-            if device['pid'] in ('0', '8')
-        }
+        devices = {}
+        for device in self.hass.data[DOMAIN].get('devices', []):
+            # 0 - wifi, 6 - ble, 8 - wifi+ble
+            if device['pid'] in ('0', '8'):
+                info = device['localip']
+            elif device['pid'] == '6':
+                info = 'BLE'
+            else:
+                continue
+            devices[device['did']] = f"{device['name']} ({info})"
 
         return self.async_show_form(
             step_id="cloud",

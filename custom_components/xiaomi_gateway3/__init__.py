@@ -129,12 +129,12 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     data: dict = config_entry.data.copy()
 
     session = async_create_clientsession(hass)
-    cloud = MiCloud(session)
+    hass.data[DOMAIN]['cloud'] = cloud = MiCloud(session, data['servers'])
 
     if 'service_token' in data:
         # load devices with saved MiCloud auth
         cloud.auth = data
-        devices = await cloud.get_total_devices(data['servers'])
+        devices = await cloud.get_devices()
     else:
         devices = None
 
@@ -145,7 +145,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
             data.update(cloud.auth)
             hass.config_entries.async_update_entry(config_entry, data=data)
 
-            devices = await cloud.get_total_devices(data['servers'])
+            devices = await cloud.get_devices()
             if devices is None:
                 _LOGGER.error("Can't load devices from MiCloud")
 

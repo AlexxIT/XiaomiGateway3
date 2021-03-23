@@ -48,8 +48,9 @@ UA = "Android-7.1.1-1.0.0-ONEPLUS A3010-136-%s APP/xiaomi.smarthome APPV/62830"
 class MiCloud:
     auth = None
 
-    def __init__(self, session: ClientSession):
+    def __init__(self, session: ClientSession, servers: list = None):
         self.session = session
+        self.servers = servers or ['cn']
         self.device_id = get_random_string(16)
 
     async def login(self, username: str, password: str):
@@ -106,60 +107,44 @@ class MiCloud:
         _LOGGER.debug(f"MiCloud step3")
         return service_token
 
-    async def get_total_devices(self, servers: list):
+    async def get_devices(self):
+        payload = {'getVirtualModel': False, 'getHuamiDevices': 0}
+
         total = []
-        for server in servers:
-            devices = await self.get_devices(server)
-            if devices is None:
+        for server in self.servers:
+            resp = await self.request(server, '/home/device_list', payload)
+            if resp is None:
                 return None
-            total += devices
+            total += resp['list']
         return total
 
-    async def get_devices(self, server: str):
-        assert server in SERVERS, "Wrong server: " + server
-        baseurl = 'https://api.io.mi.com/app' if server == 'cn' \
-            else f"https://{server}.api.io.mi.com/app"
+    async def get_rooms(self):
+        payload = {'fg': True, 'fetch_share': True, 'limit': 300}
 
-        url = '/home/device_list'
-        data = '{"getVirtualModel":false,"getHuamiDevices":0}'
+        total = []
+        for server in self.servers:
+            resp = await self.request(server, '/v2/homeroom/gethome', payload)
+            if resp is None:
+                return None
+            for home in resp['homelist']:
+                total += home['roomlist']
+        return total
 
-        nonce = gen_nonce()
-        signed_nonce = gen_signed_nonce(self.auth['ssecurity'], nonce)
-        signature = gen_signature(url, signed_nonce, nonce, data)
-
-        try:
-            r = await self.session.post(baseurl + url, cookies={
-                'userId': self.auth['user_id'],
-                'serviceToken': self.auth['service_token'],
-                'locale': 'en_US'
-            }, headers={
-                'User-Agent': UA,
-                'x-xiaomi-protocal-flag-cli': 'PROTOCAL-HTTP2'
-            }, data={
-                'signature': signature,
-                '_nonce': nonce,
-                'data': data
-            }, timeout=10)
-
-            resp = await r.json(content_type=None)
-            assert resp['code'] == 0, resp
-            return resp['result']['list']
-
-        except asyncio.TimeoutError:
-            _LOGGER.error("Timeout while loading MiCloud device list")
-        except:
-            _LOGGER.exception(f"Can't load devices list")
-
+    async def get_bindkey(self, did: str):
+        payload = {'did': did, 'pdid': 1}
+        for server in self.servers:
+            resp = await self.request(server, '/v2/device/blt_get_beaconkey',
+                                      payload)
+            if resp:
+                return resp['beaconkey']
         return None
 
-    async def request_miot_api(self, server: str, api: str, params: list):
-        """Request MIoT API, for gateway alarm control. By Haoyu, 2021"""
+    async def request(self, server: str, url: str, payload: dict):
         assert server in SERVERS, "Wrong server: " + server
         baseurl = 'https://api.io.mi.com/app' if server == 'cn' \
             else f"https://{server}.api.io.mi.com/app"
 
-        url = '/miotspec' + api
-        data = json.dumps({'params': params}, separators=(',', ':'))
+        data = json.dumps(payload, separators=(',', ':'))
 
         nonce = gen_nonce()
         signed_nonce = gen_signed_nonce(self.auth['ssecurity'], nonce)
@@ -180,14 +165,14 @@ class MiCloud:
             }, timeout=10)
 
             resp = await r.json(content_type=None)
-            _LOGGER.debug(f"Response from MIoT API {api}: {resp}")
+            _LOGGER.debug(f"Response from MIoT API {url}: {resp}")
             assert resp['code'] == 0, resp
             return resp['result']
 
         except asyncio.TimeoutError:
-            _LOGGER.error(f"Timeout while requesting MIoT api {api}")
+            _LOGGER.error(f"Timeout while requesting MIoT api {url}")
         except:
-            _LOGGER.exception(f"Can't request MIoT API {api}")
+            _LOGGER.exception(f"Can't request MIoT API {url}")
 
         return None
 

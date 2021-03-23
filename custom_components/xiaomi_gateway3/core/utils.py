@@ -68,6 +68,81 @@ def migrate_options(data):
     return {'data': data, 'options': options}
 
 
+def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
+        -> Optional[str]:
+    try:
+        # 1. try connect with telnet (custom firmware)?
+        shell = TelnetShell(host)
+        # 1.1. check token with telnet
+        return None if shell.get_token() == token else 'wrong_token'
+    except:
+        if not telnet_cmd:
+            return 'cant_connect'
+
+    # 2. try connect with miio
+    miio = SyncmiIO(host, token)
+    info = miio.info()
+    # fw 1.4.6_0012 without cloud will respond with a blank string reply
+    if info is None:
+        # if device_id not None - device works but not answer on commands
+        return 'wrong_token' if miio.device_id else 'cant_connect'
+
+    # 3. check if right model
+    if info and info['model'] != 'lumi.gateway.mgl03':
+        return 'wrong_model'
+
+    raw = json.loads(telnet_cmd)
+    # fw 1.4.6_0043+ won't answer on cmd without cloud, so don't check answer
+    miio.send(raw['method'], raw.get('params'))
+
+    try:
+        # 4. check if telnet command helps
+        TelnetShell(host)
+    except:
+        return 'wrong_telnet'
+
+
+def get_lan_key(host: str, token: str):
+    device = SyncmiIO(host, token)
+    resp = device.send('get_lumi_dpf_aes_key')
+    if resp is None:
+        return "Can't connect to gateway"
+    if len(resp[0]) == 16:
+        return resp[0]
+    key = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                  for _ in range(16))
+    resp = device.send('set_lumi_dpf_aes_key', [key])
+    if resp[0] == 'ok':
+        return key
+    return "Can't update gateway key"
+
+
+async def get_room_mapping(cloud: MiCloud, host: str, token: str):
+    try:
+        device = SyncmiIO(host, token)
+        local_rooms = device.send('get_room_mapping')
+        cloud_rooms = await cloud.get_rooms()
+        result = ''
+        for local_id, cloud_id in local_rooms:
+            cloud_name = next(
+                (p['name'] for p in cloud_rooms if p['id'] == cloud_id), '-'
+            )
+            result += f"\n- {local_id}: {cloud_name}"
+        return result
+
+    except:
+        return "Can't get from cloud"
+
+
+async def get_bindkey(cloud: MiCloud, did: str):
+    bindkey = await cloud.get_bindkey(did)
+    if bindkey is None:
+        return "Can't get from cloud"
+    if bindkey.endswith('FFFFFFFF'):
+        return "Not needed"
+    return bindkey
+
+
 TITLE = "Xiaomi Gateway 3 Debug"
 NOTIFY_TEXT = '<a href="%s?r=10" target="_blank">Open Log<a>'
 HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'
