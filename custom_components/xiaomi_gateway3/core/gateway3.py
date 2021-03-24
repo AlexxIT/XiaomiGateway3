@@ -988,7 +988,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         else:
             payload = None
 
-        self._process_ble_event(device, payload)
+        if payload:
+            self._process_ble_event(device, payload)
 
     def process_ble_event_fix(self, data: dict):
         self.debug(f"Process BLE Fix {data}")
@@ -1004,7 +1005,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         device['seq'] = data['seq']
 
         payload = bluetooth.parse_xiaomi_ble(data, data['pdid'])
-        self._process_ble_event(device, payload)
+        if payload:
+            self._process_ble_event(device, payload)
 
     def _process_ble_event(self, device: dict, payload: dict):
         did = device['did']
