@@ -399,7 +399,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         if 'true' in self._debug:
             _LOGGER.debug(f"{self.host} | {message}")
 
-    def stop(self):
+    def stop(self, *args):
         self.enabled = False
         self.mqtt._thread_terminate = True
 
@@ -743,6 +743,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         self.process_gw_stats()
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
+        # for debug purpose
+        enabled = self.enabled
         try:
             topic = msg.topic
 

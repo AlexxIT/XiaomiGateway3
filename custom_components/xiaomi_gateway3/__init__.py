@@ -3,6 +3,7 @@ import logging
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant, Event
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -123,6 +124,8 @@ async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
 
     gw: Gateway3 = hass.data[DOMAIN][entry.entry_id]
     gw.start()
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, gw.stop)
 
 
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
