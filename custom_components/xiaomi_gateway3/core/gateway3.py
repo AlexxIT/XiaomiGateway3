@@ -605,6 +605,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 dev_list = json.loads(data.get('dev_list', 'null')) or []
 
                 for did in dev_list:
+                    if did + '.model' not in data:
+                        self.debug(f"{did} has not in devices DB")
+                        continue
                     model = data[did + '.model']
                     desc = zigbee.get_device(model)
 
