@@ -275,7 +275,7 @@ DEVICES = [{
     'lumi.sen_ill.mgl01': ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
     'mi_spec': [
         ['2.1', '2.1', 'illuminance', 'sensor'],
-        ['3.1', '3.1', 'votage', 'sensor'],
+        ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }, {
     'lumi.sensor_smoke': ["Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW"],
@@ -353,7 +353,7 @@ DEVICES = [{
     'lumi.motion.agl04': ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
     'mi_spec': [
         ['4.1', None, 'motion', 'binary_sensor'],
-        ['3.1', '3.1', 'voltage', 'sensor'],
+        ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }]
 
