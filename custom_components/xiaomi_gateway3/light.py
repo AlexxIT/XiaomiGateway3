@@ -1,4 +1,5 @@
 import logging
+import math
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP, ATTR_TRANSITION
@@ -133,6 +134,7 @@ class XiaomiZigbeeLight(XiaomiEntity, LightEntity):
 
 class XiaomiMeshLight(XiaomiEntity, LightEntity):
     _brightness = None
+    _max_brightness = 65535
     _color_temp = None
     _min_mireds = int(1000000 / 6500)
     _max_mireds = int(1000000 / 2700)
@@ -171,8 +173,11 @@ class XiaomiMeshLight(XiaomiEntity, LightEntity):
 
         color_temp = self.device.get('color_temp')
         if color_temp:
-            self._min_mireds = int(1000000 / color_temp[0])
-            self._max_mireds = int(1000000 / color_temp[1])
+            self._min_mireds = math.floor(1000000 / color_temp[1])
+            self._max_mireds = math.ceil(1000000 / color_temp[0])
+        max_brightness = self.device.get('max_brightness')
+        if max_brightness:
+            self._max_brightness = max_brightness
 
     def update(self, data: dict = None):
         if data is None:
@@ -185,7 +190,7 @@ class XiaomiMeshLight(XiaomiEntity, LightEntity):
             self._state = bool(data[self.attr])
         if 'brightness' in data:
             # 0...65535
-            self._brightness = data['brightness'] / 65535.0 * 255.0
+            self._brightness = data['brightness'] * 255.0 / self._max_brightness
         if 'color_temp' in data and data['color_temp']:
             # 2700..6500 => 370..153
             self._color_temp = \
@@ -200,7 +205,7 @@ class XiaomiMeshLight(XiaomiEntity, LightEntity):
 
         if ATTR_BRIGHTNESS in kwargs:
             self._brightness = kwargs[ATTR_BRIGHTNESS]
-            payload['brightness'] = int(self._brightness / 255.0 * 65535)
+            payload['brightness'] = int(self._brightness / 255.0 * self._max_brightness)
 
         if ATTR_COLOR_TEMP in kwargs:
             self._color_temp = kwargs[ATTR_COLOR_TEMP]
