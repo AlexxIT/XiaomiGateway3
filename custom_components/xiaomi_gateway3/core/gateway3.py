@@ -37,8 +37,7 @@ class DevicesRegistry:
     @staticmethod
     def async_added_to_hass(entity: XiaomiEntity):
         device = entity.device
-        if entity.attr not in device['entities']:
-            device['entities'].append(entity.attr)
+        if entity.update not in device['updates']:
             device['updates'].append(entity.update)
 
     @staticmethod
@@ -46,11 +45,17 @@ class DevicesRegistry:
         device = entity.device
         if entity.attr in device['entities']:
             device['entities'].remove(entity.attr)
+        # gateway alarm don't have update
+        if entity.update in device['updates']:
             device['updates'].remove(entity.update)
 
     def add_entity(self, domain: str, device: dict, attr: str):
-        if domain is None or domain in device['entities']:
+        if domain is None or attr in device['entities']:
             return
+
+        # instant add entity to prevent double setup
+        device['entities'].append(attr)
+
         self.setups[domain](self, device, attr)
 
 
@@ -807,12 +812,12 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             did = device['did']
             type_ = device['type']
 
+            if type_ == 'gateway':
+                self.did = device['did']
+                self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
+
             # if device already exists - take it from registry
             if did not in self.devices:
-                if type_ == 'gateway':
-                    self.did = device['did']
-                    self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
-
                 if type_ in ('gateway', 'zigbee'):
                     desc = zigbee.get_device(device['model'])
                 elif type_ == 'mesh':
