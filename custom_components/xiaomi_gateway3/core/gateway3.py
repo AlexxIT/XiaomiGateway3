@@ -154,7 +154,7 @@ class GatewayMesh(DevicesRegistry):
             bulk[did][prop] = param['value']
 
         for did, payload in bulk.items():
-            self.debug(f"Process Mesh Data for {did}: {payload}")
+            # self.debug(f"Process Mesh Data for {did}: {payload}")
             for handler in self.devices[did]['updates']:
                 handler(payload)
 
