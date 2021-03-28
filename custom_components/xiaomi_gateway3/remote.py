@@ -97,7 +97,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 self.gw.pair_model = (model[:-3] if model.endswith('.v1')
                                       else model)
                 self.turn_on()
-            elif cmd in ('reboot', 'ftp'):
+            elif cmd in ('reboot', 'ftp', 'dump'):
                 self.gw.send_telnet(cmd)
             elif cmd == 'power':
                 self.gw.send(self.device, {'power_tx': int(args[1])})

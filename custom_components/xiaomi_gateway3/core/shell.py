@@ -32,6 +32,8 @@ RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
 
+TAR_DATA = b"tar -czOC data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info miioconfig.db | base64\n"
+
 BT_MD5 = {
     '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
     '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
@@ -170,6 +172,12 @@ class TelnetShell(Telnet):
             self.write(f"cat {filename}\r\n".encode())
             self.read_until(b"\r\n")  # skip command
             return self.read_until(b"# ")[:-2]
+
+    def tar_data(self):
+        self.write(TAR_DATA)
+        self.read_until(b"base64\r\n")  # skip command
+        raw = self.read_until(b"# ", timeout=30)
+        return base64.b64decode(raw)
 
     def run_buzzer(self):
         self.exec("kill $(ps | grep dummy:basic_gw | awk '{print $1}')")

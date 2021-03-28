@@ -3,6 +3,7 @@ import logging
 import re
 import socket
 import time
+from pathlib import Path
 from threading import Thread
 from typing import Optional, Dict, Callable
 
@@ -354,7 +355,7 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     telnet_cmd = None
 
     def __init__(self, host: str, token: str, config: dict, **options):
-        super().__init__(daemon=True)
+        super().__init__(daemon=True, name=f"XG3_{host}")
 
         self.host = host
         self.options = options
@@ -1138,6 +1139,11 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                 if command == 'ftp':
                     shell.check_or_download_busybox()
                     shell.run_ftp()
+                elif command == 'dump':
+                    raw = shell.tar_data()
+                    filename = Path().absolute() / f"{self.name}.tar.gz"
+                    with open(filename, 'wb') as f:
+                        f.write(raw)
                 else:
                     shell.exec(command)
             shell.close()
