@@ -915,12 +915,14 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
                     payload[prop] = param['value'] / 100.0
             elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0
-            elif prop == 'voltage':
+            elif prop in ('battery', 'voltage'):
                 # sometimes voltage and battery came in one payload
-                if 'battery' not in payload:
-                    payload['battery'] = round(
-                        (min(param['value'], 3200) - 2500) / 7
-                    )
+                if prop == 'voltage' and 'battery' in payload:
+                    continue
+                payload['battery'] = (
+                    param['value'] if param['value'] < 1000
+                    else round((min(param['value'], 3200) - 2500) / 7)
+                )
             elif prop == 'alive' and param['value']['status'] == 'offline':
                 device['online'] = False
             elif prop == 'angle':
