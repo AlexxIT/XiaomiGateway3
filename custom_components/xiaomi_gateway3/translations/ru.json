@@ -25,7 +25,7 @@
         }
       },
       "token": {
-        "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) или [вручную](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Ознакомьтесь с поддерживаемыми версиями прошивок в [документации компонента](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) или [вручную](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Читайте о настройке **команда для открытия telnet** в [документации](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
         "data": {
           "host": "IP-адрес",
           "token": "Токен",
