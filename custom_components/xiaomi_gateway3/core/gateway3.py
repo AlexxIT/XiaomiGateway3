@@ -419,7 +419,7 @@ class GatewayEntry(Thread, GatewayStats):
     def _enable_telnet(self):
         """Enable telnet with miio protocol."""
         raw = json.loads(self.telnet_cmd)
-        if self.miio.send(raw['method'], raw.get('params')) != 'ok':
+        if self.miio.send(raw['method'], raw.get('params')) != ['ok']:
             self.debug(f"Can't enable telnet")
             return False
         return True
