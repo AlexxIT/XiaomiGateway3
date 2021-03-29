@@ -26,13 +26,13 @@ TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
 
 class GatewayBase(DevicesRegistry):
-    # did of the gateway
     did: str = None
+    """Xiaomi did of the gateway"""
 
-    # if mqtt connected => gateay online
     available: bool = None
-    # gateay main loop enabled
+    """Getaway is considered online if there is an active connection to mqtt"""
     enabled: bool = None
+    """Gateway stops main loop if enabled property sets to False"""
 
     host: str = None
 
@@ -317,7 +317,10 @@ class GatewayStats(GatewayMesh):
 
 
 # noinspection PyUnusedLocal
-class Gateway3(Thread, GatewayStats):
+class GatewayEntry(Thread, GatewayStats):
+    """Main class for working with the gateway via Telnet (23), MQTT (1883) and
+    miIO (54321) protocols.
+    """
     time_offset = 0
     pair_model = None
     pair_payload = None
@@ -1133,3 +1136,6 @@ class Gateway3(Thread, GatewayStats):
             if device.get('mac') == mac:
                 return device
         return None
+
+
+Gateway3 = GatewayEntry
