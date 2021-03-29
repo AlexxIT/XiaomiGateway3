@@ -11,20 +11,53 @@ from .utils import DOMAIN
 # TODO: rewrite all usage to dataclass
 @dataclass
 class XiaomiDevice:
-    did: str
-    model: str
+    did: str  # unique Xiaomi did
+    model: str  # Xiaomi model
     mac: str
-    type: str
+    type: str  # gateway, zigbee, ble, mesh
     online: bool
 
-    device_manufacturer: str = None
-    device_model: str = None
-    device_name: str = None
-    device_version: str = None
+    device_info: Dict[str, Any]
 
     extra: Dict[str, Any] = field(default_factory=dict)
-    entities: List[str] = field(default_factory=list)
-    updates: List[Callable] = field(default_factory=list)
+
+    # all device entities except stats
+    entities: Dict[str, 'XiaomiEntity'] = field(default_factory=dict)
+
+    gateways: List['Gateway3'] = field(default_factory=list)
+
+
+class DevicesRegistry:
+    """Global registry for all gateway devices. Because BLE devices updates
+    from all gateway simultaniosly.
+
+    Key - device did, `numb` for wifi and mesh devices, `lumi.ieee` for zigbee
+    devices, `blt.3.alphanum` for ble devices, `group.numb` for mesh groups.
+    """
+    devices: Dict[str, dict] = {}
+    setups: Dict[str, Callable] = None
+
+    def add_setup(self, domain: str, handler):
+        """Add hass device setup funcion."""
+        self.setups[domain] = handler
+
+    def add_entity(self, domain: str, device: dict, attr: str):
+        if self not in device['gateways']:
+            device['gateways'].append(self)
+
+        if domain is None or attr in device['entities']:
+            return
+
+        # instant add entity to prevent double setup
+        device['entities'][attr] = None
+
+        self.setups[domain](self, device, attr)
+
+    def set_entity(self, entity: 'XiaomiEntity'):
+        entity.device['entities'][entity.attr] = entity
+
+    def remove_entity(self, entity: 'XiaomiEntity'):
+        entity.device['entities'].pop(entity.attr)
 
 
 class XiaomiEntity(Entity):
@@ -55,11 +88,11 @@ class XiaomiEntity(Entity):
         if 'init' in self.device and self._state is None:
             self.update(self.device['init'])
 
-        self.gw.async_added_to_hass(self)
+        self.gw.set_entity(self)
 
     async def async_will_remove_from_hass(self) -> None:
         """Also run when rename entity_id"""
-        self.gw.async_will_remove_from_hass(self)
+        self.gw.remove_entity(self)
 
     # @property
     # def entity_registry_enabled_default(self):

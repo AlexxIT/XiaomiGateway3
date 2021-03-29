@@ -5,12 +5,12 @@ import socket
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Optional, Dict, Callable
+from typing import Optional
 
 from paho.mqtt.client import Client, MQTTMessage
 
 from . import bluetooth, utils, zigbee
-from .helpers import XiaomiEntity
+from .helpers import DevicesRegistry
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
@@ -25,50 +25,30 @@ RE_REVERSE = re.compile(r'(..)(..)(..)(..)(..)(..)')
 TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
 
-class DevicesRegistry:
-    """Global registry for all gateway devices. Because BLE devices updates
-    from all gateway simultaniosly.
+class GatewayBase(DevicesRegistry):
+    # did of the gateway
+    did: str = None
 
-    Key - device did, `numb` for wifi and mesh devices, `lumi.ieee` for zigbee
-    devices, `blt.3.alphanum` for ble devices, `group.numb` for mesh groups.
-    """
-    devices: Dict[str, dict] = {}
-    setups: Dict[str, Callable] = None
-
-    @staticmethod
-    def async_added_to_hass(entity: XiaomiEntity):
-        device = entity.device
-        if entity.update not in device['updates']:
-            device['updates'].append(entity.update)
-
-    @staticmethod
-    def async_will_remove_from_hass(entity: XiaomiEntity):
-        device = entity.device
-        if entity.attr in device['entities']:
-            device['entities'].remove(entity.attr)
-        # gateway alarm don't have update
-        if entity.update in device['updates']:
-            device['updates'].remove(entity.update)
-
-    def add_entity(self, domain: str, device: dict, attr: str):
-        if domain is None or attr in device['entities']:
-            return
-
-        # instant add entity to prevent double setup
-        device['entities'].append(attr)
-
-        self.setups[domain](self, device, attr)
-
-
-class GatewayMesh(DevicesRegistry):
+    # if mqtt connected => gateay online
+    available: bool = None
+    # gateay main loop enabled
     enabled: bool = None
 
+    host: str = None
+
+    # TODO: remove this prop
+    gw_topic: str = None
+
+    mqtt: Client = None
     miio: SyncmiIO = None
-    mesh_params: list = None
-    mesh_ts: float = 0
 
     def debug(self, message: str):
         raise NotImplemented
+
+
+class GatewayMesh(GatewayBase):
+    mesh_params: list = None
+    mesh_ts: float = 0
 
     def mesh_start(self):
         self.mesh_params = []
@@ -156,8 +136,10 @@ class GatewayMesh(DevicesRegistry):
 
         for did, payload in bulk.items():
             # self.debug(f"Process Mesh Data for {did}: {payload}")
-            for handler in self.devices[did]['updates']:
-                handler(payload)
+            device = self.devices[did]
+            for entity in device['entities'].values():
+                if entity:
+                    entity.update(payload)
 
     def send_mesh(self, device: dict, data: dict):
         # data = {'light':True}
@@ -186,17 +168,9 @@ class GatewayMesh(DevicesRegistry):
 
 
 # noinspection PyUnusedLocal
-class GatewayStats:
-    did: str = None
+class GatewayStats(GatewayMesh):
     stats: dict = None
-    host: str = None
     info_ts: float = 0
-
-    mqtt: Client = None
-    gw_topic: str = None
-
-    # if mqtt connected
-    available: bool = None
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
     # -1 - disabled
@@ -204,9 +178,6 @@ class GatewayStats:
 
     # collected data from MQTT topic log/z3 (zigbee console)
     z3buffer: Optional[dict] = None
-
-    def debug(self, message: str):
-        raise NotImplemented
 
     def add_stats(self, ieee: str, handler):
         self.stats[ieee] = handler
@@ -346,8 +317,7 @@ class GatewayStats:
 
 
 # noinspection PyUnusedLocal
-class Gateway3(Thread, GatewayMesh, GatewayStats):
-    did = None
+class Gateway3(Thread, GatewayStats):
     time_offset = 0
     pair_model = None
     pair_payload = None
@@ -383,22 +353,6 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
     @property
     def device(self):
         return self.devices[self.did]
-
-    def add_setup(self, domain: str, handler):
-        """Add hass device setup funcion."""
-        self.setups[domain] = handler
-
-    def setup_entry(self, domain: str, device: dict, attr: str):
-        if 'setup' not in device:
-            # setup first entry
-            device['setup'] = [attr]
-        elif attr in device['setup']:
-            # skip duplicate entry
-            return
-        else:
-            device['setup'].append(attr)
-
-        self.setups[domain](self, device, attr)
 
     def debug(self, message: str):
         # basic logs
@@ -840,8 +794,8 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
 
                 self.debug(f"Setup {type_} device {device}")
 
-                device['entities'] = []
-                device['updates'] = []
+                device['entities'] = {}
+                device['gateways'] = []
                 self.devices[did] = device
 
             else:
@@ -949,8 +903,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
         if payload:
             device['online'] = True
 
-        for handler in device['updates']:
-            handler(payload)
+        for entity in device['entities'].values():
+            if entity:
+                entity.update(payload)
 
         # TODO: move code earlier!!!
         if 'added_device' in payload:
@@ -1034,8 +989,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             domain = bluetooth.get_ble_domain(k)
             self.add_entity(domain, device, k)
 
-        for handler in device['updates']:
-            handler(payload)
+        for entity in device['entities'].values():
+            if entity:
+                entity.update(payload)
 
         raw = json.dumps(init, separators=(',', ':'))
         self.mqtt.publish(f"ble/{did}", raw, retain=True)
@@ -1063,8 +1019,9 @@ class Gateway3(Thread, GatewayMesh, GatewayStats):
             domain = bluetooth.get_ble_domain(k)
             self.add_entity(domain, device, k)
 
-        for handler in device['updates']:
-            handler(payload)
+        for entity in device['entities'].values():
+            if entity:
+                entity.update(payload)
 
     def process_pair(self, raw: bytes):
         _LOGGER.debug(f"!!! {raw}")

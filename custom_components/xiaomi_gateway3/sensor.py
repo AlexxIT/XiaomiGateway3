@@ -51,7 +51,7 @@ async def async_setup_entry(hass, entry, add_entities):
         if attr == 'action':
             add_entities([XiaomiAction(gateway, device, attr)])
         elif attr == 'gateway':
-            add_entities([GatewayStats(gateway, device, attr)])
+            add_entities([GatewayStats(gateway, device, attr)], True)
         elif attr == 'zigbee':
             add_entities([ZigbeeStats(gateway, device, attr)])
         elif attr == 'ble':
@@ -102,6 +102,7 @@ class GatewayStats(XiaomiSensor):
         self.update()
 
     async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
         self.gw.remove_stats(self.device['did'], self.update)
 
     def update(self, data: dict = None):
@@ -143,6 +144,7 @@ class ZigbeeStats(XiaomiSensor):
         self.gw.add_stats(self._attrs['ieee'], self.update)
 
     async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
         self.gw.remove_stats(self._attrs['ieee'], self.update)
 
     def update(self, data: dict = None):
@@ -214,6 +216,7 @@ class BLEStats(XiaomiSensor):
         self.gw.add_stats(self.device['did'], self.update)
 
     async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
         self.gw.remove_stats(self.device['did'], self.update)
 
     def update(self, data: dict = None):
