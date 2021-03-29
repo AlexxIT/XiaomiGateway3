@@ -63,7 +63,7 @@ class GatewayMesh(GatewayBase):
 
         if self.mesh_params:
             self.mesh_ts = time.time() + 30
-            Thread(target=self.mesh_run).start()
+            Thread(target=self.mesh_run, name=f"{self.host}_mesh").start()
 
     def mesh_run(self):
         self.debug("Start Mesh Thread")
@@ -325,7 +325,7 @@ class Gateway3(Thread, GatewayStats):
     telnet_cmd = None
 
     def __init__(self, host: str, token: str, config: dict, **options):
-        super().__init__(daemon=True, name=f"XG3_{host}")
+        super().__init__(daemon=True, name=f"{host}_main")
 
         self.host = host
         self.options = options
