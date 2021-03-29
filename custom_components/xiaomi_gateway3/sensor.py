@@ -267,7 +267,7 @@ class XiaomiAction(XiaomiEntity):
         for k, v in data.items():
             if k == 'button':
                 # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
-                if 'voltage' in data:
+                if 'battery' in data:
                     return
                 data[self.attr] = BUTTON.get(v, 'unknown')
                 break

@@ -105,7 +105,7 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
 
     def update(self, data: dict = None):
         # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
-        if 'voltage' in data:
+        if 'battery' in data:
             return
 
         # https://github.com/AlexxIT/XiaomiGateway3/issues/135
