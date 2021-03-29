@@ -23,10 +23,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('switch', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 class XiaomiZigbeeSwitch(XiaomiEntity, ToggleEntity):
     @property
     def is_on(self):

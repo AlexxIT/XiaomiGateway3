@@ -63,10 +63,6 @@ async def async_setup_entry(hass, entry, add_entities):
     gw.add_setup('sensor', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 class XiaomiSensor(XiaomiEntity):
     @property
     def state(self):

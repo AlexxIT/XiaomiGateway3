@@ -31,10 +31,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('alarm_control_panel', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
     @property
     def miio_did(self):
@@ -60,12 +56,6 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
     @property
     def code_arm_required(self):
         return False
-
-    async def async_added_to_hass(self):
-        pass
-
-    async def async_will_remove_from_hass(self) -> None:
-        pass
 
     def alarm_disarm(self, code=None):
         self.gw.miio.send('set_properties', [{

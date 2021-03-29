@@ -21,10 +21,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('cover', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 class XiaomiCover(XiaomiEntity, CoverEntity):
     @property
     def current_cover_position(self):

@@ -20,10 +20,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('remote', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 class Gateway3Entity(XiaomiEntity, ToggleEntity):
     async def async_added_to_hass(self):
         await super().async_added_to_hass()

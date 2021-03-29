@@ -31,10 +31,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup('climate', setup)
 
 
-async def async_unload_entry(hass, entry):
-    return True
-
-
 # noinspection PyAbstractClass
 class XiaomiClimate(XiaomiEntity, ClimateEntity):
     _current_hvac = None
