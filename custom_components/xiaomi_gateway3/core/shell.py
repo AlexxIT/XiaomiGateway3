@@ -32,7 +32,7 @@ RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
 
-TAR_DATA = b"tar -czOC data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info miioconfig.db | base64\n"
+TAR_DATA = b"tar -czOC data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info | base64\n"
 
 BT_MD5 = {
     '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
