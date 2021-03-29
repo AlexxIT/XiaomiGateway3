@@ -364,7 +364,7 @@ class GatewayEntry(Thread, GatewayStats):
 
     def stop(self, *args):
         self.enabled = False
-        self.mqtt._thread_terminate = True
+        self.mqtt.loop_stop()
 
         for device in self.devices.values():
             if self in device['gateways']:
