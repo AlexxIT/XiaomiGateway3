@@ -363,6 +363,10 @@ class Gateway3(Thread, GatewayStats):
         self.enabled = False
         self.mqtt._thread_terminate = True
 
+        for device in self.devices.values():
+            if self in device['gateways']:
+                device['gateways'].remove(self)
+
     def run(self):
         """Main thread loop."""
         self.debug("Start main thread")
@@ -687,12 +691,20 @@ class Gateway3(Thread, GatewayStats):
             self.debug(f"Can't set firmware lock: {e}")
             return False
 
+    def update_entities_states(self):
+        for device in self.devices.values():
+            if self in device['gateways']:
+                for entity in device['entities'].values():
+                    if entity:
+                        entity.schedule_update_ha_state()
+
     def on_connect(self, client, userdata, flags, rc):
         self.debug("MQTT connected")
         self.mqtt.subscribe('#')
 
         self.available = True
         self.process_gw_stats()
+        self.update_entities_states()
 
     def on_disconnect(self, client, userdata, rc):
         self.debug("MQTT disconnected")
@@ -701,6 +713,7 @@ class Gateway3(Thread, GatewayStats):
 
         self.available = False
         self.process_gw_stats()
+        self.update_entities_states()
 
     def on_message(self, client: Client, userdata, msg: MQTTMessage):
         # for debug purpose
@@ -738,6 +751,7 @@ class Gateway3(Thread, GatewayStats):
             elif topic == 'log/ble':
                 payload = json.loads(msg.payload)
                 self.process_ble_event_fix(payload)
+                self.process_ble_stats(payload)
 
             elif topic == 'log/z3':
                 self.process_z3(msg.payload.decode())

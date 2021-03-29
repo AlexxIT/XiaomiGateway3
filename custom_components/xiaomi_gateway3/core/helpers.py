@@ -112,7 +112,11 @@ class XiaomiEntity(Entity):
 
     @property
     def available(self) -> bool:
-        return self.device.get('online', True) or self._ignore_offline
+        gw_available = any(
+            gateway.available for gateway in self.device['gateways']
+        )
+        return gw_available and (self.device.get('online', True) or
+                                 self._ignore_offline)
 
     @property
     def device_state_attributes(self):
