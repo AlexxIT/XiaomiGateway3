@@ -636,8 +636,10 @@ class GatewayEntry(Thread, GatewayStats):
                             'model': 0,
                             'childs': [],
                             'type': 'mesh',
-                            'online': False
+                            'online': True
                         }
+                        devices.append(device)
+
                         group_addr = row[1]
                         mesh_groups[group_addr] = device
 
@@ -657,10 +659,6 @@ class GatewayEntry(Thread, GatewayStats):
                         if group_addr in mesh_groups:
                             # add bulb to group if exist
                             mesh_groups[group_addr]['childs'].append(row[0])
-
-                    for device in mesh_groups.values():
-                        if device['childs']:
-                            devices.append(device)
 
                 except:
                     _LOGGER.exception("Can't read mesh devices")
