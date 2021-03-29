@@ -693,7 +693,7 @@ class GatewayEntry(Thread, GatewayStats):
             return False
 
     def update_entities_states(self):
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if self in device['gateways']:
                 for entity in device['entities'].values():
                     if entity:
