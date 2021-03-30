@@ -51,7 +51,7 @@ async def async_setup_entry(hass, entry, add_entities):
         if attr == 'action':
             add_entities([XiaomiAction(gateway, device, attr)])
         elif attr == 'gateway':
-            add_entities([GatewayStats(gateway, device, attr)], True)
+            add_entities([GatewayStats(gateway, device, attr)])
         elif attr == 'zigbee':
             add_entities([ZigbeeStats(gateway, device, attr)])
         elif attr == 'ble':
