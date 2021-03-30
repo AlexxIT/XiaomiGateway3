@@ -113,7 +113,11 @@ class GatewayMesh(GatewayBase):
         bulk = {}
 
         for param in data:
-            if param.get('code', 0) != 0:
+            code = param.get('code', 0)
+            if code == -4004:
+                # handle device offline state
+                param['value'] = None
+            elif code != 0:
                 continue
 
             did = param['did']

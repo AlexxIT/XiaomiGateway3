@@ -175,11 +175,15 @@ class XiaomiMeshLight(XiaomiEntity, LightEntity):
             self.gw.mesh_force_update()
             return
 
-        self.device['online'] = True
-
         if self.attr in data:
-            self._state = bool(data[self.attr])
-        if 'brightness' in data:
+            # handle main attribute as online state
+            if data[self.attr] is not None:
+                self._state = bool(data[self.attr])
+                self.device['online'] = True
+            else:
+                self.device['online'] = False
+
+        if 'brightness' in data and data['brightness'] is not None:
             # 0...65535
             self._brightness = data['brightness'] / 65535.0 * 255.0
         if 'color_temp' in data and data['color_temp']:
