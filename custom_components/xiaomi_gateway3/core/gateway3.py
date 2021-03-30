@@ -1115,7 +1115,7 @@ class GatewayEntry(Thread, GatewayStats):
                     shell.run_ftp()
                 elif command == 'dump':
                     raw = shell.tar_data()
-                    filename = Path().absolute() / f"{self.name}.tar.gz"
+                    filename = Path().absolute() / f"{self.host}.tar.gz"
                     with open(filename, 'wb') as f:
                         f.write(raw)
                 else:
