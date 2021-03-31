@@ -602,7 +602,7 @@ class GatewayEntry(Thread, GatewayStats):
                         'mac': '0x' + data[did + '.mac'],
                         'ieee': ieee,
                         'nwk': nwks.get(ieee),
-                        'model': data[did + '.model'],
+                        'model': model,
                         'type': 'zigbee',
                         'fw_ver': retain.get('fw_ver'),
                         'init': zigbee.fix_xiaomi_props(model, params),
@@ -940,6 +940,9 @@ class GatewayEntry(Thread, GatewayStats):
             device['type'] = 'zigbee'
             device['init'] = payload
             self.setup_devices([device])
+
+        # return for tests purpose
+        return payload
 
     def process_ble_event(self, data: dict):
         self.debug(f"Process BLE {data}")

@@ -1,113 +1,75 @@
-from custom_components.xiaomi_gateway3.core import utils
+from custom_components.xiaomi_gateway3.core import zigbee
 from custom_components.xiaomi_gateway3.core.gateway3 import Gateway3
 
 
-def test_lumi_property():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.sensor_motion.aq2'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = payload == {'motion': 1}
-
+def _generate_gateway(model: str):
+    device = {'did': 'lumi.xxx', 'model': model, 'entities': {}}
+    device.update(zigbee.get_device(model))
     gw = Gateway3('', '', {})
     gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
-    gw.process_message({
+    return gw
+
+
+def test_lumi_property():
+    gw = _generate_gateway('lumi.sensor_motion.aq2')
+    payload = gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'params': [{'res_name': '3.1.85', 'value': 1}]
     })
-
-    assert device['_']
+    assert payload == {'motion': 1}
 
 
 def test_wrong_temperature():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.sensor_motion.aq2'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = payload == {'0.1.85': 12300}
-
-    gw = Gateway3('', '', {})
-    gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
-    gw.process_message({
+    gw = _generate_gateway('lumi.sensor_motion.aq2')
+    payload = gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'params': [{'res_name': '0.1.85', 'value': 12300}]
     })
-
-    assert device['_']
+    assert payload == {'0.1.85': 12300}
 
 
 def test_mi_spec_property():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.sen_ill.mgl01'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = payload == {'battery': 86}
-
-    gw = Gateway3('', '', {})
-    gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
-
-    gw.process_message({
+    gw = _generate_gateway('lumi.sen_ill.mgl01')
+    payload = gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'mi_spec': [{'siid': 3, 'piid': 1, 'value': 3100}]
     })
-
-    assert device['_']
+    assert payload == {'battery': 86}
 
 
 def test_mi_spec_event():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.motion.agl04'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = payload == {'motion': 1}
-
-    gw = Gateway3('', '', {})
-    gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
-    gw.process_message({
+    gw = _generate_gateway('lumi.motion.agl04')
+    payload = gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'mi_spec': [{'siid': 4, 'eiid': 1, 'arguments': []}]
     })
-
-    assert device['_']
+    assert payload == {'motion': 1}
 
 
 def test_online():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.sensor_motion.aq2'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = device['online']
-
-    gw = Gateway3('', '', {})
-    gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
+    gw = _generate_gateway('lumi.sensor_motion.aq2')
     gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'params': [{'res_name': '3.1.85', 'value': 1}]
     })
-
-    assert device['_']
+    assert gw.devices['lumi.xxx']['online']
 
 
 def test_offline():
-    device = {'did': 'lumi.xxx', 'model': 'lumi.sensor_motion.aq2'}
-    device.update(utils.get_device(device['model']))
-
-    def handler(payload: dict):
-        device['_'] = device['online'] is False
-
-    gw = Gateway3('', '', {})
-    gw.devices = {'lumi.xxx': device}
-    gw.add_update('lumi.xxx', handler)
+    gw = _generate_gateway('lumi.sensor_motion.aq2')
     gw.process_message({
         'cmd': 'report', 'did': 'lumi.xxx',
         'params': [{'res_name': '8.0.2102', 'value': {
             'status': 'offline', 'time': 10800
         }}]
     })
+    assert gw.devices['lumi.xxx']['online'] is False
 
-    assert device['_']
+
+def test_airmonitor_acn01():
+    gw = _generate_gateway('lumi.airmonitor.acn01')
+    payload = gw.process_message({
+        'cmd': 'report', 'did': 'lumi.xxx',
+        'mi_spec': [{'siid': 3, 'piid': 1, 'value': 36.6}]
+    })
+    assert payload == {'temperature': 36.6}
