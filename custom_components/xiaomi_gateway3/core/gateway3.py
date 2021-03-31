@@ -678,7 +678,7 @@ class GatewayEntry(Thread, GatewayStats):
             return None
 
         except Exception as e:
-            self.debug(f"Can't read devices: {e}")
+            _LOGGER.exception(f"{self.host} | Can't read devices: {e}")
             return None
 
     def lock_firmware(self, enable: bool):
