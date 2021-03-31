@@ -544,6 +544,14 @@ automation:
 
 You can use this integration to **get a token for any of your Xiaomi devices**. You don't need to have Xiaomi Gateway 3. Just install and add the integration, enter the username / password from your Mi Home account. And use the integration settings to view your account's device tokens.
 
+Also you can get:
+
+- **LAN key** for old [Xiaomi Mijia Gateway](https://www.home-assistant.io/integrations/xiaomi_aqara/) (lumi.gateway.v3)
+- **room names** for Vacuums that support room with names
+- **Bindkey** for BLE devices that has it
+
+<img src="cloud_tokens.png" width="1202">
+
 # Disable Buzzer
 
 If you have a hacked motion sensor, the gateway will beep periodically.
