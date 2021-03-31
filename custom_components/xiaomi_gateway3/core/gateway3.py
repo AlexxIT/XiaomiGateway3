@@ -897,9 +897,11 @@ class GatewayEntry(Thread, GatewayStats):
                 # sometimes voltage and battery came in one payload
                 if prop == 'voltage' and 'battery' in payload:
                     continue
+                # I do not know if the formula is correct, so battery is more
+                # important than voltage
                 payload['battery'] = (
                     param['value'] if param['value'] < 1000
-                    else round((min(param['value'], 3200) - 2500) / 7)
+                    else int((min(param['value'], 3200) - 2600) / 6)
                 )
             elif prop == 'alive' and param['value']['status'] == 'offline':
                 device['online'] = False

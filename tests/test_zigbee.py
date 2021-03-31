@@ -34,7 +34,7 @@ def test_mi_spec_property():
         'cmd': 'report', 'did': 'lumi.xxx',
         'mi_spec': [{'siid': 3, 'piid': 1, 'value': 3100}]
     })
-    assert payload == {'battery': 86}
+    assert payload == {'battery': 83}
 
 
 def test_mi_spec_event():
@@ -73,3 +73,16 @@ def test_airmonitor_acn01():
         'mi_spec': [{'siid': 3, 'piid': 1, 'value': 36.6}]
     })
     assert payload == {'temperature': 36.6}
+
+
+def test_voltage():
+    gw = _generate_gateway('lumi.sensor_magnet')
+    payload = gw.process_message({
+        'cmd': 'heartbeat', 'params': [{
+            'did': 'lumi.xxx', 'res_list': [
+                {'res_name': '8.0.2008', 'value': 3045},
+                {'res_name': '8.0.2001', 'value': 74},
+            ]
+        }]
+    })
+    assert payload == {'battery': 74}
