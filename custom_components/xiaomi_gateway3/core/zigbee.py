@@ -436,7 +436,8 @@ def get_device(zigbee_model: str) -> Optional[dict]:
     return {
         'device_name': 'Zigbee',
         'device_mode': zigbee_model,
-        'params': []
+        'params': [],
+        'mi_spec': []
     }
 
 
