@@ -1,0 +1,78 @@
+{
+  "config": {
+    "error": {
+      "no_servers": "Wybierz co najmniej jeden serwer",
+      "cant_login": "Nie można się zalogować, sprawdź czy wpisałeś poprawny login i hasło",
+      "cant_connect": "Nie można nawiązać połączenia z bramką",
+      "wrong_model": "Niewspierany model bramki",
+      "wrong_token": "Niepoprawny token Mi Home",
+      "wrong_telnet": "Nieprawidłowa komenda otwarcia protokołu telnet"
+    },
+    "step": {
+      "user": {
+        "title": "Wybierz akcję",
+        "data": {
+          "action": "Akcja"
+        }
+      },
+      "cloud": {
+        "title": "Dodaj konto Xiaomi Home",
+        "description": "Wybierz tylko te serwery na której masz urządzenia",
+        "data": {
+          "username": "Email / ID konta Xiaomi",
+          "password": "Hasło",
+          "servers": "Serwery"
+        }
+      },
+      "token": {
+        "description": "Możesz uzyskać token automatycznie używając [danych logowania do konta Xiaomi](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) bądź [ręcznie](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Listę wspieranych wersji oprogramowania możesz znaleźć [tutaj](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "data": {
+          "host": "Host (Adres IP bramki)",
+          "token": "Token",
+          "telnet_cmd": "Komenda do otwarcia protokołu telnet"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Informacje o urządzeniach z Xiaomi Home",
+        "data": {
+          "did": "Urządzenie"
+        },
+        "description": "{device_info}"
+      },
+      "user": {
+        "title": "Ustawienia bramki",
+        "data": {
+          "host": "Host",
+          "token": "Token",
+          "telnet_cmd": "Komenda do otwarcia protokołu telnet",
+          "ble": "Wsparcie dla urządzeń BLE (Bluetoth Low Energy)",
+          "stats": "Dane dotyczące wydajności Zigbee i BLE",
+          "debug": "Debugowanie",
+          "buzzer": "Wyłącz głośnik w bramce [PRO]",
+          "parent": "Pokazuj urządzenia centralne w statystykach [PRO]",
+          "zha": "Tryb [PRO]"
+        },
+        "description": "Jeśli nie wiesz co robisz to NIGDY nie dotykaj ustawień **PRO**"
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "button": "Naciśnięcie przycisku",
+      "button_1": "Naciśnięcie 1 przycisku",
+      "button_2": "Naciśnięcie 2 przycisku",
+      "button_3": "Naciśnięcie 3 przycisku",
+      "button_4": "Naciśnięcie 4 przycisku",
+      "button_5": "Naciśnięcie 5 przycisku",
+      "button_6": "Naciśnięcie 6 przycisku",
+      "button_both": "Naciśnięcie obydwu przycisków",
+      "button_both_12": "Naciśnięcie przycisków 1 i 2",
+      "button_both_13": "Naciśnięcie przycisków 1 i 3",
+      "button_both_23": "Naciśnięcie przycisków 2 i 3"
+    }
+  }
+}
