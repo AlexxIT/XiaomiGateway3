@@ -36,7 +36,9 @@ OPT_PARENT = {
     -1: "Disabled", 0: "Manually", 60: "Hourly"
 }
 OPT_MODE = {
-    False: "Mi Home", True: "Zigbee Home Automation (ZHA)"
+    False: "Mi Home",
+    True: "Zigbee Home Automation (ZHA)",
+    'z2m': "zigbee2mqtt"
 }
 
 
@@ -128,6 +130,25 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
         return OptionsFlowHandler(entry)
 
 
+TITLE = "Xiaomi Gateway 3"
+
+ZHA_NOTIFICATION = """Please create manually
+
+Integration: **Zigbee Home Automation**
+Radio Type: **EZSP**
+Path: `socket://%s:8888`
+Speed: `115200`"""
+
+Z2M_NOTIFICATION = """Add to your zigbee2mqtt config
+
+```
+serial:
+  port: 'tcp://%s:8888'
+  adapter: ezsp
+```
+"""
+
+
 class OptionsFlowHandler(OptionsFlow):
     def __init__(self, entry: ConfigEntry):
         self.entry = entry
@@ -201,6 +222,28 @@ class OptionsFlowHandler(OptionsFlow):
 
     async def async_step_user(self, user_input=None):
         if user_input:
+            old_mode = self.entry.options.get('zha', False)
+            new_mode = user_input['zha']
+            if new_mode != old_mode:
+                host = user_input['host']
+
+                # change zigbee firmware if needed
+                if new_mode in (False, 'z2m'):
+                    ezsp_version = 8 if new_mode else 7
+                    if not await utils.update_zigbee_firmware(
+                            self.hass, host, ezsp_version
+                    ):
+                        raise Exception("Can't update zigbee firmware")
+
+                if new_mode is True:
+                    self.hass.components.persistent_notification.async_create(
+                        ZHA_NOTIFICATION % host, TITLE
+                    )
+                elif new_mode == 'z2m':
+                    self.hass.components.persistent_notification.async_create(
+                        Z2M_NOTIFICATION % host, TITLE
+                    )
+
             return self.async_create_entry(title='', data=user_input)
 
         host = self.entry.options['host']

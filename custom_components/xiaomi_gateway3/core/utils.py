@@ -7,17 +7,21 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
+import requests
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.requirements import async_process_requirements
 
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell
 from .xiaomi_cloud import MiCloud
 
 DOMAIN = 'xiaomi_gateway3'
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def remove_device(hass: HomeAssistantType, did: str):
@@ -141,6 +145,53 @@ async def get_bindkey(cloud: MiCloud, did: str):
     if bindkey.endswith('FFFFFFFF'):
         return "Not needed"
     return bindkey
+
+
+EZSP_URLS = {
+    7: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1',
+    8: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_7_8_z2m.gbl?viasf=1',
+}
+
+
+def _update_zigbee_firmware(host: str, ezsp_version: int):
+    shell = TelnetShell(host)
+
+    ps = shell.get_running_ps()
+    if "Lumi_Z3GatewayHost_MQTT" in ps:
+        shell.stop_lumi_zigbee()
+    if "tcp-l:8888" not in ps:
+        shell.check_or_download_socat()
+        shell.run_zigbee_tcp()
+
+    from ..util.elelabs_ezsp_utility import ElelabsUtilities
+
+    config = type('', (), {
+        'port': (host, 8888),
+        'baudrate': 115200,
+        'dlevel': _LOGGER.level
+    })
+    utils = ElelabsUtilities(config, _LOGGER)
+
+    # check current ezsp version
+    resp = utils.probe()
+    if resp[0] == 0 and resp[1] == ezsp_version:
+        return True
+
+    url = EZSP_URLS[ezsp_version]
+    r = requests.get(url)
+
+    resp = utils.flash(r.content)
+
+    return resp[0] == 0 and resp[1] == ezsp_version
+
+
+async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
+                                 ezsp_version: int):
+    await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
+
+    return await hass.async_add_executor_job(
+        _update_zigbee_firmware, host, ezsp_version
+    )
 
 
 TITLE = "Xiaomi Gateway 3 Debug"

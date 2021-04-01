@@ -21,18 +21,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 class Gateway3Entity(XiaomiEntity, ToggleEntity):
-    async def async_added_to_hass(self):
-        await super().async_added_to_hass()
-
-        zha = self.gw.options.get('zha')
-        if zha and not self.hass.config_entries.async_entries('zha'):
-            persistent_notification.async_create(
-                self.hass,
-                "Integration: **Zigbee Home Automation**\n"
-                "Radio Type: **EZSP**\n"
-                f"Path: `socket://{self.gw.host}:8888`\n"
-                "Speed: `115200`", "Please create manually")
-
     @property
     def is_on(self):
         return self._state
