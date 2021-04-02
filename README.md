@@ -36,6 +36,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Add and remove Zigbee devices](#add-and-remove-zigbee-devices)
 - [Add third-party Zigbee devices](#add-third-party-zigbee-devices)
 - [Zigbee Home Automation Mode](#zigbee-home-automation-mode)
+- [Zigbee2MQTT Mode](#zigbee2mqtt-mode)
 - [Handle Button Actions](#handle-button-actions)
 - [Handle BLE Locks](#handle-ble-locks)
 - [Obtain Mi Home device token](#obtain-mi-home-device-token)
@@ -60,10 +61,10 @@ A. No. The integration does not support Xiaomi Wi-Fi devices.
 A. Partially. The component connects to a hub on the local network. Zigbee devices work without internet. But adding new Zigbee devices to Mi Home requires Internet. Updating BLE device data may not work without Internet.
 
 **Q. Does the integration support non Xiaomi Zigbee devices?**  
-A. Yes. There are two ways to connect third party Zigbee devices. The first method allows devices to work in both Mi Home and Hass at the same time. The second method (ZHA) disconnects the hub from Mi Home and only works with Hass. Both methods have a different set of supported devices. There is no exact supported list. Don't expect absolutely every device on the market to be supported in any of these methods.
+A. Yes. There are three ways to connect third party Zigbee devices. All methods have a different set of supported devices. There is no exact supported list. Don't expect absolutely every device on the market to be supported in any of these methods.
 
 **Q. Will the Zigbee devices continue to work in Mi Home?**  
-A. Yes. If you do not enable ZHA mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
+A. Yes. If you do not enable ZHA or z2m mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
 
 **Q. Do I need to receive a token or enable Telnet manually?**  
 A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
@@ -71,8 +72,8 @@ A. No. The token is obtained automatically using the login / password from the M
 **Q. Should I open or solder the hub?**  
 A. No. Read [supported firmwares](#supported-firmwares) section.
 
-**Q. Should I use ZHA mode?**  
-A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best not to enable ZHA. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
+**Q. Should I use ZHA or z2m mode?**  
+A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA or z2m mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
 
 **Q. How many Zigbee devices does the hub support?**  
 A. The hub can connect directly up to 32 battery-powered devices (end devices). And **additionaly** up to 26 powered devices (routers). Other devices on your network can work through routers. The maximum number of devices is unknown. Official Xiaomi documentation writes about 128 devices.
@@ -364,7 +365,7 @@ You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/iss
 
 [Zigbee Home Automation](https://www.home-assistant.io/integrations/zha/) (ZHA) is a standard Home Assistant component for managing Zigbee devices. It works with various radio modules such as CC2531, Conbee II, Tasmoted Sonoff ZBBridge and others.
 
-**Important:** ZHA component is in early development stage. Don't expect it to work well with all devices.
+**Important:** ZHA component is in active development stage. Don't expect it to work well with all devices.
 
 **Attention: ZHA mode cannot work simultaneously with Mi Home!**
 
@@ -379,6 +380,34 @@ Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them 
 You can change the operating mode at any time. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
 
 Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
+
+# Zigbee2MQTT Mode
+
+**Video DEMO**
+
+[![Xiaomi Gateway 3 with support Zigbee2mqtt in Home Assistant](https://img.youtube.com/vi/esJ0nsqjejc/mqdefault.jpg)](https://www.youtube.com/watch?v=esJ0nsqjejc)
+
+[Zigbee2MQTT](https://www.zigbee2mqtt.io/) is a bigest project that support [hundreds](https://www.zigbee2mqtt.io/information/supported_devices.html) Zigbee devices from different vendors. And can be integrate with a lot of home automation projects.
+
+Unlike the ZHA you should install to your host or Hass.io system: [Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) and [Zigbee2MQTT Addon](https://github.com/zigbee2mqtt/hassio-zigbee2mqtt). Also you should setup [MQTT](https://www.home-assistant.io/integrations/mqtt/) integration.
+
+**Attention: Zigbee2MQTT mode cannot work simultaneously with Mi Home!**
+
+When you turn on Zigbee2MQTT mode - zigbee devices in Mi Home will stop working. Bluetooth devices will continue to work.
+
+To switch the mode go to:
+
+> Configuration > Integrations > Xiaomi Gateway 3 > Options > Mode
+
+Zigbee devices will not migrate from Mi Home to Zigbee2MQTT. You will need to pair them again.
+
+This mode will flash firmware of Gateway Zigbee chip automatically! And flash it back when you switch back to Mi Home mode. Becuse Zigbee2MQTT support only [new EZSP firmware](https://github.com/Koenkk/zigbee-herdsman/pull/317) and Xiaomi works with old one.
+
+You can use this mode with thank to this peoples:
+
+- [@kirovilya](https://github.com/kirovilya) and [@G1K](https://github.com/G1K) - developed support EFR32 chips in z2m project
+- [@CODeRUS](https://github.com/CODeRUS) and [@zvldz](https://github.com/zvldz) - adapted the script to flash the chip
+- [@faronov](https://github.com/faronov) - complied a new version of firmware 
 
 # Handle Button Actions
 
