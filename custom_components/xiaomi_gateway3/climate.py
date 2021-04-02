@@ -38,7 +38,7 @@ class XiaomiClimate(XiaomiEntity, ClimateEntity):
     _fan_mode = None
     _hvac_mode = None
     _is_on = None
-    _state: Optional[bytearray] = None
+    _state: bytearray = None
     # fix scenes with turned off climate
     # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
     _target_temp = 0
