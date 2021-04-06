@@ -136,6 +136,10 @@ class GatewayMesh(GatewayBase):
             if did not in bulk:
                 bulk[did] = {}
 
+            # TODO: fix this dirty hack
+            if device['model'] == 3083 and prop == 'power':
+                param['value'] /= 100.0
+
             bulk[did][prop] = param['value']
 
         for did, payload in bulk.items():
