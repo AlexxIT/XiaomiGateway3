@@ -56,16 +56,13 @@ DEVICES = [{
     ]
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
+    2007: ["Unknown", "Mesh Switch Controller"],
     'params': [
         [2, 1, 'switch', 'switch']
     ],
 }, {
-    2007: ["Unknown", "Mesh Switch Controller"],
-    'params': [
-        [2, 1, 'switch', 'switch']
-    ]
-}, {
     2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
+    3878: ["PTX", "Mesh Wall Triple Switch", "PTX-SK3M"],
     'params': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
