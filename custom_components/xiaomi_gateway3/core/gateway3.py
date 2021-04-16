@@ -213,12 +213,14 @@ class GatewayStats(GatewayMesh):
                 }
             elif 'free_mem' in payload:
                 s = payload['run_time']
-                h, m, s = s // 3600, s % 3600 // 60, s % 60
+                d, h, m, s = (s // (3600 * 24), s % (3600 * 24) // 3600,
+                              s % 3600 // 60, s % 60)
+
                 payload = {
                     'free_mem': payload['free_mem'],
                     'load_avg': payload['load_avg'],
                     'rssi': -payload['rssi'],
-                    'uptime': f"{h:02}:{m:02}:{s:02}",
+                    'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
                 }
 
         self.stats[self.did](payload)
