@@ -3,6 +3,7 @@ import logging
 import random
 import re
 import string
+import time
 import uuid
 from datetime import datetime
 from typing import List, Optional
@@ -98,6 +99,9 @@ def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
     raw = json.loads(telnet_cmd)
     # fw 1.4.6_0043+ won't answer on cmd without cloud, so don't check answer
     miio.send(raw['method'], raw.get('params'))
+
+    # waiting for telnet to start
+    time.sleep(1)
 
     try:
         # 4. check if telnet command helps
