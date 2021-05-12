@@ -167,6 +167,8 @@ def _update_zigbee_firmware(host: str, ezsp_version: int):
         shell.check_or_download_socat()
         shell.run_zigbee_tcp()
 
+    _LOGGER.debug(f"Try update EZSP to version {ezsp_version}")
+
     from ..util.elelabs_ezsp_utility import ElelabsUtilities
 
     config = type('', (), {
@@ -178,6 +180,7 @@ def _update_zigbee_firmware(host: str, ezsp_version: int):
 
     # check current ezsp version
     resp = utils.probe()
+    _LOGGER.debug(f"EZSP before flash: {resp}")
     if resp[0] == 0 and resp[1] == ezsp_version:
         return True
 
@@ -185,7 +188,7 @@ def _update_zigbee_firmware(host: str, ezsp_version: int):
     r = requests.get(url)
 
     resp = utils.flash(r.content)
-
+    _LOGGER.debug(f"EZSP after flash: {resp}")
     return resp[0] == 0 and resp[1] == ezsp_version
 
 
