@@ -8,6 +8,7 @@ from typing import Optional
 # Zigbee Model: [Manufacturer, Device Name, Device Model]
 # params: [lumi res name, xiaomi prop name, hass attr name, hass domain]
 # old devices uses params, new devices uses mi_spec
+# for mi_spec events you can use yaml in attr name field
 DEVICES = [{
     'lumi.gateway.mgl03': ["Xiaomi", "Gateway 3", "ZNDMWG03LM"],
     'params': [
@@ -352,7 +353,7 @@ DEVICES = [{
 }, {
     'lumi.motion.agl04': ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
     'mi_spec': [
-        ['4.1', None, 'motion', 'binary_sensor'],
+        ['4.1', None, 'motion: 1', 'binary_sensor'],
         ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }, {
@@ -364,6 +365,26 @@ DEVICES = [{
         ['3.3', '3.3', 'tvoc', 'sensor'],
         ['4.1', '4.1', 'tvoc_level', 'binary_sensor'],
         ['4.2', '4.2', 'battery', 'sensor'],
+    ]
+}, {
+    'lumi.switch.b1lc04': ["Aqara", "Single Wall Switch E1", "QBKG38LM"],
+    'mi_spec': [
+        ['2.1', '2.1', 'switch', 'switch'],
+        ['6.1', None, 'button: 1', None],
+        ['6.2', None, 'button: 2', None],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
+    'lumi.switch.b2lc04': ["Aqara", "Double Wall Switch E1", "QBKG39LM"],
+    'mi_spec': [
+        ['2.1', '2.1', 'channel 1', 'switch'],
+        ['3.1', '3.1', 'channel 2', 'switch'],
+        ['7.1', None, 'button_1: 1', None],
+        ['7.2', None, 'button_1: 2', None],
+        ['8.1', None, 'button_2: 1', None],
+        ['8.2', None, 'button_2: 2', None],
+        ['9.1', None, 'button_both: 4', None],
+        [None, None, 'action', 'sensor'],
     ]
 }]
 

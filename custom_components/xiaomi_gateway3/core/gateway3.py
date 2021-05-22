@@ -7,6 +7,7 @@ from pathlib import Path
 from threading import Thread
 from typing import Optional
 
+import yaml
 from paho.mqtt.client import Client, MQTTMessage
 
 from . import bluetooth, utils, zigbee
@@ -922,8 +923,9 @@ class GatewayEntry(Thread, GatewayStats):
             elif 'value' in param:
                 payload[prop] = param['value']
             elif 'arguments' in param:
-                if prop == 'motion':
-                    payload[prop] = 1
+                d = yaml.safe_load(prop)
+                if isinstance(d, dict):
+                    payload.update(d)
                 else:
                     payload[prop] = param['arguments']
 

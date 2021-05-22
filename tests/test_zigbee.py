@@ -46,6 +46,21 @@ def test_mi_spec_event():
     assert payload == {'motion': 1}
 
 
+def test_e1_click_event():
+    gw = _generate_gateway('lumi.switch.b2lc04')
+    payload = gw.process_message({
+        'cmd': 'report', 'did': 'lumi.xxx',
+        'mi_spec': [{'siid': 8, 'eiid': 2, 'arguments': []}]
+    })
+    assert payload == {'button_2': 2}
+
+    payload = gw.process_message({
+        'cmd': 'report', 'did': 'lumi.xxx',
+        'mi_spec': [{'siid': 9, 'eiid': 1, 'arguments': []}]
+    })
+    assert payload == {'button_both': 4}
+
+
 def test_online():
     gw = _generate_gateway('lumi.sensor_motion.aq2')
     gw.process_message({
