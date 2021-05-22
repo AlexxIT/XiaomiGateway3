@@ -165,7 +165,7 @@ class MiCloud:
             }, timeout=10)
 
             resp = await r.json(content_type=None)
-            _LOGGER.debug(f"Response from MIoT API {url}: {resp}")
+            # _LOGGER.debug(f"Response from MIoT API {url}: {resp}")
             assert resp['code'] == 0, resp
             return resp['result']
 
