@@ -495,6 +495,8 @@ class GatewayEntry(Thread, GatewayStats):
                     self.debug("Stop Lumi Zigbee")
                     shell.stop_lumi_zigbee()
 
+                if "tcp-l:8889" in ps:
+                    shell.stop_zigbee_tcp()
                 if "tcp-l:8888" not in ps:
                     if "Received" in shell.check_or_download_socat():
                         self.debug("Download socat")
@@ -502,7 +504,8 @@ class GatewayEntry(Thread, GatewayStats):
                     shell.run_zigbee_tcp()
 
             else:
-                if "tcp-l:8888" in ps:
+                # check both 8888 and 8889
+                if "tcp-l:888" in ps:
                     self.debug("Stop Zigbee TCP")
                     shell.stop_zigbee_tcp()
 
