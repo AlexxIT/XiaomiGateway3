@@ -141,6 +141,10 @@ class GatewayMesh(GatewayBase):
             if device['model'] == 3083 and prop == 'power':
                 param['value'] /= 100.0
 
+            # https://github.com/AlexxIT/XiaomiGateway3/issues/312
+            if prop in ('temperature', 'humidity') and param['value']:
+                param['value'] = round(param['value'], 2)
+
             bulk[did][prop] = param['value']
 
         for did, payload in bulk.items():
