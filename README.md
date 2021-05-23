@@ -89,11 +89,11 @@ A. All button clicks are displayed in the status of that one entity.
 The component is only tested with these firmware versions:
 
 - v1.4.6_0012 - you may use default open telnet command
-- v1.4.7_0160 - you **should** use [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709), safe to update
+- v1.5.0_0026 - you **should** use [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709), safe to update
 
 If you have problems with other firmware, don't even ask to fix it.
 
-The component can work with these firmware versions, but they may have bugs: v1.4.4_0003, v1.4.5_0012, v1.4.5_0016, v1.4.6_0030, v1.4.6_0043, v1.4.7_0063, v1.4.7_0065, v1.4.7_0115.
+The component can work with these firmware versions, but they may have bugs: v1.4.4_0003, v1.4.5_0012, v1.4.5_0016, v1.4.6_0030, v1.4.6_0043, v1.4.7_0063, v1.4.7_0065, v1.4.7_0115, v1.4.7_0160.
 
 Optionally you can flash gateway with custom firmware: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
