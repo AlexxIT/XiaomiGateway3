@@ -193,6 +193,7 @@ BLE devices and their attributes **don't appear immediately**! Data collected an
 Tested Mesh Lights:
 - Xiaomi Mesh Bulb (MJDP09YL)
 - Xiaomi Mesh Downlight (MJTS01YL)
+- Xiaomi Mesh Downlight (MJTS003)
 - Xiaomi Mesh Group (Mesh Group)
 - Yeelight Mesh Bulb E14 (YLDP09YL)
 - Yeelight Mesh Bulb E27 (YLDP10YL)
