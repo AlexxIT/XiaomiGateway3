@@ -151,6 +151,14 @@ async def get_bindkey(cloud: MiCloud, did: str):
     return bindkey
 
 
+def reverse_mac(s: str):
+    return f"{s[10:]}{s[8:10]}{s[6:8]}{s[4:6]}{s[2:4]}{s[:2]}"
+
+
+def print_mac(s: str):
+    return f"{s[:2]}:{s[2:4]}:{s[4:6]}:{s[6:8]}:{s[8:10]}:{s[10:]}".upper()
+
+
 EZSP_URLS = {
     7: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1',
     8: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_7_8_z2m.gbl?viasf=1',

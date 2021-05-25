@@ -35,11 +35,8 @@ FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
 TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info miioconfig.db 2>/dev/null | base64\n"
 
 BT_MD5 = {
-    '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
-    '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
-    '1.4.7_0115': 'be4724fbc5223fcde60aff7f58ffea28',
-    '1.4.7_0160': '9290241cd9f1892d2ba84074f07391d4',
-    '1.5.0_0026': '9290241cd9f1892d2ba84074f07391d4',
+    '1.4.7_0160': 'ba2e1931667c836187cbf7f1e834f588',
+    '1.5.0_0026': 'ba2e1931667c836187cbf7f1e834f588',
 }
 
 
@@ -103,6 +100,9 @@ class TelnetShell(Telnet):
             "/data/silabs_ncp_bt /dev/ttyS1 1 2>&1 >/dev/null | "
             "mosquitto_pub -t log/ble -l &"
         )
+
+    def stop_bt(self):
+        self.exec("killall silabs_ncp_bt")
 
     def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""

@@ -10,7 +10,9 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 
+from .core import bluetooth
 from .core.gateway3 import Gateway3
+from .core.helpers import DevicesRegistry
 from .core.utils import DOMAIN, XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud
 
@@ -20,8 +22,6 @@ DOMAINS = ['binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
            'switch', 'alarm_control_panel']
 
 CONF_DEVICES = 'devices'
-CONF_DEBUG = 'debug'
-CONF_BUZZER = 'buzzer'
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
@@ -30,25 +30,25 @@ CONFIG_SCHEMA = vol.Schema({
                 vol.Optional('occupancy_timeout'): cv.positive_int,
             }, extra=vol.ALLOW_EXTRA),
         },
-        vol.Optional(CONF_BUZZER): cv.boolean,
-        vol.Optional(CONF_DEBUG): cv.string,
     }, extra=vol.ALLOW_EXTRA),
 }, extra=vol.ALLOW_EXTRA)
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
-    config = hass_config.get(DOMAIN) or {}
+    config = hass_config.get(DOMAIN)
 
-    if 'disabled' in config:
-        # for dev purposes
-        return False
+    if config and 'devices' in config:
+        for k, v in config['devices'].items():
+            # AA:BB:CC:DD:EE:FF => aabbccddeeff
+            k = k.replace(':', '').lower()
+            DevicesRegistry.defaults[k] = v
+
+            if 'bindkey' in v:
+                bluetooth.add_beaconkey(k, v['bindkey'])
 
     hass.data[DOMAIN] = {
-        'config': config,
         'debug': _LOGGER.level > 0  # default debug from Hass config
     }
-
-    config.setdefault('devices', {})
 
     await _handle_device_remove(hass)
 
@@ -75,9 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not entry.update_listeners:
         entry.add_update_listener(async_update_options)
 
-    config = hass.data[DOMAIN]['config']
-    hass.data[DOMAIN][entry.entry_id] = \
-        Gateway3(**entry.options, config=config)
+    hass.data[DOMAIN][entry.entry_id] = Gateway3(**entry.options)
 
     hass.async_create_task(_setup_domains(hass, entry))
 
@@ -168,15 +166,13 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         _LOGGER.debug("No devices in .storage")
         return False
 
-    # TODO: Think about a bunch of devices
-    if 'devices' not in hass.data[DOMAIN]:
-        hass.data[DOMAIN]['devices'] = devices
-    else:
-        hass.data[DOMAIN]['devices'] += devices
-
-    default_devices = hass.data[DOMAIN]['config']['devices']
     for device in devices:
-        default_devices[device['did']] = {'device_name': device['name']}
+        # key - mac for BLE, and did for others
+        did = device['did'] if device['pid'] not in '6' else \
+            device['mac'].replace(':', '').lower()
+        DevicesRegistry.defaults.setdefault(did, {})
+        # don't override name if exists
+        DevicesRegistry.defaults[did].setdefault('device_name', device['name'])
 
     return True
 

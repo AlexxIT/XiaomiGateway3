@@ -30,7 +30,8 @@ SERVERS = {
 OPT_DEBUG = {
     'true': "Basic logs",
     'miio': "miIO logs",
-    'mqtt': "MQTT logs"
+    'mqtt': "MQTT logs",
+    'ble': "BLE logs",
 }
 OPT_PARENT = {
     -1: "Disabled", 0: "Manually", 60: "Hourly"
@@ -39,6 +40,11 @@ OPT_MODE = {
     False: "Mi Home",
     True: "Zigbee Home Automation (ZHA)",
     'z2m': "zigbee2mqtt"
+}
+OPT_BLE = {
+    False: "Disabled",
+    True: "Enabled",
+    'adv': "ADVanced"
 }
 
 
@@ -262,7 +268,7 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Required('host', default=host): str,
                 vol.Required('token', default=token): str,
                 vol.Optional('telnet_cmd', default=telnet_cmd): str,
-                vol.Required('ble', default=ble): bool,
+                vol.Required('ble', default=ble): vol.In(OPT_BLE),
                 vol.Required('stats', default=stats): bool,
                 vol.Optional('debug', default=debug): cv.multi_select(
                     OPT_DEBUG

@@ -1,16 +1,20 @@
 from datetime import datetime
 from typing import Optional
 
+from Crypto.Cipher import AES
+
 # Bluetooth Model: [Manufacturer, Device Name, Device Model]
 # params: [siid, piid, hass attr name, hass domain]
 DEVICES = [{
     # BLE
     131: ["Xiaomi", "Kettle", "YM-K1501"],
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
+    339: ["Yeelight", "Remote Control", "YLYK01YL"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
     794: ["Xiaomi", "Door Lock", "MJZNMS02LM"],
     839: ["Xiaomi", "Qingping TH Sensor", "CGG1"],
     903: ["Xiaomi", "ZenMeasure TH", "MHO-C401"],
+    950: ["Yeelight", "Dimmer", "YLKG07YL"],
     982: ["Xiaomi", "Qingping Door Sensor", "CGH1"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1115: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
@@ -42,7 +46,7 @@ DEVICES = [{
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'light', 'light'],
         [2, 2, 'brightness', None],
         [2, 3, 'color_temp', None],
@@ -50,20 +54,20 @@ DEVICES = [{
 }, {
     # Mesh Switches
     1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
     ]
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     2007: ["Unknown", "Mesh Switch Controller"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'switch', 'switch']
     ],
 }, {
     2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Wall Triple Switch", "PTX-SK3M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
         [4, 1, 'right_switch', 'switch'],
@@ -74,7 +78,7 @@ DEVICES = [{
     ]
 }, {
     2257: ["PTX", "Mesh Wall Double Switch", "PTX-SK2M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
         [8, 1, 'backlight', 'switch'],
@@ -83,14 +87,14 @@ DEVICES = [{
     ]
 }, {
     2258: ["PTX", "Mesh Wall Single Switch", "PTX-SK1M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'switch', 'switch'],
         [8, 1, 'backlight', 'switch'],
         [8, 2, 'smart', 'switch'],
     ]
 }, {
     2717: ["Xiaomi", "Mesh Wall Triple Switch", "ISA-KG03HL"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
         [4, 1, 'right_switch', 'switch'],
@@ -99,7 +103,7 @@ DEVICES = [{
     ]
 }, {
     3083: ["Xiaomi", "Mi Smart Electrical Outlet", "ZNCZ01ZM"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'outlet', 'switch'],
         [3, 1, 'power', 'sensor'],
         [4, 1, 'backlight', 'switch'],
@@ -174,10 +178,25 @@ BLE_LOCK_ERROR = {
 }
 
 ACTIONS = {
+    339: {
+        0: 'on', 1: 'off', 2: 'temp', 4: 'mode', 3: 'up', 5: 'down',
+        0x20000: 'on_hold', 0x20001: 'off_hold', 0x20002: 'temp_hold',
+        0x20004: 'mode_hold', 0x20003: 'up_hold', 0x20005: 'down_hold',
+    },
     1249: {0: 'right', 1: 'left'},
     1983: {0: 'single', 0x010000: 'double', 0x020000: 'hold'},
     2147: {0: 'single'},
 }
+
+# https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers/
+BLE_MANUF = {
+    b'\x4C\x00': "Apple",
+    b'\x8f\x03': "Xiaomi"
+}
+
+# mac in lower case witout colon = key in hexstring
+BLE_KEYS = {}
+BLE_SEQ = {}
 
 
 def get_ble_domain(param: str) -> Optional[str]:
@@ -204,6 +223,25 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
     length = len(data)
 
     if eid == 0x1001 and length == 3:  # 4097
+        if pdid == 950:
+            if data[2] == 3:
+                if data[0] == 0:
+                    # click from 1 to 5
+                    return {'button': data[1]}
+                elif data[0] == 1:
+                    # hold with duration
+                    return {'action': 'hold', 'duration': data[1]}
+            elif data[2] == 4:
+                if data[0] == 0:
+                    # rotate with sign (right or left)
+                    value = int.from_bytes(data[1:2], 'little', signed=True)
+                    return {'action': 'rotate', 'angle': value}
+                elif data[1] == 0:
+                    # hold and rotate with sign (right or left)
+                    value = int.from_bytes(data[0:1], 'little', signed=True)
+                    return {'action': 'rotate_hold', 'angle': value}
+            return None
+
         value = int.from_bytes(data, 'little')
         return {
             'action': ACTIONS[pdid][value]
@@ -379,6 +417,195 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
     return None
 
 
+def mibeacon_decode4(mibeacon: bytes, payload_pos: int, key: str):
+    payload = mibeacon[payload_pos:-7]
+    if not payload:
+        return None
+
+    try:
+        # mac + pid + cnt + counter
+        key = bytes.fromhex(key)
+        nonce = mibeacon[5:11] + mibeacon[2:5] + mibeacon[-7:-4]
+        cipher = AES.new(key, AES.MODE_CCM, nonce=nonce, mac_len=4)
+        cipher.update(b'\x11')
+
+        token = mibeacon[-4:]
+        return cipher.decrypt_and_verify(payload, token)
+    except:
+        return None
+
+
+def mibeacon_decode2(mibeacon: bytes, payload_pos: int, key: str):
+    payload = mibeacon[payload_pos:-4]
+    if not payload:
+        return None
+
+    key = bytes.fromhex(key[0:12] + '8d3d3c97' + key[12:24])
+
+    # frame + pid + cnt + counter + mac5
+    nonce = mibeacon[0:5] + mibeacon[-4:-1] + mibeacon[5:10]
+    cipher = AES.new(key, AES.MODE_CCM, nonce=nonce, mac_len=4)
+    cipher.update(b'\x11')
+
+    return cipher.decrypt(payload)
+
+
+def parse_raw_xiaomi(data: bytes):
+    frame = int.from_bytes(data[:2], 'little')
+    # check mac
+    if frame & 0x10 == 0:
+        return None
+    # check payload
+    if frame & 0x40 == 0:
+        return None
+
+    mac = bytearray(reversed(data[5:11])).hex()
+    seq = data[4]
+
+    # check same seq
+    if BLE_SEQ.get(mac) == seq:
+        return None
+
+    BLE_SEQ[mac] = seq
+
+    version = (frame >> 12) & 0b1111
+
+    i = 5 + 6
+    # check capability
+    if frame & 0x20:
+        cap = data[i]
+        i += 1
+        if (cap >> 3) == 0b11:
+            i += 2
+        if version == 5 and cap & 0x20:
+            i += 2
+
+    payload = data[i:-2] if version == 5 and frame & 0x80 else data[i:]
+    if payload == b'':
+        return None
+
+    # check encription
+    if frame & 0x08:
+        if mac not in BLE_KEYS:
+            return None
+
+        if 4 <= version <= 5:
+            payload = mibeacon_decode4(data, i, BLE_KEYS[mac])
+        elif 2 <= version <= 3:
+            payload = mibeacon_decode2(data, i, BLE_KEYS[mac])
+        else:
+            return None
+
+    # eid - 2 bytes, size - 1 byte, value 1+ bytes
+    if not payload or len(payload) < 4:
+        return None
+
+    pdid = int.from_bytes(data[2:4], 'little')
+    eid = int.from_bytes(payload[:2], 'little')
+    edata = payload[3:]
+
+    if payload[2] != len(edata):
+        # wrong payload len
+        return None
+
+    return {
+        'dev': {'mac': mac, 'pdid': pdid},
+        'evt': {'eid': eid, 'edata': edata.hex()},
+        'frmCnt': seq
+    }
+
+
+def parse_raw_ble(data: str) -> Optional[dict]:
+    """Return payload only for valid Advertising."""
+    # https://www.silabs.com/community/wireless/bluetooth/knowledge-base.entry.html/2017/02/10/bluetooth_advertisin-hGsf
+    # https://www.argenox.com/library/bluetooth-low-energy/ble-advertising-primer/
+    data = bytes.fromhex(data)
+
+    result = None
+
+    # validate payload
+    i = 0
+    while i < len(data):
+        len_ = data[i]
+        if i + len_ >= len(data):
+            return None
+
+        ad_type = data[i + 1]
+        # https://www.bluetooth.com/specifications/assigned-numbers/generic-access-profile/
+        if 0x2D < ad_type < 0xFF or ad_type == 0:
+            return None
+
+        # Service Data + 16-bit UUID
+        if ad_type == 0x16 and data[i + 2:i + 4] == b'\x95\xfe':
+            result = parse_raw_xiaomi(data[i + 4:i + 1 + len_])
+
+        i += 1 + len_
+
+    if i != len(data):
+        return None
+
+    return result
+
+
+def get_ble_model(data: str) -> Optional[str]:
+    """Return Xiaomi Product ID if available. Or known manufacturer. If payload
+    invalid - return Null.
+    """
+    data = bytes.fromhex(data)
+
+    if len(data) < 3:
+        return None
+
+    pdid = manuf = None
+
+    # validate payload
+    i = 0
+    while i < len(data):
+        len_ = data[i]
+        if i + len_ >= len(data):
+            return None
+
+        ad_type = data[i + 1]
+        if 0x2D < ad_type < 0xFF or ad_type == 0:
+            return None
+
+        # Service Data + 16-bit UUID
+        if ad_type == 0x16:
+            if data[i + 2:i + 4] == b'\x95\xfe':
+                pdid = str(int.from_bytes(data[i + 6:i + 8], 'little'))
+        elif ad_type == 0x2A:
+            pdid = "Mesh"
+        elif ad_type == 0xFF:
+            # Manufacturer Specific Data
+            manuf = BLE_MANUF.get(data[i + 2:i + 4])
+            if data[i + 2:i + 4] == b'\x8f\x03':
+                if data[i + 5] == 0x10:  # proximity
+                    pdid = str(int.from_bytes(data[i + 6:i + 8], 'little'))
+                elif data[i + 5] == 0x11:  # phone
+                    name_len = data[i + 9] >> 4
+                    pdid = data[i + 10:i + 10 + name_len].decode()
+
+        i += 1 + len_
+
+    if i != len(data):
+        return None
+
+    return pdid or manuf or "Unknown"
+
+
+def add_beaconkey(mac: str, beaconkey: str, from_db: bool = False):
+    if mac in BLE_KEYS:
+        return
+
+    if from_db:
+        key = bytes.fromhex('00000000000000000000000000000000')
+        cipher = AES.new(key, AES.MODE_CCM, nonce=key[:8], mac_len=4)
+        payload = bytes.fromhex(beaconkey)
+        BLE_KEYS[mac] = cipher.decrypt(payload).hex()
+    else:
+        BLE_KEYS[mac] = beaconkey
+
+
 def get_device(pdid: int, default_name: str) -> Optional[dict]:
     for device in DEVICES:
         if pdid in device:
@@ -387,7 +614,8 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
                 'device_manufacturer': desc[0],
                 'device_name': desc[0] + ' ' + desc[1],
                 'device_model': desc[2] if len(desc) > 2 else pdid,
-                'params': device.get('params'),
+                'lumi_spec': None,
+                'miot_spec': device.get('miot_spec'),
                 # if color temp not default 2700..6500
                 'color_temp': COLOR_TEMP.get(pdid),
                 'max_brightness': MAX_BRIGHTNESS.get(pdid)
@@ -396,8 +624,9 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
     return {
         'device_name': default_name,
         'device_model': pdid,
+        'lumi_spec': None,
         # default Mesh device will be Bulb
-        'params': [
+        'miot_spec': [
             [2, 1, 'light', 'light'],
             [2, 2, 'brightness', None],
             [2, 3, 'color_temp', None],

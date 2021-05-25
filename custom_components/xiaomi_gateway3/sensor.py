@@ -6,9 +6,9 @@ from homeassistant.const import *
 from homeassistant.util.dt import now
 
 from . import DOMAIN
-from .core import zigbee
+from .core import bluetooth, utils, zigbee
 from .core.gateway3 import Gateway3
-from .core.helpers import XiaomiEntity
+from .core.helpers import DevicesRegistry, XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ UNITS = {
     'smoke density': '% obs/ft',
     'moisture': '%',
     'tvoc': CONCENTRATION_PARTS_PER_BILLION,
+    'ble_scanner': 'devices'
     # 'link_quality': 'lqi',
     # 'rssi': 'dBm',
     # 'msg_received': 'msg',
@@ -42,6 +43,7 @@ ICONS = {
     'zigbee': 'mdi:zigbee',
     'ble': 'mdi:bluetooth',
     'tvoc': 'mdi:cloud',
+    'ble_scanner': 'mdi:bluetooth-transfer'
 }
 
 INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
@@ -58,6 +60,8 @@ async def async_setup_entry(hass, entry, add_entities):
             add_entities([ZigbeeStats(gateway, device, attr)])
         elif attr == 'ble':
             add_entities([BLEStats(gateway, device, attr)])
+        elif attr == 'ble_scanner':
+            add_entities([BLEScanner(gateway, device, attr)])
         else:
             add_entities([XiaomiSensor(gateway, device, attr)])
 
@@ -215,15 +219,49 @@ class BLEStats(XiaomiSensor):
                 'msg_received': 0,
             }
 
-        self.gw.add_stats(self.device['did'], self.update)
+        self.gw.add_stats(self.device['mac'], self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['did'], self.update)
+        self.gw.remove_stats(self.device['mac'], self.update)
 
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1
         self._state = now().isoformat(timespec='seconds')
+        self.schedule_update_ha_state()
+
+
+class BLEScanner(XiaomiSensor):
+    processed_macs = None
+
+    async def async_added_to_hass(self):
+        self.gw.set_entity(self)
+        self.processed_macs = []
+        self._attrs['known_macs'] = []
+        self._attrs['unknown_macs'] = []
+
+    def update(self, data: dict = None):
+        if 'mac' in data:
+            mac = data['mac']  # reversed MAC
+            if mac in self.processed_macs:
+                return
+
+            model = bluetooth.get_ble_model(data['adv'])
+            if not model:
+                return
+
+            self.processed_macs.append(mac)
+
+            mac = utils.reverse_mac(mac)  # usual MAC without colon
+            pmac = utils.print_mac(mac) + ' ' + model
+            if (mac in DevicesRegistry.devices or
+                    mac in DevicesRegistry.defaults):
+                self._attrs['known_macs'].append(pmac)
+            else:
+                self._attrs['unknown_macs'].append(pmac)
+
+            self._state = len(self.processed_macs)
+
         self.schedule_update_ha_state()
 
 
@@ -233,6 +271,7 @@ BUTTON = {
     2: 'double',
     3: 'triple',
     4: 'quadruple',
+    5: 'quintuple',  # only Yeelight Dimmer
     16: 'hold',
     17: 'release',
     18: 'shake',

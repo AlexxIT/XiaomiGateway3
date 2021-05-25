@@ -5,6 +5,7 @@ from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity import Entity
 
+from . import zigbee, bluetooth
 from .utils import DOMAIN
 
 
@@ -16,6 +17,9 @@ class XiaomiDevice:
     mac: str
     type: str  # gateway, zigbee, ble, mesh
     online: bool
+
+    lumi_spec: list
+    miot_spec: list
 
     device_info: Dict[str, Any]
 
@@ -36,6 +40,8 @@ class DevicesRegistry:
     """
     devices: Dict[str, dict] = {}
     setups: Dict[str, Callable] = None
+
+    defaults: Dict[str, dict] = {}
 
     def add_setup(self, domain: str, handler):
         """Add hass device setup funcion."""
@@ -59,6 +65,44 @@ class DevicesRegistry:
     def remove_entity(self, entity: 'XiaomiEntity'):
         entity.device['entities'].pop(entity.attr)
 
+    def find_or_create_device(self, device: dict) -> dict:
+        # search device by did
+        did = device.get('did')
+        if did in self.devices:
+            return self.devices[did]
+
+        # update device with specs
+        type_ = device['type']
+        if type_ in ('gateway', 'zigbee'):
+            device.update(zigbee.get_device(device['model']))
+        elif type_ == 'mesh':
+            device.update(bluetooth.get_device(device['model'], 'Mesh'))
+        elif type_ == 'ble':
+            device.update(bluetooth.get_device(device['model'], 'BLE'))
+
+        model = device['model']
+        if model in self.defaults:
+            device.update(self.defaults[model])
+
+        if did in self.defaults:
+            device.update(self.defaults[did])
+
+        mac = device['mac'].lower()
+        if mac in self.defaults:
+            device.update(self.defaults[mac])
+
+        device['entities'] = {}
+        device['gateways'] = []
+
+        # use mac for ble devices as did
+        self.devices[mac if type_ == 'ble' else did] = device
+
+        if type_ == 'mesh':
+            # to consider mesh device as known device
+            self.defaults.setdefault(mac, {})
+
+        return device
+
 
 class XiaomiEntity(Entity):
     _ignore_offline = None
@@ -71,9 +115,9 @@ class XiaomiEntity(Entity):
         self.attr = attr
         self._attrs = {}
 
-        self._unique_id = f"{self.device['mac']}_{self.attr}"
-        self._name = (self.device['device_name'] + ' ' +
-                      self.attr.replace('_', ' ').title())
+        self._unique_id = f"{device.get('entity_name', device['mac'])}_{attr}"
+        self._name = (device['device_name'] + ' ' +
+                      attr.replace('_', ' ').title())
 
         self.entity_id = f"{DOMAIN}.{self._unique_id}"
 
