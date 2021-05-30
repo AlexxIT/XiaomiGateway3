@@ -38,7 +38,7 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
 
     @property
     def should_poll(self):
-        return True
+        return False
 
     @property
     def state(self):
@@ -77,12 +77,20 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 3
         }])
 
-    def update(self, *args):
-        try:
-            resp = self.gw.miio.send('get_properties', [{
-                'did': self.miio_did, 'siid': 3, 'piid': 1
-            }])
-            state = resp[0]['value']
-            self._state = ALARM_STATES[state]
-        except:
-            pass
+    def update(self, data: dict = None):        
+        if data is None:
+            try:
+                resp = self.gw.miio.send('get_properties', [{
+                    'did': self.miio_did, 'siid': 3, 'piid': 1
+                }])
+                state = resp[0]['value']
+                self._state = ALARM_STATES[state]
+                return
+            except:
+                pass
+
+        else:
+            if 'alarm' in data:
+                state = data['alarm']
+                self._state = ALARM_STATES[state]
+                self.schedule_update_ha_state()

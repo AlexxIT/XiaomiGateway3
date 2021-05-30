@@ -25,6 +25,9 @@ DEVICES = [{
         [None, None, 'pair', 'remote'],
         [None, None, 'firmware lock', 'switch'],  # firmware lock
         [None, None, 'alarm', 'alarm_control_panel'],
+    ],
+    'miot_spec': [
+        [3, 1, 'alarm', 'alarm_control_panel'],
     ]
 }, {
     # on/off, power measurement
