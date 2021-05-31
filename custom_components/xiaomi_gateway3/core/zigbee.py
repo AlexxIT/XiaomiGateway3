@@ -353,8 +353,9 @@ DEVICES = [{
 }, {
     'lumi.motion.agl04': ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
     'mi_spec': [
-        ['4.1', None, 'motion: 1', 'binary_sensor'],
+        [None, None, 'motion', 'binary_sensor'],
         ['3.1', '3.1', 'battery', 'sensor'],
+        ['4.1', None, 'motion: 1', None],
     ]
 }, {
     'lumi.airmonitor.acn01': ["Aqara", "TVOC Air Quality Monitor",
