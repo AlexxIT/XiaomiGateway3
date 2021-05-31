@@ -38,7 +38,7 @@ DEVICES = [{
     996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
     997: ["Yeelight", "Mesh Spotlight", "YLSD04YL"],
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
-    1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL"],
+    1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
