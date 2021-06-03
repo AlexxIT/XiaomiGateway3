@@ -25,6 +25,9 @@ UNITS = {
     'smoke density': '% obs/ft',
     'moisture': '%',
     'tvoc': CONCENTRATION_PARTS_PER_BILLION,
+    'weight': '*',
+    'weight_kg': 'kg',
+    'weight_lb': 'lb'
     # 'link_quality': 'lqi',
     # 'rssi': 'dBm',
     # 'msg_received': 'msg',
@@ -42,6 +45,9 @@ ICONS = {
     'zigbee': 'mdi:zigbee',
     'ble': 'mdi:bluetooth',
     'tvoc': 'mdi:cloud',
+    'weight': 'mdi:weight',
+    'weight_kg': 'mdi:weight-kilogram',
+    'weight_lb': 'mdi:weight-pound'
 }
 
 INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
@@ -85,6 +91,9 @@ class XiaomiSensor(XiaomiEntity):
     def update(self, data: dict = None):
         if self.attr in data:
             self._state = data[self.attr]
+            # TODO: fixme
+            if self.attr.startswith('weight'):
+                self._attrs.update(data)
         self.schedule_update_ha_state()
 
 
@@ -215,11 +224,11 @@ class BLEStats(XiaomiSensor):
                 'msg_received': 0,
             }
 
-        self.gw.add_stats(self.device['did'], self.update)
+        self.gw.add_stats(self.device['mac'], self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['did'], self.update)
+        self.gw.remove_stats(self.device['mac'], self.update)
 
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1
@@ -233,6 +242,7 @@ BUTTON = {
     2: 'double',
     3: 'triple',
     4: 'quadruple',
+    5: 'quintuple',  # only Yeelight Dimmer
     16: 'hold',
     17: 'release',
     18: 'shake',

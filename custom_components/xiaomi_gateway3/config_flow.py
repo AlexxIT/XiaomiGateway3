@@ -30,7 +30,8 @@ SERVERS = {
 OPT_DEBUG = {
     'true': "Basic logs",
     'miio': "miIO logs",
-    'mqtt': "MQTT logs"
+    'mqtt': "MQTT logs",
+    'ble': "BLE logs",
 }
 OPT_PARENT = {
     -1: "Disabled", 0: "Manually", 60: "Hourly"
