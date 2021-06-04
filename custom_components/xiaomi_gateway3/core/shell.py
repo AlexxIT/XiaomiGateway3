@@ -83,8 +83,18 @@ class TelnetShell(Telnet):
         self.exec(f"killall gw3")
 
     def run_zigbee_tcp(self, port=8888):
+        # stop default lumi utility
+        self.exec("killall daemon_app.sh tail Lumi_Z3GatewayHost_MQTT")
+
+        # run socat
         if self.check_bin('socat', MD5_SOCAT, 'bin/socat'):
             self.exec(RUN_ZIGBEE_TCP % port)
+
+        # run dummy Lumi_Z3GatewayHost_MQTT so daemon_miio won't start original
+        self.exec("sh -c 'sleep 999d' dummy:Lumi_Z3GatewayHost_MQTT &")
+
+        # run daemon_app
+        self.exec("daemon_app.sh &")
 
     def stop_zigbee_tcp(self):
         # stop both 8888 and 8889

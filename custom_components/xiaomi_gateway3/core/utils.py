@@ -167,8 +167,6 @@ def _update_zigbee_firmware(host: str, ezsp_version: int):
     shell = TelnetShell(host)
 
     ps = shell.get_running_ps()
-    if "Lumi_Z3GatewayHost_MQTT" in ps:
-        shell.stop_lumi_zigbee()
     if "tcp-l:8888" in ps:
         shell.stop_zigbee_tcp()
     # flash on another port because running ZHA or z2m can breake process

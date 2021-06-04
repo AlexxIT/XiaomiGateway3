@@ -624,10 +624,6 @@ class GatewayEntry(Thread, GatewayBLE):
                     shell.run_buzzer()
 
             if self.options.get('zha'):
-                if "Lumi_Z3GatewayHost_MQTT" in ps:
-                    self.debug("Stop Lumi Zigbee")
-                    shell.stop_lumi_zigbee()
-
                 if "tcp-l:8889" in ps:
                     shell.stop_zigbee_tcp()
                 if "tcp-l:8888" not in ps:
@@ -640,12 +636,15 @@ class GatewayEntry(Thread, GatewayBLE):
                     self.debug("Stop Zigbee TCP")
                     shell.stop_zigbee_tcp()
 
+                if "dummy:Lumi_Z3GatewayHost_MQTT" in ps:
+                    shell.stop_lumi_zigbee()
+
                 if (self.parent_scan_interval >= 0 and
                         "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps):
                     self.debug("Run public Zigbee console")
                     shell.run_public_zb_console()
 
-                elif "Lumi_Z3GatewayHost_MQTT" not in ps:
+                elif "Lumi_Z3GatewayHost_MQTT -n" not in ps:
                     self.debug("Run Lumi Zigbee")
                     shell.run_lumi_zigbee()
 
