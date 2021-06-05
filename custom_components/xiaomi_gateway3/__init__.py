@@ -103,10 +103,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     gw = hass.data[DOMAIN][entry.entry_id]
     gw.stop()
 
-    return all([
-        await hass.config_entries.async_forward_entry_unload(entry, domain)
+    await asyncio.gather(*[
+        hass.config_entries.async_forward_entry_unload(entry, domain)
         for domain in DOMAINS
     ])
+
+    return True
 
 
 async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):

@@ -546,7 +546,7 @@ class GatewayEntry(Thread, GatewayBLE):
 
     def stop(self, *args):
         self.enabled = False
-        self.mqtt.loop_stop()
+        self.mqtt.disconnect()
 
         for device in self.devices.values():
             if self in device['gateways']:
@@ -873,7 +873,7 @@ class GatewayEntry(Thread, GatewayBLE):
     def update_entities_states(self):
         for device in list(self.devices.values()):
             if self in device['gateways']:
-                for entity in device['entities'].values():
+                for entity in list(device['entities'].values()):
                     if entity:
                         entity.schedule_update_ha_state()
 
