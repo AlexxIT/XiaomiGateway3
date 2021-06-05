@@ -98,7 +98,7 @@ DEVICES = [{
         [8, 2, 'smart', 'switch'],
     ]
 }, {
-    2717: ["Xiaomi", "Mesh Wall Triple Switch", "ISA-KG03HL"],
+    2717: ["Xiaomi", "Mesh Wall Triple Switch", "ZNKG03HL/ISA-KG03HL"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
