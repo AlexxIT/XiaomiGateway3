@@ -6,6 +6,7 @@ import string
 import time
 import uuid
 from datetime import datetime
+from functools import lru_cache
 from typing import List, Optional
 
 import requests
@@ -33,6 +34,15 @@ def remove_device(hass: HomeAssistantType, did: str):
     device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
     if device:
         registry.async_remove_device(device.id)
+
+
+@lru_cache()
+def get_area(hass: HomeAssistantType, mac: str):
+    """Remove device by did from Hass"""
+    # lumi.1234567890 => 0x1234567890
+    registry: DeviceRegistry = hass.data['device_registry']
+    device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
+    return device.area_id
 
 
 def migrate_unique_id(hass: HomeAssistantType):

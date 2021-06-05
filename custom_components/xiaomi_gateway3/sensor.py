@@ -6,7 +6,7 @@ from homeassistant.const import *
 from homeassistant.util.dt import now
 
 from . import DOMAIN
-from .core import zigbee
+from .core import zigbee, utils
 from .core.gateway3 import Gateway3
 from .core.helpers import XiaomiEntity
 
@@ -52,6 +52,8 @@ ICONS = {
 
 INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
         'link_quality', 'rssi', 'last_seen']
+
+DEFAULT_TS = now()
 
 
 async def async_setup_entry(hass, entry, add_entities):
@@ -108,13 +110,12 @@ class GatewayStats(XiaomiSensor):
         return True
 
     async def async_added_to_hass(self):
-        self.gw.add_stats(self.device['did'], self.update)
+        self.gw.set_stats(self.device['did'], self)
         # update available when added to Hass
         self.update()
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['did'], self.update)
+        self.gw.remove_stats(self.device['did'], self)
 
     def update(self, data: dict = None):
         # empty data - update state to available time
@@ -152,11 +153,10 @@ class ZigbeeStats(XiaomiSensor):
                 'last_missed': 0,
             }
 
-        self.gw.add_stats(self._attrs['ieee'], self.update)
+        self.gw.set_stats(self._attrs['ieee'], self)
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self._attrs['ieee'], self.update)
+        self.gw.remove_stats(self._attrs['ieee'], self)
 
     def update(self, data: dict = None):
         if 'sourceAddress' in data:
@@ -208,6 +208,10 @@ class ZigbeeStats(XiaomiSensor):
 
 
 class BLEStats(XiaomiSensor):
+    best_mac = None
+    best_rssi = None
+    best_ts = None
+
     @property
     def device_class(self):
         # don't use const to support older Hass version
@@ -223,16 +227,31 @@ class BLEStats(XiaomiSensor):
                 'mac': self.device['mac'],
                 'msg_received': 0,
             }
+            self.best_mac = None
+            self.best_rssi = -999
+            self.best_ts = DEFAULT_TS
 
-        self.gw.add_stats(self.device['mac'], self.update)
+        self.gw.set_stats(self.device['mac'], self)
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['mac'], self.update)
+        self.gw.remove_stats(self.device['mac'], self)
 
     def update(self, data: dict = None):
+        ts = now()
+
+        if (data and (
+                (ts - self.best_ts).total_seconds() > 30 or
+                data['rssi'] > self.best_rssi or
+                data['mac'] == self.best_mac)
+        ):
+            self.best_rssi = self._attrs['rssi'] = data['rssi']
+            self.best_ts = ts
+            if data['mac'] != self.best_mac:
+                self.best_mac = data['mac']
+                self._attrs['area'] = utils.get_area(self.hass, data['mac'])
+
         self._attrs['msg_received'] += 1
-        self._state = now().isoformat(timespec='seconds')
+        self._state = ts.isoformat(timespec='seconds')
         self.schedule_update_ha_state()
 
 

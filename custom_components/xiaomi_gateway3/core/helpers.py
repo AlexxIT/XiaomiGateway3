@@ -66,13 +66,14 @@ class DevicesRegistry:
         entity.device['entities'].pop(entity.attr)
 
     def find_or_create_device(self, device: dict) -> dict:
-        # search device by did
-        did = device.get('did')
+        type_ = device['type']
+        did = device['did'] if type_ != 'ble' else device['mac'].lower()
         if did in self.devices:
             return self.devices[did]
 
+        self.devices[did] = device
+
         # update device with specs
-        type_ = device['type']
         if type_ in ('gateway', 'zigbee'):
             device.update(zigbee.get_device(device['model']))
         elif type_ == 'mesh':
@@ -88,18 +89,11 @@ class DevicesRegistry:
             device.update(self.defaults[did])
 
         mac = device['mac'].lower()
-        if mac in self.defaults:
+        if did != mac and mac in self.defaults:
             device.update(self.defaults[mac])
 
         device['entities'] = {}
         device['gateways'] = []
-
-        # use mac for ble devices as did
-        self.devices[mac if type_ == 'ble' else did] = device
-
-        if type_ == 'mesh':
-            # to consider mesh device as known device
-            self.defaults.setdefault(mac, {})
 
         return device
 

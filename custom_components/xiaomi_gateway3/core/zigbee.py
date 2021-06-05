@@ -25,7 +25,6 @@ DEVICES = [{
         [None, None, 'pair', 'remote'],
         [None, None, 'firmware lock', 'switch'],  # firmware lock
         [None, None, 'alarm', 'alarm_control_panel'],
-        [None, None, 'gateway', 'sensor'],  # stat sensor by default
     ]
 }, {
     # on/off, power measurement

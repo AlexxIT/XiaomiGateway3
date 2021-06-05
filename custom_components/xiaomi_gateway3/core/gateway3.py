@@ -5,13 +5,13 @@ import socket
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Optional
+from typing import Optional, Callable
 
 import yaml
 from paho.mqtt.client import Client, MQTTMessage
 
 from . import bluetooth, utils, zigbee
-from .helpers import DevicesRegistry
+from .helpers import DevicesRegistry, XiaomiEntity
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
@@ -45,6 +45,10 @@ class GatewayBase(DevicesRegistry):
     @property
     def debug_mode(self):
         return self.options.get('debug', '')
+
+    @property
+    def device(self):
+        return self.devices[self.did]
 
     def debug(self, message: str):
         # basic logs
@@ -186,7 +190,8 @@ class GatewayMesh(GatewayBase):
 
 
 class GatewayStats(GatewayMesh):
-    stats: dict = None
+    # global stats for all gateways
+    stats: dict = {}
     info_ts: float = 0
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
@@ -196,14 +201,24 @@ class GatewayStats(GatewayMesh):
     # collected data from MQTT topic log/z3 (zigbee console)
     z3buffer: Optional[dict] = None
 
-    def add_stats(self, ieee: str, handler):
-        self.stats[ieee] = handler
+    def add_stats(self, device: dict, attr: str):
+        if 'stats' in device:
+            return
+
+        device['stats'] = True
+
+        self.setups['sensor'](self, device, attr)
+
+    def set_stats(self, sid: str, entity: XiaomiEntity):
+        self.stats[sid] = entity.update
 
         if self.parent_scan_interval > 0:
             self.info_ts = time.time() + 5
 
-    def remove_stats(self, ieee: str, handler):
-        self.stats.pop(ieee)
+    def remove_stats(self, sid: str, entity: XiaomiEntity):
+        entity.device.pop('stats')
+
+        self.stats.pop(sid)
 
     def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
@@ -245,9 +260,9 @@ class GatewayStats(GatewayMesh):
 
             self.get_gateway_info()
 
-    def process_ble_stats(self, mac: str):
+    def process_ble_stats(self, mac: str, payload: dict):
         if mac in self.stats:
-            self.stats[mac](None)
+            self.stats[mac](payload)
 
     def process_z3(self, payload: str):
         if payload.startswith("CLI command executed"):
@@ -337,7 +352,7 @@ class GatewayStats(GatewayMesh):
 class GatewayBLE(GatewayStats):
     ble_scanner = None
 
-    def process_ble_event(self, data: dict):
+    def process_ble_event(self, data: dict, stats: dict = None):
         self.debug(f"Process BLE {data}")
 
         mac = data['dev']['mac'].replace(':', '').lower() \
@@ -354,9 +369,11 @@ class GatewayBLE(GatewayStats):
                 'init': {}
             })
             if self.options.get('stats'):
-                self.add_entity('sensor', device, 'ble')
+                self.add_stats(device, 'ble')
         else:
             device = self.devices[mac]
+
+        self.process_ble_stats(mac, stats)
 
         if device.get('seq') == data['frmCnt']:
             return
@@ -383,16 +400,35 @@ class GatewayBLE(GatewayStats):
         if data['useful'] != 2:
             return
 
-        if data.get('uuid') == 0xFE95:
+        if data.get('uuid') == 0xFE95:  # MiBeacon
             mibeacon = data['data']
-            data = {
+            data2 = {
                 'dev': {'mac': mibeacon['mac'], 'pdid': mibeacon['pdid']},
                 'evt': {'eid': mibeacon['eid'], 'edata': mibeacon['edata']},
                 'frmCnt': mibeacon['seq']
             }
-            self.process_ble_event(data)
+            self.process_ble_event(data2, {
+                'rssi': data['rssi'], 'mac': self.device['mac']
+            })
 
-        elif 'data' in data:
+        elif data.get('cid') == 0x004C:  # iBeacon
+            ibeacon = data['data']
+            mac = f"{ibeacon['uuid']}-{ibeacon['major']}-{ibeacon['minor']}"
+            if mac not in self.devices:
+                device = self.find_or_create_device({
+                    'mac': mac,
+                    'model': data['cid'],
+                    'type': 'ble',
+                    'init': {}
+                })
+                if self.options.get('stats'):
+                    self.add_stats(device, 'ble')
+
+            self.process_ble_stats(mac, {
+                'rssi': data['rssi'], 'mac': self.device['mac']
+            })
+
+        elif 'uuid' in data and 'data' in data:
             mac = data['mac'].replace(':', '').lower()
             if mac not in self.devices:
                 device = self.find_or_create_device({
@@ -402,9 +438,13 @@ class GatewayBLE(GatewayStats):
                     'init': {}
                 })
                 if self.options.get('stats'):
-                    self.add_entity('sensor', device, 'ble')
+                    self.add_stats(device, 'ble')
             else:
                 device = self.devices[mac]
+
+            self.process_ble_stats(mac, {
+                'rssi': data['rssi'], 'mac': self.device['mac']
+            })
 
             if 'seq' in data:
                 if device.get('seq') == data['seq']:
@@ -432,8 +472,6 @@ class GatewayBLE(GatewayStats):
         for entity in device['entities'].values():
             if entity:
                 entity.update(payload)
-
-        self.process_ble_stats(mac)
 
         raw = json.dumps(init, separators=(',', ':'))
         self.mqtt.publish(f"ble/{mac}", raw, retain=True)
@@ -493,11 +531,6 @@ class GatewayEntry(Thread, GatewayBLE):
             self.miio.debug = True
 
         self.setups = {}
-        self.stats = {}
-
-    @property
-    def device(self):
-        return self.devices[self.did]
 
     @property
     def ble_mode(self):
@@ -936,7 +969,7 @@ class GatewayEntry(Thread, GatewayBLE):
                     self.add_entity(param[3], device, param[2])
 
             if self.options.get('stats') and type_ in ('zigbee', 'ble'):
-                self.add_entity('sensor', device, type_)
+                self.add_stats(device, type_)
 
     def process_zigbee_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
