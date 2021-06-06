@@ -969,6 +969,7 @@ class GatewayEntry(Thread, GatewayBLE):
             if type_ == 'gateway':
                 self.did = device['did']
                 self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
+                self.add_stats(device, type_)
 
             if type_ in ('gateway', 'zigbee', 'mesh'):
                 for param in (device['lumi_spec'] or device['miot_spec']):
