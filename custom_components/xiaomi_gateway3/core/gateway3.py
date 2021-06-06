@@ -5,7 +5,7 @@ import socket
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Optional, Callable
+from typing import Optional
 
 import yaml
 from paho.mqtt.client import Client, MQTTMessage
@@ -201,6 +201,10 @@ class GatewayStats(GatewayMesh):
     # collected data from MQTT topic log/z3 (zigbee console)
     z3buffer: Optional[dict] = None
 
+    @property
+    def stats_enable(self):
+        return self.options.get('stats')
+
     def add_stats(self, device: dict, attr: str):
         if 'stats' in device:
             return
@@ -368,12 +372,12 @@ class GatewayBLE(GatewayStats):
                 'type': 'ble',
                 'init': {}
             })
-            if self.options.get('stats'):
-                self.add_stats(device, 'ble')
         else:
             device = self.devices[mac]
 
-        self.process_ble_stats(mac, stats)
+        if self.stats_enable:
+            self.add_stats(device, 'ble')
+            self.process_ble_stats(mac, stats)
 
         if device.get('seq') == data['frmCnt']:
             return
@@ -421,12 +425,14 @@ class GatewayBLE(GatewayStats):
                     'type': 'ble',
                     'init': {}
                 })
-                if self.options.get('stats'):
-                    self.add_stats(device, 'ble')
+            else:
+                device = self.devices[mac]
 
-            self.process_ble_stats(mac, {
-                'rssi': data['rssi'], 'mac': self.device['mac']
-            })
+            if self.stats_enable:
+                self.add_stats(device, 'ble')
+                self.process_ble_stats(mac, {
+                    'rssi': data['rssi'], 'mac': self.device['mac']
+                })
 
         elif 'uuid' in data and 'data' in data:
             mac = data['mac'].replace(':', '').lower()
@@ -437,14 +443,14 @@ class GatewayBLE(GatewayStats):
                     'type': 'ble',
                     'init': {}
                 })
-                if self.options.get('stats'):
-                    self.add_stats(device, 'ble')
             else:
                 device = self.devices[mac]
 
-            self.process_ble_stats(mac, {
-                'rssi': data['rssi'], 'mac': self.device['mac']
-            })
+            if self.stats_enable:
+                self.add_stats(device, 'ble')
+                self.process_ble_stats(mac, {
+                    'rssi': data['rssi'], 'mac': self.device['mac']
+                })
 
             if 'seq' in data:
                 if device.get('seq') == data['seq']:
