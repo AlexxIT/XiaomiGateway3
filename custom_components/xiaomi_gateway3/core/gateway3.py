@@ -414,10 +414,16 @@ class GatewayBLE(GatewayStats):
             self.process_ble_event(data2, {
                 'rssi': data['rssi'], 'mac': self.device['mac']
             })
+            return
 
-        elif data.get('cid') == 0x004C:  # iBeacon
-            ibeacon = data['data']
-            mac = f"{ibeacon['uuid']}-{ibeacon['major']}-{ibeacon['minor']}"
+        cid = data.get('cid')
+        if cid in (0x004C, 0x0157):  # iBeacon
+            if cid == 0x004C:
+                ib = data['data']
+                mac = f"{ib['uuid']}-{ib['major']}-{ib['minor']}"
+            else:
+                mac = data['mac'].replace(':', '').lower()
+
             if mac not in self.devices:
                 device = self.find_or_create_device({
                     'mac': mac,
@@ -433,8 +439,9 @@ class GatewayBLE(GatewayStats):
                 self.process_ble_stats(mac, {
                     'rssi': data['rssi'], 'mac': self.device['mac']
                 })
+            return
 
-        elif 'uuid' in data and 'data' in data:
+        if 'uuid' in data and 'data' in data:
             mac = data['mac'].replace(':', '').lower()
             if mac not in self.devices:
                 device = self.find_or_create_device({

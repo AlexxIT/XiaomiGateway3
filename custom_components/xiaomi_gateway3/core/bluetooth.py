@@ -114,7 +114,8 @@ DEVICES = [{
         [4, 1, 'backlight', 'switch'],
     ]
 }, {
-    0x004C: ["Apple", "iBeacon", "iBeacon"],
+    0x004C: ["Apple", "iBeacon", "Tracker"],
+    0x0157: ["Huami", "MiBand or Amazfit Watch", "Tracker"],
     0x181A: ["ATC1441", "TH Sensor", "LYWSD03MMC"],
     0x181B: ["Xiaomi", "Composition Scale 2", "XMTZC05HM"],
     0x181D: ["Xiaomi", "Scale 2", "XMTZC04HM"],
