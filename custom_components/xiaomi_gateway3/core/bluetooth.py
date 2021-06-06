@@ -34,6 +34,7 @@ DEVICES = [{
     # MiBeacon from advanced support
     131: ["Xiaomi", "Kettle", "YM-K1501"],
     339: ["Yeelight", "Remote Control", "YLYK01YL"],
+    860: ["Xiaomi", "Scooter M365 Pro", "DDHBC02NEB"],  # only tracking
     950: ["Yeelight", "Dimmer", "YLKG07YL"],
     # Thanks to https://github.com/custom-components/ble_monitor/issues/352
     959: ["Yeelight", "Heater Remote", "YLYB01YL-BHFRC"],
