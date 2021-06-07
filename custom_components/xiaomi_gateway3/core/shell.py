@@ -77,7 +77,7 @@ class TelnetShell(Telnet):
 
     def run_gw3(self, params=''):
         if self.check_bin('gw3', MD5_GW3, 'gw3/' + MD5_GW3):
-            self.exec(f"/data/gw3 {params}&")
+            self.exec(f"/data/gw3 {params} 2>/tmp/gw3.log &")
 
     def stop_gw3(self):
         self.exec(f"killall gw3")
