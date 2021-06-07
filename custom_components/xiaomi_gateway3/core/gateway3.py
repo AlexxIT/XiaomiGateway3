@@ -416,31 +416,6 @@ class GatewayBLE(GatewayStats):
             })
             return
 
-        cid = data.get('cid')
-        if cid in (0x004C, 0x00D2, 0x0157):
-            if cid == 0x004C:  # iBeacon
-                ib = data['data']
-                mac = f"{ib['uuid']}-{ib['major']}-{ib['minor']}"
-            else:  # MiBand, Amazfit, Nut
-                mac = data['mac'].replace(':', '').lower()
-
-            if mac not in self.devices:
-                device = self.find_or_create_device({
-                    'mac': mac,
-                    'model': data['cid'],
-                    'type': 'ble',
-                    'init': {}
-                })
-            else:
-                device = self.devices[mac]
-
-            if self.stats_enable:
-                self.add_stats(device, 'ble')
-                self.process_ble_stats(mac, {
-                    'rssi': data['rssi'], 'mac': self.device['mac']
-                })
-            return
-
         if 'uuid' in data and 'data' in data:
             mac = data['mac'].replace(':', '').lower()
             if mac not in self.devices:
@@ -465,6 +440,32 @@ class GatewayBLE(GatewayStats):
                 device['seq'] = data['seq']
 
             self.process_ble_payload(device, data['data'])
+            return
+
+        cid = data.get('cid')
+        if cid in (0x004C, 0x00D2, 0x0157):
+            if cid == 0x004C:  # iBeacon
+                ib = data['data']
+                mac = f"{ib['uuid']}-{ib['major']}-{ib['minor']}"
+            else:  # MiBand, Amazfit, Nut
+                mac = data['mac'].replace(':', '').lower()
+
+            if mac not in self.devices:
+                device = self.find_or_create_device({
+                    'mac': mac,
+                    'model': data['cid'],
+                    'type': 'ble',
+                    'init': {}
+                })
+            else:
+                device = self.devices[mac]
+
+            if self.stats_enable:
+                self.add_stats(device, 'ble')
+                self.process_ble_stats(mac, {
+                    'rssi': data['rssi'], 'mac': self.device['mac']
+                })
+            return
 
     def process_ble_payload(self, device: dict, payload: dict):
         mac = device['mac']
