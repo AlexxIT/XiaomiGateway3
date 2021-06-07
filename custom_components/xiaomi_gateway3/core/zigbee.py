@@ -387,6 +387,21 @@ DEVICES = [{
         ['9.1', None, 'button_both: 4', None],
         [None, None, 'action', 'sensor'],
     ]
+}, {
+    # required switch firmware 0.0.0_0030
+    'lumi.switch.b2naus01': ["Aqara", "Double Wall Switch US", "WS-USC04"],
+    'miot_spec': [
+        ['2.1', '2.1', 'channel 1', 'switch'],
+        ['3.1', '3.1', 'channel 2', 'switch'],
+        ['4.1', None, 'consumption', None],
+        ['4.2', 'load_power', 'power', 'sensor'],
+        ['7.1', None, 'button_1: 1', None],
+        ['7.2', None, 'button_1: 2', None],
+        ['8.1', None, 'button_2: 1', None],
+        ['8.2', None, 'button_2: 2', None],
+        ['9.1', None, 'button_both: 4', None],
+        [None, None, 'action', 'sensor'],
+    ]
 }]
 
 GLOBAL_PROP = {
