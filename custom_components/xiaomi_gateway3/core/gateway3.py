@@ -417,11 +417,11 @@ class GatewayBLE(GatewayStats):
             return
 
         cid = data.get('cid')
-        if cid in (0x004C, 0x0157):  # iBeacon
-            if cid == 0x004C:
+        if cid in (0x004C, 0x00D2, 0x0157):
+            if cid == 0x004C:  # iBeacon
                 ib = data['data']
                 mac = f"{ib['uuid']}-{ib['major']}-{ib['minor']}"
-            else:
+            else:  # MiBand, Amazfit, Nut
                 mac = data['mac'].replace(':', '').lower()
 
             if mac not in self.devices:

@@ -116,6 +116,7 @@ DEVICES = [{
     ]
 }, {
     0x004C: ["Apple", "iBeacon", "Tracker"],
+    0x00D2: ["Nut", "Nut", "Tracker"],
     0x0157: ["Huami", "MiBand or Amazfit Watch", "Tracker"],
     0x181A: ["ATC1441", "TH Sensor", "LYWSD03MMC"],
     0x181B: ["Xiaomi", "Composition Scale 2", "XMTZC05HM"],
