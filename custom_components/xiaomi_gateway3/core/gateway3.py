@@ -1154,7 +1154,8 @@ class GatewayEntry(Thread, GatewayBLE):
                     'siid': int(k[0]), 'piid': int(k[2]), 'value': v
                 })
 
-            payload['miot_spec'] = params
+            # Attention! mi_spec are used in payload
+            payload['mi_spec'] = params
         else:
             params = [{
                 'res_name': next(p[0] for p in device['lumi_spec']
