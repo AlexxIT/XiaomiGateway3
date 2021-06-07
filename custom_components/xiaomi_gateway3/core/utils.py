@@ -12,6 +12,7 @@ from typing import List, Optional
 import requests
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import HomeAssistantType
@@ -36,13 +37,17 @@ def remove_device(hass: HomeAssistantType, did: str):
         registry.async_remove_device(device.id)
 
 
-@lru_cache()
+@lru_cache(maxsize=None)  # fast cache with None size
 def get_area(hass: HomeAssistantType, mac: str):
     """Remove device by did from Hass"""
     # lumi.1234567890 => 0x1234567890
-    registry: DeviceRegistry = hass.data['device_registry']
-    device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
-    return device.area_id
+    devices: DeviceRegistry = hass.data['device_registry']
+    device = devices.async_get_device({('xiaomi_gateway3', mac)}, None)
+    if device.area_id:
+        areas : AreaRegistry = hass.data['area_registry']
+        area = areas.async_get_area(device.area_id)
+        return area.name if area else device.area_id
+    return None
 
 
 def migrate_unique_id(hass: HomeAssistantType):
