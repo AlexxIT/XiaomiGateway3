@@ -1,8 +1,8 @@
-# Xiaomi Gateway 3 integration for Home Assistant
+# Xiaomi Gateway 3 for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
-[![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
-[![Donate](https://img.shields.io/badge/donate-Yandex-red.svg)](https://money.yandex.ru/to/41001428278477)
+[![Donate](https://img.shields.io/badge/donate-BuyMeCoffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
+[![Donate](https://img.shields.io/badge/donate-YooMoney-8C3FFD.svg)](https://yoomoney.ru/to/41001428278477)
 
 Control Zigbee devices from Home Assistant with **Xiaomi Gateway 3 (ZNDMWG03LM and ZNDMWG02LM)** on original firmware.
 
@@ -29,8 +29,8 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
 - [Supported Bluetooth Mesh Devices](#supported-bluetooth-mesh-devices)
-- [Install](#install)
-- [Config](#config)
+- [Installation](#installation)
+- [Configuration](#configuration)
 - [Zigbee and BLE performance table](#zigbee-and-ble-performance-table)
 - [Advanced config](#advanced-config)
 - [Add and remove Zigbee devices](#add-and-remove-zigbee-devices)
@@ -209,23 +209,25 @@ Tested Mesh Switches:
 
 Other Mesh devices also maybe supported...
 
-# Install
+# Installation
 
 **Video DEMO**
 
 [![Xiaomi Gateway 3 control from Home Assistant](https://img.youtube.com/vi/CQVSFISC9CE/mqdefault.jpg)](https://www.youtube.com/watch?v=CQVSFISC9CE)
 
-You can install component with [HACS](https://hacs.xyz/). Available in default integration list.
+**Method 1.** [HACS](https://hacs.xyz/):
 
-Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.com/AlexxIT/XiaomiGateway3/releases/latest) to `custom_components` folder in your config folder.
+> HACS > Integrations > Plus > **XiaomiGateway3** > Install
 
-# Config
+**Method 2.** Manually copy `xiaomi_gateway3` folder from [latest release](https://github.com/AlexxIT/XiaomiGateway3/releases/latest) to `/config/custom_components` folder.
+
+# Configuration
 
 **Video DEMO**
 
 [![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
 
-With GUI. Configuration > Integration > Xiaomi Gateway 3.
+> Configuration > Integrations > Add Integration > **Xiaomi Gateway3 **
 
 If the integration is not in the list, you need to clear the browser cache.
 
