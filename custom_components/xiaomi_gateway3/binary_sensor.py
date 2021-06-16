@@ -5,7 +5,6 @@ from homeassistant.components.automation import ATTR_LAST_TRIGGERED
 from homeassistant.components.binary_sensor import BinarySensorEntity, \
     DEVICE_CLASS_DOOR, DEVICE_CLASS_MOISTURE
 from homeassistant.config import DATA_CUSTOMIZE
-from homeassistant.core import callback
 from homeassistant.helpers.event import async_call_later
 from homeassistant.util.dt import now
 
@@ -93,8 +92,14 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
 
         await super().async_added_to_hass()
 
-    @callback
-    def _set_no_motion(self, *args):
+    async def _start_no_motion_timer(self, delay: float):
+        if self._unsub_set_no_motion:
+            self._unsub_set_no_motion()
+
+        self._unsub_set_no_motion = async_call_later(
+            self.hass, abs(delay), self._set_no_motion)
+
+    async def _set_no_motion(self, *args):
         self.debug("Clear motion")
 
         self._last_off = time.time()
@@ -151,8 +156,7 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
 
             self.debug(f"Extend delay: {delay} seconds")
 
-            self._unsub_set_no_motion = async_call_later(
-                self.hass, abs(delay), self._set_no_motion)
+            self.hass.add_job(self._start_no_motion_timer, delay)
 
         # repeat event from Aqara integration
         self.hass.bus.fire('xiaomi_aqara.motion', {
