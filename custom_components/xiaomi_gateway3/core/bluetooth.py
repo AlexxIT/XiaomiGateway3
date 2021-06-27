@@ -376,6 +376,13 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
             {'motion': 1, 'light': int(value >= 100)}
         )
 
+    elif eid == 0x10 and len(data) == 2:  # 16
+        # Toothbrush Т500
+        if data[0] == 0:
+            return {'action': 'start', 'counter': data[1]}
+        else:
+            return {'action': 'finish', 'score': data[1]}
+
     return None
 
 
