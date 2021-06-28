@@ -14,6 +14,7 @@ DEVICES = [{
     982: ["Xiaomi", "Qingping Door Sensor", "CGH1"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1115: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
+    1161: ["Xiaomi", "Toothbrush T500", "MES601"],
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD"],
     1371: ["Xiaomi", "TH Sensor 2", "LYWSD03MMC"],
     1398: ["Xiaomi", "Alarm Clock", "CGD1"],
