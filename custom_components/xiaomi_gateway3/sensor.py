@@ -22,6 +22,7 @@ UNITS = {
     'conductivity': "µS/cm",
     'consumption': ENERGY_WATT_HOUR,
     'gas density': '% LEL',
+    'supply': '%',
     'smoke density': '% obs/ft',
     'moisture': '%',
     'tvoc': CONCENTRATION_PARTS_PER_BILLION,
