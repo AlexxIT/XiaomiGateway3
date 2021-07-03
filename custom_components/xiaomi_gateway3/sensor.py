@@ -298,7 +298,7 @@ class XiaomiAction(XiaomiEntity):
                 'entity_id': self.entity_id, 'click_type': self._state
             })
 
-            time.sleep(.1)
+            time.sleep(.3)
 
             self._state = ''
 
