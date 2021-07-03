@@ -6,6 +6,7 @@ import string
 import time
 import uuid
 from datetime import datetime
+from functools import lru_cache
 from typing import List, Optional
 
 import requests
@@ -13,6 +14,7 @@ from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.requirements import async_process_requirements
 
@@ -203,6 +205,13 @@ async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
     return await hass.async_add_executor_job(
         _update_zigbee_firmware, host, ezsp_version
     )
+
+
+@lru_cache(maxsize=0)
+def attributes_template(hass: HomeAssistantType) -> Template:
+    template = hass.data[DOMAIN]['config']['attributes_template']
+    template.hass = hass
+    return template
 
 
 TITLE = "Xiaomi Gateway 3 Debug"

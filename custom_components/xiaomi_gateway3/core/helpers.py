@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from typing import *
 
@@ -5,7 +6,9 @@ from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity import Entity
 
-from .utils import DOMAIN
+from .utils import DOMAIN, attributes_template
+
+_LOGGER = logging.getLogger(__name__)
 
 
 # TODO: rewrite all usage to dataclass
@@ -88,6 +91,8 @@ class XiaomiEntity(Entity):
         if 'init' in self.device and self._state is None:
             self.update(self.device['init'])
 
+        self.render_attributes_template()
+
         self.gw.set_entity(self)
 
     async def async_will_remove_from_hass(self) -> None:
@@ -161,3 +166,17 @@ class XiaomiEntity(Entity):
 
     def update(self, data: dict):
         pass
+
+    def render_attributes_template(self):
+        try:
+            attrs = attributes_template(self.hass).async_render({
+                'attr': self.attr,
+                'device': self.device,
+                'gateway': self.gw.device
+            })
+            if isinstance(attrs, dict):
+                self._attrs.update(attrs)
+        except KeyError:
+            pass
+        except:
+            _LOGGER.exception("Can't render attributes")

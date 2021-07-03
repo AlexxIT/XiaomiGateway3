@@ -22,6 +22,7 @@ DOMAINS = ['binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
 CONF_DEVICES = 'devices'
 CONF_DEBUG = 'debug'
 CONF_BUZZER = 'buzzer'
+CONF_ATTRIBUTES_TEMPLATE = 'attributes_template'
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
@@ -32,6 +33,7 @@ CONFIG_SCHEMA = vol.Schema({
         },
         vol.Optional(CONF_BUZZER): cv.boolean,
         vol.Optional(CONF_DEBUG): cv.string,
+        vol.Optional(CONF_ATTRIBUTES_TEMPLATE): cv.template
     }, extra=vol.ALLOW_EXTRA),
 }, extra=vol.ALLOW_EXTRA)
 
