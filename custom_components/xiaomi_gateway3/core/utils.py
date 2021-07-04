@@ -162,16 +162,13 @@ EZSP_URLS = {
 def _update_zigbee_firmware(host: str, ezsp_version: int):
     shell = TelnetShell(host)
 
-    ps = shell.get_running_ps()
-    if "Lumi_Z3GatewayHost_MQTT" in ps:
-        shell.stop_lumi_zigbee()
-    if "tcp-l:8888" in ps:
-        shell.stop_zigbee_tcp()
+    # stop all utilities without checking if they are running
+    shell.stop_lumi_zigbee()
+    shell.stop_zigbee_tcp()
     # flash on another port because running ZHA or z2m can breake process
-    if "tcp-l:8889" not in ps:
-        shell.check_or_download_socat()
-        shell.run_zigbee_tcp(port=8889)
-        time.sleep(.5)
+    shell.check_or_download_socat()
+    shell.run_zigbee_tcp(port=8889)
+    time.sleep(.5)
 
     _LOGGER.debug(f"Try update EZSP to version {ezsp_version}")
 

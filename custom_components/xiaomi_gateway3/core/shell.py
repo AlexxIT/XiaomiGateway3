@@ -79,7 +79,8 @@ class TelnetShell(Telnet):
         self.exec("daemon_app.sh &")
 
     def stop_lumi_zigbee(self):
-        self.exec("killall daemon_app.sh Lumi_Z3GatewayHost_MQTT")
+        self.exec("killall daemon_app.sh")
+        self.exec("killall Lumi_Z3GatewayHost_MQTT")
 
     def check_or_download_busybox(self):
         download = DOWNLOAD.format('busybox', 'bin')
@@ -140,7 +141,8 @@ class TelnetShell(Telnet):
         return self.exec("ps -w")
 
     def redirect_miio2mqtt(self, pattern: str):
-        self.exec("killall daemon_miio.sh miio_client; pkill -f log/miio")
+        self.exec("killall daemon_miio.sh")
+        self.exec("miio_client; pkill -f log/miio")
         time.sleep(.5)
         cmd = MIIO_147 if self.ver >= '1.4.7_0063' else MIIO_146
         self.exec(cmd + MIIO2MQTT % pattern)
@@ -148,7 +150,8 @@ class TelnetShell(Telnet):
 
     def run_public_zb_console(self):
         # Z3 starts with tail on old fw and without it on new fw from 1.4.7
-        self.exec("killall daemon_app.sh tail Lumi_Z3GatewayHost_MQTT")
+        self.exec("killall daemon_app.sh")
+        self.exec("tail Lumi_Z3GatewayHost_MQTT")
 
         # run Gateway with open console port (`-v` param)
         arg = " -r 'c'" if self.ver >= '1.4.7_0063' else ''

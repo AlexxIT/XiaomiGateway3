@@ -495,9 +495,8 @@ class GatewayEntry(Thread, GatewayStats):
                     shell.run_buzzer()
 
             if self.options.get('zha'):
-                if "Lumi_Z3GatewayHost_MQTT" in ps:
-                    self.debug("Stop Lumi Zigbee")
-                    shell.stop_lumi_zigbee()
+                # stop lumi without checking if it's running
+                shell.stop_lumi_zigbee()
 
                 if "tcp-l:8889" in ps:
                     shell.stop_zigbee_tcp()
@@ -518,7 +517,7 @@ class GatewayEntry(Thread, GatewayStats):
                     self.debug("Run public Zigbee console")
                     shell.run_public_zb_console()
 
-                elif "Lumi_Z3GatewayHost_MQTT" not in ps:
+                elif "daemon_app.sh" not in ps:
                     self.debug("Run Lumi Zigbee")
                     shell.run_lumi_zigbee()
 
