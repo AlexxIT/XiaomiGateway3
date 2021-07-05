@@ -5,13 +5,13 @@ import socket
 import time
 from pathlib import Path
 from threading import Thread
-from typing import Optional
+from typing import Optional, Callable
 
 import yaml
 from paho.mqtt.client import Client, MQTTMessage
 
 from . import bluetooth, utils, zigbee
-from .helpers import DevicesRegistry
+from .helpers import DevicesRegistry, XiaomiEntity
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
@@ -45,6 +45,10 @@ class GatewayBase(DevicesRegistry):
     @property
     def debug_mode(self):
         return self.options.get('debug', '')
+
+    @property
+    def device(self):
+        return self.devices[self.did]
 
     def debug(self, message: str):
         # basic logs
@@ -186,7 +190,8 @@ class GatewayMesh(GatewayBase):
 
 
 class GatewayStats(GatewayMesh):
-    stats: dict = None
+    # global stats for all gateways
+    stats: dict = {}
     info_ts: float = 0
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
@@ -196,14 +201,24 @@ class GatewayStats(GatewayMesh):
     # collected data from MQTT topic log/z3 (zigbee console)
     z3buffer: Optional[dict] = None
 
-    def add_stats(self, ieee: str, handler):
-        self.stats[ieee] = handler
+    def add_stats(self, device: dict, attr: str):
+        if 'stats' in device:
+            return
+
+        device['stats'] = True
+
+        self.setups['sensor'](self, device, attr)
+
+    def set_stats(self, sid: str, entity: XiaomiEntity):
+        self.stats[sid] = entity.update
 
         if self.parent_scan_interval > 0:
             self.info_ts = time.time() + 5
 
-    def remove_stats(self, ieee: str, handler):
-        self.stats.pop(ieee)
+    def remove_stats(self, sid: str, entity: XiaomiEntity):
+        entity.device.pop('stats')
+
+        self.stats.pop(sid)
 
     def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
@@ -247,7 +262,7 @@ class GatewayStats(GatewayMesh):
 
     def process_ble_stats(self, mac: str):
         if mac in self.stats:
-            self.stats[mac](None)
+            self.stats[mac]()
 
     def process_z3(self, payload: str):
         if payload.startswith("CLI command executed"):
@@ -352,7 +367,7 @@ class GatewayBLE(GatewayStats):
                 'init': {}
             })
             if self.options.get('stats'):
-                self.add_entity('sensor', device, 'ble')
+                self.add_stats(device, 'ble')
         else:
             device = self.devices[mac]
 
@@ -474,11 +489,6 @@ class GatewayEntry(Thread, GatewayBLE):
             self.miio.debug = True
 
         self.setups = {}
-        self.stats = {}
-
-    @property
-    def device(self):
-        return self.devices[self.did]
 
     @property
     def ble_mode(self):

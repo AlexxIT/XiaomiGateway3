@@ -6,7 +6,7 @@ from homeassistant.const import *
 from homeassistant.util.dt import now
 
 from . import DOMAIN
-from .core import zigbee
+from .core import zigbee, utils
 from .core.gateway3 import Gateway3
 from .core.helpers import XiaomiEntity
 
@@ -100,13 +100,12 @@ class GatewayStats(XiaomiSensor):
         return True
 
     async def async_added_to_hass(self):
-        self.gw.add_stats(self.device['did'], self.update)
+        self.gw.set_stats(self.device['did'], self)
         # update available when added to Hass
         self.update()
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['did'], self.update)
+        self.gw.remove_stats(self.device['did'], self)
 
     def update(self, data: dict = None):
         # empty data - update state to available time
@@ -145,11 +144,10 @@ class ZigbeeStats(XiaomiSensor):
             }
             self.render_attributes_template()
 
-        self.gw.add_stats(self._attrs['ieee'], self.update)
+        self.gw.set_stats(self._attrs['ieee'], self)
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self._attrs['ieee'], self.update)
+        self.gw.remove_stats(self._attrs['ieee'], self)
 
     def update(self, data: dict = None):
         if 'sourceAddress' in data:
@@ -218,11 +216,10 @@ class BLEStats(XiaomiSensor):
             }
             self.render_attributes_template()
 
-        self.gw.add_stats(self.device['mac'], self.update)
+        self.gw.set_stats(self.device['mac'], self)
 
     async def async_will_remove_from_hass(self) -> None:
-        await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['mac'], self.update)
+        self.gw.remove_stats(self.device['mac'], self)
 
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1
