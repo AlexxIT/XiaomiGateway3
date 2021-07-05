@@ -4,9 +4,9 @@ from typing import Optional
 # Bluetooth Model: [Manufacturer, Device Name, Device Model]
 # params: [siid, piid, hass attr name, hass domain]
 DEVICES = [{
-    # BLE
-    131: ["Xiaomi", "Kettle", "YM-K1501"],
+    # MiBeacon from official support
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
+    349: ["Xiaomi", "Flower Pot", "HHCCPOT002"],
     426: ["Xiaomi", "TH Sensor", "LYWSDCGQ/01ZM"],
     794: ["Xiaomi", "Door Lock", "MJZNMS02LM"],
     839: ["Xiaomi", "Qingping TH Sensor", "CGG1"],
@@ -43,7 +43,7 @@ DEVICES = [{
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'light', 'light'],
         [2, 2, 'brightness', None],
         [2, 3, 'color_temp', None],
@@ -51,20 +51,20 @@ DEVICES = [{
 }, {
     # Mesh Switches
     1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
     ]
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     2007: ["Unknown", "Mesh Switch Controller"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'switch', 'switch']
     ],
 }, {
     2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Wall Triple Switch", "PTX-SK3M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
         [4, 1, 'right_switch', 'switch'],
@@ -75,7 +75,7 @@ DEVICES = [{
     ]
 }, {
     2257: ["PTX", "Mesh Wall Double Switch", "PTX-SK2M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
         [8, 1, 'backlight', 'switch'],
@@ -84,14 +84,14 @@ DEVICES = [{
     ]
 }, {
     2258: ["PTX", "Mesh Wall Single Switch", "PTX-SK1M"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'switch', 'switch'],
         [8, 1, 'backlight', 'switch'],
         [8, 2, 'smart', 'switch'],
     ]
 }, {
     2717: ["Xiaomi", "Mesh Wall Triple Switch", "ISA-KG03HL"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
         [4, 1, 'right_switch', 'switch'],
@@ -100,7 +100,7 @@ DEVICES = [{
     ]
 }, {
     3083: ["Xiaomi", "Mi Smart Electrical Outlet", "ZNCZ01ZM"],
-    'params': [
+    'miot_spec': [
         [2, 1, 'outlet', 'switch'],
         [3, 1, 'power', 'sensor'],
         [4, 1, 'backlight', 'switch'],
@@ -395,7 +395,8 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
                 'device_manufacturer': desc[0],
                 'device_name': desc[0] + ' ' + desc[1],
                 'device_model': desc[2] if len(desc) > 2 else pdid,
-                'params': device.get('params'),
+                'lumi_spec': None,
+                'miot_spec': device.get('miot_spec'),
                 # if color temp not default 2700..6500
                 'color_temp': COLOR_TEMP.get(pdid),
                 'max_brightness': MAX_BRIGHTNESS.get(pdid)
@@ -404,8 +405,9 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
     return {
         'device_name': default_name,
         'device_model': pdid,
+        'lumi_spec': None,
         # default Mesh device will be Bulb
-        'params': [
+        'miot_spec': [
             [2, 1, 'light', 'light'],
             [2, 2, 'brightness', None],
             [2, 3, 'color_temp', None],

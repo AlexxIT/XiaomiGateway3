@@ -218,11 +218,11 @@ class BLEStats(XiaomiSensor):
             }
             self.render_attributes_template()
 
-        self.gw.add_stats(self.device['did'], self.update)
+        self.gw.add_stats(self.device['mac'], self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
-        self.gw.remove_stats(self.device['did'], self.update)
+        self.gw.remove_stats(self.device['mac'], self.update)
 
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1
@@ -236,6 +236,7 @@ BUTTON = {
     2: 'double',
     3: 'triple',
     4: 'quadruple',
+    5: 'quintuple',  # only Yeelight Dimmer
     16: 'hold',
     17: 'release',
     18: 'shake',
