@@ -24,7 +24,11 @@ DEVICES = [{
         ['8.0.2155', None, 'cloud', None],  # {"cloud_link":0}
         [None, None, 'pair', 'remote'],
         [None, None, 'firmware lock', 'switch'],  # firmware lock
-        [None, None, 'alarm', 'alarm_control_panel'],
+    ],
+    'miot_spec': [
+        # different format from bluetooth Mesh Device :(
+        [3, 1, 'alarm', 'alarm_control_panel'],
+        [3, 22, 'alarm_trigger', None],
     ]
 }, {
     # on/off, power measurement
