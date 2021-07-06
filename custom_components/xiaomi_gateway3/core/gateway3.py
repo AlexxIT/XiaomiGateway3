@@ -926,10 +926,8 @@ class GatewayEntry(Thread, GatewayBLE):
                 for param in (device['lumi_spec'] or device['miot_spec']):
                     self.add_entity(param[3], device, param[2])
 
-            if self.options.get('stats') and type_ in (
-                    'gateway', 'zigbee', 'ble'
-            ):
-                self.add_entity('sensor', device, type_)
+            if self.stats_enable and type_ in ('gateway', 'zigbee', 'ble'):
+                self.add_stats(device, type_)
 
     def process_zigbee_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
@@ -1099,6 +1097,7 @@ class GatewayEntry(Thread, GatewayBLE):
                     'siid': int(k[0]), 'piid': int(k[2]), 'value': v
                 })
 
+            # Attention! mi_spec are used in payload
             payload['mi_spec'] = params
         else:
             params = [{
