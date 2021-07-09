@@ -1,10 +1,16 @@
 import voluptuous as vol
-from homeassistant.components.device_automation import TRIGGER_BASE_SCHEMA
 from homeassistant.components.homeassistant.triggers import \
     state as state_trigger
 from homeassistant.const import *
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceEntry
+
+try:
+    from homeassistant.components.device_automation import TRIGGER_BASE_SCHEMA
+except ImportError:
+    from homeassistant.components.device_automation import (
+        DEVICE_TRIGGER_BASE_SCHEMA as TRIGGER_BASE_SCHEMA,
+    )
 
 from . import DOMAIN
 from .core import zigbee
