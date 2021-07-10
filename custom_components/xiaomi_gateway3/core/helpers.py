@@ -214,7 +214,7 @@ class XiaomiEntity(Entity):
             })
             if isinstance(attrs, dict):
                 self._attrs.update(attrs)
-        except KeyError:
+        except AttributeError:
             pass
         except:
             _LOGGER.exception("Can't render attributes")
