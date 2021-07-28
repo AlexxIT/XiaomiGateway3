@@ -52,7 +52,7 @@ class TelnetShell(Telnet):
     def __init__(self, host: str):
         super().__init__(host, timeout=3)
 
-        self.read_until(b"login: ")
+        self.read_until(b"login: ", timeout=3)
         # some users have problems with \r\n symbols in login
         self.write(b"admin\n")
 
@@ -65,7 +65,7 @@ class TelnetShell(Telnet):
     def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
         self.write(command.encode() + b"\n")
-        raw = self.read_until(b"\r\n# ")
+        raw = self.read_until(b"\r\n# ", timeout=10)
         return raw if as_bytes else raw.decode()
 
     def check_bin(self, filename: str, md5: str, url=None) -> bool:
@@ -185,17 +185,18 @@ class TelnetShell(Telnet):
     def read_file(self, filename: str, as_base64=False):
         if as_base64:
             self.write(f"cat {filename} | base64\n".encode())
-            self.read_until(b"\r\n")  # skip command
-            raw = self.read_until(b"# ")
+            self.read_until(b"\r\n", timeout=3)  # skip command
+            raw = self.read_until(b"# ", timeout=10)
+            # b"cat: can't open ..."
             return base64.b64decode(raw)
         else:
             self.write(f"cat {filename}\n".encode())
-            self.read_until(b"\r\n")  # skip command
-            return self.read_until(b"# ")[:-2]
+            self.read_until(b"\r\n", timeout=3)  # skip command
+            return self.read_until(b"# ", timeout=10)[:-2]
 
     def tar_data(self):
         self.write(TAR_DATA)
-        self.read_until(b"base64\r\n")  # skip command
+        self.read_until(b"base64\r\n", timeout=3)  # skip command
         raw = self.read_until(b"# ", timeout=30)
         return base64.b64decode(raw)
 
