@@ -428,6 +428,17 @@ DEVICES = [{
         ['9.1', None, 'button_both: 4', None],
         [None, None, 'action', 'sensor'],
     ]
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-acn002:1
+    'lumi.curtain.acn002': ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
+    'miot_spec': [
+        # ['2.1', '2.1', 'fault', None],
+        ['2.2', None, 'motor', 'cover'],
+        # ['2.4', '2.4', 'target_position', None],
+        ['2.5', '2.5', 'position', None],
+        ['2.6', '2.6', 'run_state', None],
+        ['3.4', '3.4', 'battery', 'sensor'],
+    ]
 }]
 
 GLOBAL_PROP = {
