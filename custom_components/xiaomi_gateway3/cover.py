@@ -10,12 +10,15 @@ from .core.helpers import XiaomiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-RUN_STATES = [STATE_CLOSING, STATE_OPENING, None]
+RUN_STATES = {0: STATE_CLOSING, 1: STATE_OPENING}
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
-        async_add_entities([XiaomiCover(gateway, device, attr)])
+        if device.get('lumi_spec'):
+            async_add_entities([XiaomiCover(gateway, device, attr)])
+        else:
+            async_add_entities([XiaomiCoverMIOT(gateway, device, attr)])
 
     gw: Gateway3 = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup('cover', setup)
@@ -59,3 +62,14 @@ class XiaomiCover(XiaomiEntity, CoverEntity):
     def set_cover_position(self, **kwargs):
         position = kwargs.get(ATTR_POSITION)
         self.gw.send(self.device, {'position': position})
+
+
+class XiaomiCoverMIOT(XiaomiCover):
+    def open_cover(self, **kwargs):
+        self.gw.send(self.device, {'motor': 2})
+
+    def close_cover(self, **kwargs):
+        self.gw.send(self.device, {'motor': 1})
+
+    def stop_cover(self, **kwargs):
+        self.gw.send(self.device, {'motor': 0})
