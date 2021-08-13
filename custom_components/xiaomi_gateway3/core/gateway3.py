@@ -735,7 +735,7 @@ class GatewayEntry(Thread, GatewayBLE):
                         'nwk': nwks.get(ieee),
                         'model': model,
                         'type': 'zigbee',
-                        'fw_ver': retain.get('fw_ver'),
+                        'fw_ver': retain.get('fw_ver') or retain.get('1.4'),
                         'init': zigbee.fix_xiaomi_props(model, params),
                         'online': retain.get('alive', 1) == 1
                     }
