@@ -58,7 +58,11 @@ class TelnetShell(Telnet):
 
         raw = self.read_until(b"\r\n# ", timeout=3)
         if b'Password:' in raw:
-            raise Exception("Telnet with password don't supported")
+            self.write(b"admin\n")
+
+            raw = self.read_until(b"\r\n# ", timeout=3)
+            if b'Login incorrect' in raw:
+                raise Exception("Telnet with standard password failed")
 
         self.ver = self.get_version()
 
