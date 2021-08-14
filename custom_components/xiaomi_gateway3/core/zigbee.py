@@ -40,14 +40,14 @@ DEVICES = [{
     # 'lumi.plug.maeu01': ["Aqara", "Plug EU", "SP-EUC01"],
     'lumi_spec': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
-        ['0.13.85', None, 'consumption', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
     ]
 }, {
     'lumi.ctrl_86plug.aq1': ["Aqara", "Socket", "QBCZ11LM"],
     'lumi_spec': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
-        ['0.13.85', None, 'consumption', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # @to4ko
     ]
 }, {
@@ -56,7 +56,7 @@ DEVICES = [{
     'lumi.switch.b1nacn02': ["Aqara", "Single Wall Switch D1", "QBKG23LM"],
     'lumi_spec': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
-        ['0.13.85', None, 'consumption', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
@@ -70,7 +70,7 @@ DEVICES = [{
     'lumi_spec': [
         # ['0.11.85', 'load_voltage', 'power', 'sensor'],  # 0
         ['0.12.85', 'load_power', 'power', 'sensor'],
-        ['0.13.85', None, 'consumption', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
         # ['0.14.85', None, '?', 'sensor'],  # 5.01, 6.13
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
@@ -136,7 +136,7 @@ DEVICES = [{
     'lumi.switch.n3acn3': ["Aqara", "Triple Wall Switch D1", "QBKG26LM"],
     'lumi_spec': [
         ['0.12.85', 'load_power', 'power', 'sensor'],
-        ['0.13.85', None, 'consumption', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
@@ -352,7 +352,7 @@ DEVICES = [{
     'lumi.plug.maeu01': ["Aqara", "Plug", "SP-EUC01"],
     'miot_spec': [
         ['2.1', '2.1', 'switch', 'switch'],
-        ['3.1', '3.1', 'consumption', 'sensor'],
+        ['3.1', '3.1', 'energy', 'sensor'],
         ['3.2', '3.2', 'power', 'sensor'],
         # ['5.7', '5.7', 'voltage', 'sensor'],
     ]
@@ -421,7 +421,7 @@ DEVICES = [{
     'miot_spec': [
         ['2.1', '2.1', 'channel 1', 'switch'],
         ['3.1', '3.1', 'channel 2', 'switch'],
-        ['4.1', None, 'consumption', None],
+        ['4.1', None, 'energy', None],
         ['4.2', 'load_power', 'power', 'sensor'],
         ['7.1', None, 'button_1: 1', None],
         ['7.2', None, 'button_1: 2', None],

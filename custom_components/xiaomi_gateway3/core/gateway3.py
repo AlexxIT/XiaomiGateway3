@@ -8,8 +8,8 @@ from threading import Thread
 from typing import Optional
 
 import yaml
-from paho.mqtt.client import Client, MQTTMessage
 
+from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils, zigbee
 from .helpers import DevicesRegistry, XiaomiEntity
 from .mini_miio import SyncmiIO
@@ -1014,6 +1014,9 @@ class GatewayEntry(Thread, GatewayBLE):
                 payload[prop] = param['value'] / 1000.0
             elif prop in ('consumption', 'power'):
                 payload[prop] = round(param['value'], 2)
+            elif prop == 'energy':
+                # energy consumption Wh to kWh
+                payload[prop] = round(param['value'] / 1000.0, 3)
             elif 'value' in param:
                 payload[prop] = param['value']
             elif 'arguments' in param:
