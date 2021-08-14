@@ -38,6 +38,11 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
             self.gw.pair_model = None
 
         elif 'added_device' in data:
+            # skip already added device, this maybe bug
+            did = data['added_device']['did']
+            if did in self.gw.devices:
+                return
+
             text = "New device:\n" + '\n'.join(
                 f"{k}: {v}" for k, v in data['added_device'].items()
             )
