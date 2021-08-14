@@ -347,6 +347,8 @@ DEVICES = [{
 }, {
     # with N, https://www.aqara.com/en/single_switch_T1_with-neutral.html
     'lumi.switch.n0agl1': ["Aqara", "Relay T1", "SSM-U01"],
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n0acn2:1
+    'lumi.switch.n0acn2': ["Aqara", "Relay T1", "DLKZMK11LM"],
     'lumi.plug.maeu01': ["Aqara", "Plug", "SP-EUC01"],
     'miot_spec': [
         ['2.1', '2.1', 'switch', 'switch'],
