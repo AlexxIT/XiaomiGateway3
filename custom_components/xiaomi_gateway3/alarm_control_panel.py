@@ -80,6 +80,7 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
             elif data.get('alarm_trigger'):
                 self._state = STATE_ALARM_TRIGGERED
 
+            self.schedule_update_ha_state()
         else:
             try:
                 resp = self.gw.miio.send('get_properties', [{
@@ -95,5 +96,3 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
                     self._state = ALARM_STATES[state]
             except:
                 pass
-
-        self.schedule_update_ha_state()
