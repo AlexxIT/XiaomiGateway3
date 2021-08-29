@@ -108,6 +108,21 @@ DEVICES = [{
         [3, 1, 'power', 'sensor'],
         [4, 1, 'backlight', 'switch'],
     ]
+}, {
+   2715: ["Xiaomi", "Mesh Wall Single Switch", "ZNKG01HL"],
+    'miot_spec': [
+        [2, 1, 'switch', 'switch'],
+        [6, 1, 'humidity', 'sensor'],
+        [6, 7, 'temperature', 'sensor'],
+    ]
+}, {
+    2716: ["Xiaomi", "Mesh Wall Double Switch", "ZNKG02HL"],
+    'miot_spec': [
+        [2, 1, 'left_switch', 'switch'],
+        [3, 1, 'right_switch', 'switch'],
+        [6, 1, 'humidity', 'sensor'],
+        [6, 7, 'temperature', 'sensor'],
+    ]
 }]
 
 # if color temp not default 2700..6500
