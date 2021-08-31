@@ -1,6 +1,9 @@
 import re
 from typing import Optional
 
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import HomeAssistantType
+
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/devices.js#L390
 # https://slsys.io/action/devicelists.html
 # All lumi models:
@@ -473,6 +476,7 @@ GLOBAL_PROP = {
     '8.0.2041': 'model',
     '8.0.2042': 'max_power',
     '8.0.2044': 'plug_detection',
+    '8.0.2091': 'ota_progress',
     '8.0.2101': 'nl_invert',  # ctrl_86plug
     '8.0.2102': 'alive',
     '8.0.2157': 'network_pan_id',
@@ -562,4 +566,17 @@ def get_buttons(model: str):
                 param[2] for param in device['lumi_spec']
                 if param[2].startswith('button')
             ]
+    return None
+
+
+async def get_ota_link(hass: HomeAssistantType, model: str) -> Optional[str]:
+    if RE_ZIGBEE_MODEL_TAIL.search(model):
+        model = model[:-3]
+
+    url = "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/"
+    r = await async_get_clientsession(hass).get(url + "index.json")
+    items = await r.json(content_type=None)
+    for item in items:
+        if item.get('modelId') == model:
+            return url + item['path']
     return None

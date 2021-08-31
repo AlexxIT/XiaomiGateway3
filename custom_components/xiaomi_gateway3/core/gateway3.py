@@ -1017,6 +1017,10 @@ class GatewayEntry(Thread, GatewayBLE):
             elif prop == 'energy':
                 # energy consumption Wh to kWh
                 payload[prop] = round(param['value'] / 1000.0, 3)
+            elif prop == 'fw_ver' and param['value'] != device['fw_ver']:
+                self._update_device_fw_ver(device, param['value'])
+            elif prop == 'ota_progress':
+                self._update_device_fw_ver(device, f"Update {param['value']}%")
             elif 'value' in param:
                 payload[prop] = param['value']
             elif 'arguments' in param:
@@ -1050,6 +1054,15 @@ class GatewayEntry(Thread, GatewayBLE):
 
         # return for tests purpose
         return payload
+
+    @staticmethod
+    def _update_device_fw_ver(device: dict, fw_ver: str):
+        device['fw_ver'] = fw_ver
+        for entity in device['entities'].values():
+            if entity:
+                utils.update_device_info(entity.hass, device['did'],
+                                         sw_version=device['fw_ver'])
+                break
 
     def process_pair(self, raw: bytes):
         _LOGGER.debug(f"!!! {raw}")

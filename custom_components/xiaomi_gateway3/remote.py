@@ -6,7 +6,7 @@ from homeassistant.components.remote import ATTR_DEVICE
 from homeassistant.helpers.entity import ToggleEntity
 
 from . import DOMAIN
-from .core import utils
+from .core import utils, zigbee
 from .core.gateway3 import Gateway3
 from .core.helpers import XiaomiEntity
 
@@ -97,6 +97,27 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 self.gw.send_mqtt('publishstate')
             elif cmd == 'info':
                 self.gw.get_gateway_info()
+            elif cmd == 'ota':
+                did: str = 'lumi.' + kwargs[ATTR_DEVICE]
+                if did not in self.gw.devices:
+                    _LOGGER.error(f"Wrong device ID: " + did)
+                    return
+
+                device = self.gw.devices[did]
+                model = device['model']
+
+                url = await zigbee.get_ota_link(self.hass, model)
+                if url:
+                    self.debug(f"Update {did} with {url}")
+                    resp = self.gw.miio.send('miIO.subdev_ota', {
+                        'did': did,
+                        'subdev_url': url
+                    })
+                    if resp != ['ok']:
+                        _LOGGER.error("Can't run update process")
+                else:
+                    _LOGGER.error("No firmware for model " + model)
+
             elif cmd == 'miio':
                 raw = json.loads(args[1])
                 resp = self.gw.miio.send(raw['method'], raw.get('params'))

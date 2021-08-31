@@ -37,6 +37,15 @@ def remove_device(hass: HomeAssistantType, did: str):
         registry.async_remove_device(device.id)
 
 
+def update_device_info(hass: HomeAssistantType, did: str, **kwargs):
+    # lumi.1234567890 => 0x1234567890
+    mac = '0x' + did[5:]
+    registry: DeviceRegistry = hass.data['device_registry']
+    device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
+    if device:
+        registry.async_update_device(device.id, **kwargs)
+
+
 def migrate_unique_id(hass: HomeAssistantType):
     """New unique_id format: `mac_attr`, no leading `0x`, spaces and uppercase.
     """
