@@ -396,6 +396,8 @@ DEVICES = [{
 }, {
     # with neutral wire
     'lumi.switch.b1nc01': ["Aqara", "Single Wall Switch E1", "QBKG40LM"],
+    # without neutral wire
+    'lumi.switch.l1aeu1': ["Aqara", "Single Wall Switch H1", "WS-EUK01"],
     'miot_spec': [
         ['2.1', '2.1', 'switch', 'switch'],
         ['7.1', None, 'button: 1', None],
@@ -405,6 +407,8 @@ DEVICES = [{
 }, {
     # with neutral wire
     'lumi.switch.b2nc01': ["Aqara", "Double Wall Switch E1", "QBKG41LM"],
+    # without neutral wire
+    'lumi.switch.l2aeu1': ["Aqara", "Double Wall Switch H1", "WS-EUK02"],
     'miot_spec': [
         ['2.1', '2.1', 'channel 1', 'switch'],
         ['3.1', '3.1', 'channel 2', 'switch'],
