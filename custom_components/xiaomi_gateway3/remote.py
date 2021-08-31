@@ -1,3 +1,4 @@
+import json
 import logging
 
 from homeassistant.components import persistent_notification
@@ -74,7 +75,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
 
     async def async_send_command(self, command, **kwargs):
         for cmd in command:
-            args = cmd.split(' ')
+            args = cmd.split(' ', 1)
             cmd = args[0]
 
             # for testing purposes
@@ -96,3 +97,9 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 self.gw.send_mqtt('publishstate')
             elif cmd == 'info':
                 self.gw.get_gateway_info()
+            elif cmd == 'miio':
+                raw = json.loads(args[1])
+                resp = self.gw.miio.send(raw['method'], raw.get('params'))
+                persistent_notification.async_create(
+                    self.hass, str(resp), "Xiaomi Gateway 3"
+                )
