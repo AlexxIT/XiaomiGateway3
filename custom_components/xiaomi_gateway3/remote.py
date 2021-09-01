@@ -104,9 +104,8 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                     return
 
                 device = self.gw.devices[did]
-                model = device['model']
 
-                url = await zigbee.get_ota_link(self.hass, model)
+                url = await zigbee.get_ota_link(self.hass, device)
                 if url:
                     self.debug(f"Update {did} with {url}")
                     resp = self.gw.miio.send('miIO.subdev_ota', {
@@ -116,7 +115,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                     if resp != ['ok']:
                         _LOGGER.error("Can't run update process")
                 else:
-                    _LOGGER.error("No firmware for model " + model)
+                    _LOGGER.error("No firmware for model " + device['model'])
 
             elif cmd == 'miio':
                 raw = json.loads(args[1])
