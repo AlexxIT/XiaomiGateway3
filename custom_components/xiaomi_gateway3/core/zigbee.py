@@ -66,18 +66,29 @@ DEVICES = [{
     ]
 }, {
     # dual channel on/off, power measurement
-    'lumi.relay.c2acn01': ["Aqara", "Relay", "LLKZMK11LM"],  # tested
     'lumi.ctrl_ln2': ["Aqara", "Double Wall Switch", "QBKG12LM"],
     'lumi.ctrl_ln2.aq1': ["Aqara", "Double Wall Switch", "QBKG12LM"],
     'lumi.switch.b2nacn02': ["Aqara", "Double Wall Switch D1", "QBKG24LM"],
     'lumi_spec': [
-        # ['0.11.85', 'load_voltage', 'power', 'sensor'],  # 0
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'energy', 'sensor'],
-        # ['0.14.85', None, '?', 'sensor'],  # 5.01, 6.13
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
-        # [?, 'enable_motor_mode', 'interlock', None]
+        ['13.1.85', None, 'button_1', None],
+        ['13.2.85', None, 'button_2', None],
+        ['13.5.85', None, 'button_both', None],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
+    'lumi.relay.c2acn01': ["Aqara", "Relay", "LLKZMK11LM"],  # tested
+    'lumi_spec': [
+        ['0.11.85', 'load_voltage', 'voltage', 'sensor'],
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
+        # ['0.14.85', None, '?', 'sensor'],  # 3.54, 5.01, 6.13
+        ['4.1.85', 'channel_0', 'channel 1', 'switch'],
+        ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        # ['4.9.85', 'enable_motor_mode', 'interlock', None]
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.5.85', None, 'button_both', None],
@@ -458,7 +469,7 @@ GLOBAL_PROP = {
     '8.0.2005': 'send_retry_cnt',
     '8.0.2006': 'chip_temperature',
     '8.0.2007': 'lqi',
-    '8.0.2008': 'voltage',
+    '8.0.2008': 'battery_voltage',
     '8.0.2009': 'pv_state',
     '8.0.2010': 'cur_state',
     '8.0.2011': 'pre_state',

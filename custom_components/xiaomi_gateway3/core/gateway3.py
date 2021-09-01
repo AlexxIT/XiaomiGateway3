@@ -994,9 +994,9 @@ class GatewayEntry(Thread, GatewayBLE):
                     payload[prop] = param['value'] / 100.0
             elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0
-            elif prop in ('battery', 'voltage'):
+            elif prop in ('battery', 'battery_voltage'):
                 # sometimes voltage and battery came in one payload
-                if prop == 'voltage' and 'battery' in payload:
+                if prop == 'battery_voltage' and 'battery' in payload:
                     continue
                 # I do not know if the formula is correct, so battery is more
                 # important than voltage
@@ -1014,6 +1014,9 @@ class GatewayEntry(Thread, GatewayBLE):
                 payload[prop] = param['value'] / 1000.0
             elif prop in ('consumption', 'power'):
                 payload[prop] = round(param['value'], 2)
+            elif prop == 'voltage':
+                # {"res_name":"0.11.85","value":215511}
+                payload[prop] = round(param['value'] / 1000.0, 2)
             elif prop == 'energy':
                 # energy consumption Wh to kWh
                 payload[prop] = round(param['value'] / 1000.0, 3)
