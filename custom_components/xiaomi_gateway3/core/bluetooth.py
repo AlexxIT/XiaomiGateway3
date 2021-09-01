@@ -338,6 +338,8 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
     elif eid == 0x0006 and len(data) == 5:
         action = int.from_bytes(data[4:], 'little')
+        if action >= len(BLE_FINGERPRINT_ACTION):
+            return None
         # status, action, state
         return {
             'action': 'fingerprint',
@@ -348,6 +350,8 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
     elif eid == 0x0007:
         # TODO: lock timestamp
+        if data[0] >= len(BLE_DOOR_ACTION):
+            return None
         return {
             'action': 'door',
             'action_id': data[0],
@@ -375,6 +379,9 @@ def parse_xiaomi_ble(event: dict, pdid: int) -> Optional[dict]:
 
         timestamp = int.from_bytes(data[5:], 'little')
         timestamp = datetime.fromtimestamp(timestamp).isoformat()
+
+        if action not in BLE_LOCK_ACTION or method not in BLE_LOCK_METHOD:
+            return None
 
         return {
             'action': 'lock',
