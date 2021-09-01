@@ -147,7 +147,7 @@ class GatewayMesh(GatewayBase):
                 bulk[did] = {}
 
             # TODO: fix this dirty hack
-            if device['model'] == 3083 and prop == 'power':
+            if device['model'] == 3083 and prop == 'power' and param['value']:
                 param['value'] /= 100.0
 
             # https://github.com/AlexxIT/XiaomiGateway3/issues/312
