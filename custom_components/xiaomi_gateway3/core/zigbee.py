@@ -85,7 +85,7 @@ DEVICES = [{
         ['0.11.85', 'load_voltage', 'voltage', 'sensor'],
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'energy', 'sensor'],
-        # ['0.14.85', None, '?', 'sensor'],  # 3.54, 5.01, 6.13
+        ['0.14.85', None, 'current', 'sensor'],
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         # ['4.9.85', 'enable_motor_mode', 'interlock', None]

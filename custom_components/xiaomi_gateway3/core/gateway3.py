@@ -1014,8 +1014,7 @@ class GatewayEntry(Thread, GatewayBLE):
                 payload[prop] = param['value'] / 1000.0
             elif prop in ('consumption', 'power'):
                 payload[prop] = round(param['value'], 2)
-            elif prop == 'voltage':
-                # {"res_name":"0.11.85","value":215511}
+            elif prop in ('voltage', 'current'):
                 payload[prop] = round(param['value'] / 1000.0, 2)
             elif prop == 'energy':
                 # energy consumption Wh to kWh
