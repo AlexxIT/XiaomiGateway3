@@ -422,7 +422,7 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
             return {
                 'device_manufacturer': desc[0],
                 'device_name': desc[0] + ' ' + desc[1],
-                'device_model': desc[2] if len(desc) > 2 else pdid,
+                'device_model': desc[2] if len(desc) > 2 else str(pdid),
                 'lumi_spec': None,
                 'miot_spec': device.get('miot_spec'),
                 # if color temp not default 2700..6500
@@ -432,7 +432,7 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
 
     return {
         'device_name': default_name,
-        'device_model': pdid,
+        'device_model': str(pdid),
         'lumi_spec': None,
         # default Mesh device will be Bulb
         'miot_spec': [
@@ -442,5 +442,5 @@ def get_device(pdid: int, default_name: str) -> Optional[dict]:
         ]
     } if default_name == 'Mesh' else {
         'device_name': default_name,
-        'device_model': pdid,
+        'device_model': str(pdid),
     }
