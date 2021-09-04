@@ -178,7 +178,7 @@ class XiaomiEntity(Entity):
                 },
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device['device_manufacturer'],
-                'model': self.device['device_model'],
+                'model': str(self.device['device_model']),
                 'name': self.device['device_name'],
                 'sw_version': self.device['fw_ver'],
             }
@@ -187,7 +187,7 @@ class XiaomiEntity(Entity):
                 'connections': {(type_, self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device.get('device_manufacturer'),
-                'model': self.device['device_model'],
+                'model': str(self.device['device_model']),
                 'name': self.device['device_name'],
                 'sw_version': self.device.get('fw_ver'),
                 'via_device': (DOMAIN, self.gw.device['mac'])
@@ -197,7 +197,7 @@ class XiaomiEntity(Entity):
                 'connections': {('bluetooth', self.device['mac'])},
                 'identifiers': {(DOMAIN, self.device['mac'])},
                 'manufacturer': self.device.get('device_manufacturer'),
-                'model': self.device['device_model'],
+                'model': str(self.device['device_model']),
                 'name': self.device['device_name'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
