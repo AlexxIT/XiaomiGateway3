@@ -27,6 +27,7 @@ DEVICES = [{
     2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
+    2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
