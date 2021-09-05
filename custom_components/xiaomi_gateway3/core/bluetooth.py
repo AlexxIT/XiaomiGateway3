@@ -48,6 +48,7 @@ DEVICES = [{
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
     3164: ["Unknown", "Mesh Downlight (RF ready)", "3164"],
     3416: ["Unknown", "Mesh Downlight (Yeelight compatible)", "3416"],
+    3531: ["Unknown", "ightctl Light", "3531"],
     'miot_spec': [
         [2, 1, 'light', 'light'],
         [2, 2, 'brightness', None],
@@ -111,7 +112,7 @@ DEVICES = [{
         [4, 1, 'backlight', 'switch'],
     ]
 }, {
-   2715: ["Xiaomi", "Mesh Wall Single Switch", "ZNKG01HL"],
+    2715: ["Xiaomi", "Mesh Wall Single Switch", "ZNKG01HL"],
     'miot_spec': [
         [2, 1, 'switch', 'switch'],
         [6, 1, 'humidity', 'sensor'],
@@ -130,6 +131,7 @@ DEVICES = [{
 # if color temp not default 2700..6500
 COLOR_TEMP = {
     2584: [3000, 6400],
+    3531: [3000, 6400],
 }
 # if max brightness not default 65535
 MAX_BRIGHTNESS = {
@@ -137,6 +139,7 @@ MAX_BRIGHTNESS = {
     2584: 100,
     3164: 100,
     3416: 100,
+    3531: 100,
 }
 
 BLE_FINGERPRINT_ACTION = [
