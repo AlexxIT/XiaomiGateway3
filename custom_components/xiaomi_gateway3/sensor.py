@@ -91,12 +91,6 @@ class XiaomiSensor(XiaomiEntity, SensorEntity):
     def icon(self):
         return ICONS.get(self.attr)
 
-    async def async_added_to_hass(self):
-        if self.attr == DEVICE_CLASS_ENERGY:
-            self._attr_last_reset = utc_from_timestamp(0)
-
-        await super().async_added_to_hass()
-
     def update(self, data: dict = None):
         if self.attr in data:
             self._state = data[self.attr]
