@@ -56,7 +56,7 @@ DEVICES = [{
     ]
 }, {
     # Mesh Switches
-    1946: ["Xiaomi", "Mesh Wall Double Switch", "DHKG02ZM"],
+    1946: ["Xiaomi", "Mesh Double Wall Switch", "DHKG02ZM"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
@@ -68,8 +68,8 @@ DEVICES = [{
         [2, 1, 'switch', 'switch']
     ],
 }, {
-    2093: ["PTX", "Mesh Wall Triple Switch", "PTX-TK3/M"],
-    3878: ["PTX", "Mesh Wall Triple Switch", "PTX-SK3M"],
+    2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
+    3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
@@ -80,7 +80,7 @@ DEVICES = [{
         [8, 4, 'right_smart', 'switch']
     ]
 }, {
-    2257: ["PTX", "Mesh Wall Double Switch", "PTX-SK2M"],
+    2257: ["PTX", "Mesh Double Wall Switch", "PTX-SK2M"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
@@ -89,14 +89,14 @@ DEVICES = [{
         [8, 3, 'right_smart', 'switch'],
     ]
 }, {
-    2258: ["PTX", "Mesh Wall Single Switch", "PTX-SK1M"],
+    2258: ["PTX", "Mesh Single Wall Switch", "PTX-SK1M"],
     'miot_spec': [
         [2, 1, 'switch', 'switch'],
         [8, 1, 'backlight', 'switch'],
         [8, 2, 'smart', 'switch'],
     ]
 }, {
-    2717: ["Xiaomi", "Mesh Wall Triple Switch", "ZNKG03HL/ISA-KG03HL"],
+    2717: ["Xiaomi", "Mesh Triple Wall Switch", "ZNKG03HL/ISA-KG03HL"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'middle_switch', 'switch'],
@@ -112,14 +112,14 @@ DEVICES = [{
         [4, 1, 'backlight', 'switch'],
     ]
 }, {
-    2715: ["Xiaomi", "Mesh Wall Single Switch", "ZNKG01HL"],
+    2715: ["Xiaomi", "Mesh Single Wall Switch", "ZNKG01HL"],
     'miot_spec': [
         [2, 1, 'switch', 'switch'],
         [6, 1, 'humidity', 'sensor'],
         [6, 7, 'temperature', 'sensor'],
     ]
 }, {
-    2716: ["Xiaomi", "Mesh Wall Double Switch", "ZNKG02HL"],
+    2716: ["Xiaomi", "Mesh Double Wall Switch", "ZNKG02HL"],
     'miot_spec': [
         [2, 1, 'left_switch', 'switch'],
         [3, 1, 'right_switch', 'switch'],
