@@ -556,7 +556,7 @@ def fix_xiaomi_props(model, params) -> dict:
         elif v in ('off', 'close'):
             params[k] = 0
         elif k == 'battery' and v and v > 1000:
-            params[k] = round((min(v, 3200) - 2500) / 7)
+            params[k] = round((min(v, 3200) - 2600) / 6)
         elif k == 'run_state':
             # https://github.com/AlexxIT/XiaomiGateway3/issues/139
             if v == 'offing':
