@@ -45,6 +45,7 @@ DEVICES = [{
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
     2293: ["Unknown", "Mesh Lightstrip (RF ready)", "2293"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    2351: ["Unknown", "Mesh Downlight", "2351"],
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
     3164: ["Unknown", "Mesh Downlight (RF ready)", "3164"],
     3416: ["Unknown", "Mesh Downlight (Yeelight compatible)", "3416"],
@@ -130,12 +131,15 @@ DEVICES = [{
 
 # if color temp not default 2700..6500
 COLOR_TEMP = {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/350
+    2351: [3100, 3100],
     2584: [3000, 6400],
     3531: [3000, 6400],
 }
 # if max brightness not default 65535
 MAX_BRIGHTNESS = {
     2293: 100,
+    2351: 100,
     2584: 100,
     3164: 100,
     3416: 100,
