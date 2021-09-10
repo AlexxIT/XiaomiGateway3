@@ -166,7 +166,8 @@ class TelnetShell(Telnet):
     def run_public_zb_console(self):
         # Z3 starts with tail on old fw and without it on new fw from 1.4.7
         self.exec("killall daemon_app.sh")
-        self.exec("tail Lumi_Z3GatewayHost_MQTT")
+        self.exec("killall tail")
+        self.exec("killall Lumi_Z3GatewayHost_MQTT")
 
         # run Gateway with open console port (`-v` param)
         arg = " -r 'c'" if self.ver >= '1.4.7_0063' else ''
