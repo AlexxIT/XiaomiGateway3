@@ -187,8 +187,11 @@ class TelnetShell(Telnet):
             self.write(f"cat {filename} | base64\n".encode())
             self.read_until(b"\r\n", timeout=3)  # skip command
             raw = self.read_until(b"# ", timeout=10)
-            # b"cat: can't open ..."
-            return base64.b64decode(raw)
+            try:
+                # b"cat: can't open ..."
+                return base64.b64decode(raw)
+            except:
+                return None
         else:
             self.write(f"cat {filename}\n".encode())
             self.read_until(b"\r\n", timeout=3)  # skip command
