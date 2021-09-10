@@ -101,8 +101,9 @@ class TelnetShell(Telnet):
         self.exec("daemon_app.sh &")
 
     def stop_lumi_zigbee(self):
+        # Z3 starts with tail on old fw and without it on new fw from 1.4.7
         self.exec("killall daemon_app.sh")
-        self.exec("killall Lumi_Z3GatewayHost_MQTT")
+        self.exec("killall tail Lumi_Z3GatewayHost_MQTT")
 
     def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
@@ -157,16 +158,14 @@ class TelnetShell(Telnet):
 
     def redirect_miio2mqtt(self, pattern: str):
         self.exec("killall daemon_miio.sh")
-        self.exec("miio_client; pkill -f log/miio")
+        self.exec("killall miio_client; pkill -f log/miio")
         time.sleep(.5)
         cmd = MIIO_147 if self.ver >= '1.4.7_0063' else MIIO_146
         self.exec(cmd + MIIO2MQTT % pattern)
         self.exec("daemon_miio.sh &")
 
     def run_public_zb_console(self):
-        # Z3 starts with tail on old fw and without it on new fw from 1.4.7
-        self.exec("killall daemon_app.sh")
-        self.exec("tail Lumi_Z3GatewayHost_MQTT")
+        self.stop_lumi_zigbee()
 
         # run Gateway with open console port (`-v` param)
         arg = " -r 'c'" if self.ver >= '1.4.7_0063' else ''
@@ -181,7 +180,7 @@ class TelnetShell(Telnet):
             "mosquitto_pub -t log/z3 -l &"
         )
 
-        self.exec("daemon_app.sh &")
+        self.run_lumi_zigbee()
 
     def read_file(self, filename: str, as_base64=False):
         if as_base64:
@@ -205,7 +204,8 @@ class TelnetShell(Telnet):
         self.exec("kill $(ps | grep dummy:basic_gw | awk '{print $1}')")
 
     def stop_buzzer(self):
-        self.exec("killall daemon_miio.sh; killall -9 basic_gw")
+        self.exec("killall daemon_miio.sh")
+        self.exec("killall -9 basic_gw")
         # run dummy process with same str in it
         self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
         self.exec("daemon_miio.sh &")
