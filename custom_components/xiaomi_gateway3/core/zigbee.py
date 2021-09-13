@@ -454,7 +454,7 @@ DEVICES = [{
     'miot_spec': [
         # ['2.1', '2.1', 'fault', None],
         ['2.2', None, 'motor', 'cover'],
-        # ['2.4', '2.4', 'target_position', None],
+        ['2.4', '2.4', 'target_position', None],
         ['2.5', '2.5', 'position', None],
         ['2.6', '2.6', 'run_state', None],
         ['3.4', '3.4', 'battery', 'sensor'],

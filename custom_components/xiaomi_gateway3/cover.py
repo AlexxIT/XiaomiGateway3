@@ -73,3 +73,7 @@ class XiaomiCoverMIOT(XiaomiCover):
 
     def stop_cover(self, **kwargs):
         self.gw.send(self.device, {'motor': 0})
+
+    def set_cover_position(self, **kwargs):
+        position = kwargs.get(ATTR_POSITION)
+        self.gw.send(self.device, {'target_position': position})
