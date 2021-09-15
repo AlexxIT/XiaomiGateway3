@@ -31,6 +31,7 @@ MIIO2MQTT = " | awk '/%s/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 RE_VERSION = re.compile(r'version=([0-9._]+)')
 
 FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
+TRASH_FILES = ('/data/root.bin', '/data/linux.bin', '/data/firmware/root.bin', '/data/firmware/linux.bin')
 
 TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
@@ -106,10 +107,10 @@ class TelnetShell(Telnet):
         self.exec("killall tail Lumi_Z3GatewayHost_MQTT")
 
     def check_firmware_lock(self) -> bool:
-        """Check if firmware update locked. And create empty file if needed."""
+        """Check if firmware update locked. And nulling files."""
         self.exec("mkdir -p /data/firmware")
         locked = [
-            "Permission denied" in self.exec("touch " + path)
+            "Permission denied" in self.exec("cat /dev/null > " + path)
             for path in FIRMWARE_PATHS
         ]
         return all(locked)
@@ -119,6 +120,10 @@ class TelnetShell(Telnet):
             command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
             for path in FIRMWARE_PATHS:
                 self.exec(command + path)
+            """ Trying to free up space in /data."""
+            if not enable:
+                for file in TRASH_FILES:
+                    self.exec("rm -f " + file)
 
     def run_ftp(self):
         if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
