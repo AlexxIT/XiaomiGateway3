@@ -17,6 +17,10 @@ except:
 
 _LOGGER = logging.getLogger(__name__)
 
+# support for older versions of the Home Assistant
+ELECTRIC_POTENTIAL_VOLT = 'V'
+ELECTRIC_CURRENT_AMPERE = 'A'
+
 UNITS = {
     DEVICE_CLASS_BATTERY: PERCENTAGE,
     DEVICE_CLASS_HUMIDITY: PERCENTAGE,
