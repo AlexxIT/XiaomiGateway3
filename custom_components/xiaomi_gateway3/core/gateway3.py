@@ -997,16 +997,10 @@ class GatewayEntry(Thread, GatewayBLE):
                     payload[prop] = param['value'] / 100.0
             elif prop == 'pressure':
                 payload[prop] = param['value'] / 100.0
-            elif prop in ('battery', 'battery_voltage'):
-                # sometimes voltage and battery came in one payload
-                if prop == 'battery_voltage' and 'battery' in payload:
-                    continue
+            elif prop == 'battery':
                 # I do not know if the formula is correct, so battery is more
                 # important than voltage
-                payload['battery'] = (
-                    param['value'] if param['value'] < 1000
-                    else int((min(param['value'], 3200) - 2600) / 6)
-                )
+                payload[prop] = zigbee.fix_xiaomi_battery(param['value'])
             elif prop == 'alive' and param['value']['status'] == 'offline':
                 device['online'] = False
             elif prop == 'angle':

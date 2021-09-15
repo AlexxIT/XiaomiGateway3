@@ -163,16 +163,6 @@ DEVICES = [{
         [None, None, 'action', 'sensor'],
     ]
 }, {
-    # cube action, no retain
-    'lumi.sensor_cube': ["Aqara", "Cube", "MFKZQ01LM"],
-    'lumi.sensor_cube.aqgl01': ["Aqara", "Cube", "MFKZQ01LM"],  # tested
-    'lumi_spec': [
-        ['0.2.85', None, 'duration', None],
-        ['0.3.85', None, 'angle', None],
-        ['13.1.85', None, 'action', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
-    ]
-}, {
     # light with brightness and color temp
     'lumi.light.aqcn02': ["Aqara", "Bulb", "ZNLDP12LM"],
     'lumi.light.cwopcn02': ["Aqara", "Opple MX650", "XDD12LM"],
@@ -199,21 +189,21 @@ DEVICES = [{
     # button action, no retain
     'lumi.sensor_switch': ["Xiaomi", "Button", "WXKG01LM"],
     'lumi.sensor_switch.aq2': ["Aqara", "Button", "WXKG11LM"],
-    'lumi.remote.b1acn01': ["Aqara", "Button", "WXKG11LM"],
     'lumi.sensor_switch.aq3': ["Aqara", "Shake Button", "WXKG12LM"],
-    'lumi.sensor_86sw1': ["Aqara", "Single Wall Button", "WXKG03LM"],
+    'lumi.remote.b1acn01': ["Aqara", "Button", "WXKG11LM"],
     'lumi.remote.b186acn01': ["Aqara", "Single Wall Button", "WXKG03LM"],
     'lumi.remote.b186acn02': ["Aqara", "Single Wall Button D1", "WXKG06LM"],
+    'lumi.sensor_86sw1': ["Aqara", "Single Wall Button", "WXKG03LM"],
     'lumi_spec': [
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # multi button action, no retain
     'lumi.sensor_86sw2': ["Aqara", "Double Wall Button", "WXKG02LM"],
-    'lumi.remote.b286acn01': ["Aqara", "Double Wall Button", "WXKG02LM"],
     'lumi.sensor_86sw2.es1': ["Aqara", "Double Wall Button", "WXKG02LM"],
+    'lumi.remote.b286acn01': ["Aqara", "Double Wall Button", "WXKG02LM"],
     'lumi.remote.b286acn02': ["Aqara", "Double Wall Button D1", "WXKG07LM"],
     'lumi.remote.b286opcn01': ["Aqara", "Opple Two Button", "WXCJKG11LM"],
     'lumi.remote.b486opcn01': ["Aqara", "Opple Four Button", "WXCJKG12LM"],
@@ -227,7 +217,7 @@ DEVICES = [{
         ['13.7.85', None, 'button_6', None],
         ['13.5.85', None, 'button_both', None],
         [None, None, 'action', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # temperature and humidity sensor
@@ -235,7 +225,7 @@ DEVICES = [{
     'lumi_spec': [
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # temperature, humidity and pressure sensor
@@ -245,7 +235,7 @@ DEVICES = [{
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
         ['0.3.85', 'pressure', 'pressure', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # door window sensor
@@ -253,14 +243,14 @@ DEVICES = [{
     'lumi.sensor_magnet.aq2': ["Aqara", "Door Sensor", "MCCGQ11LM"],
     'lumi_spec': [
         ['3.1.85', 'status', 'contact', 'binary_sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # motion sensor
     'lumi.sensor_motion': ["Xiaomi", "Motion Sensor", "RTCGQ01LM"],
     'lumi_spec': [
         ['3.1.85', None, 'motion', 'binary_sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # motion sensor with illuminance
@@ -269,14 +259,14 @@ DEVICES = [{
         ['0.3.85', 'lux', 'illuminance_lux', None],
         ['0.4.85', 'illumination', 'illuminance', 'sensor'],
         ['3.1.85', None, 'motion', 'binary_sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # water leak sensor
     'lumi.sensor_wleak.aq1': ["Aqara", "Water Leak Sensor", "SJCGQ11LM"],
     'lumi_spec': [
         ['3.1.85', 'alarm', 'moisture', 'binary_sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     # vibration sensor
@@ -287,14 +277,18 @@ DEVICES = [{
         ['0.3.85', None, 'vibrate_intensity', None],
         ['13.1.85', None, 'vibration', None],
         ['14.1.85', None, 'vibration_level', None],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
         [None, None, 'action', 'sensor']
     ]
 }, {
-    'lumi.sen_ill.mgl01': ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
-    'miot_spec': [
-        ['2.1', '2.1', 'illuminance', 'sensor'],
-        ['3.1', '3.1', 'battery', 'sensor'],
+    # cube action, no retain
+    'lumi.sensor_cube': ["Aqara", "Cube", "MFKZQ01LM"],
+    'lumi.sensor_cube.aqgl01': ["Aqara", "Cube", "MFKZQ01LM"],  # tested
+    'lumi_spec': [
+        ['0.2.85', None, 'duration', None],
+        ['0.3.85', None, 'angle', None],
+        ['13.1.85', None, 'action', 'sensor'],
+        ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
     'lumi.sensor_smoke': ["Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW"],
@@ -302,6 +296,12 @@ DEVICES = [{
         ['0.1.85', 'density', 'smoke density', 'sensor'],
         ['13.1.85', 'alarm', 'smoke', 'binary_sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
+}, {
+    'lumi.sen_ill.mgl01': ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
+    'miot_spec': [
+        ['2.1', '2.1', 'illuminance', 'sensor'],
+        ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }, {
     'lumi.sensor_natgas': ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
@@ -555,8 +555,8 @@ def fix_xiaomi_props(model, params) -> dict:
             params[k] = 1
         elif v in ('off', 'close'):
             params[k] = 0
-        elif k == 'battery' and v and v > 1000:
-            params[k] = round((min(v, 3200) - 2600) / 6)
+        elif k == 'battery' and v:
+            params[k] = fix_xiaomi_battery(v)
         elif k == 'run_state':
             # https://github.com/AlexxIT/XiaomiGateway3/issues/139
             if v == 'offing':
@@ -567,6 +567,17 @@ def fix_xiaomi_props(model, params) -> dict:
                 params[k] = 2
 
     return params
+
+
+def fix_xiaomi_battery(value: int) -> int:
+    """Convert battery voltage to battery percent."""
+    if value <= 100:
+        return value
+    if value <= 2700:
+        return 0
+    if value >= 3200:
+        return 100
+    return int((value - 2700) / 5)
 
 
 def get_buttons(model: str):
