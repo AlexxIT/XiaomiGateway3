@@ -601,7 +601,8 @@ async def get_ota_link(hass: HomeAssistantType, device: dict) -> Optional[str]:
     # Xiaomi Plug should be updated to fw 30 before updating to latest fw
     if model == 'lumi.plug' and get_fw_ver(device) < 30:
         # waiting pull request https://github.com/Koenkk/zigbee-OTA/pull/49
-        return url.replace('Koenkk', 'AlexxIT') + 'images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota'
+        return url.replace('Koenkk', 'AlexxIT') + \
+               'images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota'
 
     r = await async_get_clientsession(hass).get(url + "index.json")
     items = await r.json(content_type=None)
