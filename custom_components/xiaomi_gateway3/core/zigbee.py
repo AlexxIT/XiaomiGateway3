@@ -449,6 +449,27 @@ DEVICES = [{
         [None, None, 'action', 'sensor'],
     ]
 }, {
+    'lumi.remote.acn003': ["Aqara", "Single Wall Button E1", "WXKG16LM"],
+    'miot_spec': [
+        ['2.1', None, 'button: 1', None],  # single
+        ['2.2', None, 'button: 2', None],  # double
+        ['2.3', None, 'button: 16', None],  # long
+        ['3.2', '3.2', 'battery', 'sensor'],
+        [None, None, 'action', 'sensor'],
+    ]
+}, {
+    'lumi.remote.acn004': ["Aqara", "Double Wall Button E1", "WXKG17LM"],
+    'miot_spec': [
+        ['2.1', None, 'button_1: 1', None],  # single
+        ['2.2', None, 'button_1: 2', None],  # double
+        ['2.3', None, 'button_1: 16', None],  # long
+        ['7.1', None, 'button_2: 1', None],  # single
+        ['7.2', None, 'button_2: 2', None],  # double
+        ['7.3', None, 'button_2: 16', None],  # long
+        ['3.2', '3.2', 'battery', 'sensor'],
+        [None, None, 'action', 'sensor'],
+    ]
+},{
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-acn002:1
     'lumi.curtain.acn002': ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
     'miot_spec': [
