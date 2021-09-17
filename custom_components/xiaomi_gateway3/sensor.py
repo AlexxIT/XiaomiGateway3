@@ -3,7 +3,7 @@ import time
 from datetime import timedelta
 
 from homeassistant.const import *
-from homeassistant.util.dt import now, utc_from_timestamp
+from homeassistant.util.dt import now
 
 from . import DOMAIN
 from .core import zigbee
@@ -327,6 +327,8 @@ class XiaomiAction(XiaomiEntity):
             elif k == 'tilt_angle':
                 data = {'vibration': 2, 'angle': v, self.attr: 'tilt'}
                 break
+            elif k in ('key_id', 'lock_control', 'lock_state'):
+                data[self.attr] = k
 
         if self.attr in data:
             self._action_attrs = {**self._attrs, **data}

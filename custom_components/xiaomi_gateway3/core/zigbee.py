@@ -338,12 +338,13 @@ DEVICES = [{
 }, {
     'lumi.lock.acn03': ["Aqara", "Door Lock S2 Pro", "ZNMS12LM"],
     'lumi_spec': [
-        ['13.1.85', None, 'key_id', 'sensor'],
+        ['3.1.85', 'reverse_lock_state', 'lock', 'binary_sensor'],
         ['13.26.85', 'door_state', 'door', 'binary_sensor'],
-        ['3.1.85', 'reverse_lock_state', 'occupancy', 'binary_sensor'],
-        ['13.28.85', None, 'lock_state', 'sensor'],
-        ['13.25.85', None, 'lock_action', 'sensor'],
-        ['8.0.2001', 'battery', 'battery', 'sensor'],
+        ['8.0.2001', 'bat_percent', 'battery', 'sensor'],
+        ['13.1.85', None, 'key_id', None],
+        ['13.25.85', None, 'lock_control', None],
+        ['13.28.85', None, 'lock_state', None],
+        [None, None, 'action', 'sensor'],
     ]
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/101
