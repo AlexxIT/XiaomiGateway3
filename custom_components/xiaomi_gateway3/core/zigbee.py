@@ -330,10 +330,19 @@ DEVICES = [{
 }, {
     'lumi.lock.aq1': ["Aqara", "Door Lock S1", "ZNMS11LM"],
     'lumi.lock.acn02': ["Aqara", "Door Lock S2", "ZNMS12LM"],
-    'lumi.lock.acn03': ["Aqara", "Door Lock S2 Pro", "ZNMS12LM"],
     'lumi_spec': [
         ['13.1.85', None, 'key_id', 'sensor'],
         ['13.20.85', 'lock_state', 'lock', 'binary_sensor'],
+        ['8.0.2001', 'battery', 'battery', 'sensor'],
+    ]
+}, {
+    'lumi.lock.acn03': ["Aqara", "Door Lock S2 Pro", "ZNMS12LM"],
+    'lumi_spec': [
+        ['13.1.85', None, 'key_id', 'sensor'],
+        ['13.26.85', 'door_state', 'door', 'binary_sensor'],
+        ['3.1.85', 'reverse_lock_state', 'occupancy', 'binary_sensor'],
+        ['13.28.85', None, 'lock_state', 'sensor'],
+        ['13.25.85', None, 'lock_action', 'sensor'],
         ['8.0.2001', 'battery', 'battery', 'sensor'],
     ]
 }, {
