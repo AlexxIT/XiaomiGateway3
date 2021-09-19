@@ -476,10 +476,11 @@ DEVICES = [{
         ['7.1', None, 'button_2: 1', None],  # single
         ['7.2', None, 'button_2: 2', None],  # double
         ['7.3', None, 'button_2: 16', None],  # long
+        ['8.1', None, 'button_both: 4', None],  # single
         ['3.2', '3.2', 'battery', 'sensor'],
         [None, None, 'action', 'sensor'],
     ]
-},{
+}, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-acn002:1
     'lumi.curtain.acn002': ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
     'miot_spec': [
