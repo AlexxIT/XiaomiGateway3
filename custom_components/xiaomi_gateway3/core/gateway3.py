@@ -11,7 +11,7 @@ import yaml
 
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils, zigbee
-from .helpers import DevicesRegistry, XiaomiEntity
+from .helpers import DevicesRegistry
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
@@ -340,8 +340,11 @@ class GatewayStats(GatewayMesh):
 
 
 class GatewayGW3(GatewayStats):
+    retain: dict = {}
+
     def process_gw3_state(self, mac: str, data: dict):
         if mac not in self.devices:
+            self.retain[mac] = data
             return
 
         device = self.devices[mac]
@@ -360,7 +363,8 @@ class GatewayGW3(GatewayStats):
     def process_gw3_info(self, mac: str, data: dict):
         if data['type'] != 'ble':
             return
-        self.find_or_create_device({
+
+        device = self.find_or_create_device({
             'mac': mac,
             'type': 'ble',
             'model': None,
@@ -369,6 +373,9 @@ class GatewayGW3(GatewayStats):
             'device_name': data['brand'] + ' ' + data['name'],
             'device_model': data['model'],
         })
+
+        if mac in self.retain:
+            self.process_ble_payload(device, self.retain[mac])
 
     def process_ble_payload(self, device: dict, payload: dict):
         # init entities if needed
