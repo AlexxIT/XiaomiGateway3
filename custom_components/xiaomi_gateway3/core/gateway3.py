@@ -920,7 +920,7 @@ class GatewayEntry(Thread, GatewayBLE):
                 for param in device['miot_spec'] or []:
                     self.add_entity(param[3], device, param[2])
 
-            if self.stats_enable and type_ in ('gateway', 'zigbee', 'ble'):
+            if self.stats_enable and type_ in ('gateway', 'zigbee'):
                 self.add_stats(device)
 
     def process_zigbee_message(self, data: dict):

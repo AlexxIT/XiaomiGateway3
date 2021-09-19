@@ -123,8 +123,7 @@ class GatewayStats(XiaomiSensor):
 
     async def async_added_to_hass(self):
         self.gw.set_stats(self)
-        # update available when added to Hass
-        self.update()
+        self.hass.add_job(self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
@@ -247,6 +246,7 @@ class BLEStats(XiaomiSensor):
             self.render_attributes_template()
 
         self.gw.set_stats(self)
+        self.hass.add_job(self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
