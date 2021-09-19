@@ -8,8 +8,8 @@ from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
 
-# We should use HTTP-link because wget don't support HTTPS and curl removed in
-# lastest fw. But it's not a problem because we check md5
+# We should use HTTP-link because wget doesn't support HTTPS and curl removed
+# in lastest fw. But it's not a problem because we check md5
 
 # original link http://pkg.musl.cc/socat/mipsel-linux-musln32/bin/socat
 # original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
@@ -36,16 +36,8 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
            b"ble_info miioconfig.db 2>/dev/null | base64\n"
 
-MD5_BT = {
-    '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
-    '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
-    '1.4.7_0115': 'be4724fbc5223fcde60aff7f58ffea28',
-    '1.4.7_0160': '9290241cd9f1892d2ba84074f07391d4',
-    '1.5.0_0026': '9290241cd9f1892d2ba84074f07391d4',
-    '1.5.0_0102': '9290241cd9f1892d2ba84074f07391d4',
-}
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
-# MD5_GW3 = 'c81b91816d4b9ad9bb271a5567e36ce9'  # alpha
+MD5_GW3 = '67cf865d7acad57b2c7d5662727cb10a'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
 
 
@@ -79,15 +71,15 @@ class TelnetShell(Telnet):
         else:
             return False
 
-    # def check_gw3(self):
-    #     return self.check_bin('gw3', MD5_GW3)
+    def check_gw3(self):
+        return self.check_bin('gw3', MD5_GW3)
 
-    # def run_gw3(self, params=''):
-    #     if self.check_bin('gw3', MD5_GW3, 'gw3/' + MD5_GW3):
-    #         self.exec(f"/data/gw3 {params}&")
+    def run_gw3(self, params=''):
+        if self.check_bin('gw3', MD5_GW3, 'gw3/' + MD5_GW3):
+            self.exec(f"/data/gw3 {params}&")
 
-    # def stop_gw3(self):
-    #     self.exec(f"killall gw3")
+    def stop_gw3(self):
+        self.exec(f"killall gw3")
 
     def run_zigbee_tcp(self, port=8888):
         if self.check_bin('socat', MD5_SOCAT, 'bin/socat'):
@@ -123,24 +115,6 @@ class TelnetShell(Telnet):
     def run_ftp(self):
         if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
             self.exec(RUN_FTP)
-
-    def check_bt(self) -> bool:
-        md5 = MD5_BT.get(self.ver)
-        if not md5:
-            return False
-        # we use same name for bt utis so gw can kill it in case of update etc.
-        return self.check_bin('silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt')
-
-    def run_bt(self):
-        self.exec(
-            "killall silabs_ncp_bt; pkill -f log/ble; "
-            "/data/silabs_ncp_bt /dev/ttyS1 1 2>&1 >/dev/null | "
-            "mosquitto_pub -t log/ble -l &"
-        )
-
-    def sniff_bluetooth(self):
-        """Deprecated"""
-        self.write(b"killall silabs_ncp_bt; silabs_ncp_bt /dev/ttyS1 1\n")
 
     def run_public_mosquitto(self):
         self.exec("killall mosquitto")

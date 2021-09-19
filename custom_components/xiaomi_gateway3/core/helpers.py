@@ -97,8 +97,8 @@ class DevicesRegistry:
             device.update(zigbee.get_device(device['model']))
         elif type_ == 'mesh':
             device.update(bluetooth.get_device(device['model'], 'Mesh'))
-        elif type_ == 'ble':
-            device.update(bluetooth.get_device(device['model'], 'BLE'))
+        # elif type_ == 'ble':
+        #     device.update(bluetooth.get_device(device['model'], 'BLE'))
 
         model = device['model']
         if model in self.defaults:
