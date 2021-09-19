@@ -218,9 +218,9 @@ def get_ble_domain(param: str) -> Optional[str]:
         return 'binary_sensor'
 
     elif param in (
-            'action', 'rssi', 'temperature', 'humidity', 'illuminance',
+            'action', 'temperature', 'humidity', 'illuminance',
             'moisture', 'conductivity', 'battery', 'formaldehyde',
-            'supply', 'idle_time'):
+            'supply', 'idle_time', 'area'):
         return 'sensor'
 
     return None

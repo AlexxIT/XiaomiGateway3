@@ -12,6 +12,7 @@ from typing import List, Optional
 import requests
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.template import Template
@@ -44,6 +45,18 @@ def update_device_info(hass: HomeAssistantType, did: str, **kwargs):
     device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
     if device:
         registry.async_update_device(device.id, **kwargs)
+
+
+@lru_cache(maxsize=None)  # fast cache with None size
+def get_area(hass: HomeAssistantType, mac: str) -> Optional[str]:
+    """Return area name for device mac. Or area_id"""
+    devices: DeviceRegistry = hass.data['device_registry']
+    device = devices.async_get_device(set(), {('mac', mac.lower())})
+    if device and device.area_id:
+        areas: AreaRegistry = hass.data['area_registry']
+        area = areas.async_get_area(device.area_id)
+        return area.name if area else device.area_id
+    return None
 
 
 def migrate_unique_id(hass: HomeAssistantType):
