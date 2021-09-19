@@ -76,9 +76,6 @@ async def async_setup_entry(hass, entry, add_entities):
 
 
 class XiaomiSensor(XiaomiEntity, SensorEntity):
-    # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
-    _attr_state_class = "measurement"
-
     @property
     def state(self):
         return self._state
@@ -94,6 +91,15 @@ class XiaomiSensor(XiaomiEntity, SensorEntity):
     @property
     def icon(self):
         return ICONS.get(self.attr)
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+
+        # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
+        if self.attr == 'energy':
+            self._attr_state_class = "total_increasing"
+        elif self.attr in UNITS:
+            self._attr_state_class = "measurement"
 
     def update(self, data: dict = None):
         if self.attr in data:
