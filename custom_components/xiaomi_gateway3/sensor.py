@@ -52,10 +52,10 @@ ICONS = {
     'moisture': 'mdi:water-percent',
     # 'supply': '?',
     'tvoc': 'mdi:cloud',
+    'gateway': 'mdi:router-wireless',
+    'zigbee': 'mdi:zigbee',
+    'ble': 'mdi:bluetooth',
 }
-
-INFO = ['ieee', 'nwk', 'msg_received', 'msg_missed', 'unresponsive',
-        'link_quality', 'rssi', 'last_seen']
 
 
 async def async_setup_entry(hass, entry, add_entities):
@@ -112,10 +112,6 @@ class GatewayStats(XiaomiSensor):
         return 'timestamp'
 
     @property
-    def icon(self):
-        return 'mdi:router-wireless'
-
-    @property
     def available(self):
         return True
 
@@ -150,10 +146,6 @@ class ZigbeeStats(XiaomiSensor):
     def device_class(self):
         # don't use const to support older Hass version
         return 'timestamp'
-
-    @property
-    def icon(self):
-        return 'mdi:zigbee'
 
     @property
     def available(self):
@@ -235,10 +227,6 @@ class BLEStats(XiaomiSensor):
     def device_class(self):
         # don't use const to support older Hass version
         return 'timestamp'
-
-    @property
-    def icon(self):
-        return 'mdi:bluetooth'
 
     @property
     def available(self):
