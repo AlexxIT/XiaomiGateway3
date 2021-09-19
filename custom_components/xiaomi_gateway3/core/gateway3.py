@@ -192,7 +192,7 @@ class GatewayMesh(GatewayBase):
 class GatewayStats(GatewayMesh):
     # global stats for all gateways
     # stats: dict = {}
-    info_ts: float = 0
+    parent_scan_ts: float = 0
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
     # -1 - disabled
@@ -208,6 +208,12 @@ class GatewayStats(GatewayMesh):
     def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
         self.debug(f"gateway <= {payload or self.available}")
+
+        if self.parent_scan_ts and time.time() > self.parent_scan_ts:
+            # block any auto updates in 30 seconds
+            self.parent_scan_ts = time.time() + 30
+
+            self.get_gateway_info()
 
         device = self.devices.get(self.did)
         if not device or not device.get('stats'):
@@ -235,18 +241,14 @@ class GatewayStats(GatewayMesh):
 
         device['stats'].update(payload)
 
-    def process_zb_stats(self, payload: dict):
+    def process_zb_stats(self, payload: dict) -> bool:
         # convert ieee to did
         did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
         device = self.devices.get(did)
         if device and device.get('stats'):
             device['stats'].update(payload)
-
-        if self.info_ts and time.time() > self.info_ts:
-            # block any auto updates in 30 seconds
-            self.info_ts = time.time() + 30
-
-            self.get_gateway_info()
+            return True
+        return False
 
     def process_ble_stats(self, mac: str, data: dict = None):
         device = self.devices.get(mac)
@@ -319,20 +321,19 @@ class GatewayStats(GatewayMesh):
                 parent = '0x' + m4[nwk][0] if nwk in m4 else '-'
 
                 payload = {
+                    'eui64': ieee,
                     'nwk': '0x' + nwk,
                     'ago': ago,
                     'type': type_,
                     'parent': parent
                 }
 
-                if ieee in self.stats:
-                    self.stats[ieee](payload)
-                else:
+                if not self.process_zb_stats(payload):
                     self.debug(f"Unknown zigbee device {ieee}: {payload}")
 
             # one hour later
             if self.parent_scan_interval > 0:
-                self.info_ts = time.time() + self.parent_scan_interval * 60
+                self.parent_scan_ts = time.time() + self.parent_scan_interval * 60
 
         except Exception as e:
             self.debug(f"Can't update parents: {e}")
@@ -615,10 +616,13 @@ class GatewayEntry(Thread, GatewayBLE):
                     self.debug("Stop Zigbee TCP")
                     shell.stop_zigbee_tcp()
 
-                if (self.parent_scan_interval >= 0 and
-                        "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps):
-                    self.debug("Run public Zigbee console")
-                    shell.run_public_zb_console()
+                if self.parent_scan_interval >= 0:
+                    if "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps:
+                        self.debug("Run public Zigbee console")
+                        shell.run_public_zb_console()
+
+                    if self.parent_scan_interval > 0:
+                        self.parent_scan_ts = 1
 
                 elif "daemon_app.sh" not in ps:
                     self.debug("Run Lumi Zigbee")
