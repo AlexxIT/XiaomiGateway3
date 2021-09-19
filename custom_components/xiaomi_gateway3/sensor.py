@@ -120,12 +120,12 @@ class GatewayStats(XiaomiSensor):
         return True
 
     async def async_added_to_hass(self):
-        self.gw.set_stats(self.device['did'], self)
+        self.gw.set_stats(self)
         # update available when added to Hass
         self.update()
 
     async def async_will_remove_from_hass(self) -> None:
-        self.gw.remove_stats(self.device['did'], self)
+        self.gw.remove_stats(self)
 
     def update(self, data: dict = None):
         # empty data - update state to available time
@@ -172,10 +172,10 @@ class ZigbeeStats(XiaomiSensor):
             }
             self.render_attributes_template()
 
-        self.gw.set_stats(self._attrs['ieee'], self)
+        self.gw.set_stats(self)
 
     async def async_will_remove_from_hass(self) -> None:
-        self.gw.remove_stats(self._attrs['ieee'], self)
+        self.gw.remove_stats(self)
 
     def update(self, data: dict = None):
         if 'sourceAddress' in data:
@@ -252,10 +252,10 @@ class BLEStats(XiaomiSensor):
             }
             self.render_attributes_template()
 
-        self.gw.set_stats(self.device['mac'], self)
+        self.gw.set_stats(self)
 
     async def async_will_remove_from_hass(self) -> None:
-        self.gw.remove_stats(self.device['mac'], self)
+        self.gw.remove_stats(self)
 
     def update(self, data: dict = None):
         self._attrs['msg_received'] += 1

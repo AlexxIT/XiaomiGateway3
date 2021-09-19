@@ -26,6 +26,8 @@ class XiaomiDevice:
 
     device_info: Dict[str, Any]
 
+    stats: 'XiaomiEntity'
+
     extra: Dict[str, Any] = field(default_factory=dict)
 
     # all device entities except stats
@@ -67,6 +69,20 @@ class DevicesRegistry:
 
     def remove_entity(self, entity: 'XiaomiEntity'):
         entity.device['entities'].pop(entity.attr)
+
+    def add_stats(self, device: dict):
+        if 'stats' in device:
+            return
+
+        device['stats'] = None
+
+        self.setups['sensor'](self, device, device['type'])
+
+    def set_stats(self, entity: 'XiaomiEntity'):
+        entity.device['stats'] = entity
+
+    def remove_stats(self, entity: 'XiaomiEntity'):
+        entity.device.pop('stats')
 
     def find_or_create_device(self, device: dict) -> dict:
         type_ = device['type']

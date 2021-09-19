@@ -191,7 +191,7 @@ class GatewayMesh(GatewayBase):
 
 class GatewayStats(GatewayMesh):
     # global stats for all gateways
-    stats: dict = {}
+    # stats: dict = {}
     info_ts: float = 0
 
     # interval for auto parent refresh in minutes, 0 - disabled auto refresh
@@ -205,30 +205,12 @@ class GatewayStats(GatewayMesh):
     def stats_enable(self):
         return self.options.get('stats')
 
-    def add_stats(self, device: dict, attr: str):
-        if 'stats' in device:
-            return
-
-        device['stats'] = True
-
-        self.setups['sensor'](self, device, attr)
-
-    def set_stats(self, sid: str, entity: XiaomiEntity):
-        self.stats[sid] = entity.update
-
-        if self.parent_scan_interval > 0:
-            self.info_ts = time.time() + 5
-
-    def remove_stats(self, sid: str, entity: XiaomiEntity):
-        entity.device.pop('stats')
-
-        self.stats.pop(sid)
-
     def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
         self.debug(f"gateway <= {payload or self.available}")
 
-        if self.did not in self.stats:
+        device = self.devices.get(self.did)
+        if not device or not device.get('stats'):
             return
 
         if payload:
@@ -251,12 +233,14 @@ class GatewayStats(GatewayMesh):
                     'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
                 }
 
-        self.stats[self.did](payload)
+        device['stats'].update(payload)
 
     def process_zb_stats(self, payload: dict):
-        ieee = payload['eui64']
-        if ieee in self.stats:
-            self.stats[ieee](payload)
+        # convert ieee to did
+        did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
+        device = self.devices.get(did)
+        if device and device.get('stats'):
+            device['stats'].update(payload)
 
         if self.info_ts and time.time() > self.info_ts:
             # block any auto updates in 30 seconds
@@ -264,9 +248,10 @@ class GatewayStats(GatewayMesh):
 
             self.get_gateway_info()
 
-    def process_ble_stats(self, mac: str):
-        if mac in self.stats:
-            self.stats[mac]()
+    def process_ble_stats(self, mac: str, data: dict = None):
+        device = self.devices.get(mac)
+        if device and device.get('stats'):
+            device['stats'].update(data)
 
     def process_z3(self, payload: str):
         if payload.startswith("CLI command executed"):
@@ -932,7 +917,7 @@ class GatewayEntry(Thread, GatewayBLE):
                     self.add_entity(param[3], device, param[2])
 
             if self.stats_enable and type_ in ('gateway', 'zigbee', 'ble'):
-                self.add_stats(device, type_)
+                self.add_stats(device)
 
     def process_zigbee_message(self, data: dict):
         if data['cmd'] == 'heartbeat':
