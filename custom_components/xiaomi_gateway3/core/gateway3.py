@@ -519,12 +519,15 @@ class GatewayEntry(Thread, GatewayGW3):
                 # check if binary has latest version
                 if shell.check_gw3():
                     if "gw3" not in ps:
+                        self.debug("Run gw3")
                         shell.run_gw3()
                 else:
                     if "gw3" in ps:
                         shell.stop_gw3()
+                    self.debug("Download and run gw3")
                     shell.run_gw3()
             elif "gw3" in ps:
+                self.debug("Stop gw3")
                 shell.stop_gw3()
 
             if "-t log/miio" not in ps:
