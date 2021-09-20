@@ -652,14 +652,52 @@ After rebooting the device, all changes will be reset. The component will launch
 
 # Debug mode
 
-Component support debug mode. Shows only component logs. The link to the logs is always random and will apear in Notifications.
+Logging can be setup from:
 
-> Configuration > Integrations > Xiaomi Gateway 3 > Options > Debug
+**1. Integration config (GUI)**
+
+> Configuration > Integrations > Xiaomi Gateway 3 > Configure > Debug
+
+Shows only component logs. The link to the logs is always random and will apear in Notifications.
 
 You can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
 
 ```
 http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2&t=100
+```
+
+**2. Integration config (YAML)**
+
+Component can log different debug events from different gateways. You can set global `debug_mode` for all gateways or config custom modes for custom gateways from GUI.
+
+Recommended config:
+
+```yaml
+xiaomi_gateway3:
+  logger:
+    filename: xiaomi_gateway3.log  # default empty
+    propagate: False  # if False - disable log to home-assistant.log and console, default True
+    max_bytes: 100000000  # file size, default 0
+    backup_count: 3  # file rotation count, default 0
+    debug_mode: true,miio,mqtt  # global modes for all gateways, default empty
+```
+
+Additional settings
+
+```yaml
+    level: debug  # default
+    mode: a  # a - append to file, w - write new file, default
+    format: "%(asctime)s %(message)s"  # default
+```
+
+**3. Hass default config**
+
+You can set custom modes for custom gateways from GUI. Witout custom modes you won't see gateways logs.
+
+```yaml
+logger:
+  logs:
+    custom_components.xiaomi_gateway3: debug
 ```
 
 # Useful links
