@@ -7,6 +7,6 @@
   "codeowners": ["@AlexxIT"],
   "dependencies": ["http"],
   "requirements": ["paho-mqtt>=1.5.0"],
-  "version": "1.4.1",
+  "version": "1.5.0",
   "iot_class": "local_push"
 }
