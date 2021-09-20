@@ -418,7 +418,7 @@ class GatewayBLE(GatewayStats):
                 entity.update(payload)
 
         if self.stats_enable:
-            self.add_stats(device, 'ble')
+            self.add_stats(device)
 
         self.process_ble_stats(mac)
 
