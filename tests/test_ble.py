@@ -38,17 +38,23 @@ def test_ble_147_ots():
 
 # TODO: fix
 def _test_motion2():
+    class XiaomiEntity:
+        attr = 'motion'
+        passed = False
+
+        def update(self, data: dict):
+            assert payload == {'motion': 1, 'light': 0}
+            XiaomiEntity.passed = True
+
+    gw = Gateway3('', '')
     device = {'init': {'motion': 0, 'light': 0}}
-
-    def handler(payload: dict):
-        assert payload == {'motion': 1, 'light': 0}
-
-    gw = Gateway3('', '', {})
     gw.devices = {'blt.xxx': device}
-    gw.add_update('blt.xxx', handler)
+    gw.set_entity(XiaomiEntity())
 
     payload = {
         "dev": {'did': 'blt.xxx', 'mac': 'AA:BB:CC:DD:EE:FF', 'pdid': 2701},
         "evt": [{"eid": 15, "edata": "0000"}],
     }
     gw.process_ble_event(payload)
+
+    assert XiaomiEntity.passed
