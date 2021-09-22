@@ -37,7 +37,7 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"ble_info miioconfig.db 2>/dev/null | base64\n"
 
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
-MD5_GW3 = '1a39f386f94b4c2aebdaaf17e1a1faac'
+MD5_GW3 = 'dafad392b0a1089cd98e012be23b0bb4'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
 
 
