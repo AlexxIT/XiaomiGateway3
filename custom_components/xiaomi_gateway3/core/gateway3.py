@@ -1095,25 +1095,34 @@ class GatewayEntry(Thread, GatewayBLE):
 
         # convert hass prop to lumi prop
         if device['miot_spec']:
-            params = []
-            for k, v in data.items():
-                if k == 'switch':
-                    v = bool(v)
-                k = next(p[0] for p in device['miot_spec'] if p[2] == k)
-                params.append({
-                    'siid': int(k[0]), 'piid': int(k[2]), 'value': v
-                })
+            try:
+                params = []
+                for k, v in data.items():
+                    k = next(p[0] for p in device['miot_spec'] if p[2] == k)
+                    if k == 'switch':
+                        v = bool(v)
+                    params.append({
+                        'siid': int(k[0]), 'piid': int(k[2]), 'value': v
+                    })
 
-            # Attention! mi_spec are used in payload
-            payload['mi_spec'] = params
-        else:
-            params = [{
-                'res_name': next(p[0] for p in device['lumi_spec']
-                                 if p[2] == k),
-                'value': v
-            } for k, v in data.items()]
+                # Attention! mi_spec are used in payload
+                payload['mi_spec'] = params
+            except StopIteration:
+                pass
 
-            payload['params'] = params
+        # lumi_spec and miot_spec persist simultaneously only in gateway
+        if device['lumi_spec']:
+            try:
+                params = [{
+                    'res_name': next(
+                        p[0] for p in device['lumi_spec'] if p[2] == k
+                    ),
+                    'value': v
+                } for k, v in data.items()]
+
+                payload['params'] = params
+            except StopIteration:
+                pass
 
         self.debug(f"{device['did']} {device['model']} => {payload}")
         payload = json.dumps(payload, separators=(',', ':')).encode()
