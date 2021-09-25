@@ -6,7 +6,7 @@ from homeassistant.const import *
 from homeassistant.util.dt import now
 
 from . import DOMAIN
-from .core import utils, zigbee
+from .core import zigbee
 from .core.gateway3 import Gateway3
 from .core.helpers import XiaomiEntity
 
@@ -55,7 +55,6 @@ ICONS = {
     'gateway': 'mdi:router-wireless',
     'zigbee': 'mdi:zigbee',
     'ble': 'mdi:bluetooth',
-    'area': 'mdi:map-marker-radius',
 }
 
 
@@ -63,8 +62,6 @@ async def async_setup_entry(hass, entry, add_entities):
     def setup(gateway: Gateway3, device: dict, attr: str):
         if attr == 'action':
             add_entities([XiaomiAction(gateway, device, attr)])
-        elif attr == 'area':
-            add_entities([TrackerArea(gateway, device, attr)])
         elif attr == 'gateway':
             add_entities([GatewayStats(gateway, device, attr)])
         elif attr == 'zigbee':
@@ -340,31 +337,5 @@ class XiaomiAction(XiaomiEntity):
             time.sleep(.3)
 
             self._state = ''
-
-        self.schedule_update_ha_state()
-
-
-DEFAULT_TS = now()
-
-
-class TrackerArea(XiaomiSensor):
-    best_mac = None
-    best_rssi = -999
-    best_ts = DEFAULT_TS
-
-    def update(self, data: dict = None):
-        if self.attr in data:
-            mac = data[self.attr]
-            ts = now()
-            if (
-                    (ts - self.best_ts).total_seconds() > 30 or
-                    data['rssi'] > self.best_rssi or
-                    mac == self.best_mac
-            ):
-                self.best_rssi = self._attrs['rssi'] = data['rssi']
-                self.best_ts = ts
-                if mac != self.best_mac:
-                    self.best_mac = mac
-                self._state = utils.get_area(self.hass, mac) or mac
 
         self.schedule_update_ha_state()
