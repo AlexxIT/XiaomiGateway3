@@ -76,12 +76,12 @@ class XiaomiKettleSensor(XiaomiBinarySensor):
         self.schedule_update_ha_state()
 
 
-class XiaomiMotionSensor(XiaomiBinarySensor):
+class XiaomiMotionBase(XiaomiEntity):
     _default_delay = None
-    _last_on = 0
     _last_off = 0
     _timeout_pos = 0
     _unsub_set_no_motion = None
+    _state_off = False
 
     async def async_added_to_hass(self):
         # old version
@@ -105,8 +105,39 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
         self._last_off = time.time()
         self._timeout_pos = 0
         self._unsub_set_no_motion = None
-        self._state = False
+        self._state = self._state_off
         self.schedule_update_ha_state()
+
+    def _trigger_motion(self):
+        self._attrs[ATTR_LAST_TRIGGERED] = now().isoformat(timespec='seconds')
+
+        if self._unsub_set_no_motion:
+            self._unsub_set_no_motion()
+
+        custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+        # if customize of any entity will be changed from GUI - default value
+        # for all motion sensors will be erased
+        timeout = custom.get(CONF_OCCUPANCY_TIMEOUT, self._default_delay)
+        if timeout:
+            if isinstance(timeout, list):
+                pos = min(self._timeout_pos, len(timeout) - 1)
+                delay = timeout[pos]
+                self._timeout_pos += 1
+            else:
+                delay = timeout
+
+            if delay < 0 and time.time() + delay < self._last_off:
+                delay *= 2
+
+            self.debug(f"Extend delay: {delay} seconds")
+
+            self.hass.add_job(self._start_no_motion_timer, delay)
+
+        return True
+
+
+class XiaomiMotionSensor(XiaomiMotionBase, XiaomiBinarySensor):
+    _last_on = 0
 
     def update(self, data: dict = None):
         # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
@@ -128,35 +159,13 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
         t = time.time()
         if t - self._last_on < 1:
             return
+        self._last_on = t
 
         self._state = True
-        self._attrs[ATTR_LAST_TRIGGERED] = now().isoformat(timespec='seconds')
-        self._last_on = t
+        self._trigger_motion()
 
         # handle available change
         self.schedule_update_ha_state()
-
-        if self._unsub_set_no_motion:
-            self._unsub_set_no_motion()
-
-        custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
-        # if customize of any entity will be changed from GUI - default value
-        # for all motion sensors will be erased
-        timeout = custom.get(CONF_OCCUPANCY_TIMEOUT, self._default_delay)
-        if timeout:
-            if isinstance(timeout, list):
-                pos = min(self._timeout_pos, len(timeout) - 1)
-                delay = timeout[pos]
-                self._timeout_pos += 1
-            else:
-                delay = timeout
-
-            if delay < 0 and t + delay < self._last_off:
-                delay *= 2
-
-            self.debug(f"Extend delay: {delay} seconds")
-
-            self.hass.add_job(self._start_no_motion_timer, delay)
 
         # repeat event from Aqara integration
         self.hass.bus.fire('xiaomi_aqara.motion', {
