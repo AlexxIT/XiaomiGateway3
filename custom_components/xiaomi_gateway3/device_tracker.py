@@ -1,4 +1,4 @@
-from homeassistant.components.device_tracker import SOURCE_TYPE_BLUETOOTH_LE
+from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.util.dt import now
@@ -33,7 +33,8 @@ class XiaomiTracker(XiaomiMotionBase, TrackerEntity):
 
     @property
     def source_type(self):
-        return SOURCE_TYPE_BLUETOOTH_LE
+        # with GPS source type location name can be custom area name
+        return SOURCE_TYPE_GPS
 
     @property
     def latitude(self):
