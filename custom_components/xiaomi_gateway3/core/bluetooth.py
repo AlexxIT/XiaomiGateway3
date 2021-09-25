@@ -220,8 +220,11 @@ def get_ble_domain(param: str) -> Optional[str]:
     elif param in (
             'action', 'temperature', 'humidity', 'illuminance',
             'moisture', 'conductivity', 'battery', 'formaldehyde',
-            'supply', 'idle_time', 'area'):
+            'supply', 'idle_time'):
         return 'sensor'
+
+    elif param == 'area':
+        return 'device_tracker'
 
     return None
 
