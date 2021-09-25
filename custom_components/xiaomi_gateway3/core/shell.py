@@ -36,6 +36,8 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
            b"ble_info miioconfig.db 2>/dev/null | base64\n"
 
+RUN_GW3 = "/data/gw3 -log=info 2>/tmp/gw3.log &"
+
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 MD5_GW3 = 'dafad392b0a1089cd98e012be23b0bb4'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
@@ -76,7 +78,7 @@ class TelnetShell(Telnet):
 
     def run_gw3(self):
         if self.check_bin('gw3', MD5_GW3, 'gw3/' + MD5_GW3):
-            self.exec(f"/data/gw3 2>/tmp/gw3.log &")
+            self.exec(RUN_GW3)
 
     def stop_gw3(self):
         self.exec(f"killall gw3")

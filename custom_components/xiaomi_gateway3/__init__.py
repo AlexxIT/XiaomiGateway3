@@ -11,7 +11,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 
-from .core import logger
+from .core import logger, shell
 from .core.gateway3 import Gateway3
 from .core.helpers import DevicesRegistry
 from .core.utils import DOMAIN, XiaomiGateway3Debug
@@ -24,6 +24,8 @@ DOMAINS = ['binary_sensor', 'climate', 'cover', 'light', 'remote', 'sensor',
 
 CONF_DEVICES = 'devices'
 CONF_ATTRIBUTES_TEMPLATE = 'attributes_template'
+CONF_GW3_COMMAND = 'gw3_command'
+CONF_GW3_UPDATE = 'gw3_update'
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
@@ -33,7 +35,9 @@ CONFIG_SCHEMA = vol.Schema({
             }, extra=vol.ALLOW_EXTRA),
         },
         CONF_LOGGER: logger.CONFIG_SCHEMA,
-        vol.Optional(CONF_ATTRIBUTES_TEMPLATE): cv.template
+        vol.Optional(CONF_ATTRIBUTES_TEMPLATE): cv.template,
+        vol.Optional(CONF_GW3_COMMAND): cv.string,
+        vol.Optional(CONF_GW3_UPDATE): cv.boolean,
     }, extra=vol.ALLOW_EXTRA),
 }, extra=vol.ALLOW_EXTRA)
 
@@ -49,6 +53,14 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
 
         if 'debug_mode' in config[CONF_LOGGER]:
             setattr(Gateway3, 'debug_mode', config[CONF_LOGGER]['debug_mode'])
+
+    if CONF_GW3_COMMAND in config:
+        # custom gw3 run command
+        shell.RUN_GW3 = config[CONF_GW3_COMMAND]
+
+    if config.get(CONF_GW3_UPDATE) is False:
+        # disable gw3 update
+        shell.MD5_GW3 = ''
 
     if 'devices' in config:
         for k, v in config['devices'].items():
