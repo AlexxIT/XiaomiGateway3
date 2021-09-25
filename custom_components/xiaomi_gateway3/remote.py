@@ -47,8 +47,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
             text = "New device:\n" + '\n'.join(
                 f"{k}: {v}" for k, v in data['added_device'].items()
             )
-            persistent_notification.async_create(self.hass, text,
-                                                 "Xiaomi Gateway 3")
+            persistent_notification.create(self.hass, text, "Xiaomi Gateway 3")
 
         elif 'removed_did' in data:
             # https://github.com/AlexxIT/XiaomiGateway3/issues/122
