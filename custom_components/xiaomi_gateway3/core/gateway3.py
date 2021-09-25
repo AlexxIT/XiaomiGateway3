@@ -22,6 +22,11 @@ RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
 
 TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
+GW3_ERROR = (
+    "Check if [issue](https://github.com/AlexxIT/XiaomiGateway3/issues) "
+    "exists or create new one:\n```\n%s\n```"
+)
+
 
 class GatewayBase(DevicesRegistry):
     did: str = None
@@ -434,6 +439,14 @@ class GatewayEntry(Thread, GatewayGW3):
     def telnet_cmd(self):
         return self.options.get('telnet_cmd') or TELNET_CMD
 
+    @property
+    def hass(self):
+        for device in self.devices.values():
+            for entity in device['entities'].values():
+                if entity and entity.hass:
+                    return entity.hass
+        return None
+
     def stop(self, *args):
         self.enabled = False
         self.mqtt.disconnect()
@@ -538,15 +551,15 @@ class GatewayEntry(Thread, GatewayGW3):
             if self.ble_mode:
                 # check if binary has latest version
                 if shell.check_gw3():
-                    if "gw3" not in ps:
+                    if "/gw3" not in ps:
                         self.debug("Run gw3")
                         shell.run_gw3()
                 else:
-                    if "gw3" in ps:
+                    if "/gw3" in ps:
                         shell.stop_gw3()
                     self.debug("Download and run gw3")
                     shell.run_gw3()
-            elif "gw3" in ps:
+            elif "/gw3" in ps:
                 self.debug("Stop gw3")
                 shell.stop_gw3()
 
@@ -793,6 +806,15 @@ class GatewayEntry(Thread, GatewayGW3):
             if topic == 'zigbee/send':
                 payload = json.loads(msg.payload)
                 self.process_zigbee_message(payload)
+
+            elif topic == 'gw3/stderr':
+                _LOGGER.warning(msg.payload)
+
+                message = GW3_ERROR % msg.payload.decode("utf-8")
+                utils.notification(self.hass, message)
+
+                # restore gw3 application
+                self._prepare_gateway()
 
             elif topic.startswith('gw3/'):
                 items = topic.split('/')

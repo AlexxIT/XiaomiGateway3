@@ -36,10 +36,12 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
            b"ble_info miioconfig.db 2>/dev/null | base64\n"
 
-RUN_GW3 = "/data/gw3 -log=info 2>/tmp/gw3.log &"
+# default log: `tail -F /var/log/messages | grep gw3`
+# publish error on app crush to mqtt: `gw3/stderr`
+RUN_GW3 = "/data/gw3 -log=syslog,info 2>&1 | mosquitto_pub -t gw3/stderr -s &"
 
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
-MD5_GW3 = '49b19bd57f4c83762c22e6d84e638dc9'
+MD5_GW3 = '4fa847f89945f1930ade4744d98a31d4'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
 
 

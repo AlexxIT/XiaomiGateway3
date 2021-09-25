@@ -11,6 +11,7 @@ from typing import List, Optional
 
 import requests
 from aiohttp import web
+from homeassistant.components import persistent_notification
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
@@ -57,6 +58,11 @@ def get_area(hass: HomeAssistantType, mac: str) -> Optional[str]:
         area = areas.async_get_area(device.area_id)
         return area.name if area else device.area_id
     return None
+
+
+def notification(hass: HomeAssistantType, message: str,
+                 title: str = "Xiaomi Gateway 3"):
+    persistent_notification.create(hass, message, title)
 
 
 def migrate_unique_id(hass: HomeAssistantType):
