@@ -59,6 +59,9 @@ class TelnetShell(Telnet):
 
         self.ver = self.get_version()
 
+        # adds /tmp to PATH because gw3 uses it
+        self.exec("export PATH=/tmp:$PATH")
+
     def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
         self.write(command.encode() + b"\n")
