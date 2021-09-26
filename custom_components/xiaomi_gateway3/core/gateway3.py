@@ -385,13 +385,13 @@ class GatewayGW3(GatewayStats):
     def process_ble_payload(self, device: dict, payload: dict):
         # init entities if needed
         init = device['init']
-        for k in payload.keys():
+        for k, v in payload.items():
             if k in init:
                 continue
 
             init[k] = payload[k]
 
-            domain = bluetooth.get_ble_domain(k)
+            domain = bluetooth.get_ble_domain(k, v)
             self.add_entity(domain, device, k)
 
         for entity in device['entities'].values():
