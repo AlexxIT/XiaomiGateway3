@@ -211,17 +211,18 @@ async def _handle_device_remove(hass: HomeAssistant):
         if not hass_device or not hass_device.identifiers:
             return
 
-        identifier = next(iter(hass_device.identifiers))
-
         # handle only our devices
-        if identifier[0] != DOMAIN or hass_device.name_by_user != 'delete':
+        for hass_did in hass_device.identifiers:
+            if hass_did[0] == DOMAIN and hass_device.name_by_user == 'delete':
+                break
+        else:
             return
 
         # remove from Mi Home
         for gw in hass.data[DOMAIN].values():
             if not isinstance(gw, Gateway3):
                 continue
-            gw_device = gw.get_device(identifier[1])
+            gw_device = gw.get_device(hass_did[1])
             if not gw_device:
                 continue
             if gw_device['type'] == 'zigbee':
