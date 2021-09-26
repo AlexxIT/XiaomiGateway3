@@ -224,8 +224,9 @@ async def _handle_device_remove(hass: HomeAssistant):
             gw_device = gw.get_device(identifier[1])
             if not gw_device:
                 continue
-            gw.debug(f"Remove device: {gw_device['did']}")
-            gw.miio.send('remove_device', [gw_device['did']])
+            if gw_device['type'] == 'zigbee':
+                gw.debug(f"Remove device: {gw_device['did']}")
+                gw.miio.send('remove_device', [gw_device['did']])
             break
 
         # remove from Hass
