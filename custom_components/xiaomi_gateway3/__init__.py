@@ -248,6 +248,11 @@ async def _handle_device_remove(hass: HomeAssistant):
             if gw_device['type'] == 'zigbee':
                 gw.debug(f"Remove device: {gw_device['did']}")
                 gw.miio.send('remove_device', [gw_device['did']])
+            elif gw_device['type'] == 'ble':
+                # remove device from BLE include list
+                mac = gw_device['mac']
+                gw.debug(f"Remove device: {mac}")
+                DevicesRegistry.defaults.pop(mac, None)
             break
 
         # remove from Hass
