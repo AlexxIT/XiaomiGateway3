@@ -11,7 +11,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 
-from .core import logger, shell
+from .core import logger, shell, utils
 from .core.gateway3 import Gateway3
 from .core.helpers import DevicesRegistry
 from .core.utils import DOMAIN, XiaomiGateway3Debug
@@ -67,7 +67,14 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
         for k, v in config[CONF_DEVICES].items():
             # AA:BB:CC:DD:EE:FF => aabbccddeeff
             k = k.replace(':', '').lower()
-            DevicesRegistry.defaults[k] = v
+            # support empty device defaults
+            DevicesRegistry.defaults[k] = v or {}
+
+    # adds all devices in registry to BLE include list
+    for device in utils.device_registry(hass).devices.values():
+        for conn in device.connections:
+            if conn and len(conn) == 2 and conn[0] == 'bluetooth':
+                DevicesRegistry.defaults.setdefault(conn[1], {})
 
     hass.data[DOMAIN] = {
         CONF_ATTRIBUTES_TEMPLATE: config.get(CONF_ATTRIBUTES_TEMPLATE)

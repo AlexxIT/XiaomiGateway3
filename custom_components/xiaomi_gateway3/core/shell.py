@@ -41,7 +41,7 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
 RUN_GW3 = "/data/gw3 -log=syslog,info 2>&1 | mosquitto_pub -t gw3/stderr -s &"
 
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
-MD5_GW3 = '4fa847f89945f1930ade4744d98a31d4'
+MD5_GW3 = 'a0057d6fafc5e0d7bcf14f78f3d77225'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
 
 

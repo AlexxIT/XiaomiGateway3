@@ -244,6 +244,17 @@ def attributes_template(hass: HomeAssistantType) -> Template:
     return template
 
 
+def reconnect_all_gateways(hass: HomeAssistantType):
+    _LOGGER.debug("Reconnect all gateways")
+    for gw in hass.data[DOMAIN].values():
+        if hasattr(gw, 'mqtt'):
+            gw.mqtt.reconnect()
+
+
+def device_registry(hass: HomeAssistantType) -> DeviceRegistry:
+    return hass.data['device_registry']
+
+
 TITLE = "Xiaomi Gateway 3 Debug"
 NOTIFY_TEXT = '<a href="%s?r=10" target="_blank">Open Log<a>'
 HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'

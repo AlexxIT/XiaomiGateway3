@@ -8,7 +8,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
 from .core import utils
-from .core.gateway3 import TELNET_CMD
+from .core.gateway3 import TELNET_CMD, Gateway3
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,6 +51,8 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                 return await self.async_step_cloud()
             elif user_input['action'] == 'token':
                 return await self.async_step_token()
+            elif user_input['action'] == 'ble':
+                return await self.async_step_ble()
             else:
                 device = next(d for d in self.hass.data[DOMAIN]['devices']
                               if d['did'] == user_input['action'])
@@ -63,17 +65,22 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                     }),
                 )
 
+        actions = ACTIONS.copy()
+
+        if Gateway3.ble_known:
+            actions['ble'] = "Add BLE Device"
+
         if DOMAIN in self.hass.data and 'devices' in self.hass.data[DOMAIN]:
             for device in self.hass.data[DOMAIN]['devices']:
                 if (device['model'] == 'lumi.gateway.mgl03' and
-                        device['did'] not in ACTIONS):
+                        device['did'] not in actions):
                     name = f"Add {device['name']} ({device['localip']})"
-                    ACTIONS[device['did']] = name
+                    actions[device['did']] = name
 
         return self.async_show_form(
             step_id='user',
             data_schema=vol.Schema({
-                vol.Required('action', default='cloud'): vol.In(ACTIONS)
+                vol.Required('action', default='cloud'): vol.In(actions)
             })
         )
 
@@ -122,6 +129,22 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
                 vol.Required('telnet_cmd', default=TELNET_CMD): str,
             }),
             errors={'base': error} if error else None
+        )
+
+    async def async_step_ble(self, user_input=None):
+        if user_input:
+            mac = user_input['mac']
+            Gateway3.defaults.setdefault(mac, {})
+            Gateway3.ble_known.pop(mac)
+
+            # reconnect all MQTT for receive device/info topic
+            utils.reconnect_all_gateways(self.hass)
+
+        return self.async_show_form(
+            step_id="ble",
+            data_schema=vol.Schema({
+                vol.Required('mac'): vol.In(Gateway3.ble_known)
+            })
         )
 
     @staticmethod

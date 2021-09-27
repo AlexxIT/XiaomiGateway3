@@ -345,21 +345,26 @@ class GatewayStats(GatewayMesh):
 
 
 class GatewayGW3(GatewayStats):
-    retain: dict = {}
+    ble_known = {}
+    ble_retain = {}
 
     def process_gw3_state(self, mac: str, data: dict):
+        mac = mac.lower().replace(':', '')
         if mac not in self.devices:
-            self.retain[mac] = data
+            # save data for first init with device/info topic
+            self.ble_retain[mac] = data
             return
 
         device = self.devices[mac]
 
+        # skip messages with same sequence numb
         if 'seq' in data:
             if device.get('seq') == data['seq']:
                 return
             device['seq'] = data['seq']
 
-        if self.stats_enable:
+        # don't create stats if device don't have entities
+        if self.stats_enable and device['entities']:
             self.add_stats(device)
             self.process_ble_stats(mac)
 
@@ -367,6 +372,14 @@ class GatewayGW3(GatewayStats):
 
     def process_gw3_info(self, mac: str, data: dict):
         if data['type'] != 'ble':
+            return
+
+        mac = mac.lower().replace(':', '')
+        # defaults can be set from: YAML, Cloud and integrations GUI
+        if mac not in self.defaults:
+            name = f"{data['brand']} {data['name']} ({mac.upper()})"
+            self.debug(f"Skip new BLE device: {name}")
+            self.ble_known[mac] = name
             return
 
         device = self.find_or_create_device({
@@ -379,8 +392,8 @@ class GatewayGW3(GatewayStats):
             'device_model': data['model'],
         })
 
-        if mac in self.retain:
-            self.process_ble_payload(device, self.retain[mac])
+        if mac in self.ble_retain:
+            self.process_ble_payload(device, self.ble_retain[mac])
 
     def process_ble_payload(self, device: dict, payload: dict):
         # init entities if needed
@@ -818,14 +831,14 @@ class GatewayEntry(Thread, GatewayGW3):
 
             elif topic.startswith('gw3/'):
                 items = topic.split('/')
+                if len(items) != 3:
+                    return
 
-                mac = items[1].lower().replace(':', '')
                 payload = json.loads(msg.payload)
-
-                if len(items) == 2:
-                    self.process_gw3_state(mac, payload)
+                if items[2] in ('state', 'event'):
+                    self.process_gw3_state(items[1], payload)
                 elif items[2] == 'info':
-                    self.process_gw3_info(mac, payload)
+                    self.process_gw3_info(items[1], payload)
 
             elif topic == 'log/miio':
                 # don't need to process another data

@@ -31,6 +31,12 @@
           "token": "Token",
           "telnet_cmd": "Open Telnet command"
         }
+      },
+      "ble": {
+        "title": "Add BLE Device",
+        "data": {
+          "mac": "Device"
+        }
       }
     }
   },
