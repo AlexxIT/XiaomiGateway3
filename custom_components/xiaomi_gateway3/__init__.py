@@ -51,6 +51,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
         info = await hass.helpers.system_info.async_get_system_info()
         _LOGGER.debug(f"SysInfo: {info}")
 
+        # update global debug_mode for all gateways
         if 'debug_mode' in config[CONF_LOGGER]:
             setattr(Gateway3, 'debug_mode', config[CONF_LOGGER]['debug_mode'])
 
@@ -62,8 +63,8 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
         # disable gw3 update
         shell.MD5_GW3 = ''
 
-    if 'devices' in config:
-        for k, v in config['devices'].items():
+    if CONF_DEVICES in config:
+        for k, v in config[CONF_DEVICES].items():
             # AA:BB:CC:DD:EE:FF => aabbccddeeff
             k = k.replace(':', '').lower()
             DevicesRegistry.defaults[k] = v
