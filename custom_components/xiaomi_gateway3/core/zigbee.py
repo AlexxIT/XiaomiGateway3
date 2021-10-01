@@ -235,6 +235,8 @@ DEVICES = [{
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
         ['0.3.85', 'pressure', 'pressure', 'sensor'],
+        # old gateway fw v1.4.6 doesn't send voltage, only percent
+        ['8.0.2001', 'battery', 'battery_percent', None],
         ['8.0.2008', 'voltage', 'battery', 'sensor'],
     ]
 }, {
@@ -600,6 +602,10 @@ def fix_xiaomi_props(model, params) -> dict:
                 params[k] = 1
             else:
                 params[k] = 2
+
+    # fix lumi.weather on gateway fw v1.4.6
+    if 'battery' not in params and 'battery_percent' in params:
+        params['battery'] = params['battery_percent']
 
     return params
 
