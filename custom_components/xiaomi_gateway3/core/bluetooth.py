@@ -44,13 +44,13 @@ DEVICES = [{
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
-    2293: ["Unknown", "Mesh Lightstrip (RF ready)", "2293"],
+    2293: ["Unknown", "Mesh Lightstrip (RF ready)", "crzm.light.wy0a01"],
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
-    2351: ["Unknown", "Mesh Downlight", "2351"],
+    2351: ["Unknown", "Mesh Downlight", "lemesh.light.wy0c05"],
     2584: ["XinGuang", "XinGuang Smart Light", "LIBMDA09X"],
-    3164: ["Unknown", "Mesh Downlight (RF ready)", "3164"],
-    3416: ["Unknown", "Mesh Downlight (Yeelight compatible)", "3416"],
-    3531: ["Unknown", "ightctl Light", "3531"],
+    3164: ["Unknown", "Mesh Downlight (RF ready)", "lemesh.light.wy0c07"],
+    3416: ["Unknown", "Mesh Downlight", "090615.light.mlig01"],
+    3531: ["Unknown", "ightctl Light", "lemesh.light.wy0c08"],
     'miot_spec': [
         [2, 1, 'light', 'light'],
         [2, 2, 'brightness', None],
@@ -65,7 +65,8 @@ DEVICES = [{
     ]
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
-    2007: ["Unknown", "Mesh Switch Controller"],
+    2007: ["Unknown", "Mesh Switch Controller", "lemesh.switch.sw0a01"],
+    3150: ["XinGuang", "Mesh Switch", "wainft.switch.sw0a01"],
     'miot_spec': [
         [2, 1, 'switch', 'switch']
     ],
