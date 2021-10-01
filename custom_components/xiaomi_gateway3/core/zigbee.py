@@ -583,6 +583,9 @@ def fix_xiaomi_props(model, params) -> dict:
         if k in ('temperature', 'humidity', 'pressure'):
             if model != 'lumi.airmonitor.acn01':
                 params[k] = v / 100.0
+        elif k == 'voltage' and v and v > 1000:
+            # retain 'load_voltage': 234721
+            params[k] = round(v / 1000.0, 2)
         elif v in ('on', 'open'):
             params[k] = 1
         elif v in ('off', 'close'):
