@@ -33,9 +33,9 @@
         }
       },
       "ble": {
-        "title": "Add BLE Device",
+        "title": "新增 BLE 裝置",
         "data": {
-          "mac": "Device"
+          "mac": "裝置"
         }
       }
     }
