@@ -321,8 +321,11 @@ class XiaomiAction(XiaomiEntity):
             elif k == 'tilt_angle':
                 data = {'vibration': 2, 'angle': v, self.attr: 'tilt'}
                 break
-            elif k in ('key_id', 'lock_control', 'lock_state'):
-                data[self.attr] = k
+            elif k in ('key_id', 'lock_control', 'lock_state') and \
+                    self.attr not in data:
+                # for zigbee lumi.lock.acn03
+                data[self.attr] = 'lock'
+                break
 
         if self.attr in data:
             self._action_attrs = {**self._attrs, **data}
