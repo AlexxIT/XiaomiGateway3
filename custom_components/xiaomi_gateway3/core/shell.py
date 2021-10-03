@@ -38,7 +38,7 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
 
 # default log: `tail -F /var/log/messages | grep gw3`
 # publish error on app crush to mqtt: `gw3/stderr`
-RUN_GW3 = "/data/gw3 -log=syslog,info 2>&1 | mosquitto_pub -t gw3/stderr -s &"
+RUN_GW3 = "/data/gw3 -log=syslog,info 2>&1|mosquitto_pub -t gw3/stderr -s -r &"
 
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 MD5_GW3 = '01c0666f92e50c8690d695c08abcee1a'
