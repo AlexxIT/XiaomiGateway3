@@ -604,7 +604,7 @@ def fix_xiaomi_props(model, params) -> dict:
                 params[k] = 2
 
     # fix lumi.weather on gateway fw v1.4.6
-    if 'battery' not in params and 'battery_percent' in params:
+    if not params.get('battery') and params.get('battery_percent'):
         params['battery'] = params['battery_percent']
 
     return params
