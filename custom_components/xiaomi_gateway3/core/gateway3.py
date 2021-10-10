@@ -492,6 +492,10 @@ class GatewayEntry(Thread, GatewayBLE):
         return self.options.get('ble', True)
 
     @property
+    def zha_mode(self):
+        return self.options.get('zha', False)
+
+    @property
     def parent_scan_interval(self):
         return self.options.get('parent', -1)
 
@@ -606,7 +610,7 @@ class GatewayEntry(Thread, GatewayBLE):
                     self.debug("Enable buzzer")
                     shell.run_buzzer()
 
-            if self.options.get('zha'):
+            if self.zha_mode:
                 # stop lumi without checking if it's running
                 shell.stop_lumi_zigbee()
 
@@ -674,7 +678,7 @@ class GatewayEntry(Thread, GatewayBLE):
             }]
 
             # 2. Read zigbee devices
-            if not self.options.get('zha'):
+            if not self.zha_mode:
                 raw = shell.read_file('/data/zigbee/device.info')
                 lumi = json.loads(raw)['devInfo']
 
@@ -911,7 +915,12 @@ class GatewayEntry(Thread, GatewayBLE):
                 self.did = device['did']
                 self.gw_topic = f"gw/{device['mac'][2:].upper()}/"
 
-            if type_ in ('gateway', 'zigbee', 'mesh'):
+            if type_ == 'gateway' and self.zha_mode:
+                # only firmware lock
+                param = device['lumi_spec'][-1]
+                self.add_entity(param[3], device, param[2])
+
+            elif type_ in ('gateway', 'zigbee', 'mesh'):
                 for param in device['lumi_spec'] or []:
                     self.add_entity(param[3], device, param[2])
                 for param in device['miot_spec'] or []:
