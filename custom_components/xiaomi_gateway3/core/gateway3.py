@@ -11,7 +11,7 @@ import yaml
 
 from paho.mqtt.client import Client, MQTTMessage
 from . import bluetooth, utils, zigbee
-from .helpers import DevicesRegistry, XiaomiEntity
+from .helpers import DevicesRegistry
 from .mini_miio import SyncmiIO
 from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
