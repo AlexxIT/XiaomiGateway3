@@ -410,11 +410,12 @@ class GatewayBLE(GatewayStats):
 
         # init entities if needed
         init = device['init']
-        for k, v in payload.items():
+        for k in payload.keys():
+            # update for retain
+            init[k] = payload[k]
+
             if k in device['entities']:
                 continue
-
-            init[k] = payload[k]
 
             domain = bluetooth.get_ble_domain(k)
             self.add_entity(domain, device, k)
