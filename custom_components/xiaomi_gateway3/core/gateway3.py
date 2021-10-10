@@ -715,14 +715,16 @@ class GatewayEntry(Thread, GatewayBLE):
                         if p[1] is not None
                     }
 
-                    ieee = f"{data[did + '.mac']:>016s}"
+                    ver = f"mod: {item['model_ver']} hw: {item['hardVer']} " \
+                          f"fw: {item['appVer']}"
+
                     device = {
                         'did': did,
                         'mac': item['mac'],  # 0xff without leading zeroes
                         'nwk': item['shortId'],  # 0xffff
                         'model': model,
                         'type': 'zigbee',
-                        'fw_ver': retain.get('fw_ver') or retain.get('1.4'),
+                        'fw_ver': ver,
                         'init': zigbee.fix_xiaomi_props(model, params),
                         'online': retain.get('alive', 1) == 1
                     }

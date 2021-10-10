@@ -633,12 +633,10 @@ def get_buttons(model: str):
 
 
 def get_fw_ver(device: dict) -> int:
-    """Support int (30) and str (1.0.0_0034) versions."""
-    version = device.get('fw_ver', 0)
-    if isinstance(version, int):
-        return version
     try:
-        return int(version.rsplit('_', 1)[1])
+        # mod: 21 hw: 0 fw: 21
+        _, fw = device['fw_ver'].rsplit(' ', 1)
+        return int(fw)
     except:
         return 0
 
