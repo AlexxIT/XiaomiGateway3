@@ -7,13 +7,14 @@ def test_console():
 
         def update(self, data: dict):
             assert data == {
-                'eui64': '0x00158D0000000002', 'nwk': '0x131E', 'ago': 335,
-                'type': 'router', 'parent': '0x1F0C'
+                'eui64': '0x00158D0000000002', 'nwk': '0x131e', 'ago': 335,
+                'type': 'router', 'parent': '0x1f0c'
             }
             Entity.passed = True
 
     gw = Gateway3('', '')
     gw.devices['lumi.158d0000000002'] = {
+        'nwk': '0x131e',
         'stats': Entity()
     }
     # gw.add_stats('0x00158D0000000002', handler)
