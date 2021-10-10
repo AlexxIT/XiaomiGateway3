@@ -81,14 +81,14 @@ class XiaomiZigbeeLight(XiaomiEntity, LightEntity):
                 br = int(kwargs[ATTR_BRIGHTNESS])
                 commands += [
                     f"zcl level-control o-mv-to-level {br} {tr}",
-                    f"send 0x{self.device['nwk']} 1 1"
+                    f"send {self.device['nwk']} 1 1"
                 ]
 
             if ATTR_COLOR_TEMP in kwargs:
                 ct = int(kwargs[ATTR_COLOR_TEMP])
                 commands += [
                     f"zcl color-control movetocolortemp {ct} {tr} 0 0",
-                    f"send 0x{self.device['nwk']} 1 1"
+                    f"send {self.device['nwk']} 1 1"
                 ]
 
             self.gw.send_zigbee_cli(commands)
@@ -120,7 +120,7 @@ class XiaomiZigbeeLight(XiaomiEntity, LightEntity):
             tr = int(kwargs[ATTR_TRANSITION] * 10.0)
             commands = [
                 f"zcl level-control o-mv-to-level 0 {tr}",
-                f"send 0x{self.device['nwk']} 1 1"
+                f"send {self.device['nwk']} 1 1"
             ]
             self.gw.send_zigbee_cli(commands)
             return

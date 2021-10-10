@@ -241,14 +241,12 @@ class GatewayStats(GatewayMesh):
 
         device['stats'].update(payload)
 
-    def process_zb_stats(self, payload: dict) -> bool:
+    def process_zb_stats(self, payload: dict):
         # convert ieee to did
         did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
         device = self.devices.get(did)
         if device and device.get('stats'):
             device['stats'].update(payload)
-            return True
-        return False
 
     def process_ble_stats(self, mac: str, data: dict = None):
         device = self.devices.get(mac)
@@ -314,21 +312,31 @@ class GatewayStats(GatewayMesh):
             for i in m1:
                 ieee = '0x' + i[1]
 
-                nwk = i[0]
+                nwk = i[0]  # FFFF
                 ago = int(i[2])
                 type_ = 'device' if i[1] in m2 else \
                     'router' if i[1] in m3 else '-'
-                parent = '0x' + m4[nwk][0] if nwk in m4 else '-'
+                parent = '0x' + m4[nwk][0].lower() if nwk in m4 else '-'
+                nwk = '0x' + nwk.lower()  # 0xffff
 
                 payload = {
                     'eui64': ieee,
-                    'nwk': '0x' + nwk,
+                    'nwk': nwk,
                     'ago': ago,
                     'type': type_,
                     'parent': parent
                 }
 
-                if not self.process_zb_stats(payload):
+                did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
+                device = self.devices.get(did)
+                if device and device.get('stats'):
+                    # the device remains in the gateway database after deletion
+                    # and may appear on another gw with another nwk
+                    if nwk == device.get('nwk'):
+                        self.process_zb_stats(payload)
+                    else:
+                        self.debug(f"Zigbee device with wrong NWK: {ieee}")
+                else:
                     self.debug(f"Unknown zigbee device {ieee}: {payload}")
 
             # one hour later
@@ -676,7 +684,7 @@ class GatewayEntry(Thread, GatewayBLE):
                     for i in range(0, len(raw) - 1, 32):
                         ieee = reversed(raw[i + 3:i + 11])
                         ieee = ''.join(f"{i:>02s}" for i in ieee)
-                        nwks[ieee] = f"{raw[i]:>04s}"
+                        nwks[ieee] = f"0x{raw[i]:>04s}"  # 0xffff
                 except:
                     _LOGGER.exception("Can't read Silicon devices DB")
 
