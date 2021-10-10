@@ -264,9 +264,8 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Optional('telnet_cmd', default=telnet_cmd): str,
                 vol.Required('ble', default=ble): bool,
                 vol.Required('stats', default=stats): bool,
-                vol.Optional('debug', default=debug): cv.multi_select(
-                    OPT_DEBUG
-                ),
+                vol.Optional('debug', default=debug):
+                    cv.multi_select(OPT_DEBUG),
                 vol.Optional('buzzer', default=buzzer): bool,
                 vol.Optional('parent', default=parent): vol.In(OPT_PARENT),
                 vol.Required('zha', default=zha): vol.In(OPT_MODE),
