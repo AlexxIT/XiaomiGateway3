@@ -167,18 +167,23 @@ class TelnetShell(Telnet):
     def run_public_zb_console(self):
         self.stop_lumi_zigbee()
 
-        # run Gateway with open console port (`-v` param)
-        arg = " -r 'c'" if self.ver >= '1.4.7_0063' else ''
-
-        # use `tail` because input for Z3 is required;
         # add `-l 0` to disable all output, we'll enable it later with
         # `debugprint on 1` command
-        self.exec(
-            "nohup tail -f /dev/null 2>&1 | "
-            "nohup Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 "
-            f"-p '/dev/ttyS2' -d '/data/silicon_zigbee_host/'{arg} 2>&1 | "
-            "mosquitto_pub -t log/z3 -l &"
-        )
+        if self.ver >= '1.4.7_0063':
+            # nohub and tail fixed in latest fw
+            self.exec(
+                "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 -p '/dev/ttyS2' "
+                "-d '/data/silicon_zigbee_host/' -r 'c' 2>&1 | "
+                "mosquitto_pub -t log/z3 -l &"
+            )
+        else:
+            # use `tail` because input for Z3 is required;
+            self.exec(
+                "nohup tail -f /dev/null 2>&1 | "
+                "nohup Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 "
+                f"-p '/dev/ttyS2' -d '/data/silicon_zigbee_host/' 2>&1 | "
+                "mosquitto_pub -t log/z3 -l &"
+            )
 
         self.run_lumi_zigbee()
 
