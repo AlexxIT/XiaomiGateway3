@@ -675,40 +675,25 @@ class GatewayEntry(Thread, GatewayBLE):
 
             # 2. Read zigbee devices
             if not self.options.get('zha'):
-                # read Silicon devices DB
-                nwks = {}
-                try:
-                    raw = shell.read_file(
-                        '/data/silicon_zigbee_host/devices.txt')
-                    raw = raw.decode().split(' ')
-                    for i in range(0, len(raw) - 1, 32):
-                        ieee = reversed(raw[i + 3:i + 11])
-                        ieee = ''.join(f"{i:>02s}" for i in ieee)
-                        nwks[ieee] = f"0x{raw[i]:>04s}"  # 0xffff
-                except:
-                    _LOGGER.exception("Can't read Silicon devices DB")
+                raw = shell.read_file('/data/zigbee/device.info')
+                lumi = json.loads(raw)['devInfo']
 
                 # read Xiaomi devices DB
                 raw = shell.read_file(shell.zigbee_db, as_base64=True)
                 # self.debug(f"Devices RAW: {raw}")
                 if raw is None:
                     self.debug("No zigbee database")
-                    data = {}
+                    xiaomi = {}
                 elif raw.startswith(b'unqlite'):
                     db = Unqlite(raw)
-                    data = db.read_all()
+                    xiaomi = db.read_all()
                 else:
                     raw = re.sub(br'}\s*{', b',', raw)
-                    data = json.loads(raw)
+                    xiaomi = json.loads(raw)
 
-                # data = {} or data = {'dev_list': 'null'}
-                dev_list = json.loads(data.get('dev_list', 'null')) or []
-
-                for did in dev_list:
-                    model = data.get(did + '.model')
-                    if not model:
-                        self.debug(f"{did} has not in devices DB")
-                        continue
+                for item in lumi:
+                    did = item['did']
+                    model = item['model']
                     desc = zigbee.get_device(model)
 
                     # skip unknown model
@@ -716,7 +701,12 @@ class GatewayEntry(Thread, GatewayBLE):
                         self.debug(f"{did} has an unsupported modell: {model}")
                         continue
 
-                    retain = json.loads(data[did + '.prop'])['props']
+                    try:
+                        retain = json.loads(xiaomi[did + '.prop'])['props']
+                    except:
+                        self.debug(f"{did} is not in the Xiaomi database")
+                        continue
+
                     self.debug(f"{did} {model} retain: {retain}")
 
                     params = {
@@ -728,9 +718,8 @@ class GatewayEntry(Thread, GatewayBLE):
                     ieee = f"{data[did + '.mac']:>016s}"
                     device = {
                         'did': did,
-                        'mac': '0x' + data[did + '.mac'],
-                        'ieee': ieee,
-                        'nwk': nwks.get(ieee),
+                        'mac': item['mac'],  # 0xff without leading zeroes
+                        'nwk': item['shortId'],  # 0xffff
                         'model': model,
                         'type': 'zigbee',
                         'fw_ver': retain.get('fw_ver') or retain.get('1.4'),
