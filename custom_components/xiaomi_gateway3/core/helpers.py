@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import *
 
 from homeassistant.config import DATA_CUSTOMIZE
+from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity import Entity
 
@@ -143,7 +144,7 @@ class XiaomiEntity(Entity):
         self._ignore_offline = custom.get('ignore_offline')
 
         if 'init' in self.device and self._state is None:
-            self.update(self.device['init'])
+            await self.async_update(self.device['init'])
 
         self.render_attributes_template()
 
@@ -218,9 +219,10 @@ class XiaomiEntity(Entity):
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
 
-    def update(self, data: dict):
-        pass
+    async def async_update(self, data: dict):
+        raise NotImplementedError
 
+    @callback
     def render_attributes_template(self):
         try:
             attrs = attributes_template(self.hass).async_render({

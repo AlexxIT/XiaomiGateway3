@@ -5,9 +5,10 @@ import logging
 import random
 import socket
 import time
+from asyncio import DatagramProtocol, Future
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
-from typing import Union, Optional
+from typing import Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
@@ -81,7 +82,7 @@ class BasemiIO:
         return self._decrypt(raw[32:])
 
 
-class SyncmiIO(BasemiIO):
+class SyncMiIO(BasemiIO):
     """Synchronous miIO protocol."""
 
     def __init__(self, host: str, token: str, timeout: float = 3):
@@ -200,48 +201,119 @@ class SyncmiIO(BasemiIO):
         return self.send('miIO.info')
 
 
-# noinspection PyMethodMayBeStatic,PyTypeChecker
-class AsyncmiIO(BasemiIO, BaseProtocol):
-    response = None
-    sock: Optional[DatagramTransport] = None
+class AsyncSocket(DatagramProtocol):
+    timeout = 0
+    transport: DatagramTransport = None
+    response: Future = None
+
+    @classmethod
+    async def socket(cls, addr: tuple):
+        sock = cls()
+        await asyncio.get_event_loop().create_datagram_endpoint(
+            lambda: sock, remote_addr=addr
+        )
+        return sock
+
+    def __init__(self):
+        self.response = asyncio.get_event_loop().create_future()
+
+    def connection_made(self, transport: DatagramTransport):
+        # _LOGGER.debug(f"connection_made {transport}")
+        self.transport = transport
 
     def datagram_received(self, data: bytes, addr):
-        # hello message
-        if len(data) == 32:
-            if data[:2] == b'\x21\x31':
-                self.device_id = int.from_bytes(data[8:12], 'big')
-                ts = int.from_bytes(data[12:16], 'big')
-                self.delta_ts = time.time() - ts
-                result = True
-            else:
-                result = False
-        else:
-            result = self._unpack_raw(data)
+        # _LOGGER.debug(f"datagram_received {data}")
+        self.response.set_result(data)
 
-        self.response.set_result(result)
+    def settimeout(self, value: int):
+        self.timeout = value
 
-    def error_received(self, exc):
-        print('Error received:', exc)
+    def sendto(self, data: bytes):
+        self.transport.sendto(data)
 
-    def connection_lost(self, exc):
-        print("Connection closed")
-        self.sock = None
-
-    async def send_raw(self, data: bytes):
-        loop = asyncio.get_running_loop()
-        if not self.sock:
-            self.sock, _ = await loop.create_datagram_endpoint(
-                lambda: self, remote_addr=self.addr)
-
-        self.response = loop.create_future()
-        # this method does not block
-        self.sock.sendto(data)
+    async def recv(self, *args):
+        self.response = asyncio.get_event_loop().create_future()
+        if self.timeout:
+            return await asyncio.wait_for(self.response, self.timeout)
         return await self.response
 
-    async def ping(self):
-        return await self.send_raw(HELLO)
+
+# noinspection PyMethodMayBeStatic,PyTypeChecker
+class AsyncMiIO(BasemiIO, BaseProtocol):
+    async def ping(self, sock: AsyncSocket) -> bool:
+        """Returns `true` if the connection to the miio device is working. The
+        token is not verified at this stage.
+        """
+        try:
+            sock.sendto(HELLO)
+            raw = await sock.recv(1024)
+            if raw[:2] == b'\x21\x31':
+                self.device_id = int.from_bytes(raw[8:12], 'big')
+                self.delta_ts = time.time() - int.from_bytes(raw[12:16], 'big')
+                return True
+        except:
+            pass
+        return False
 
     async def send(self, method: str, params: Union[dict, list] = None):
+        """Send command to miIO device and get result from it. Params can be
+        dict or list depend on command.
+        """
+        pings = 0
+        for times in range(1, 4):
+            try:
+                # create socket every time for reset connection, because we can
+                # reseive answer on previous request or request from another
+                # thread
+                sock = await AsyncSocket.socket(self.addr)
+                sock.settimeout(5)
+
+                # need device_id for send command, can get it from ping cmd
+                if self.delta_ts is None and not await self.ping(sock):
+                    pings += 1
+                    continue
+
+                # pack each time for new message id
+                msg_id = random.randint(100000000, 999999999)
+                raw_send = self._pack_raw(msg_id, method, params)
+                sock.sendto(raw_send)
+                # can receive more than 1024 bytes (1056 approximate maximum)
+                raw_recv = await sock.recv(10240)
+                data = self._unpack_raw(raw_recv).rstrip(b'\x00')
+
+                if data == b'':
+                    # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
+                    # command with empty answer
+                    data = {'result': ''}
+                    break
+
+                data = json.loads(data)
+                # check if we received response for our cmd
+                if data['id'] == msg_id:
+                    break
+
+                _LOGGER.debug(f"{self.addr[0]} | wrong ID")
+
+            except socket.timeout:
+                _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]} | exception {e}")
+
+        else:
+            _LOGGER.warning(
+                f"{self.addr[0]} | Device offline"
+                if pings >= 2 else
+                f"{self.addr[0]} | Can't send {method} {params}"
+            )
+            return None
+
+        if 'result' in data:
+            return data['result']
+        else:
+            _LOGGER.debug(f"{self.addr[0]} | {data}")
+            return None
+
+    async def send2(self, method: str, params: Union[dict, list] = None):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
         """
@@ -249,7 +321,9 @@ class AsyncmiIO(BasemiIO, BaseProtocol):
             return None
 
         try:
-            raw = self._pack_raw(method, params)
+            # pack each time for new message id
+            msg_id = random.randint(100000000, 999999999)
+            raw = self._pack_raw(msg_id, method, params)
             data = await self.send_raw(raw)
             return json.loads(data.rstrip(b'\x00'))['result']
         except Exception as e:

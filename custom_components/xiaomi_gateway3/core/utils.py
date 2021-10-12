@@ -1,9 +1,9 @@
+import asyncio
 import json
 import logging
 import random
 import re
 import string
-import time
 import uuid
 from datetime import datetime
 from functools import lru_cache
@@ -12,13 +12,14 @@ from typing import List, Optional
 import requests
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.requirements import async_process_requirements
 
-from .mini_miio import SyncmiIO
+from .mini_miio import AsyncMiIO
 from .shell import TelnetShell
 from .xiaomi_cloud import MiCloud
 
@@ -27,6 +28,7 @@ DOMAIN = 'xiaomi_gateway3'
 _LOGGER = logging.getLogger(__name__)
 
 
+@callback
 def remove_device(hass: HomeAssistantType, did: str):
     """Remove device by did from Hass"""
     # lumi.1234567890 => 0x1234567890
@@ -37,6 +39,7 @@ def remove_device(hass: HomeAssistantType, did: str):
         registry.async_remove_device(device.id)
 
 
+@callback
 def update_device_info(hass: HomeAssistantType, did: str, **kwargs):
     # lumi.1234567890 => 0x1234567890
     mac = '0x' + did[5:]
@@ -84,20 +87,20 @@ def migrate_options(data):
     return {'data': data, 'options': options}
 
 
-def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
+async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
-    try:
-        # 1. try connect with telnet (custom firmware)?
-        shell = TelnetShell(host)
+    # 1. try connect with telnet (custom firmware)?
+    shell = TelnetShell()
+    if await shell.connect(host) and await shell.login():
         # 1.1. check token with telnet
-        return None if shell.get_token() == token else 'wrong_token'
-    except:
-        if not telnet_cmd:
-            return 'cant_connect'
+        return None if await shell.get_token() == token else 'wrong_token'
+
+    if not telnet_cmd:
+        return 'cant_connect'
 
     # 2. try connect with miio
-    miio = SyncmiIO(host, token)
-    info = miio.info()
+    miio = AsyncMiIO(host, token)
+    info = await miio.info()
     # fw 1.4.6_0012 without cloud will respond with a blank string reply
     if info is None:
         # if device_id not None - device works but not answer on commands
@@ -109,28 +112,27 @@ def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
 
     raw = json.loads(telnet_cmd)
     # fw 1.4.6_0043+ won't answer on cmd without cloud, so don't check answer
-    miio.send(raw['method'], raw.get('params'))
+    await miio.send(raw['method'], raw.get('params'))
 
     # waiting for telnet to start
-    time.sleep(1)
+    await asyncio.sleep(1)
 
-    try:
-        # 4. check if telnet command helps
-        TelnetShell(host)
-    except:
+    if not await shell.connect(host) or not await shell.login():
         return 'wrong_telnet'
 
+    return None
 
-def get_lan_key(host: str, token: str):
-    device = SyncmiIO(host, token)
-    resp = device.send('get_lumi_dpf_aes_key')
+
+async def get_lan_key(host: str, token: str):
+    device = AsyncMiIO(host, token)
+    resp = await device.send('get_lumi_dpf_aes_key')
     if resp is None:
         return "Can't connect to gateway"
     if len(resp[0]) == 16:
         return resp[0]
     key = ''.join(random.choice(string.ascii_lowercase + string.digits)
                   for _ in range(16))
-    resp = device.send('set_lumi_dpf_aes_key', [key])
+    resp = await device.send('set_lumi_dpf_aes_key', [key])
     if resp[0] == 'ok':
         return key
     return "Can't update gateway key"
@@ -138,8 +140,8 @@ def get_lan_key(host: str, token: str):
 
 async def get_room_mapping(cloud: MiCloud, host: str, token: str):
     try:
-        device = SyncmiIO(host, token)
-        local_rooms = device.send('get_room_mapping')
+        device = AsyncMiIO(host, token)
+        local_rooms = await device.send('get_room_mapping')
         cloud_rooms = await cloud.get_rooms()
         result = ''
         for local_id, cloud_id in local_rooms:
@@ -174,16 +176,7 @@ EZSP_URLS = {
 }
 
 
-def _update_zigbee_firmware(host: str, ezsp_version: int):
-    shell = TelnetShell(host)
-
-    # stop all utilities without checking if they are running
-    shell.stop_lumi_zigbee()
-    shell.stop_zigbee_tcp()
-    # flash on another port because running ZHA or z2m can breake process
-    shell.run_zigbee_tcp(port=8889)
-    time.sleep(.5)
-
+async def _update_zigbee_firmware(host: str, ezsp_version: int):
     _LOGGER.debug(f"Try update EZSP to version {ezsp_version}")
 
     from ..util.elelabs_ezsp_utility import ElelabsUtilities
@@ -212,6 +205,17 @@ def _update_zigbee_firmware(host: str, ezsp_version: int):
 async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
                                  ezsp_version: int):
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
+
+    shell = TelnetShell()
+    if not await shell.connect(host) or not await shell.login():
+        return False
+
+    # stop all utilities without checking if they are running
+    await shell.stop_lumi_zigbee()
+    await shell.stop_zigbee_tcp()
+    # flash on another port because running ZHA or z2m can breake process
+    await shell.run_zigbee_tcp(port=8889)
+    await asyncio.sleep(.5)
 
     return await hass.async_add_executor_job(
         _update_zigbee_firmware, host, ezsp_version

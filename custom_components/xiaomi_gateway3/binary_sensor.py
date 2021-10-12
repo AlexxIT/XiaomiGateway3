@@ -45,7 +45,7 @@ class XiaomiBinarySensor(XiaomiEntity, BinarySensorEntity):
     def device_class(self):
         return DEVICE_CLASS.get(self.attr, self.attr)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if self.attr in data:
             custom = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
             if not custom.get(CONF_INVERT_STATE):
@@ -54,7 +54,7 @@ class XiaomiBinarySensor(XiaomiEntity, BinarySensorEntity):
             else:
                 self._state = not data[self.attr]
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 KETTLE = {
@@ -66,14 +66,14 @@ KETTLE = {
 
 
 class XiaomiKettleSensor(XiaomiBinarySensor):
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if self.attr in data:
             value = data[self.attr]
             self._state = bool(value)
             self._attrs['action_id'] = value
             self._attrs['action'] = KETTLE[value]
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class XiaomiMotionSensor(XiaomiBinarySensor):
@@ -92,13 +92,6 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
 
         await super().async_added_to_hass()
 
-    async def _start_no_motion_timer(self, delay: float):
-        if self._unsub_set_no_motion:
-            self._unsub_set_no_motion()
-
-        self._unsub_set_no_motion = async_call_later(
-            self.hass, abs(delay), self._set_no_motion)
-
     async def _set_no_motion(self, *args):
         self.debug("Clear motion")
 
@@ -106,9 +99,9 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
         self._timeout_pos = 0
         self._unsub_set_no_motion = None
         self._state = False
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
         if 'battery' in data:
             return
@@ -121,7 +114,7 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
         # check only motion=1
         if data.get(self.attr) != 1:
             # handle available change
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
             return
 
         # don't trigger motion right after illumination
@@ -134,7 +127,7 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
         self._last_on = t
 
         # handle available change
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
         if self._unsub_set_no_motion:
             self._unsub_set_no_motion()
@@ -156,9 +149,10 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
 
             self.debug(f"Extend delay: {delay} seconds")
 
-            self.hass.add_job(self._start_no_motion_timer, delay)
+            self._unsub_set_no_motion = async_call_later(
+                self.hass, abs(delay), self._set_no_motion)
 
         # repeat event from Aqara integration
-        self.hass.bus.fire('xiaomi_aqara.motion', {
+        self.hass.bus.async_fire('xiaomi_aqara.motion', {
             'entity_id': self.entity_id
         })

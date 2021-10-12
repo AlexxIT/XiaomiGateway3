@@ -1,9 +1,9 @@
+import asyncio
 import base64
 import logging
 import re
-import time
+from asyncio import StreamReader, StreamWriter
 from socket import socket, AF_INET, SOCK_DGRAM
-from telnetlib import Telnet
 from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,33 +49,56 @@ MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 MD5_SOCAT = '92b77e1a93c4f4377b4b751a5390d979'
 
 
-class TelnetShell(Telnet):
-    def __init__(self, host: str):
-        super().__init__(host, timeout=3)
+class TelnetShell:
+    reader: StreamReader = None
+    writer: StreamWriter = None
 
-        self.read_until(b"login: ", timeout=3)
-        # some users have problems with \r\n symbols in login
-        self.write(b"admin\n")
+    ver: str = None
 
-        raw = self.read_until(b"\r\n# ", timeout=3)
-        if b'Password:' in raw:
-            raise Exception("Telnet with password don't supported")
+    async def connect(self, host: str, port=23) -> bool:
+        try:
+            coro = asyncio.open_connection(host, port, limit=1_000_000)
+            self.reader, self.writer = await asyncio.wait_for(coro, 5)
+            return True
+        except:
+            return False
 
-        self.ver = self.get_version()
+    async def close(self):
+        self.writer.close()
+        await self.writer.wait_closed()
 
-    def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
+    async def login(self) -> bool:
+        try:
+            coro = self.reader.readuntil(b"login: ")
+            await asyncio.wait_for(coro, 3)
+
+            self.writer.write(b"admin\n")
+
+            coro = self.reader.readuntil(b"\r\n# ")
+            raw = await asyncio.wait_for(coro, timeout=3)
+            if b'Password:' in raw:
+                raise Exception("Telnet with password don't supported")
+
+            self.ver = await self.get_version()
+
+            return True
+        except:
+            return False
+
+    async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
-        self.write(command.encode() + b"\n")
-        raw = self.read_until(b"\r\n# ", timeout=10)
+        self.writer.write(command.encode() + b"\n")
+        coro = self.reader.readuntil(b"\r\n# ")
+        raw = await asyncio.wait_for(coro, timeout=10)
         return raw if as_bytes else raw.decode()
 
-    def check_bin(self, filename: str, md5: str, url=None) -> bool:
+    async def check_bin(self, filename: str, md5: str, url=None) -> bool:
         """Check binary md5 and download it if needed."""
-        if md5 in self.exec("md5sum /data/" + filename):
+        if md5 in await self.exec("md5sum /data/" + filename):
             return True
         elif url:
-            self.exec(WGET.format(url, filename))
-            return self.check_bin(filename, md5)
+            await self.exec(WGET.format(url, filename))
+            return await self.check_bin(filename, md5)
         else:
             return False
 
@@ -89,27 +112,27 @@ class TelnetShell(Telnet):
     # def stop_gw3(self):
     #     self.exec(f"killall gw3")
 
-    def run_zigbee_tcp(self, port=8888):
-        if self.check_bin('socat', MD5_SOCAT, 'bin/socat'):
-            self.exec(RUN_ZIGBEE_TCP % port)
+    async def run_zigbee_tcp(self, port=8888):
+        if await self.check_bin('socat', MD5_SOCAT, 'bin/socat'):
+            await self.exec(RUN_ZIGBEE_TCP % port)
 
-    def stop_zigbee_tcp(self):
+    async def stop_zigbee_tcp(self):
         # stop both 8888 and 8889
-        self.exec("pkill -f 'tcp-l:888'")
+        await self.exec("pkill -f 'tcp-l:888'")
 
-    def run_lumi_zigbee(self):
-        self.exec("daemon_app.sh &")
+    async def run_lumi_zigbee(self):
+        await self.exec("daemon_app.sh &")
 
-    def stop_lumi_zigbee(self):
+    async def stop_lumi_zigbee(self):
         # Z3 starts with tail on old fw and without it on new fw from 1.4.7
-        self.exec("killall daemon_app.sh")
-        self.exec("killall tail Lumi_Z3GatewayHost_MQTT")
+        await self.exec("killall daemon_app.sh")
+        await self.exec("killall tail Lumi_Z3GatewayHost_MQTT")
 
-    def check_firmware_lock(self) -> bool:
+    async def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
-        self.exec("mkdir -p /data/firmware")
+        await self.exec("mkdir -p /data/firmware")
         locked = [
-            "Permission denied" in self.exec("touch " + path)
+            "Permission denied" in await self.exec("touch " + path)
             for path in FIRMWARE_PATHS
         ]
         return all(locked)
@@ -124,116 +147,118 @@ class TelnetShell(Telnet):
         if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
             self.exec(RUN_FTP)
 
-    def check_bt(self) -> bool:
+    async def check_bt(self) -> bool:
         md5 = MD5_BT.get(self.ver)
         if not md5:
             return False
         # we use same name for bt utis so gw can kill it in case of update etc.
-        return self.check_bin('silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt')
+        return await self.check_bin('silabs_ncp_bt', md5,
+                                    md5 + '/silabs_ncp_bt')
 
-    def run_bt(self):
-        self.exec(
+    async def run_bt(self):
+        await self.exec(
             "killall silabs_ncp_bt; pkill -f log/ble; "
             "/data/silabs_ncp_bt /dev/ttyS1 1 2>&1 >/dev/null | "
             "mosquitto_pub -t log/ble -l &"
         )
 
-    def sniff_bluetooth(self):
-        """Deprecated"""
-        self.write(b"killall silabs_ncp_bt; silabs_ncp_bt /dev/ttyS1 1\n")
-
-    def run_public_mosquitto(self):
-        self.exec("killall mosquitto")
-        time.sleep(.5)
-        self.exec("mosquitto -d")
-        time.sleep(.5)
+    async def run_public_mosquitto(self):
+        await self.exec("killall mosquitto")
+        await asyncio.sleep(.5)
+        await self.exec("mosquitto -d")
+        await asyncio.sleep(.5)
         # fix CPU 90% full time bug
-        self.exec("killall zigbee_gw")
+        await self.exec("killall zigbee_gw")
 
-    def run_ntpd(self):
-        self.exec("ntpd -l")
+    async def run_ntpd(self):
+        await self.exec("ntpd -l")
 
-    def get_running_ps(self) -> str:
-        return self.exec("ps -w")
+    async def get_running_ps(self) -> str:
+        return await self.exec("ps -w")
 
-    def redirect_miio2mqtt(self, pattern: str):
-        self.exec("killall daemon_miio.sh")
-        self.exec("killall miio_client; pkill -f log/miio")
-        time.sleep(.5)
+    async def redirect_miio2mqtt(self, pattern: str):
+        await self.exec("killall daemon_miio.sh")
+        await self.exec("killall miio_client; pkill -f log/miio")
+        await asyncio.sleep(.5)
         cmd = MIIO_147 if self.ver >= '1.4.7_0063' else MIIO_146
-        self.exec(cmd + MIIO2MQTT % pattern)
-        self.exec("daemon_miio.sh &")
+        await self.exec(cmd + MIIO2MQTT % pattern)
+        await self.exec("daemon_miio.sh &")
 
-    def run_public_zb_console(self):
-        self.stop_lumi_zigbee()
+    async def run_public_zb_console(self):
+        await self.stop_lumi_zigbee()
 
         # add `-l 0` to disable all output, we'll enable it later with
         # `debugprint on 1` command
         if self.ver >= '1.4.7_0063':
             # nohub and tail fixed in latest fw
-            self.exec(
+            await self.exec(
                 "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 -p '/dev/ttyS2' "
                 "-d '/data/silicon_zigbee_host/' -r 'c' 2>&1 | "
                 "mosquitto_pub -t log/z3 -l &"
             )
         else:
             # use `tail` because input for Z3 is required;
-            self.exec(
+            await self.exec(
                 "nohup tail -f /dev/null 2>&1 | "
                 "nohup Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l 0 "
                 f"-p '/dev/ttyS2' -d '/data/silicon_zigbee_host/' 2>&1 | "
                 "mosquitto_pub -t log/z3 -l &"
             )
 
-        self.run_lumi_zigbee()
+        await self.run_lumi_zigbee()
 
-    def read_file(self, filename: str, as_base64=False):
-        if as_base64:
-            self.write(f"cat {filename} | base64\n".encode())
-            self.read_until(b"\r\n", timeout=3)  # skip command
-            raw = self.read_until(b"# ", timeout=10)
-            try:
-                # b"cat: can't open ..."
-                return base64.b64decode(raw)
-            except:
-                return None
-        else:
-            self.write(f"cat {filename}\n".encode())
-            self.read_until(b"\r\n", timeout=3)  # skip command
-            return self.read_until(b"# ", timeout=10)[:-2]
+    async def read_file(self, filename: str, as_base64=False):
+        command = f"cat {filename} | base64\n" if as_base64 \
+            else f"cat {filename}\r\n"
 
-    def tar_data(self):
-        self.write(TAR_DATA)
-        self.read_until(b"base64\r\n", timeout=3)  # skip command
-        raw = self.read_until(b"# ", timeout=30)
+        self.writer.write(command.encode())
+
+        coro = self.reader.readuntil(b"\r\n")
+        await asyncio.wait_for(coro, timeout=3)  # skip command
+
+        coro = self.reader.readuntil(b"# ")
+        raw = await asyncio.wait_for(coro, timeout=10)
+
+        try:
+            # b"cat: can't open ..."
+            return base64.b64decode(raw) if as_base64 else raw[:-2]
+        except:
+            return None
+
+    async def tar_data(self):
+        self.writer.write(TAR_DATA)
+        coro = self.reader.readuntil(b"\r\n")
+        await asyncio.wait_for(coro, timeout=3)  # skip command
+        coro = self.reader.readuntil(b"# ")
+        raw = await asyncio.wait_for(coro, timeout=10)
         return base64.b64decode(raw)
 
-    def run_buzzer(self):
-        self.exec("kill $(ps | grep dummy:basic_gw | awk '{print $1}')")
+    async def run_buzzer(self):
+        await self.exec("kill $(ps | grep dummy:basic_gw | awk '{print $1}')")
 
-    def stop_buzzer(self):
-        self.exec("killall daemon_miio.sh")
-        self.exec("killall -9 basic_gw")
+    async def stop_buzzer(self):
+        await self.exec("killall daemon_miio.sh")
+        await self.exec("killall -9 basic_gw")
         # run dummy process with same str in it
-        self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
-        self.exec("daemon_miio.sh &")
+        await self.exec("sh -c 'sleep 999d' dummy:basic_gw &")
+        await self.exec("daemon_miio.sh &")
 
-    def get_version(self):
-        raw = self.read_file('/etc/rootfs_fw_info')
+    async def get_version(self):
+        raw = await self.read_file('/etc/rootfs_fw_info')
         m = RE_VERSION.search(raw.decode())
         return m[1]
 
-    def get_token(self):
-        return self.read_file('/data/miio/device.token').rstrip().hex()
+    async def get_token(self):
+        raw = await self.read_file('/data/miio/device.token')
+        return raw.rstrip().hex()
 
-    def get_did(self):
-        raw = self.read_file('/data/miio/device.conf').decode()
-        m = re.search(r'did=(\d+)', raw)
+    async def get_did(self):
+        raw = await self.read_file('/data/miio/device.conf')
+        m = re.search(r'did=(\d+)', raw.decode())
         return m[1]
 
-    def get_wlan_mac(self) -> str:
-        raw = self.read_file('/sys/class/net/wlan0/address')
-
+    async def get_wlan_mac(self) -> str:
+        raw = await self.read_file('/sys/class/net/wlan0/address')
         return raw.decode().rstrip().upper()
 
     @property

@@ -30,7 +30,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
     def icon(self):
         return 'mdi:zigbee'
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if 'pairing_start' in data:
             self._state = True
 
@@ -47,7 +47,9 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
             text = "New device:\n" + '\n'.join(
                 f"{k}: {v}" for k, v in data['added_device'].items()
             )
-            persistent_notification.create(self.hass, text, "Xiaomi Gateway 3")
+            persistent_notification.async_create(
+                self.hass, text, "Xiaomi Gateway 3"
+            )
 
         elif 'removed_did' in data:
             # https://github.com/AlexxIT/XiaomiGateway3/issues/122
@@ -58,18 +60,18 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 self.debug(f"Handle removed_did: {did}")
                 utils.remove_device(self.hass, did)
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def turn_on(self):
+    async def async_turn_on(self):
         # work for any device model, dev_type: 0 - zb1, 1 - zb3, don't matter
-        self.gw.miio.send('miIO.zb_start_provision', {
+        await self.gw.miio.send('miIO.zb_start_provision', {
             'dev_type': 0, 'duration': 60, 'method': 0,
             'model': 'lumi.sensor_switch.v2', 'pid': 62
         })
         # self.gw.send(self.device, {'pairing_start': 60})
 
-    def turn_off(self):
-        self.gw.miio.send('miIO.zb_end_provision', {'code': -1})
+    async def async_turn_off(self):
+        await self.gw.miio.send('miIO.zb_end_provision', {'code': -1})
         # self.gw.send(self.device, {'pairing_stop': 0})
 
     async def async_send_command(self, command, **kwargs):
@@ -80,22 +82,24 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
             # for testing purposes
             if cmd == 'ble':
                 raw = kwargs[ATTR_DEVICE].replace('\'', '"')
-                self.gw.process_ble_event(raw)
+                await self.gw.process_ble_event(raw)
             elif cmd == 'pair':
                 model: str = kwargs[ATTR_DEVICE]
                 self.gw.pair_model = (model[:-3] if model.endswith('.v1')
                                       else model)
-                self.turn_on()
+                await self.async_turn_on()
             elif cmd in ('reboot', 'ftp', 'dump'):
-                self.gw.send_telnet(cmd)
+                await self.gw.send_telnet(cmd)
             elif cmd == 'power':
-                self.gw.send(self.device, {'power_tx': int(args[1])})
+                power = int(args[1])
+                await self.gw.send_zigbee(self.device, {'power_tx': power})
             elif cmd == 'channel':
-                self.gw.send(self.device, {'channel': int(args[1])})
+                channel = int(args[1])
+                await self.gw.send_zigbee(self.device, {'channel': channel})
             elif cmd == 'publishstate':
-                self.gw.send_mqtt('publishstate')
+                await self.gw.send_mqtt('publishstate')
             elif cmd == 'info':
-                self.gw.get_gateway_info()
+                await self.gw.get_gateway_info()
             elif cmd == 'ota':
                 did: str = 'lumi.' + kwargs[ATTR_DEVICE]
                 if did not in self.gw.devices:
@@ -107,7 +111,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 url = await zigbee.get_ota_link(self.hass, device)
                 if url:
                     self.debug(f"Update {did} with {url}")
-                    resp = self.gw.miio.send('miIO.subdev_ota', {
+                    resp = await self.gw.miio.send('miIO.subdev_ota', {
                         'did': did,
                         'subdev_url': url
                     })
@@ -118,7 +122,9 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
 
             elif cmd == 'miio':
                 raw = json.loads(args[1])
-                resp = self.gw.miio.send(raw['method'], raw.get('params'))
+                resp = await self.gw.miio.send(
+                    raw['method'], raw.get('params')
+                )
                 persistent_notification.async_create(
                     self.hass, str(resp), "Xiaomi Gateway 3"
                 )

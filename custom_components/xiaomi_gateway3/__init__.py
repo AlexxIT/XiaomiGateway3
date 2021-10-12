@@ -115,8 +115,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
         for entity_id in remove:
             registry.async_remove(entity_id)
 
-    gw = hass.data[DOMAIN][entry.entry_id]
-    gw.stop()
+    gw: Gateway3 = hass.data[DOMAIN][entry.entry_id]
+    await gw.stop()
 
     await asyncio.gather(*[
         hass.config_entries.async_forward_entry_unload(entry, domain)
@@ -228,7 +228,7 @@ async def _handle_device_remove(hass: HomeAssistant):
                 continue
             if gw_device['type'] == 'zigbee':
                 gw.debug(f"Remove device: {gw_device['did']}")
-                gw.miio.send('remove_device', [gw_device['did']])
+                await gw.miio.send('remove_device', [gw_device['did']])
             break
 
         # remove from Hass

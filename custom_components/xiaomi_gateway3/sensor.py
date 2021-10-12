@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import time
 from datetime import timedelta
 
 from homeassistant.const import *
@@ -63,7 +63,7 @@ async def async_setup_entry(hass, entry, add_entities):
         if attr == 'action':
             add_entities([XiaomiAction(gateway, device, attr)])
         elif attr == 'gateway':
-            add_entities([GatewayStats(gateway, device, attr)])
+            add_entities([GatewayStats(gateway, device, attr)], True)
         elif attr == 'zigbee':
             add_entities([ZigbeeStats(gateway, device, attr)])
         elif attr == 'ble':
@@ -101,10 +101,10 @@ class XiaomiSensor(XiaomiEntity, SensorEntity):
         elif self.attr in UNITS:
             self._attr_state_class = "measurement"
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if self.attr in data:
             self._state = data[self.attr]
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class GatewayStats(XiaomiSensor):
@@ -123,12 +123,11 @@ class GatewayStats(XiaomiSensor):
 
     async def async_added_to_hass(self):
         self.gw.set_stats(self)
-        self.hass.add_job(self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         # empty data - update state to available time
         if not data:
             self._state = now().isoformat(timespec='seconds') \
@@ -136,7 +135,7 @@ class GatewayStats(XiaomiSensor):
         else:
             self._attrs.update(data)
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class ZigbeeStats(XiaomiSensor):
@@ -174,7 +173,10 @@ class ZigbeeStats(XiaomiSensor):
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
+        if data is None:
+            return
+
         if 'sourceAddress' in data:
             self._attrs['link_quality'] = data['linkQuality']
             self._attrs['rssi'] = data['rssi']
@@ -220,7 +222,7 @@ class ZigbeeStats(XiaomiSensor):
         elif data.get('deviceState') == 17:
             self._attrs['unresponsive'] += 1
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class BLEStats(XiaomiSensor):
@@ -246,15 +248,15 @@ class BLEStats(XiaomiSensor):
             self.render_attributes_template()
 
         self.gw.set_stats(self)
-        self.hass.add_job(self.update)
+        self.hass.async_create_task(self.async_update())
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         self._attrs['msg_received'] += 1
         self._state = now().isoformat(timespec='seconds')
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/converters/fromZigbee.js#L4738
@@ -301,7 +303,7 @@ class XiaomiAction(XiaomiEntity):
     def device_state_attributes(self):
         return self._action_attrs or self._attrs
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         for k, v in data.items():
             if k == 'button':
                 # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
@@ -330,15 +332,15 @@ class XiaomiAction(XiaomiEntity):
         if self.attr in data:
             self._action_attrs = {**self._attrs, **data}
             self._state = data[self.attr]
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
             # repeat event from Aqara integration
-            self.hass.bus.fire('xiaomi_aqara.click', {
+            self.hass.bus.async_fire('xiaomi_aqara.click', {
                 'entity_id': self.entity_id, 'click_type': self._state
             })
 
-            time.sleep(.3)
+            await asyncio.sleep(.3)
 
             self._state = ''
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()

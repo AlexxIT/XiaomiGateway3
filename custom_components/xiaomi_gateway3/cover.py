@@ -41,39 +41,39 @@ class XiaomiCover(XiaomiEntity, CoverEntity):
     def is_closed(self):
         return self.current_cover_position == 0
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if 'run_state' in data:
             self._state = RUN_STATES.get(data['run_state'])
 
         if 'position' in data:
             self._attrs[ATTR_CURRENT_POSITION] = data['position']
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def open_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 1})
+    async def async_open_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 1})
 
-    def close_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 0})
+    async def async_close_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 0})
 
-    def stop_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 2})
+    async def async_stop_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 2})
 
-    def set_cover_position(self, **kwargs):
+    async def async_set_cover_position(self, **kwargs):
         position = kwargs.get(ATTR_POSITION)
-        self.gw.send(self.device, {'position': position})
+        await self.gw.send_zigbee(self.device, {'position': position})
 
 
 class XiaomiCoverMIOT(XiaomiCover):
-    def open_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 2})
+    async def async_open_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 2})
 
-    def close_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 1})
+    async def async_close_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 1})
 
-    def stop_cover(self, **kwargs):
-        self.gw.send(self.device, {'motor': 0})
+    async def async_stop_cover(self, **kwargs):
+        await self.gw.send_zigbee(self.device, {'motor': 0})
 
-    def set_cover_position(self, **kwargs):
+    async def async_set_cover_position(self, **kwargs):
         position = kwargs.get(ATTR_POSITION)
-        self.gw.send(self.device, {'target_position': position})
+        await self.gw.send_zigbee(self.device, {'target_position': position})

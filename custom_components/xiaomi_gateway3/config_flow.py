@@ -107,7 +107,7 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_token(self, user_input=None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         if user_input is not None:
-            error = utils.check_mgl03(**user_input)
+            error = await utils.check_mgl03(**user_input)
             if error:
                 return await self.async_step_token(error=error)
 
@@ -185,7 +185,7 @@ class OptionsFlowHandler(OptionsFlow):
                 )
 
             if device['model'] == 'lumi.gateway.v3':
-                device_info += "\nLAN key: " + utils.get_lan_key(
+                device_info += "\nLAN key: " + await utils.get_lan_key(
                     device['localip'], device['token']
                 )
             elif '.vacuum.' in device['model']:
