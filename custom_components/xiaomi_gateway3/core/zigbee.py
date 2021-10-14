@@ -37,11 +37,18 @@ DEVICES = [{
     # on/off, power measurement
     'lumi.plug': ["Xiaomi", "Plug", "ZNCZ02LM"],  # tested
     'lumi.plug.mitw01': ["Xiaomi", "Plug TW", "ZNCZ03LM"],
-    'lumi.plug.mmeu01': ["Xiaomi", "Plug EU", "ZNCZ04LM"],
     'lumi.plug.maus01': ["Xiaomi", "Plug US", "ZNCZ12LM"],
     'lumi.ctrl_86plug': ["Aqara", "Socket", "QBCZ11LM"],
     # 'lumi.plug.maeu01': ["Aqara", "Plug EU", "SP-EUC01"],
     'lumi_spec': [
+        ['0.12.85', 'load_power', 'power', 'sensor'],
+        ['0.13.85', None, 'energy', 'sensor'],
+        ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+    ]
+}, {
+    'lumi.plug.mmeu01': ["Xiaomi", "Plug EU", "ZNCZ04LM"],
+    'lumi_spec': [
+        ['0.11.85', 'load_voltage', 'voltage', 'sensor'],
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?

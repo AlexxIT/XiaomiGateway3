@@ -16,8 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 WGET = "(wget http://master.dl.sourceforge.net/project/mgl03/{0}?viasf=1 " \
        "-O /data/{1} && chmod +x /data/{1})"
 
-RUN_ZIGBEE_TCP = "/data/socat tcp-l:%d,reuseaddr,fork,keepalive,nodelay," \
-                 "keepidle=1,keepintvl=1,keepcnt=5 /dev/ttyS2,raw,echo=0 &"
+RUN_ZIGBEE_TCP = "/data/socat tcp-l:%d,fork,keepalive,nodelay,reuseaddr " \
+                 "/dev/ttyS2,b115200,ixon=1,ixoff=1,raw,echo=0 &"
 
 LOCK_FIRMWARE = "/data/busybox chattr +i "
 UNLOCK_FIRMWARE = "/data/busybox chattr -i "
