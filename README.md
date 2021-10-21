@@ -16,9 +16,11 @@ This method does not change the device firmware. Gateway continues to work with 
 
 Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
 
-**Important:** This component does not work with:
- - Xiaomi Gateway 2 (DGNWG02LM, lumi.gateway.v3) - use [this](https://www.home-assistant.io/integrations/xiaomi_aqara/) component
- - Xiaomi Gateway EU (DGNWG05LM, lumi.gateway.mieu01)
+**Important:** Use another integrations for support:
+
+- Xiaomi Gateway 2 (DGNWG02LM) - [external link](https://www.home-assistant.io/integrations/xiaomi_aqara/)
+- Xiaomi Gateway EU (DGNWG05LM), Aqara Hub (ZHWG11LM) - [external link](https://openlumi.github.io/)
+- Aqara E1 CN (ZHWG16LM), Aqara G2H (ZNSXJ12LM), Aqara H1 CN (QBCZWG11LM), Aqara M1S CN (ZHWG15LM), Aqara M2 CN (ZHWG12LM), Aqara P3 CN (KTBL12LM) - [external link](https://github.com/niceboygithub/AqaraGateway)
 
 **Attention:** The component is under active development. Breaking changes may appear.
 
