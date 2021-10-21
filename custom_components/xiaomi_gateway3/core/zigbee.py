@@ -503,7 +503,7 @@ DEVICES = [{
 }]
 
 GLOBAL_PROP = {
-    # '8.0.2001': 'battery',
+    '8.0.2001': 'battery_percent',
     '8.0.2002': 'reset_cnt',
     '8.0.2003': 'send_all_cnt',
     '8.0.2004': 'send_fail_cnt',
@@ -525,6 +525,10 @@ GLOBAL_PROP = {
     '8.0.2034': 'load_s0',  # ctrl_dualchn
     '8.0.2035': 'load_s1',  # ctrl_dualchn
     '8.0.2036': 'parent',
+    '8.0.2037': 'invalid_count',
+    '8.0.2038': 'wakeup_num',
+    '8.0.2039': 'disturbance_num',
+    '8.0.2040': 'param_version',
     '8.0.2041': 'model',
     '8.0.2042': 'max_power',
     '8.0.2044': 'plug_detection',
