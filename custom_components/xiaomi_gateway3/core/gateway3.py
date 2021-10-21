@@ -9,11 +9,10 @@ from typing import Optional
 
 import yaml
 
-from . import bluetooth, utils, zigbee
+from . import bluetooth, shell, utils, zigbee
 from .helpers import DevicesRegistry
 from .mini_miio import AsyncMiIO
 from .mini_mqtt import MiniMQTT, MQTTMessage
-from .shell import TelnetShell, ntp_time
 from .unqlite import Unqlite, SQLite
 
 _LOGGER = logging.getLogger(__name__)
@@ -527,33 +526,33 @@ class GatewayEntry(GatewayNetwork):
     async def get_devices(self):
         """Load devices info for Coordinator, Zigbee and Mesh."""
         try:
-            shell = TelnetShell()
-            if not await shell.connect(self.host) or not await shell.login():
+            sh = shell.TelnetShell()
+            if not await sh.connect(self.host) or not await sh.login():
                 return None
 
             # 1. Read coordinator info
-            raw = await shell.read_file('/data/zigbee/coordinator.info')
+            raw = await sh.read_file('/data/zigbee/coordinator.info')
             device = json.loads(raw)
             devices = [{
-                'did': await shell.get_did(),
+                'did': await sh.get_did(),
                 'model': 'lumi.gateway.mgl03',
                 'mac': device['mac'],
-                'wlan_mac': await shell.get_wlan_mac(),
+                'wlan_mac': await sh.get_wlan_mac(),
                 'type': 'gateway',
-                'fw_ver': shell.ver,
+                'fw_ver': sh.ver,
                 'online': True,
                 'init': {
-                    'firmware lock': await shell.check_firmware_lock(),
+                    'firmware lock': await sh.check_firmware_lock(),
                 }
             }]
 
             # 2. Read zigbee devices
             if not self.zha_mode:
-                raw = await shell.read_file('/data/zigbee/device.info')
+                raw = await sh.read_file('/data/zigbee/device.info')
                 lumi = json.loads(raw)['devInfo']
 
                 # read Xiaomi devices DB
-                raw = await shell.read_file(shell.zigbee_db, as_base64=True)
+                raw = await sh.read_file(sh.zigbee_db, as_base64=True)
                 # self.debug(f"Devices RAW: {raw}")
                 if raw is None:
                     self.debug("No zigbee database")
@@ -606,7 +605,7 @@ class GatewayEntry(GatewayNetwork):
 
             # 3. Read bluetooth devices
             if self.ble_mode:
-                raw = await shell.read_file('/data/miio/mible_local.db',
+                raw = await sh.read_file('/data/miio/mible_local.db',
                                             as_base64=True)
                 try:
                     db = SQLite(raw)
@@ -627,7 +626,7 @@ class GatewayEntry(GatewayNetwork):
                     # load Mesh groups
                     mesh_groups = {}
 
-                    rows = db.read_table(shell.mesh_group_table)
+                    rows = db.read_table(sh.mesh_group_table)
                     for row in rows:
                         # don't know if 8 bytes enougth
                         mac = int(row[0]).to_bytes(8, 'big').hex()
@@ -645,7 +644,7 @@ class GatewayEntry(GatewayNetwork):
                         mesh_groups[group_addr] = device
 
                     # load Mesh bulbs
-                    rows = db.read_table(shell.mesh_device_table)
+                    rows = db.read_table(sh.mesh_device_table)
                     for row in rows:
                         device = {
                             'did': row[0],
@@ -684,77 +683,45 @@ class GatewayEntry(GatewayNetwork):
         """
         self.debug("Prepare Gateway")
         try:
-            shell = TelnetShell()
-            if not await shell.connect(self.host) or not await shell.login():
+            sh = shell.TelnetShell()
+            if not await sh.connect(self.host) or not await sh.login():
                 return False
 
-            self.debug(f"Version: {shell.ver}")
+            if sh.ver < '1.4.7_0000':
+                _LOGGER.error(
+                    f"Gateway {self.host} firmware {sh.ver} unsupported"
+                )
+                return False
 
-            ps = await shell.get_running_ps()
+            self.debug(f"Version: {sh.ver}")
+
+            ps = await sh.get_running_ps()
 
             if "mosquitto -d" not in ps:
                 self.debug("Run public mosquitto")
-                await shell.run_public_mosquitto()
+                await sh.run_public_mosquitto()
 
             if "ntpd" not in ps:
                 # run NTPd for sync time
-                await shell.run_ntpd()
+                await sh.run_ntpd()
 
-            if await shell.check_bt():
-                if "-t log/ble" not in ps:
-                    self.debug("Run fixed BT")
-                    await shell.run_bt()
-            else:
-                self.debug("Fixed BT don't supported")
-
-            if "-t log/miio" not in ps:
-                # all data or only necessary events
-                pattern = (
-                    '\\{"' if 'miio' in self.debug_mode else
-                    "ot_agent_recv_handler_one.+"
-                    "ble_event|properties_changed|heartbeat"
-                )
-                self.debug(f"Redirect miio to MQTT")
-                await shell.redirect_miio2mqtt(pattern)
-
+            patches = [shell.PATCH_MIIO]
+            if self.ble_mode and await sh.check_bt():
+                patches.append(shell.PATCH_BLETOOTH)
             if self.options.get('buzzer'):
-                if "dummy:basic_gw" not in ps:
-                    self.debug("Disable buzzer")
-                    await shell.stop_buzzer()
-            else:
-                if "dummy:basic_gw" in ps:
-                    self.debug("Enable buzzer")
-                    await shell.run_buzzer()
+                patches.append(shell.PATCH_BUZZER)
+            if sh.miio_ps(patches) not in ps:
+                _LOGGER.debug(f"Patch daemon_miio.sh with {len(patches)}")
+                await sh.update_daemon_miio(patches)
 
-            if self.zha_mode:
-                # stop lumi without checking if it's running
-                await shell.stop_lumi_zigbee()
+            patches = [shell.PATCH_ZIGBEE_TCP] \
+                if self.zha_mode and await sh.check_zigbee_tcp() \
+                else []
+            if sh.app_ps(patches) not in ps:
+                _LOGGER.debug(f"Patch daemon_app.sh with {len(patches)}")
+                await sh.update_daemon_app(patches)
 
-                if "tcp-l:8889" in ps:
-                    await shell.stop_zigbee_tcp()
-                if "tcp-l:8888" not in ps:
-                    self.debug("Run Zigbee TCP")
-                    await shell.run_zigbee_tcp()
-
-            else:
-                # check both 8888 and 8889
-                if "tcp-l:888" in ps:
-                    self.debug("Stop Zigbee TCP")
-                    await shell.stop_zigbee_tcp()
-
-                if self.parent_scan_interval >= 0:
-                    if "Lumi_Z3GatewayHost_MQTT -n 1 -b 115200 -l" not in ps:
-                        self.debug("Run public Zigbee console")
-                        await shell.run_public_zb_console()
-
-                    if self.parent_scan_interval > 0:
-                        self.parent_scan_ts = 1
-
-                elif "daemon_app.sh" not in ps:
-                    self.debug("Run Lumi Zigbee")
-                    await shell.run_lumi_zigbee()
-
-            await shell.close()
+            await sh.close()
 
             return True
 
@@ -767,7 +734,7 @@ class GatewayEntry(GatewayNetwork):
 
     async def update_time_offset(self):
         gw_time = await asyncio.get_event_loop().run_in_executor(
-            None, ntp_time, self.host
+            None, shell.ntp_time, self.host
         )
         if gw_time:
             self.time_offset = gw_time - time.time()
@@ -776,12 +743,12 @@ class GatewayEntry(GatewayNetwork):
     async def lock_firmware(self, enable: bool):
         self.debug(f"Set firmware lock to {enable}")
         try:
-            shell = TelnetShell()
-            if not await shell.connect(self.host) or not await shell.login():
+            sh = shell.TelnetShell()
+            if not await sh.connect(self.host) or not await sh.login():
                 return False
-            await shell.lock_firmware(enable)
-            locked = await shell.check_firmware_lock()
-            await shell.close()
+            await sh.lock_firmware(enable)
+            locked = await sh.check_firmware_lock()
+            await sh.close()
             return enable == locked
 
         except Exception as e:
@@ -1026,22 +993,22 @@ class GatewayEntry(GatewayNetwork):
         await self.mqtt.publish('zigbee/recv', payload)
 
     async def send_telnet(self, *args: str):
-        shell = TelnetShell()
-        if not await shell.connect(self.host) or not await shell.login():
+        sh = shell.TelnetShell()
+        if not await sh.connect(self.host) or not await sh.login():
             return
 
         for command in args:
             if command == 'ftp':
-                shell.run_ftp()
+                sh.run_ftp()
             elif command == 'dump':
-                raw = await shell.tar_data()
+                raw = await sh.tar_data()
                 filename = Path().absolute() / f"{self.host}.tar.gz"
                 with open(filename, 'wb') as f:
                     f.write(raw)
             else:
-                await shell.exec(command)
+                await sh.exec(command)
 
-        await shell.close()
+        await sh.close()
 
     async def send_mqtt(self, cmd: str):
         if cmd == 'publishstate':

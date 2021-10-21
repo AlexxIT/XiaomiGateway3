@@ -34,8 +34,7 @@ OPT_DEBUG = {
 }
 OPT_MODE = {
     False: "Mi Home",
-    True: "Zigbee Home Automation (ZHA)",
-    'z2m': "zigbee2mqtt"
+    True: "ZHA or zigbee2mqtt",
 }
 
 
@@ -129,18 +128,20 @@ class XiaomiGateway3FlowHandler(ConfigFlow, domain=DOMAIN):
 
 TITLE = "Xiaomi Gateway 3"
 
-ZHA_NOTIFICATION = """Please create manually
+ZHA_NOTIFICATION = """For **ZHA**, goto:
 
-Integration: **Zigbee Home Automation**
-Radio Type: **EZSP**
-Path: `socket://%s:8888`
-Speed: `115200`"""
+Configuration > Integrations > Add Integration > Zigbee Home Automation:
 
-Z2M_NOTIFICATION = """Add to your zigbee2mqtt config
+- Radio Type: **EZSP**
+- Path: `socket://{0}:8888`
+
+For **zigbee2mqtt**, goto:
+
+Supervisor > Zigbee2mqtt > Configuration:
 
 ```
 serial:
-  port: 'tcp://%s:8888'
+  port: 'tcp://{0}:8888'
   adapter: ezsp
 ```
 """
@@ -225,20 +226,14 @@ class OptionsFlowHandler(OptionsFlow):
                 host = user_input['host']
 
                 # change zigbee firmware if needed
-                if new_mode in (False, 'z2m'):
-                    ezsp_version = 8 if new_mode else 7
-                    if not await utils.update_zigbee_firmware(
-                            self.hass, host, ezsp_version
-                    ):
-                        raise Exception("Can't update zigbee firmware")
+                if not await utils.update_zigbee_firmware(
+                        self.hass, host, new_mode
+                ):
+                    raise Exception("Can't update zigbee firmware")
 
                 if new_mode is True:
                     self.hass.components.persistent_notification.async_create(
-                        ZHA_NOTIFICATION % host, TITLE
-                    )
-                elif new_mode == 'z2m':
-                    self.hass.components.persistent_notification.async_create(
-                        Z2M_NOTIFICATION % host, TITLE
+                        ZHA_NOTIFICATION.format(host), TITLE
                     )
 
             return self.async_create_entry(title='', data=user_input)

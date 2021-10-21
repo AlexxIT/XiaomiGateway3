@@ -4,6 +4,7 @@ import logging
 import random
 import re
 import string
+import traceback
 import uuid
 from datetime import datetime
 from functools import lru_cache
@@ -19,6 +20,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.requirements import async_process_requirements
 
+from .ezsp import EzspUtils
 from .mini_miio import AsyncMiIO
 from .shell import TelnetShell
 from .xiaomi_cloud import MiCloud
@@ -168,58 +170,103 @@ def reverse_mac(s: str):
     return f"{s[10:]}{s[8:10]}{s[6:8]}{s[4:6]}{s[2:4]}{s[:2]}"
 
 
-EZSP_URLS = {
-    7: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/'
-       'ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1',
-    8: 'https://master.dl.sourceforge.net/project/mgl03/zigbee/'
-       'ncp-uart-sw_mgl03_6_7_8_z2m.gbl?viasf=1',
-}
+NCP_URL = "https://master.dl.sourceforge.net/project/mgl03/zigbee/%s?viasf=1"
 
 
-async def _update_zigbee_firmware(host: str, ezsp_version: int):
-    _LOGGER.debug(f"Try update EZSP to version {ezsp_version}")
+def flash_zigbee_firmware(host: str, ports: list, fw_url: str, fw_ver: str,
+                          fw_port=0, force=False):
+    """
+    param host: gateway host
+    param ports: one or multiple ports with different speeds, first port
+        should be 115200
+    param fw_url: url to firmware file
+    param fw_ver: firmware version, checks before and after flash
+    param fw_port: optional, port with firmware speed if it is not 115200
+    param second_port: optional, second port if current firmware may have
+        different speed
+    param force: skip check firmware version before flash
+    return: True if NCP firmware version equal to fw_ver
+    """
 
-    from ..util.elelabs_ezsp_utility import ElelabsUtilities
+    # we can flash NCP only in boot mode on speed 115200
+    # but NCP can work on another speed, so we need to try both of them
+    # work with 115200 on port 8115, and with 38400 on port 8038
+    _LOGGER.debug(f"Try to update Zigbee NCP to version {fw_ver}")
 
-    config = type('', (), {
-        'port': (host, 8889),
-        'baudrate': 115200,
-        'dlevel': _LOGGER.level
-    })
-    utils = ElelabsUtilities(config, _LOGGER)
+    if isinstance(ports, int):
+        ports = [ports]
 
-    # check current ezsp version
-    resp = utils.probe()
-    _LOGGER.debug(f"EZSP before flash: {resp}")
-    if resp[0] == 0 and resp[1] == ezsp_version:
-        return True
+    utils = EzspUtils()
 
-    url = EZSP_URLS[ezsp_version]
-    r = requests.get(url)
+    try:
+        # try to find right speed from the list
+        for port in ports:
+            utils.connect(host, port)
+            state = utils.state()
+            if state:
+                break
+            utils.close()
+        else:
+            raise RuntimeError
 
-    resp = utils.flash(r.content)
-    _LOGGER.debug(f"EZSP after flash: {resp}")
-    return resp[0] == 0 and resp[1] == ezsp_version
+        if state == "normal":
+            if fw_ver in utils.version and not force:
+                _LOGGER.debug("No need to flash")
+                return True
+            _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
+            utils.launch_boot()
+            state = utils.state()
+
+        _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
+
+        # should be in boot
+        assert state == "boot"
+
+        r = requests.get(fw_url)
+        assert r.status_code == 200, r.status_code
+
+        assert utils.flash_and_close(r.content)
+
+        utils.connect(host, ports[0])
+        utils.reboot_and_close()
+
+        utils.connect(host, fw_port or ports[0])
+        state = utils.state()
+        _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
+        return fw_ver in utils.version
+
+    except:
+        _LOGGER.debug(f"NCP flash error: {traceback.format_exc(1)}")
+        return False
+
+    finally:
+        utils.close()
 
 
 async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
-                                 ezsp_version: int):
+                                 custom: bool):
+    """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
 
     shell = TelnetShell()
-    if not await shell.connect(host) or not await shell.login():
+    if (not await shell.connect(host) or not await shell.login()
+            or not await shell.run_zigbee_flash()):
         return False
 
-    # stop all utilities without checking if they are running
-    await shell.stop_lumi_zigbee()
-    await shell.stop_zigbee_tcp()
-    # flash on another port because running ZHA or z2m can breake process
-    await shell.run_zigbee_tcp(port=8889)
     await asyncio.sleep(.5)
 
-    return await hass.async_add_executor_job(
-        _update_zigbee_firmware, host, ezsp_version
-    )
+    args = [
+        host, [8115, 8038], NCP_URL % 'mgl03_ncp_6_7_10_b38400_sw.gbl',
+        'v6.7.10', 8038
+    ] if custom else [
+        host, [8115, 8038], NCP_URL % 'ncp-uart-sw_mgl03_6_6_2_stock.gbl',
+        'v6.6.2', 8115
+    ]
+
+    for _ in range(3):
+        if await hass.async_add_executor_job(flash_zigbee_firmware, *args):
+            return True
+    return False
 
 
 @lru_cache(maxsize=0)
