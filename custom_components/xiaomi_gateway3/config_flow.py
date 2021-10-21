@@ -32,9 +32,6 @@ OPT_DEBUG = {
     'miio': "miIO logs",
     'mqtt': "MQTT logs"
 }
-OPT_PARENT = {
-    -1: "Disabled", 0: "Manually", 60: "Hourly"
-}
 OPT_MODE = {
     False: "Mi Home",
     True: "Zigbee Home Automation (ZHA)",
@@ -253,7 +250,6 @@ class OptionsFlowHandler(OptionsFlow):
         stats = self.entry.options.get('stats', False)
         debug = self.entry.options.get('debug', [])
         buzzer = self.entry.options.get('buzzer', False)
-        parent = self.entry.options.get('parent', -1)
         zha = self.entry.options.get('zha', False)
 
         return self.async_show_form(
@@ -267,7 +263,6 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Optional('debug', default=debug):
                     cv.multi_select(OPT_DEBUG),
                 vol.Optional('buzzer', default=buzzer): bool,
-                vol.Optional('parent', default=parent): vol.In(OPT_PARENT),
                 vol.Required('zha', default=zha): vol.In(OPT_MODE),
             }),
         )
