@@ -734,13 +734,15 @@ class GatewayEntry(GatewayNetwork):
         finally:
             await sh.close()
 
+    def _time_delta(self) -> float:
+        t = shell.ntp_time(self.host)
+        return t - time.time() if t else 0
+
     async def update_time_offset(self):
-        gw_time = await asyncio.get_event_loop().run_in_executor(
-            None, shell.ntp_time, self.host
+        self.time_offset = await asyncio.get_event_loop().run_in_executor(
+            None, self._time_delta
         )
-        if gw_time:
-            self.time_offset = gw_time - time.time()
-            self.debug(f"Gateway time offset: {self.time_offset}")
+        self.debug(f"Gateway time offset: {self.time_offset}")
 
     async def lock_firmware(self, enable: bool):
         self.debug(f"Set firmware lock to {enable}")
