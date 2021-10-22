@@ -461,6 +461,10 @@ class GatewayEntry(GatewayNetwork):
         await self.process_gw_stats()
         await self.update_entities_states()
 
+        for device in list(self.devices.values()):
+            if self in device['gateways'] and device['type'] == 'zigbee':
+                await self.read_zigbee_alive(device)
+
     async def on_message(self, msg: MQTTMessage):
         try:
             topic = msg.topic
@@ -847,8 +851,11 @@ class GatewayEntry(GatewayNetwork):
                 # I do not know if the formula is correct, so battery is more
                 # important than voltage
                 payload[prop] = zigbee.fix_xiaomi_battery(param['value'])
-            elif prop == 'alive' and param['value']['status'] == 'offline':
-                device['online'] = False
+            elif prop in ('alive', 'parent'):
+                if prop == 'alive' and param['value']['status'] == 'offline':
+                    device['online'] = False
+                if device.get('stats'):
+                    await device['stats'].async_update({prop: param['value']})
             elif prop == 'angle':
                 # xiaomi cube 100 points = 360 degrees
                 payload[prop] = param['value'] * 4
@@ -980,6 +987,14 @@ class GatewayEntry(GatewayNetwork):
                 payload['params'] = params
             except StopIteration:
                 pass
+
+        self.debug(f"{device['did']} {device['model']} => {payload}")
+        await self.mqtt.publish('zigbee/recv', payload)
+
+    async def read_zigbee_alive(self, device: dict):
+        did = device['did'] if device['did'] != self.did else 'lumi.0'
+        params = [{'res_name': '8.0.2102'}]
+        payload = {'cmd': 'read', 'did': did, 'params': params}
 
         self.debug(f"{device['did']} {device['model']} => {payload}")
         await self.mqtt.publish('zigbee/recv', payload)
