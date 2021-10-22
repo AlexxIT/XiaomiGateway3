@@ -13,7 +13,7 @@ from . import bluetooth, shell, utils, zigbee
 from .helpers import DevicesRegistry
 from .mini_miio import AsyncMiIO
 from .mini_mqtt import MiniMQTT, MQTTMessage
-from .unqlite import Unqlite, SQLite
+from .unqlite import SQLite
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -553,16 +553,12 @@ class GatewayEntry(GatewayNetwork):
 
                 # read Xiaomi devices DB
                 raw = await sh.read_file(sh.zigbee_db, as_base64=True)
-                # self.debug(f"Devices RAW: {raw}")
-                if raw is None:
-                    self.debug("No zigbee database")
-                    xiaomi = {}
-                elif raw.startswith(b'unqlite'):
-                    db = Unqlite(raw)
-                    xiaomi = db.read_all()
-                else:
+                if raw:
                     raw = re.sub(br'}\s*{', b',', raw)
                     xiaomi = json.loads(raw)
+                else:
+                    self.debug("No zigbee database")
+                    xiaomi = {}
 
                 for item in lumi:
                     did = item['did']
@@ -606,7 +602,7 @@ class GatewayEntry(GatewayNetwork):
             # 3. Read bluetooth devices
             if self.ble_mode:
                 raw = await sh.read_file('/data/miio/mible_local.db',
-                                            as_base64=True)
+                                         as_base64=True)
                 try:
                     db = SQLite(raw)
 
