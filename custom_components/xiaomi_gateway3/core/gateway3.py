@@ -406,10 +406,6 @@ class GatewayEntry(GatewayNetwork):
     def zha_mode(self):
         return self.options.get('zha', False)
 
-    @property
-    def parent_scan_interval(self):
-        return self.options.get('parent', -1)
-
     def start(self):
         asyncio.create_task(self.run_forever())
 
