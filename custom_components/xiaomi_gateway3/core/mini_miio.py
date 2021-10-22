@@ -313,23 +313,6 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             _LOGGER.debug(f"{self.addr[0]} | {data}")
             return None
 
-    async def send2(self, method: str, params: Union[dict, list] = None):
-        """Send command to miIO device and get result from it. Params can be
-        dict or list depend on command.
-        """
-        if not self.device_id and not await self.ping():
-            return None
-
-        try:
-            # pack each time for new message id
-            msg_id = random.randint(100000000, 999999999)
-            raw = self._pack_raw(msg_id, method, params)
-            data = await self.send_raw(raw)
-            return json.loads(data.rstrip(b'\x00'))['result']
-        except Exception as e:
-            _LOGGER.warning(f"Can't send: {e}")
-            return None
-
     async def send_bulk(self, method: str, params: list):
         """Sends a command with a large number of parameters. Splits into
         multiple requests when the size of one request is exceeded.
