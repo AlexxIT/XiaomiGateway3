@@ -220,7 +220,8 @@ def flash_zigbee_firmware(host: str, ports: list, fw_url: str, fw_ver: str,
         _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
 
         # should be in boot
-        assert state == "boot"
+        if state != "boot":
+            return False
 
         r = requests.get(fw_url)
         assert r.status_code == 200, r.status_code
