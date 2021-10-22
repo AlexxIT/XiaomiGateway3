@@ -597,6 +597,8 @@ class GatewayEntry(GatewayNetwork):
                         'init': zigbee.fix_xiaomi_props(model, params),
                         'online': retain.get('alive', 1) == 1
                     }
+                    if 'parent' in retain:
+                        device['init']['parent'] = retain['parent']
                     devices.append(device)
 
             # 3. Read bluetooth devices

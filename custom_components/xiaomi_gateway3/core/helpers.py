@@ -138,6 +138,16 @@ class XiaomiEntity(Entity):
     def debug(self, message: str):
         self.gw.debug(f"{self.entity_id} | {message}")
 
+    def parent(self, did: str = None):
+        if not did:
+            did = self.device['init'].get('parent')
+        if did == 0:
+            return 0
+        try:
+            return self.gw.devices[did]['nwk']
+        except:
+            return None
+
     async def async_added_to_hass(self):
         """Also run when rename entity_id"""
         custom: dict = self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)

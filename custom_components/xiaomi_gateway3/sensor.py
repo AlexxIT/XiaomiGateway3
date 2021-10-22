@@ -161,7 +161,7 @@ class ZigbeeStats(XiaomiSensor):
             self._attrs = {
                 'ieee': ieee,
                 'nwk': self.device['nwk'],
-                'parent': self.device['init'].get('parent'),
+                'parent': self.parent(),
                 'msg_received': 0,
                 'msg_missed': 0,
                 'unresponsive': 0,
@@ -215,7 +215,7 @@ class ZigbeeStats(XiaomiSensor):
             self._state = now().isoformat(timespec='seconds')
 
         elif 'parent' in data:
-            self._attrs['parent'] = data['parent']
+            self._attrs['parent'] = self.parent(data['parent'])
 
         elif 'alive' in data:
             ago = timedelta(seconds=data['alive']['time'])
