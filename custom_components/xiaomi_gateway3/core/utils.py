@@ -92,37 +92,41 @@ def migrate_options(data):
 async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
-    shell = TelnetShell()
-    if await shell.connect(host) and await shell.login():
-        # 1.1. check token with telnet
-        return None if await shell.get_token() == token else 'wrong_token'
+    sh = TelnetShell()
+    try:
+        if await sh.connect(host) and await sh.login():
+            # 1.1. check token with telnet
+            return None if await sh.get_token() == token else 'wrong_token'
 
-    if not telnet_cmd:
-        return 'cant_connect'
+        if not telnet_cmd:
+            return 'cant_connect'
 
-    # 2. try connect with miio
-    miio = AsyncMiIO(host, token)
-    info = await miio.info()
-    # fw 1.4.6_0012 without cloud will respond with a blank string reply
-    if info is None:
-        # if device_id not None - device works but not answer on commands
-        return 'wrong_token' if miio.device_id else 'cant_connect'
+        # 2. try connect with miio
+        miio = AsyncMiIO(host, token)
+        info = await miio.info()
+        # fw 1.4.6_0012 without cloud will respond with a blank string reply
+        if info is None:
+            # if device_id not None - device works but not answer on commands
+            return 'wrong_token' if miio.device_id else 'cant_connect'
 
-    # 3. check if right model
-    if info and info['model'] != 'lumi.gateway.mgl03':
-        return 'wrong_model'
+        # 3. check if right model
+        if info and info['model'] != 'lumi.gateway.mgl03':
+            return 'wrong_model'
 
-    raw = json.loads(telnet_cmd)
-    # fw 1.4.6_0043+ won't answer on cmd without cloud, so don't check answer
-    await miio.send(raw['method'], raw.get('params'))
+        raw = json.loads(telnet_cmd)
+        # fw 1.4.6_0043+ won't answer on cmd without cloud, don't check answer
+        await miio.send(raw['method'], raw.get('params'))
 
-    # waiting for telnet to start
-    await asyncio.sleep(1)
+        # waiting for telnet to start
+        await asyncio.sleep(1)
 
-    if not await shell.connect(host) or not await shell.login():
-        return 'wrong_telnet'
+        if not await sh.connect(host) or not await sh.login():
+            return 'wrong_telnet'
 
-    return None
+        return None
+
+    finally:
+        await sh.close()
 
 
 async def get_lan_key(host: str, token: str):
@@ -249,10 +253,15 @@ async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
     """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
 
-    shell = TelnetShell()
-    if (not await shell.connect(host) or not await shell.login()
-            or not await shell.run_zigbee_flash()):
-        return False
+    sh = TelnetShell()
+    try:
+        if not await sh.connect(host) or not await sh.login() or \
+                not await sh.run_zigbee_flash():
+            return False
+    except:
+        pass
+    finally:
+        await sh.close()
 
     await asyncio.sleep(.5)
 

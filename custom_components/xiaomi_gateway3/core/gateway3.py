@@ -524,8 +524,8 @@ class GatewayEntry(GatewayNetwork):
 
     async def get_devices(self):
         """Load devices info for Coordinator, Zigbee and Mesh."""
+        sh = shell.TelnetShell()
         try:
-            sh = shell.TelnetShell()
             if not await sh.connect(self.host) or not await sh.login():
                 return None
 
@@ -672,13 +672,16 @@ class GatewayEntry(GatewayNetwork):
             _LOGGER.exception(f"{self.host} | Can't read devices: {e}")
             return None
 
+        finally:
+            await sh.close()
+
     async def prepare_gateway(self):
         """Launching the required utilities on the hub, if they are not already
         running.
         """
         self.debug("Prepare Gateway")
+        sh = shell.TelnetShell()
         try:
-            sh = shell.TelnetShell()
             if not await sh.connect(self.host) or not await sh.login():
                 return False
 
@@ -716,8 +719,6 @@ class GatewayEntry(GatewayNetwork):
                 _LOGGER.debug(f"Patch daemon_app.sh with {len(patches)}")
                 await sh.update_daemon_app(patches)
 
-            await sh.close()
-
             return True
 
         except (ConnectionRefusedError, socket.timeout):
@@ -726,6 +727,9 @@ class GatewayEntry(GatewayNetwork):
         except Exception as e:
             self.debug(f"Can't prepare gateway: {e}")
             return False
+
+        finally:
+            await sh.close()
 
     async def update_time_offset(self):
         gw_time = await asyncio.get_event_loop().run_in_executor(
@@ -737,18 +741,20 @@ class GatewayEntry(GatewayNetwork):
 
     async def lock_firmware(self, enable: bool):
         self.debug(f"Set firmware lock to {enable}")
+        sh = shell.TelnetShell()
         try:
-            sh = shell.TelnetShell()
             if not await sh.connect(self.host) or not await sh.login():
                 return False
             await sh.lock_firmware(enable)
             locked = await sh.check_firmware_lock()
-            await sh.close()
             return enable == locked
 
         except Exception as e:
             self.debug(f"Can't set firmware lock: {e}")
             return False
+
+        finally:
+            await sh.close()
 
     async def update_entities_states(self):
         for device in list(self.devices.values()):
