@@ -469,6 +469,9 @@ class GatewayEntry(GatewayNetwork):
         try:
             topic = msg.topic
 
+            if topic == 'broker/ping':
+                return
+
             if 'mqtt' in self.debug_mode:
                 _LOGGER.debug(f"{self.host} | MQTT | {topic} {msg.payload}")
 
