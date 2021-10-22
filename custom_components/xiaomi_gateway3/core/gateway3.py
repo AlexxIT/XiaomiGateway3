@@ -447,6 +447,7 @@ class GatewayEntry(GatewayNetwork):
             await self.on_connect()
             async for msg in self.mqtt:
                 asyncio.create_task(self.on_message(msg))
+            await self.mqtt.close()
             await self.on_disconnect()
 
         self.debug("Stop main thread")
