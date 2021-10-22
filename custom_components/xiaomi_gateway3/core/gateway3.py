@@ -706,6 +706,10 @@ class GatewayEntry(GatewayNetwork):
                 # run NTPd for sync time
                 await sh.run_ntpd()
 
+            # for development purposes
+            if 'skip_patches' in self.debug_mode:
+                return True
+
             patches = [shell.PATCH_MIIO]
             if self.ble_mode and await sh.check_bt():
                 patches.append(shell.PATCH_BLETOOTH)
