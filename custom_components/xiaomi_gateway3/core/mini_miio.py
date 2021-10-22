@@ -206,14 +206,6 @@ class AsyncSocket(DatagramProtocol):
     transport: DatagramTransport = None
     response: Future = None
 
-    @classmethod
-    async def socket(cls, addr: tuple):
-        sock = cls()
-        await asyncio.get_event_loop().create_datagram_endpoint(
-            lambda: sock, remote_addr=addr
-        )
-        return sock
-
     def __init__(self):
         self.response = asyncio.get_event_loop().create_future()
 
@@ -230,6 +222,14 @@ class AsyncSocket(DatagramProtocol):
 
     def sendto(self, data: bytes):
         self.transport.sendto(data)
+
+    def close(self):
+        self.transport.close()
+
+    async def connect(self, addr: tuple):
+        await asyncio.get_event_loop().create_datagram_endpoint(
+            lambda: self, remote_addr=addr
+        )
 
     async def recv(self, *args):
         self.response = asyncio.get_event_loop().create_future()
@@ -261,12 +261,13 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         """
         pings = 0
         for times in range(1, 4):
+            sock = AsyncSocket()
+            sock.settimeout(5)
             try:
                 # create socket every time for reset connection, because we can
                 # reseive answer on previous request or request from another
                 # thread
-                sock = await AsyncSocket.socket(self.addr)
-                sock.settimeout(5)
+                await sock.connect(self.addr)
 
                 # need device_id for send command, can get it from ping cmd
                 if self.delta_ts is None and not await self.ping(sock):
@@ -298,7 +299,8 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
             except Exception as e:
                 _LOGGER.debug(f"{self.addr[0]} | exception {e}")
-
+            finally:
+                sock.close()
         else:
             _LOGGER.warning(
                 f"{self.addr[0]} | Device offline"
