@@ -497,9 +497,6 @@ class GatewayEntry(GatewayNetwork):
             elif topic == 'log/ble':
                 await self.process_ble_event_fix(msg.json)
 
-            elif topic == 'log/z3':
-                await self.process_z3(msg.text)
-
             elif topic.endswith('/heartbeat'):
                 await self.process_gw_stats(msg.json)
 
