@@ -3,6 +3,7 @@ http://stanford-clark.com/MQTT/
 """
 import asyncio
 import json
+import random
 from asyncio import StreamReader, StreamWriter
 from typing import Optional
 
@@ -101,7 +102,8 @@ class RawMessage:
         msg.write_int(3, 1)  # protocol version
         msg.write_int(0, 1)  # flags
         msg.write_int(keep_alive, 2)  # keep alive
-        msg.write_str('hass')  # client ID
+        cid = random.randint(1000, 9999)
+        msg.write_str(f"hass-{cid}")  # client ID (should be unique)
         msg.write_header(CONNECT, qos=0)
         return msg.raw
 
