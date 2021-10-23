@@ -44,7 +44,8 @@ MD5_SER2NET = 'f27a481e54f94ea7613b461bda090b0f'
 PATCH = 'sed -r "s={1}={2}=" -i /tmp/daemon_{0}.sh'
 PATCH_MIIO = PATCH.format(
     "miio", "^ +miio_client .+$",
-    "miio_client -l 0 -o FILE_STORE -d \$MIIO_PATH -n 128 | grep ot_agent_recv_handler_one | grep 'ble_event\\\\\\|properties_changed\\\\\\|heartbeat' | mosquitto_pub -t log/miio -l \&"
+    # use awk because buffer
+    "miio_client -l 0 -o FILE_STORE -d \$MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print \$0;fflush()}' | mosquitto_pub -t log/miio -l \&"
 )
 PATCH_BLETOOTH = PATCH.format(
     "miio", "^ +silabs_ncp_bt .+$",
