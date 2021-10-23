@@ -720,16 +720,15 @@ class GatewayEntry(Thread, GatewayBLE):
                         if p[1] is not None
                     }
 
-                    ver = f"mod: {item['model_ver']} hw: {item['hardVer']} " \
-                          f"fw: {item['appVer']}"
-
                     device = {
                         'did': did,
                         'mac': item['mac'],  # 0xff without leading zeroes
                         'nwk': item['shortId'],  # 0xffff
                         'model': model,
                         'type': 'zigbee',
-                        'fw_ver': ver,
+                        'fw_ver': item['appVer'],
+                        'hw_ver': item['hardVer'],
+                        'mod_ver': item['model_ver'],
                         'init': zigbee.fix_xiaomi_props(model, params),
                         'online': retain.get('alive', 1) == 1
                     }
@@ -1046,6 +1045,7 @@ class GatewayEntry(Thread, GatewayBLE):
             device['mac'] = '0x' + device['mac']
             device['type'] = 'zigbee'
             device['init'] = payload
+            device['fw_ver'] = 0
             self.setup_devices([device])
 
         # return for tests purpose

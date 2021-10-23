@@ -205,7 +205,7 @@ class XiaomiEntity(Entity):
                 'manufacturer': self.device.get('device_manufacturer'),
                 'model': self.device['device_model'],
                 'name': self.device['device_name'],
-                'sw_version': self.device.get('fw_ver'),
+                'sw_version': self.device['fw_ver'],
                 'via_device': (DOMAIN, self.gw.device['mac'])
             }
         else:  # ble and mesh
