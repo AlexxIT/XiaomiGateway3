@@ -18,6 +18,7 @@ from .unqlite import SQLite
 _LOGGER = logging.getLogger(__name__)
 
 RE_NWK_KEY = re.compile(r'lumi send-nwk-key (0x.+?) {(.+?)}')
+RE_SERIAL = re.compile(r'(tx|rx|oe|fe|brk):(\d+)')
 
 TELNET_CMD = '{"method":"enable_telnet_service","params":""}'
 
@@ -201,8 +202,7 @@ class GatewayStats(GatewayMesh):
         # empty payload - update available state
         self.debug(f"gateway <= {payload or self.available}")
 
-        device = self.devices.get(self.did)
-        if not device or not device.get('stats'):
+        if not self.device.get('stats'):
             return
 
         if payload:
@@ -225,7 +225,7 @@ class GatewayStats(GatewayMesh):
                     'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
                 }
 
-        await device['stats'].async_update(payload)
+        await self.device['stats'].async_update(payload)
 
     async def process_zb_stats(self, payload: dict):
         # convert ieee to did
@@ -436,6 +436,7 @@ class GatewayEntry(GatewayNetwork):
 
                 self.setup_devices(devices)
                 await self.update_time_offset()
+                await self.update_serial_stats()
                 self.mesh_start()
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
@@ -496,6 +497,7 @@ class GatewayEntry(GatewayNetwork):
                         await self.process_gw_stats(payload)
                         # time offset may changed right after gw.heartbeat
                         await self.update_time_offset()
+                        await self.update_serial_stats()
 
             elif topic == 'log/ble':
                 await self.process_ble_event_fix(msg.json)
@@ -761,6 +763,25 @@ class GatewayEntry(GatewayNetwork):
         except Exception as e:
             self.debug(f"Can't set firmware lock: {e}")
             return False
+
+        finally:
+            await sh.close()
+
+    async def update_serial_stats(self):
+        if not self.device.get('stats'):
+            return
+
+        sh = shell.TelnetShell()
+        try:
+            if not await sh.connect(self.host):
+                return
+            serial = await sh.read_file('/proc/tty/driver/serial')
+            lines = serial.decode().split('\n')
+            stats = {
+                s: {k: int(v) for k, v in RE_SERIAL.findall(lines[i])}
+                for i, s in enumerate(('bluetooth', 'zigbee'), 2)
+            }
+            await self.process_gw_stats(stats)
 
         finally:
             await sh.close()
