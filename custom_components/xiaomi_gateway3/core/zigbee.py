@@ -657,15 +657,6 @@ def get_buttons(device_model: str):
     return None
 
 
-def get_fw_ver(device: dict) -> int:
-    try:
-        # mod: 21 hw: 0 fw: 21
-        _, fw = device['fw_ver'].rsplit(' ', 1)
-        return int(fw)
-    except:
-        return 0
-
-
 async def get_ota_link(hass: HomeAssistantType, device: dict) -> Optional[str]:
     model = device['model']
     if RE_ZIGBEE_MODEL_TAIL.search(model):
@@ -674,7 +665,7 @@ async def get_ota_link(hass: HomeAssistantType, device: dict) -> Optional[str]:
     url = "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/"
 
     # Xiaomi Plug should be updated to fw 30 before updating to latest fw
-    if model == 'lumi.plug' and get_fw_ver(device) < 30:
+    if model == 'lumi.plug' and 0 < device['fw_ver'] < 30:
         # waiting pull request https://github.com/Koenkk/zigbee-OTA/pull/49
         return url.replace('Koenkk', 'AlexxIT') + \
                'images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota'
