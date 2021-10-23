@@ -182,11 +182,11 @@ class TelnetShell:
         ]
         return all(locked)
 
-    def lock_firmware(self, enable: bool):
-        if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
+    async def lock_firmware(self, enable: bool):
+        if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
             command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
             for path in FIRMWARE_PATHS:
-                self.exec(command + path)
+                await self.exec(command + path)
 
     def run_ftp(self):
         if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
