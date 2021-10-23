@@ -94,7 +94,7 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
     # 1. try connect with telnet (custom firmware)?
     sh = TelnetShell()
     try:
-        if await sh.connect(host) and await sh.login():
+        if await sh.connect(host):
             # 1.1. check token with telnet
             return None if await sh.get_token() == token else 'wrong_token'
 
@@ -120,7 +120,7 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         # waiting for telnet to start
         await asyncio.sleep(1)
 
-        if not await sh.connect(host) or not await sh.login():
+        if not await sh.connect(host):
             return 'wrong_telnet'
 
         return None
@@ -255,8 +255,7 @@ async def update_zigbee_firmware(hass: HomeAssistantType, host: str,
 
     sh = TelnetShell()
     try:
-        if not await sh.connect(host) or not await sh.login() or \
-                not await sh.run_zigbee_flash():
+        if not await sh.connect(host) or not await sh.run_zigbee_flash():
             return False
     except:
         pass

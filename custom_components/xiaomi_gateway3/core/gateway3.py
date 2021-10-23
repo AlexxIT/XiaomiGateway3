@@ -527,7 +527,7 @@ class GatewayEntry(GatewayNetwork):
         """Load devices info for Coordinator, Zigbee and Mesh."""
         sh = shell.TelnetShell()
         try:
-            if not await sh.connect(self.host) or not await sh.login():
+            if not await sh.connect(self.host):
                 return None
 
             # 1. Read coordinator info
@@ -685,7 +685,7 @@ class GatewayEntry(GatewayNetwork):
         self.debug("Prepare Gateway")
         sh = shell.TelnetShell()
         try:
-            if not await sh.connect(self.host) or not await sh.login():
+            if not await sh.connect(self.host):
                 return False
 
             if sh.ver < '1.4.7_0000':
@@ -752,7 +752,7 @@ class GatewayEntry(GatewayNetwork):
         self.debug(f"Set firmware lock to {enable}")
         sh = shell.TelnetShell()
         try:
-            if not await sh.connect(self.host) or not await sh.login():
+            if not await sh.connect(self.host):
                 return False
             await sh.lock_firmware(enable)
             locked = await sh.check_firmware_lock()
@@ -1015,7 +1015,7 @@ class GatewayEntry(GatewayNetwork):
 
     async def send_telnet(self, *args: str):
         sh = shell.TelnetShell()
-        if not await sh.connect(self.host) or not await sh.login():
+        if not await sh.connect(self.host):
             return
 
         for command in args:

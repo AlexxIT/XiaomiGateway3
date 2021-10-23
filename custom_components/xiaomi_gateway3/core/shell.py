@@ -73,16 +73,7 @@ class TelnetShell:
         try:
             coro = asyncio.open_connection(host, port, limit=1_000_000)
             self.reader, self.writer = await asyncio.wait_for(coro, 5)
-            return True
-        except:
-            return False
 
-    async def close(self):
-        self.writer.close()
-        await self.writer.wait_closed()
-
-    async def login(self) -> bool:
-        try:
             coro = self.reader.readuntil(b"login: ")
             await asyncio.wait_for(coro, 3)
 
@@ -98,6 +89,10 @@ class TelnetShell:
             return True
         except:
             return False
+
+    async def close(self):
+        self.writer.close()
+        await self.writer.wait_closed()
 
     async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
