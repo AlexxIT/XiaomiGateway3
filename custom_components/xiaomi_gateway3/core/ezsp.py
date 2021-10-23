@@ -4,7 +4,6 @@ import socket
 import time
 from typing import Optional
 
-from xmodem import XMODEM
 from ..util.elelabs_ezsp_utility import EzspProtocolInterface
 
 _LOGGER = logging.getLogger(__name__)
@@ -123,6 +122,7 @@ class EzspUtils:
         if not success:
             return False
 
+        from xmodem import XMODEM
         modem = XMODEM(getc, putc)
         modem.log = _LOGGER.getChild('xmodem')
         stream = io.BytesIO(file)
