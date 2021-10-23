@@ -577,7 +577,7 @@ def get_device(zigbee_model: str) -> Optional[dict]:
             return {
                 # 'model': zigbee_model,
                 'device_manufacturer': desc[0],
-                'device_name': desc[0] + ' ' + desc[1],
+                'device_name': f"{desc[0]} {desc[1]}",
                 'device_model': (
                     zigbee_model + ' ' + desc[2]
                     if len(desc) > 2 else zigbee_model
