@@ -595,11 +595,11 @@ class GatewayEntry(GatewayNetwork):
                         'fw_ver': item['appVer'],
                         'hw_ver': item['hardVer'],
                         'mod_ver': item['model_ver'],
-                        'init': zigbee.fix_xiaomi_props(model, params),
+                        'init': {
+                            **retain, **zigbee.fix_xiaomi_props(model, params)
+                        },
                         'online': retain.get('alive', 1) == 1
                     }
-                    if 'parent' in retain:
-                        device['init']['parent'] = retain['parent']
                     devices.append(device)
 
             # 3. Read bluetooth devices
@@ -893,7 +893,7 @@ class GatewayEntry(GatewayNetwork):
                 # I do not know if the formula is correct, so battery is more
                 # important than voltage
                 payload[prop] = zigbee.fix_xiaomi_battery(param['value'])
-            elif prop in ('alive', 'parent'):
+            elif prop in ('alive', 'parent', 'reset_cnt'):
                 if prop == 'alive' and param['value']['status'] == 'offline':
                     device['online'] = False
                 if device.get('stats'):

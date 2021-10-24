@@ -141,6 +141,7 @@ class GatewayStats(XiaomiSensor):
 class ZigbeeStats(XiaomiSensor):
     last_seq1 = None
     last_seq2 = None
+    last_rst = None
 
     @property
     def state(self):
@@ -167,6 +168,7 @@ class ZigbeeStats(XiaomiSensor):
                 'unresponsive': 0,
                 'last_missed': 0,
             }
+            self.last_rst = self.device['init'].get('reset_cnt')
             self.render_attributes_template()
 
         self.gw.set_stats(self)
@@ -194,7 +196,8 @@ class ZigbeeStats(XiaomiSensor):
                 raw = data['APSPlayload']
                 manufact_spec = int(raw[2:4], 16) & 4
                 new_seq2 = int(raw[8:10] if manufact_spec else raw[4:6], 16)
-                if self.last_seq1 is not None:
+                # new_seq2 == 0 -> probably device reset
+                if self.last_seq1 is not None and new_seq2 != 0:
                     miss = min(
                         (new_seq1 - self.last_seq1 - 1) & 0xFF,
                         (new_seq2 - self.last_seq2 - 1) & 0xFF
@@ -220,6 +223,12 @@ class ZigbeeStats(XiaomiSensor):
         elif 'alive' in data:
             ago = timedelta(seconds=data['alive']['time'])
             self._state = (now() - ago).isoformat(timespec='seconds')
+
+        elif 'reset_cnt' in data:
+            self._attrs.setdefault('reset_cnt', 0)
+            if self.last_rst is not None:
+                self._attrs['reset_cnt'] += data['reset_cnt'] - self.last_rst
+            self.last_rst = data['reset_cnt']
 
         elif data.get('deviceState') == 17:
             self._attrs['unresponsive'] += 1
