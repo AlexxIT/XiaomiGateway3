@@ -945,7 +945,9 @@ class GatewayEntry(GatewayNetwork):
             device['mac'] = '0x' + device['mac']
             device['type'] = 'zigbee'
             device['init'] = payload
+            device['nwk'] = '0xffff'
             device['fw_ver'] = 0
+            device['online'] = True
             self.setup_devices([device])
 
         # return for tests purpose
