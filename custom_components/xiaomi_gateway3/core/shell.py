@@ -63,6 +63,13 @@ PATCH_ZIGBEE_TCP = PATCH2.format(
     "/data/ser2net -C '8888:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT XONXOFF'"
 )
 
+PATCH_BLUETOOTH_TMP = PATCH.format(
+    "miio", "^ +silabs_ncp_bt ", "/tmp/silabs_ncp_bt "
+)
+PATCH_ZIGBEE_TMP = PATCH.format(
+    "app", "^ +zigbee_gw ", "zigbee_gw -s /tmp/zigbee_gw/ "
+)
+
 
 class TelnetShell:
     reader: StreamReader = None
@@ -125,7 +132,8 @@ class TelnetShell:
 
     async def update_daemon_app(self, patches: list):
         await self.exec("killall daemon_app.sh")
-        await self.exec("killall Lumi_Z3GatewayHost_MQTT ser2net socat")
+        await self.exec(
+            "killall Lumi_Z3GatewayHost_MQTT ser2net socat zigbee_gw")
 
         if not patches:
             await self.exec(f"daemon_app.sh &")
@@ -196,6 +204,14 @@ class TelnetShell:
         return await self.check_bin(
             'silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt'
         )
+
+    async def patch_tmp(self):
+        resp = await self.exec("ls /tmp/silabs_ncp_bt")
+        if resp.startswith('/tmp/'):
+            return
+        await self.exec("cp -R /data/miio /data/zigbee_gw /tmp")
+        await self.exec("cp /bin/silabs_ncp_bt /tmp")
+        await self.exec("sed -r 's=/data/=/tmp//=g' -i /tmp/silabs_ncp_bt")
 
     async def run_public_mosquitto(self):
         await self.exec("killall mosquitto")

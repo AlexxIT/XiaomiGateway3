@@ -711,21 +711,29 @@ class GatewayEntry(GatewayNetwork):
             if 'skip_patches' in self.debug_mode:
                 return True
 
-            patches = [shell.PATCH_MIIO]
+            mpatches = [shell.PATCH_MIIO]
             if self.ble_mode and await sh.check_bt():
-                patches.append(shell.PATCH_BLETOOTH)
+                mpatches.append(shell.PATCH_BLETOOTH)
             if self.options.get('buzzer'):
-                patches.append(shell.PATCH_BUZZER)
-            if sh.miio_ps(patches) not in ps:
-                _LOGGER.debug(f"Patch daemon_miio.sh with {len(patches)}")
-                await sh.update_daemon_miio(patches)
+                mpatches.append(shell.PATCH_BUZZER)
 
-            patches = [shell.PATCH_ZIGBEE_TCP] \
+            apatches = [shell.PATCH_ZIGBEE_TCP] \
                 if self.zha_mode and await sh.check_zigbee_tcp() \
                 else []
-            if sh.app_ps(patches) not in ps:
-                _LOGGER.debug(f"Patch daemon_app.sh with {len(patches)}")
-                await sh.update_daemon_app(patches)
+
+            if 'patch_tmp' in self.debug_mode:
+                await sh.patch_tmp()
+                if shell.PATCH_BLETOOTH in mpatches:
+                    mpatches.remove(shell.PATCH_BLETOOTH)
+                mpatches.append(shell.PATCH_BLUETOOTH_TMP)
+                apatches.append(shell.PATCH_ZIGBEE_TMP)
+
+            if sh.miio_ps(mpatches) not in ps:
+                _LOGGER.debug(f"Patch daemon_miio.sh with {len(mpatches)}")
+                await sh.update_daemon_miio(mpatches)
+            if sh.app_ps(apatches) not in ps:
+                _LOGGER.debug(f"Patch daemon_app.sh with {len(apatches)}")
+                await sh.update_daemon_app(apatches)
 
             return True
 
