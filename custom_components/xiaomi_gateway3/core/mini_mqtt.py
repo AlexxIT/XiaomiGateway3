@@ -231,8 +231,9 @@ class MiniMQTT:
         return msg
 
     async def close(self):
-        self.writer.close()
-        await self.writer.wait_closed()
+        if self.writer:
+            self.writer.close()
+            await self.writer.wait_closed()
 
     def __aiter__(self):
         return self

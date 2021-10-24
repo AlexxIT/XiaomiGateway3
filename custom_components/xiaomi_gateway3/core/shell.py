@@ -99,8 +99,9 @@ class TelnetShell:
             return False
 
     async def close(self):
-        self.writer.close()
-        await self.writer.wait_closed()
+        if self.writer:
+            self.writer.close()
+            await self.writer.wait_closed()
 
     async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
