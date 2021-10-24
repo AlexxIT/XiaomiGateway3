@@ -296,7 +296,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
 
                 _LOGGER.debug(f"{self.addr[0]} | wrong ID")
 
-            except socket.timeout:
+            except asyncio.TimeoutError:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
             except:
                 _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
