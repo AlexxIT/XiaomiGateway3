@@ -739,6 +739,7 @@ class GatewayEntry(GatewayNetwork):
                     _LOGGER.debug("Init Zigbee in memory storage")
                     apatches += [shell.PATCH_MEMORY_ZIGBEE1,
                                  shell.PATCH_MEMORY_ZIGBEE2]
+                await sh.exec(shell.SAVE_SERIAL_STATS)
 
             if sh.miio_ps(mpatches) not in ps:
                 _LOGGER.debug(f"Patch daemon_miio.sh with {len(mpatches)}")

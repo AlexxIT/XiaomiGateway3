@@ -68,6 +68,8 @@ PATCH_MEMORY_ZIGBEE1 = "[ -d /tmp/zigbee_gw ] || cp -R /data/zigbee_gw /tmp"
 PATCH_MEMORY_ZIGBEE2 = PATCH1.format(
     "app", "^ +zigbee_gw", "zigbee_gw -s /tmp/zigbee_gw/"
 )
+# just for statistics
+SAVE_SERIAL_STATS = "[ -f /tmp/serial ] || cp /proc/tty/driver/serial /tmp"
 
 # if [ ! -e /tmp/bt_dont_need_startup ]; then
 PATCH_DISABLE_BLUETOOTH = PATCH1.format(
