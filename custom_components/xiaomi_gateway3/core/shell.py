@@ -41,34 +41,40 @@ MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 MD5_SER2NET = 'f27a481e54f94ea7613b461bda090b0f'
 
 # sed with extended regex and edit file in-place
-PATCH = 'sed -r "s={1}={2}=" -i /tmp/daemon_{0}.sh'
-PATCH_MIIO = PATCH.format(
+PATCH1 = 'sed -r "s={1}={2}=g" -i /tmp/daemon_{0}.sh'
+PATCH2 = 'sed -r "s={1}={2}=; s={3}={4}=" -i /tmp/daemon_{0}.sh'
+
+# use awk because buffer
+PATCH_MIIO_MQTT = PATCH1.format(
     "miio", "^ +miio_client .+$",
-    # use awk because buffer
     "miio_client -l 0 -o FILE_STORE -d \$MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print \$0;fflush()}' | mosquitto_pub -t log/miio -l \&"
 )
-PATCH_BLETOOTH = PATCH.format(
+PATCH_BLETOOTH_MQTT = PATCH1.format(
     "miio", "^ +silabs_ncp_bt .+$",
     "/data/silabs_ncp_bt /dev/ttyS1 \$RESTORE 2>\&1 >/dev/null | mosquitto_pub -t log/ble -l \&"
 )
-PATCH_BUZZER = PATCH.format(
-    "miio", "^ +if.+grep basic_gw.+$", "if false; then"
-)
 
-PATCH2 = 'sed -r "s={1}={2}=; s={3}={4}=" -i /tmp/daemon_{0}.sh'
-# we need to set port when apply this patch: PATCH_ZIGBEE_TCP % 8888
 PATCH_ZIGBEE_TCP = PATCH2.format(
     "app", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net",
     "^ +Lumi_Z3GatewayHost_MQTT .+$",
     "/data/ser2net -C '8888:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT XONXOFF'"
 )
 
-PATCH_BLUETOOTH_TMP = PATCH.format(
-    "miio", "^ +silabs_ncp_bt ", "/tmp/silabs_ncp_bt "
+PATCH_MEMORY_BLUETOOTH1 = "[ -d /tmp/miio ] || (cp -R /data/miio /tmp && cp /data/silabs_ncp_bt /tmp && sed -r 's=/data/=/tmp//=g' -i /tmp/silabs_ncp_bt)"
+PATCH_MEMORY_BLUETOOTH2 = PATCH1.format(
+    "miio", "^/data/silabs_ncp_bt", "/tmp/silabs_ncp_bt"
 )
-PATCH_ZIGBEE_TMP = PATCH.format(
-    "app", "^ +zigbee_gw ", "zigbee_gw -s /tmp/zigbee_gw/ "
+PATCH_MEMORY_ZIGBEE1 = "[ -d /tmp/zigbee_gw ] || cp -R /data/zigbee_gw /tmp"
+PATCH_MEMORY_ZIGBEE2 = PATCH1.format(
+    "app", "^ +zigbee_gw", "zigbee_gw -s /tmp/zigbee_gw/"
 )
+
+# if [ ! -e /tmp/bt_dont_need_startup ]; then
+PATCH_DISABLE_BLUETOOTH = PATCH1.format(
+    "miio", "^ +if.+bt_dont_need_startup.+$", "if false; then"
+)
+PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
+PATCH_DISABLE_BUZZER2 = PATCH1.format("miio", "^ +basic_gw", "/tmp/basic_gw")
 
 
 class TelnetShell:
@@ -140,8 +146,7 @@ class TelnetShell:
             await self.exec(f"daemon_app.sh &")
             return
 
-        await self.exec(
-            "cp /bin/daemon_app.sh /tmp/daemon_app.sh && chmod +x /tmp/daemon_app.sh")
+        await self.exec("cp /bin/daemon_app.sh /tmp")
         for patch in patches:
             await self.exec(patch)
 
@@ -159,8 +164,7 @@ class TelnetShell:
             await self.exec(f"daemon_miio.sh &")
             return
 
-        await self.exec(
-            "cp /bin/daemon_miio.sh /tmp/daemon_miio.sh && chmod +x /tmp/daemon_miio.sh")
+        await self.exec("cp /bin/daemon_miio.sh /tmp")
         for patch in patches:
             await self.exec(patch)
 
@@ -205,14 +209,6 @@ class TelnetShell:
         return await self.check_bin(
             'silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt'
         )
-
-    async def patch_tmp(self):
-        resp = await self.exec("ls /tmp/silabs_ncp_bt")
-        if resp.startswith('/tmp/'):
-            return
-        await self.exec("cp -R /data/miio /data/zigbee_gw /tmp")
-        await self.exec("cp /bin/silabs_ncp_bt /tmp")
-        await self.exec("sed -r 's=/data/=/tmp//=g' -i /tmp/silabs_ncp_bt")
 
     async def run_public_mosquitto(self):
         await self.exec("killall mosquitto")

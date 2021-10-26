@@ -49,14 +49,14 @@
           "host": "Host",
           "token": "Token",
           "telnet_cmd": "Open Telnet command",
-          "ble": "Support BLE Devices",
-          "stats": "Zigbee and BLE performance data",
+          "ble": "Support Bluetooth devices",
+          "stats": "Add statistic sensors",
           "debug": "Debug",
-          "buzzer": "Disable buzzer [PRO]",
-          "parent": "Parent devices in stats [PRO]",
-          "zha": "Mode [PRO]"
+          "buzzer": "Disable buzzer [ADV]",
+          "memory": "Use storage in memory [ADV]",
+          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
         },
-        "description": "Change **PRO** options ONLY if you know what you doing"
+        "description": "Change **ADV** options ONLY if you know what you doing"
       }
     }
   },

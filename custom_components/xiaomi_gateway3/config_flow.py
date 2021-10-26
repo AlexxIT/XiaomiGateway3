@@ -29,12 +29,7 @@ SERVERS = {
 
 OPT_DEBUG = {
     'true': "Basic logs",
-    'miio': "miIO logs",
     'mqtt': "MQTT logs"
-}
-OPT_MODE = {
-    False: "Mi Home",
-    True: "ZHA or zigbee2mqtt",
 }
 
 
@@ -245,6 +240,7 @@ class OptionsFlowHandler(OptionsFlow):
         stats = self.entry.options.get('stats', False)
         debug = self.entry.options.get('debug', [])
         buzzer = self.entry.options.get('buzzer', False)
+        memory = self.entry.options.get('memory', False)
         zha = self.entry.options.get('zha', False)
 
         return self.async_show_form(
@@ -258,6 +254,7 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Optional('debug', default=debug):
                     cv.multi_select(OPT_DEBUG),
                 vol.Optional('buzzer', default=buzzer): bool,
-                vol.Required('zha', default=zha): vol.In(OPT_MODE),
+                vol.Optional('memory', default=memory): bool,
+                vol.Optional('zha', default=zha): bool,
             }),
         )

@@ -711,22 +711,34 @@ class GatewayEntry(GatewayNetwork):
             if 'skip_patches' in self.debug_mode:
                 return True
 
-            mpatches = [shell.PATCH_MIIO]
+            mpatches = [shell.PATCH_MIIO_MQTT]
+            apatches = []
+
+            if self.zha_mode and await sh.check_zigbee_tcp():
+                _LOGGER.debug("Init ZHA or z2m mode")
+                apatches.append(shell.PATCH_ZIGBEE_TCP)
+
             if self.ble_mode and await sh.check_bt():
-                mpatches.append(shell.PATCH_BLETOOTH)
+                _LOGGER.debug("Patch Bluetooth")
+                mpatches.append(shell.PATCH_BLETOOTH_MQTT)
+
             if self.options.get('buzzer'):
-                mpatches.append(shell.PATCH_BUZZER)
+                _LOGGER.debug("Disable Buzzer")
+                mpatches += [shell.PATCH_DISABLE_BUZZER1,
+                             shell.PATCH_DISABLE_BUZZER2]
 
-            apatches = [shell.PATCH_ZIGBEE_TCP] \
-                if self.zha_mode and await sh.check_zigbee_tcp() \
-                else []
-
-            if 'patch_tmp' in self.debug_mode:
-                await sh.patch_tmp()
-                if shell.PATCH_BLETOOTH in mpatches:
-                    mpatches.remove(shell.PATCH_BLETOOTH)
-                mpatches.append(shell.PATCH_BLUETOOTH_TMP)
-                apatches.append(shell.PATCH_ZIGBEE_TMP)
+            if self.options.get('memory'):
+                if shell.PATCH_BLETOOTH_MQTT in mpatches:
+                    _LOGGER.debug("Init Bluetooth in memory storage")
+                    mpatches += [shell.PATCH_MEMORY_BLUETOOTH1,
+                                 shell.PATCH_MEMORY_BLUETOOTH2]
+                else:
+                    _LOGGER.debug("Disable Bluetooth")
+                    mpatches.append(shell.PATCH_DISABLE_BLUETOOTH)
+                if shell.PATCH_ZIGBEE_TCP not in apatches:
+                    _LOGGER.debug("Init Zigbee in memory storage")
+                    apatches += [shell.PATCH_MEMORY_ZIGBEE1,
+                                 shell.PATCH_MEMORY_ZIGBEE2]
 
             if sh.miio_ps(mpatches) not in ps:
                 _LOGGER.debug(f"Patch daemon_miio.sh with {len(mpatches)}")
