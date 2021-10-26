@@ -16,13 +16,13 @@ _LOGGER = logging.getLogger(__name__)
 # original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
 WGET = "(wget http://master.dl.sourceforge.net/project/mgl03/{0}?viasf=1 -O /data/{1} && chmod +x /data/{1})"
 
-LOCK_FIRMWARE = "/data/busybox chattr +i "
-UNLOCK_FIRMWARE = "/data/busybox chattr -i "
+CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"
+LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bin && /data/busybox chattr +i /data/firmware/firmware_ota.bin"
+UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware/firmware_ota.bin"
+
 RUN_FTP = "/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &"
 # flash on another ports because running ZHA or z2m can breake process
 RUN_ZIGBEE_FLASH = "/data/ser2net -C '8115:raw:60:/dev/ttyS2:115200 8DATABITS NONE 1STOPBIT' -C '8038:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT'"
-
-FIRMWARE_PATHS = ('/data/firmware.bin', '/data/firmware/firmware_ota.bin')
 
 TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
@@ -184,18 +184,13 @@ class TelnetShell:
 
     async def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
-        await self.exec("mkdir -p /data/firmware")
-        locked = [
-            "Permission denied" in await self.exec("touch " + path)
-            for path in FIRMWARE_PATHS
-        ]
-        return all(locked)
+        resp = await self.exec(CHECK_FIRMWARE)
+        return '-i-' in resp
 
     async def lock_firmware(self, enable: bool):
         if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
             command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
-            for path in FIRMWARE_PATHS:
-                await self.exec(command + path)
+            await self.exec(command)
 
     def run_ftp(self):
         if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
