@@ -425,7 +425,9 @@ class GatewayEntry(GatewayNetwork):
         task = asyncio.create_task(self.run_forever())
         self.tasks.append(task)
 
-    async def stop(self):
+    async def stop(self, *args):
+        self.debug("Stop all tasks")
+
         for task in self.tasks:
             task.cancel()
 
