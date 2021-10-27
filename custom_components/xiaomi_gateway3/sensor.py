@@ -133,6 +133,26 @@ class GatewayStats(XiaomiSensor):
             self._state = now().isoformat(timespec='seconds') \
                 if self.gw.available else None
         else:
+            if 'networkUp' in data:
+                # {"networkUp":false}
+                data = {
+                    'network_pan_id': data.get('networkPanId'),
+                    'radio_tx_power': data.get('radioTxPower'),
+                    'radio_channel': data.get('radioChannel'),
+                }
+            elif 'free_mem' in data:
+                s = data['run_time']
+                d = s // (3600 * 24)
+                h = s % (3600 * 24) // 3600
+                m = s % 3600 // 60
+                s = s % 60
+                data = {
+                    'free_mem': data['free_mem'],
+                    'load_avg': data['load_avg'],
+                    'rssi': -data['rssi'],
+                    'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
+                }
+
             self._attrs.update(data)
 
         self.async_write_ha_state()

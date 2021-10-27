@@ -202,31 +202,8 @@ class GatewayStats(GatewayMesh):
     async def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
         self.debug(f"gateway <= {payload or self.available}")
-
-        if not self.device.get('stats'):
-            return
-
-        if payload:
-            if 'networkUp' in payload:
-                # {"networkUp":false}
-                payload = {
-                    'network_pan_id': payload.get('networkPanId'),
-                    'radio_tx_power': payload.get('radioTxPower'),
-                    'radio_channel': payload.get('radioChannel'),
-                }
-            elif 'free_mem' in payload:
-                s = payload['run_time']
-                d, h, m, s = (s // (3600 * 24), s % (3600 * 24) // 3600,
-                              s % 3600 // 60, s % 60)
-
-                payload = {
-                    'free_mem': payload['free_mem'],
-                    'load_avg': payload['load_avg'],
-                    'rssi': -payload['rssi'],
-                    'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
-                }
-
-        await self.device['stats'].async_update(payload)
+        if self.device.get('stats'):
+            await self.device['stats'].async_update(payload)
 
     async def process_zb_stats(self, payload: dict):
         # convert ieee to did
