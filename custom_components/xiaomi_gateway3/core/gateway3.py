@@ -359,13 +359,11 @@ class GatewayNetwork(GatewayBLE):
     def telnet_cmd(self):
         return self.options.get('telnet_cmd') or TELNET_CMD
 
-    def check_port(self, port: int):
+    async def check_port(self, port: int):
         """Check if gateway port open."""
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            return s.connect_ex((self.host, port)) == 0
-        finally:
-            s.close()
+        return await asyncio.get_event_loop().run_in_executor(
+            None, shell.check_port, self.host, port
+        )
 
     async def enable_telnet(self):
         """Enable telnet with miio protocol."""
@@ -434,7 +432,7 @@ class GatewayEntry(GatewayNetwork):
         """Main thread loop."""
         while True:
             # if not telnet - enable it
-            if not self.check_port(23) and \
+            if not await self.check_port(23) and \
                     not await self.enable_telnet():
                 await asyncio.sleep(30)
                 continue

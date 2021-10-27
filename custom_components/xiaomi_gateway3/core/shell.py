@@ -3,8 +3,8 @@ import base64
 import hashlib
 import logging
 import re
+import socket
 from asyncio import StreamReader, StreamWriter
-from socket import socket, AF_INET, SOCK_DGRAM
 from typing import Union
 
 _LOGGER = logging.getLogger(__name__)
@@ -326,16 +326,26 @@ NTP_QUERY = b'\x1b' + 47 * b'\0'
 
 def ntp_time(host: str) -> float:
     """Return server send time"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(2)
     try:
-        sock = socket(AF_INET, SOCK_DGRAM)
-        sock.settimeout(2)
-
         sock.sendto(NTP_QUERY, (host, 123))
         raw = sock.recv(1024)
 
         integ = int.from_bytes(raw[-8:-4], 'big')
         fract = int.from_bytes(raw[-4:], 'big')
         return integ + float(fract) / 2 ** 32 - NTP_DELTA
-
     except:
         return 0
+    finally:
+        sock.close()
+
+
+def check_port(host: str, port: int):
+    """Check if gateway port open."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
+    try:
+        return s.connect_ex((host, port)) == 0
+    finally:
+        s.close()
