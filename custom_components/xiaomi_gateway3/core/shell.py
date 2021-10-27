@@ -172,7 +172,7 @@ class TelnetShell:
         with patches hash in process list.
         """
         await self.exec("killall daemon_miio.sh")
-        await self.exec("killall miio_client silabs_ncp_bt")
+        await self.exec("killall miio_client silabs_ncp_bt mosquitto_pub")
         await self.exec("killall -9 basic_gw")
 
         if not patches:
