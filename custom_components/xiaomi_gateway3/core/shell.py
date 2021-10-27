@@ -113,6 +113,8 @@ PATCH_DISABLE_BLUETOOTH = sed(
 PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
 PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw", 'g')
 
+SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|cut -d' ' -f1`" ] && cp /tmp/{0} /data/{0}"""
+
 
 class TelnetShell:
     reader: StreamReader = None
@@ -219,6 +221,16 @@ class TelnetShell:
             await self.exec(patch)
 
         await self.exec(f"/tmp/daemon_miio.sh {self.miio_ps(patches)} &")
+
+    async def memory_sync(self):
+        resp = await self.exec(
+            "ls --color=never /tmp/miio/mible_local.db /tmp/zigbee_gw/*"
+        )
+        for file in resp.split('\r\n'):
+            if not file.startswith('/tmp/'):
+                continue
+            command = SYNC_MEMORY_FILE.format(file[5:])
+            await self.exec(command)
 
     @staticmethod
     def app_ps(patches: list):

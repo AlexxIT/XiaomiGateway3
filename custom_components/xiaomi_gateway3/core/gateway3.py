@@ -375,6 +375,14 @@ class GatewayNetwork(GatewayBLE):
             return False
         return True
 
+    async def memory_sync(self):
+        sh = shell.TelnetShell()
+        try:
+            if await sh.connect(self.host):
+                await sh.memory_sync()
+        finally:
+            await sh.close()
+
 
 # noinspection PyUnusedLocal
 class GatewayEntry(GatewayNetwork):

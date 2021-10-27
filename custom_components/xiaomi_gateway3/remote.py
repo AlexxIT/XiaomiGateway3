@@ -98,8 +98,8 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 await self.gw.send_zigbee(self.device, {'channel': channel})
             elif cmd == 'publishstate':
                 await self.gw.send_mqtt('publishstate')
-            elif cmd == 'info':
-                await self.gw.get_gateway_info()
+            elif cmd == 'memsync':
+                await self.gw.memory_sync()
             elif cmd == 'ota':
                 did: str = 'lumi.' + kwargs[ATTR_DEVICE]
                 if did not in self.gw.devices:
