@@ -355,6 +355,8 @@ class GatewayBLE(GatewayStats):
 
 
 class GatewayNetwork(GatewayBLE):
+    time_offset = 0
+
     @property
     def telnet_cmd(self):
         return self.options.get('telnet_cmd') or TELNET_CMD
@@ -373,6 +375,35 @@ class GatewayNetwork(GatewayBLE):
             return False
         return True
 
+    def _time_delta(self) -> float:
+        t = shell.ntp_time(self.host)
+        return t - time.time() if t else 0
+
+    async def update_time_offset(self):
+        self.time_offset = await asyncio.get_event_loop().run_in_executor(
+            None, self._time_delta
+        )
+        self.debug(f"Gateway time offset: {self.time_offset}")
+
+    async def update_serial_stats(self):
+        if not self.device.get('stats'):
+            return
+
+        sh = shell.TelnetShell()
+        try:
+            if not await sh.connect(self.host):
+                return
+            serial = await sh.read_file('/proc/tty/driver/serial')
+            lines = serial.decode().split('\n')
+            stats = {
+                s: {k: int(v) for k, v in RE_SERIAL.findall(lines[i])}
+                for i, s in enumerate(('bluetooth', 'zigbee'), 2)
+            }
+            await self.process_gw_stats(stats)
+
+        finally:
+            await sh.close()
+
     async def memory_sync(self):
         sh = shell.TelnetShell()
         try:
@@ -387,7 +418,6 @@ class GatewayEntry(GatewayNetwork):
     """Main class for working with the gateway via Telnet (23), MQTT (1883) and
     miIO (54321) protocols.
     """
-    time_offset = 0
     pair_model = None
     pair_payload = None
     pair_payload2 = None
@@ -773,16 +803,6 @@ class GatewayEntry(GatewayNetwork):
         finally:
             await sh.close()
 
-    def _time_delta(self) -> float:
-        t = shell.ntp_time(self.host)
-        return t - time.time() if t else 0
-
-    async def update_time_offset(self):
-        self.time_offset = await asyncio.get_event_loop().run_in_executor(
-            None, self._time_delta
-        )
-        self.debug(f"Gateway time offset: {self.time_offset}")
-
     async def lock_firmware(self, enable: bool):
         self.debug(f"Set firmware lock to {enable}")
         sh = shell.TelnetShell()
@@ -796,25 +816,6 @@ class GatewayEntry(GatewayNetwork):
         except Exception as e:
             self.debug(f"Can't set firmware lock: {e}")
             return False
-
-        finally:
-            await sh.close()
-
-    async def update_serial_stats(self):
-        if not self.device.get('stats'):
-            return
-
-        sh = shell.TelnetShell()
-        try:
-            if not await sh.connect(self.host):
-                return
-            serial = await sh.read_file('/proc/tty/driver/serial')
-            lines = serial.decode().split('\n')
-            stats = {
-                s: {k: int(v) for k, v in RE_SERIAL.findall(lines[i])}
-                for i, s in enumerate(('bluetooth', 'zigbee'), 2)
-            }
-            await self.process_gw_stats(stats)
 
         finally:
             await sh.close()
