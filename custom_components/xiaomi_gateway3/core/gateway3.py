@@ -5,7 +5,7 @@ import re
 import socket
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 import yaml
 
@@ -29,7 +29,7 @@ class GatewayBase(DevicesRegistry):
 
     available: bool = None
     """Getaway is considered online if there is an active connection to mqtt"""
-    enabled: bool = None
+    tasks: List[asyncio.Task] = None
     """Gateway stops main loop if enabled property sets to False"""
 
     host: str = None
@@ -73,12 +73,13 @@ class GatewayMesh(GatewayBase):
 
         if self.mesh_params:
             self.mesh_ts = time.time() + 30
-            asyncio.create_task(self.mesh_run_forever())
+            task = asyncio.create_task(self.mesh_run_forever())
+            self.tasks.append(task)
 
     async def mesh_run_forever(self):
         self.debug("Start Mesh Thread")
 
-        while self.enabled:
+        while True:
             if time.time() < self.mesh_ts:
                 await asyncio.sleep(1)
                 continue
@@ -389,6 +390,8 @@ class GatewayEntry(GatewayNetwork):
         self.host = host
         self.options = options
 
+        self.tasks = []
+
         self.miio = AsyncMiIO(host, token)
         self.mqtt = MiniMQTT()
 
@@ -406,11 +409,12 @@ class GatewayEntry(GatewayNetwork):
         return self.options.get('zha', False)
 
     def start(self):
-        asyncio.create_task(self.run_forever())
+        task = asyncio.create_task(self.run_forever())
+        self.tasks.append(task)
 
     async def stop(self):
-        self.enabled = False
-        await self.mqtt.disconnect()
+        for task in self.tasks:
+            task.cancel()
 
         for device in self.devices.values():
             if self in device['gateways']:
@@ -420,8 +424,7 @@ class GatewayEntry(GatewayNetwork):
         self.debug("Start main loop")
 
         """Main thread loop."""
-        self.enabled = True
-        while self.enabled:
+        while True:
             # if not telnet - enable it
             if not self.check_port(23) and \
                     not await self.enable_telnet():
@@ -446,9 +449,12 @@ class GatewayEntry(GatewayNetwork):
                 continue
 
             await self.on_connect()
-            async for msg in self.mqtt:
-                asyncio.create_task(self.on_message(msg))
-            await self.mqtt.close()
+            try:
+                async for msg in self.mqtt:
+                    asyncio.create_task(self.on_message(msg))
+            finally:
+                await self.mqtt.disconnect()
+                await self.mqtt.close()
             await self.on_disconnect()
 
         self.debug("Stop main thread")
