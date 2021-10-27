@@ -100,6 +100,10 @@ class TelnetShell:
             if b'Password:' in raw:
                 raise Exception("Telnet with password don't supported")
 
+            self.writer.write(b"stty -echo\n")
+            coro = self.reader.readuntil(b"# ")
+            await asyncio.wait_for(coro, timeout=3)
+
             self.ver = await self.get_version()
 
             return True
@@ -114,9 +118,18 @@ class TelnetShell:
     async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
         """Run command and return it result."""
         self.writer.write(command.encode() + b"\n")
-        coro = self.reader.readuntil(b"\r\n# ")
+        coro = self.reader.readuntil(b"# ")
         raw = await asyncio.wait_for(coro, timeout=10)
-        return raw if as_bytes else raw.decode()
+        return raw[:-2] if as_bytes else raw[:-2].decode()
+
+    async def read_file(self, filename: str, as_base64=False):
+        command = f"cat {filename}|base64" if as_base64 else f"cat {filename}"
+        try:
+            raw = await self.exec(command, as_bytes=True)
+            # b"cat: can't open ..."
+            return base64.b64decode(raw) if as_base64 else raw
+        except:
+            return None
 
     async def check_bin(self, filename: str, md5: str, url=None) -> bool:
         """Check binary md5 and download it if needed."""
@@ -220,24 +233,6 @@ class TelnetShell:
 
     async def get_running_ps(self) -> str:
         return await self.exec("ps -ww | grep -v ' 0 SW'")
-
-    async def read_file(self, filename: str, as_base64=False):
-        command = f"cat {filename} | base64\n" if as_base64 \
-            else f"cat {filename}\r\n"
-
-        self.writer.write(command.encode())
-
-        coro = self.reader.readuntil(b"\r\n")
-        await asyncio.wait_for(coro, timeout=3)  # skip command
-
-        coro = self.reader.readuntil(b"# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
-
-        try:
-            # b"cat: can't open ..."
-            return base64.b64decode(raw) if as_base64 else raw[:-2]
-        except:
-            return None
 
     async def tar_data(self):
         self.writer.write(TAR_DATA)
