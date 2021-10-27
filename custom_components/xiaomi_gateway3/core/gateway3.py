@@ -722,7 +722,7 @@ class GatewayEntry(GatewayNetwork):
 
             if self.zha_mode and await sh.check_zigbee_tcp():
                 _LOGGER.debug("Init ZHA or z2m mode")
-                apatches.append(shell.PATCH_ZIGBEE_TCP)
+                apatches += [shell.PATCH_ZIGBEE_TCP1, shell.PATCH_ZIGBEE_TCP2]
 
             if self.ble_mode and await sh.check_bt():
                 _LOGGER.debug("Patch Bluetooth")
@@ -741,10 +741,11 @@ class GatewayEntry(GatewayNetwork):
                 else:
                     _LOGGER.debug("Disable Bluetooth")
                     mpatches.append(shell.PATCH_DISABLE_BLUETOOTH)
-                if shell.PATCH_ZIGBEE_TCP not in apatches:
+                if shell.PATCH_ZIGBEE_TCP1 not in apatches:
                     _LOGGER.debug("Init Zigbee in memory storage")
                     apatches += [shell.PATCH_MEMORY_ZIGBEE1,
-                                 shell.PATCH_MEMORY_ZIGBEE2]
+                                 shell.PATCH_MEMORY_ZIGBEE2,
+                                 shell.PATCH_MEMORY_ZIGBEE3]
                 await sh.exec(shell.SAVE_SERIAL_STATS)
 
             if sh.miio_ps(mpatches) not in ps:

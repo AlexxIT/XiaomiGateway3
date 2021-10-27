@@ -40,43 +40,78 @@ MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 # MD5_GW3 = 'c81b91816d4b9ad9bb271a5567e36ce9'  # alpha
 MD5_SER2NET = 'f27a481e54f94ea7613b461bda090b0f'
 
-# sed with extended regex and edit file in-place
-PATCH1 = 'sed -r "s={1}={2}=g" -i /tmp/daemon_{0}.sh'
-PATCH2 = 'sed -r "s={1}={2}=; s={3}={4}=" -i /tmp/daemon_{0}.sh'
 
-# use awk because buffer
-PATCH_MIIO_MQTT = PATCH1.format(
+def sed(app: str, pattern: str, repl: str, g: str = ''):
+    """sed with extended regex and edit file in-place"""
+    repl = repl.replace('$', '\$').replace('&', '\&').replace('=', '\='). \
+        replace('`', '\`').replace('"', '\\"').replace('\n', '\\n')
+    return f'sed -r "s={pattern}={repl}=" -i /tmp/daemon_{app}.sh'
+
+
+# grep output to cloud and send it to MQTT, use awk because buffer
+PATCH_MIIO_MQTT = sed(
     "miio", "^ +miio_client .+$",
-    "miio_client -l 0 -o FILE_STORE -d \$MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print \$0;fflush()}' | mosquitto_pub -t log/miio -l \&"
+    "miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 )
-PATCH_BLETOOTH_MQTT = PATCH1.format(
+# use patched silabs_ncp_bt from sourceforge and send stderr to MQTT
+PATCH_BLETOOTH_MQTT = sed(
     "miio", "^ +silabs_ncp_bt .+$",
-    "/data/silabs_ncp_bt /dev/ttyS1 \$RESTORE 2>\&1 >/dev/null | mosquitto_pub -t log/ble -l \&"
+    "/data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
 )
 
-PATCH_ZIGBEE_TCP = PATCH2.format(
-    "app", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net",
-    "^ +Lumi_Z3GatewayHost_MQTT .+$",
+# replace default Z3 to ser2net
+PATCH_ZIGBEE_TCP1 = sed(
+    "app", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net"
+)
+PATCH_ZIGBEE_TCP2 = sed(
+    "app", "^ +Lumi_Z3GatewayHost_MQTT .+$",
     "/data/ser2net -C '8888:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT XONXOFF'"
 )
 
+# patch silabs_ncp_bt for storing data in tmp (memory)
 PATCH_MEMORY_BLUETOOTH1 = "[ -d /tmp/miio ] || (cp -R /data/miio /tmp && cp /data/silabs_ncp_bt /tmp && sed -r 's=/data/=/tmp//=g' -i /tmp/silabs_ncp_bt)"
-PATCH_MEMORY_BLUETOOTH2 = PATCH1.format(
+PATCH_MEMORY_BLUETOOTH2 = sed(
     "miio", "^/data/silabs_ncp_bt", "/tmp/silabs_ncp_bt"
 )
+# every 5 min sync sqlite DB from memory to NAND if changed
+PATCH_MEMORY_BLUETOOTH3 = sed(
+    "miio", "^\tdo$", """\tdo
+if [ ${#N} -eq 60 ]; then
+  if [ "`md5sum /tmp/miio/mible_local.db|cut -d' ' -f1`" != "`md5sum /data/miio/mible_local.db|cut -d' ' -f1`" ]; then
+    cp /tmp/miio/mible_local.db /data/miio
+    echo "`date` bluetooth" >> /var/log/storage_sync.log
+  fi; N=
+fi; N=$N.
+"""
+)
+
+# move zigbee DB to tmp (memory)
 PATCH_MEMORY_ZIGBEE1 = "[ -d /tmp/zigbee_gw ] || cp -R /data/zigbee_gw /tmp"
-PATCH_MEMORY_ZIGBEE2 = PATCH1.format(
+PATCH_MEMORY_ZIGBEE2 = sed(
     "app", "^ +zigbee_gw", "zigbee_gw -s /tmp/zigbee_gw/"
 )
+# every 5 min sync zigbee DB if device list changed
+PATCH_MEMORY_ZIGBEE3 = sed(
+    "app", "^\tdo$", """\tdo
+if [ ${#N} -eq 60 ]; then
+  if [ "`md5sum /tmp/zigbee_gw/device_properties.json|cut -d' ' -f1`" != "`md5sum /data/zigbee_gw/device_properties.json|cut -d' ' -f1`" ]; then
+    cp /tmp/zigbee_gw/device_properties.json /data/zigbee_gw
+    false | cp -i /tmp/zigbee_gw/*.json /data/zigbee_gw/ 2>/dev/null
+    echo "`date` zigbee" >> /var/log/storage_sync.log
+  fi; N=
+fi; N=$N.
+"""
+)
+
 # just for statistics
 SAVE_SERIAL_STATS = "[ -f /tmp/serial ] || cp /proc/tty/driver/serial /tmp"
 
 # if [ ! -e /tmp/bt_dont_need_startup ]; then
-PATCH_DISABLE_BLUETOOTH = PATCH1.format(
+PATCH_DISABLE_BLUETOOTH = sed(
     "miio", "^ +if.+bt_dont_need_startup.+$", "if false; then"
 )
 PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
-PATCH_DISABLE_BUZZER2 = PATCH1.format("miio", "^ +basic_gw", "/tmp/basic_gw")
+PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw", 'g')
 
 
 class TelnetShell:
