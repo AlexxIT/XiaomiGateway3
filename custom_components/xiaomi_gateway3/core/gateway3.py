@@ -347,7 +347,8 @@ class GatewayNetwork(GatewayBLE):
     async def enable_telnet(self):
         """Enable telnet with miio protocol."""
         raw = json.loads(self.telnet_cmd)
-        if await self.miio.send(raw['method'], raw.get('params')) != ['ok']:
+        resp = await self.miio.send(raw['method'], raw.get('params'))
+        if not resp or resp.get('result') != ['ok']:
             self.debug(f"Can't enable telnet")
             return False
         return True

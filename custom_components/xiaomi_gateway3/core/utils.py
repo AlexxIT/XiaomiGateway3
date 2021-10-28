@@ -104,13 +104,17 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         # 2. try connect with miio
         miio = AsyncMiIO(host, token)
         info = await miio.info()
-        # fw 1.4.6_0012 without cloud will respond with a blank string reply
+
+        # if info is None - devise doesn't answer on pings
         if info is None:
-            # if device_id not None - device works but not answer on commands
-            return 'wrong_token' if miio.device_id else 'cant_connect'
+            return 'cant_connect'
+
+        # if empty info - device works but not answer on commands
+        if not info:
+            return 'wrong_token'
 
         # 3. check if right model
-        if info and info['model'] != 'lumi.gateway.mgl03':
+        if info['model'] != 'lumi.gateway.mgl03':
             return 'wrong_model'
 
         raw = json.loads(telnet_cmd)

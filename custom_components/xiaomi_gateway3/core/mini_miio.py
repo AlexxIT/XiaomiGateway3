@@ -259,8 +259,14 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
     async def send(self, method: str, params: Union[dict, list] = None):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
+
+        Possible results:
+        - None - device offline
+        - {} (empty dict) - device online but can't response on cmd
+        - {'id':123,'result':...} - device answered on cmd with good result
+        - {'id':123,'error':...}
         """
-        pings = 0
+        offline = False
         for times in range(1, 4):
             sock = AsyncSocket()
             sock.settimeout(5)
@@ -272,7 +278,8 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
 
                 # need device_id for send command, can get it from ping cmd
                 if self.delta_ts is None and not await self.ping(sock):
-                    pings += 1
+                    # device doesn't answered on ping
+                    offline = True
                     continue
 
                 # pack each time for new message id
@@ -286,48 +293,48 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
                 if data == b'':
                     # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
                     # command with empty answer
-                    data = {'result': ''}
-                    break
+                    continue
 
                 data = json.loads(data)
                 # check if we received response for our cmd
-                if data['id'] == msg_id:
-                    break
+                if data['id'] != msg_id:
+                    _LOGGER.debug(f"{self.addr[0]} | wrong answer ID")
+                    continue
 
-                _LOGGER.debug(f"{self.addr[0]} | wrong ID")
+                return data
 
             except asyncio.TimeoutError:
-                _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+                # _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+                pass
             except:
                 _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
             finally:
                 sock.close()
-        else:
-            _LOGGER.warning(
-                f"{self.addr[0]} | Device offline"
-                if pings >= 2 else
-                f"{self.addr[0]} | Can't send {method} {params}"
-            )
+
+            # init ping again
+            self.delta_ts = None
+
+        if offline:
+            _LOGGER.warning(f"{self.addr[0]} | Device offline")
             return None
 
-        if 'result' in data:
-            return data['result']
-        else:
-            _LOGGER.debug(f"{self.addr[0]} | {data}")
-            return None
+        _LOGGER.info(f"{self.addr[0]} | No answer on {method} {params}")
+        return {}
 
-    async def send_bulk(self, method: str, params: list):
+    async def send_bulk(self, method: str, params: list) -> list:
         """Sends a command with a large number of parameters. Splits into
         multiple requests when the size of one request is exceeded.
         """
         try:
             result = []
             for i in range(0, len(params), 15):
-                result += await self.send(method, params[i:i + 15])
+                resp = await self.send(method, params[i:i + 15])
+                result += resp['result']
             return result
         except:
             return None
 
     async def info(self):
         """Get info about miIO device."""
-        return await self.send('miIO.info')
+        resp = await self.send('miIO.info')
+        return resp.get('result') if resp else resp

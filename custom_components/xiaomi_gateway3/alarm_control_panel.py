@@ -86,13 +86,13 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
                 resp = await self.gw.miio.send('get_properties', [{
                     'did': self.miio_did, 'siid': 3, 'piid': 22
                 }])
-                if resp[0]['value'] == 1:
+                if resp['result'][0]['value'] == 1:
                     self._state = STATE_ALARM_TRIGGERED
                 else:
                     resp = await self.gw.miio.send('get_properties', [{
                         'did': self.miio_did, 'siid': 3, 'piid': 1
                     }])
-                    state = resp[0]['value']
+                    state = resp['result'][0]['value']
                     self._state = ALARM_STATES[state]
             except:
                 pass

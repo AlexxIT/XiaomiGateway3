@@ -115,7 +115,7 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                         'did': did,
                         'subdev_url': url
                     })
-                    if resp != ['ok']:
+                    if not resp or resp.get('result') != ['ok']:
                         _LOGGER.error(f"Can't run update process: {resp}")
                 else:
                     _LOGGER.error("No firmware for model " + device['model'])
