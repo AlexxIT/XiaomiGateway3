@@ -136,7 +136,9 @@ async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
     gw: Gateway3 = hass.data[DOMAIN][entry.entry_id]
     gw.start()
 
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, gw.stop)
+    entry.async_on_unload(
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, gw.stop)
+    )
 
 
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
