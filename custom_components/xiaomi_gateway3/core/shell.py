@@ -59,6 +59,11 @@ PATCH_BLETOOTH_MQTT = sed(
     "/data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
 )
 
+PATCH_ZIGBEE_PARENTS = sed(
+    "app", "^ +(Lumi_Z3GatewayHost_MQTT [^>]+).+$",
+    "\\1-l 0 | mosquitto_pub -t log/z3 -l &"
+)
+
 # replace default Z3 to ser2net
 PATCH_ZIGBEE_TCP1 = sed(
     "app", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net"
@@ -195,7 +200,8 @@ class TelnetShell:
     async def update_daemon_app(self, patches: list):
         await self.exec("killall daemon_app.sh")
         await self.exec(
-            "killall Lumi_Z3GatewayHost_MQTT ser2net socat zigbee_gw")
+            "killall Lumi_Z3GatewayHost_MQTT ser2net socat zigbee_gw; pkill -f log/z3"
+        )
 
         if not patches:
             await self.exec(f"daemon_app.sh &")
@@ -212,8 +218,9 @@ class TelnetShell:
         with patches hash in process list.
         """
         await self.exec("killall daemon_miio.sh")
-        await self.exec("killall miio_client silabs_ncp_bt mosquitto_pub")
-        await self.exec("killall -9 basic_gw")
+        await self.exec(
+            "killall miio_client silabs_ncp_bt; killall -9 basic_gw; pkill -f 'log/ble|log/miio'"
+        )
 
         if not patches:
             await self.exec(f"daemon_miio.sh &")

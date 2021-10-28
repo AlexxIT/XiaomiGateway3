@@ -200,6 +200,7 @@ class ZigbeeStats(XiaomiSensor):
         if data is None:
             return
 
+        # from Z3 MessageReceived topic
         if 'sourceAddress' in data:
             self._attrs['link_quality'] = data['linkQuality']
             self._attrs['rssi'] = data['rssi']
@@ -237,13 +238,23 @@ class ZigbeeStats(XiaomiSensor):
 
             self._state = now().isoformat(timespec='seconds')
 
+        # from gw.process_parent_scan (Z3 utility timer)
+        elif 'ago' in data:
+            ago = timedelta(seconds=data['ago'])
+            self._state = (now() - ago).isoformat(timespec='seconds')
+            self._attrs['type'] = data['type']
+            self._attrs['parent'] = data['parent']
+
+        # from battery sensors heartbeat
         elif 'parent' in data:
             self._attrs['parent'] = self.parent(data['parent'])
 
+        # from zigbee_agent utility (disabled)
         elif 'alive' in data:
             ago = timedelta(seconds=data['alive']['time'])
             self._state = (now() - ago).isoformat(timespec='seconds')
 
+        # from device heartbeat
         elif 'reset_cnt' in data:
             self._attrs.setdefault('reset_cnt', 0)
             if self.last_rst is not None:

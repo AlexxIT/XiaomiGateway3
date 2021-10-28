@@ -139,10 +139,10 @@ class XiaomiEntity(Entity):
         self.gw.debug(f"{self.entity_id} | {message}")
 
     def parent(self, did: str = None):
-        if not did:
+        if did is None:
             did = self.device['init'].get('parent')
-        if did == 0:
-            return 0
+        if did == '':
+            return '-'
         try:
             return self.gw.devices[did]['nwk']
         except:

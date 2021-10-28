@@ -4,6 +4,7 @@ import logging
 import re
 import socket
 import time
+import traceback
 from pathlib import Path
 from typing import Optional, List
 
@@ -195,6 +196,10 @@ class GatewayMesh(GatewayBase):
 
 
 class GatewayStats(GatewayMesh):
+    parent_scan_ts: float = 0
+    # collected data from MQTT topic log/z3 (zigbee console)
+    z3buffer: Optional[dict] = None
+
     @property
     def stats_enable(self):
         return self.options.get('stats')
@@ -204,6 +209,11 @@ class GatewayStats(GatewayMesh):
         self.debug(f"gateway <= {payload or self.available}")
         if self.device.get('stats'):
             await self.device['stats'].async_update(payload)
+
+        if self.parent_scan_ts and time.time() > self.parent_scan_ts:
+            # block any auto updates in 10 seconds
+            self.parent_scan_ts = time.time() + 10
+            await self.run_parent_scan()
 
     async def process_zb_stats(self, payload: dict):
         # convert ieee to did
@@ -216,6 +226,109 @@ class GatewayStats(GatewayMesh):
         device = self.devices.get(mac)
         if device and device.get('stats'):
             await device['stats'].async_update(data)
+
+    async def process_z3(self, payload: str):
+        if payload.startswith("CLI command executed"):
+            cmd = payload[22:-1]
+            if cmd == "debugprint all_on" or self.z3buffer is None:
+                # reset all buffers
+                self.z3buffer = {}
+            else:
+                self.z3buffer[cmd] = self.z3buffer['buffer']
+
+            self.z3buffer['buffer'] = ''
+
+            if cmd == "plugin concentrator print-table":
+                await self.process_parent_scan()
+
+        elif self.z3buffer:
+            self.z3buffer['buffer'] += payload
+
+    async def run_parent_scan(self):
+        self.debug("Run zigbee parent scan process")
+        payload = {'commands': [
+            {'commandcli': "debugprint all_on"},
+            {'commandcli': "plugin device-table print"},
+            {'commandcli': "plugin stack-diagnostics child-table"},
+            {'commandcli': "plugin stack-diagnostics neighbor-table"},
+            {'commandcli': "plugin concentrator print-table"},
+            {'commandcli': "debugprint all_off"},
+        ]}
+        payload = json.dumps(payload, separators=(',', ':'))
+        await self.mqtt.publish(self.gw_topic + 'commands', payload)
+
+    async def process_parent_scan(self):
+        self.debug("Process zigbee parent scan response")
+        try:
+            raw = self.z3buffer["plugin device-table print"]
+            dt = re.findall(
+                r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}\w+ (\d+)', raw
+            )
+
+            raw = self.z3buffer["plugin stack-diagnostics child-table"]
+            ct = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+            raw = self.z3buffer["plugin stack-diagnostics neighbor-table"]
+            rt = re.findall(r'\(>\)([A-F0-9]{16})', raw)
+
+            raw = self.z3buffer["plugin concentrator print-table"]
+            pt = re.findall(r': (.+?) \(Me\)', raw)
+            pt = [i.replace('0x', '').split(' -> ') for i in pt]
+            pt = {i[0]: i[1:] for i in pt}
+
+            self.debug(f"Total zigbee devices: {len(dt)}")
+
+            for i in dt:
+                ieee = '0x' + i[1]
+                nwk = i[0]  # FFFF
+                ago = int(i[2])
+
+                if i[1] in ct:
+                    type_ = 'device'
+                elif i[1] in rt:
+                    type_ = 'router'
+                elif nwk in pt:
+                    type_ = 'device'
+                else:
+                    type_ = '?'
+
+                if nwk in pt:
+                    if len(pt[nwk]) > 1:
+                        parent = '0x' + pt[nwk][0].lower()
+                    else:
+                        parent = '-'
+                elif i[1] in ct:
+                    parent = '-'
+                else:
+                    parent = '?'
+
+                nwk = '0x' + nwk.lower()  # 0xffff
+
+                payload = {
+                    'eui64': ieee,
+                    'nwk': nwk,
+                    'ago': ago,
+                    'type': type_,
+                    'parent': parent
+                }
+
+                did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
+                device = self.devices.get(did)
+                if device and device.get('stats'):
+                    # the device remains in the gateway database after deletion
+                    # and may appear on another gw with another nwk
+                    if nwk == device.get('nwk'):
+                        await self.process_zb_stats(payload)
+                    else:
+                        self.debug(f"Zigbee device with wrong NWK: {ieee}")
+                else:
+                    self.debug(f"Unknown zigbee device {ieee}: {payload}")
+
+            # one hour later
+            self.parent_scan_ts = time.time() + 3600
+
+        except:
+            self.debug(f"Can't update parents: {traceback.format_exc(1)}")
 
 
 class GatewayBLE(GatewayStats):
@@ -479,14 +592,16 @@ class GatewayEntry(GatewayNetwork):
         await self.mqtt.subscribe('#')
 
         self.available = True
+        self.parent_scan_ts = int(self.stats_enable and not self.zha_mode)
+
         await self.process_gw_stats()
         await self.update_entities_states()
         await self.update_serial_stats()
         await self.update_time_offset()
 
-        for device in list(self.devices.values()):
-            if self in device['gateways'] and device['type'] == 'zigbee':
-                await self.read_zigbee_alive(device)
+        # for device in list(self.devices.values()):
+        #     if self in device['gateways'] and device['type'] == 'zigbee':
+        #         await self.read_zigbee_alive(device)
 
     async def on_message(self, msg: MQTTMessage):
         try:
@@ -523,6 +638,9 @@ class GatewayEntry(GatewayNetwork):
 
             elif topic == 'log/ble':
                 await self.process_ble_event_fix(msg.json)
+
+            elif topic == 'log/z3':
+                await self.process_z3(msg.text)
 
             elif topic.endswith('/heartbeat'):
                 await self.process_gw_stats(msg.json)
@@ -733,11 +851,15 @@ class GatewayEntry(GatewayNetwork):
                 return True
 
             mpatches = [shell.PATCH_MIIO_MQTT]
-            apatches = []
 
             if self.zha_mode and await sh.check_zigbee_tcp():
                 self.debug("Init ZHA or z2m mode")
-                apatches += [shell.PATCH_ZIGBEE_TCP1, shell.PATCH_ZIGBEE_TCP2]
+                apatches = [shell.PATCH_ZIGBEE_TCP1, shell.PATCH_ZIGBEE_TCP2]
+            elif self.stats_enable:
+                self.debug("Init Zigbee parents")
+                apatches = [shell.PATCH_ZIGBEE_PARENTS]
+            else:
+                apatches = []
 
             if self.ble_mode and await sh.check_bt():
                 self.debug("Patch Bluetooth")
@@ -899,11 +1021,10 @@ class GatewayEntry(GatewayNetwork):
                 # I do not know if the formula is correct, so battery is more
                 # important than voltage
                 payload[prop] = zigbee.fix_xiaomi_battery(param['value'])
-            elif prop in ('alive', 'parent', 'reset_cnt'):
-                if prop == 'alive' and param['value']['status'] == 'offline':
-                    device['online'] = False
-                if device.get('stats'):
-                    await device['stats'].async_update({prop: param['value']})
+            elif prop == 'alive' and param['value']['status'] == 'offline':
+                device['online'] = False
+            elif prop in ('parent', 'reset_cnt') and device.get('stats'):
+                await device['stats'].async_update({prop: param['value']})
             elif prop == 'angle':
                 # xiaomi cube 100 points = 360 degrees
                 payload[prop] = param['value'] * 4

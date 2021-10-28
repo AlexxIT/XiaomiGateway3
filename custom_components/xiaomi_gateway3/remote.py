@@ -98,6 +98,8 @@ class Gateway3Entity(XiaomiEntity, ToggleEntity):
                 await self.gw.send_zigbee(self.device, {'channel': channel})
             elif cmd == 'publishstate':
                 await self.gw.send_mqtt('publishstate')
+            elif cmd == 'parentscan':
+                await self.gw.run_parent_scan()
             elif cmd == 'memsync':
                 await self.gw.memory_sync()
             elif cmd == 'ota':
