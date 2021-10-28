@@ -243,6 +243,12 @@ class OptionsFlowHandler(OptionsFlow):
         memory = self.entry.options.get('memory', False)
         zha = self.entry.options.get('zha', False)
 
+        # migrate old config options
+        if 'miio' in debug:
+            debug.remove('miio')
+        if isinstance(zha, str):
+            zha = bool(zha)
+
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
