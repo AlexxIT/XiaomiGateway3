@@ -115,6 +115,9 @@ PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw", 'g')
 
 SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|cut -d' ' -f1`" ] && cp /tmp/{0} /data/{0}"""
 
+DB_BLUETOOTH = "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
+DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
+
 
 class TelnetShell:
     reader: StreamReader = None
@@ -314,10 +317,6 @@ class TelnetShell:
     @property
     def mesh_device_table(self) -> str:
         return 'mesh_device_v3' if self.ver >= '1.4.7_0160' else 'mesh_device'
-
-    @property
-    def zigbee_db(self) -> str:
-        return '/data/zigbee_gw/*.json'
 
 
 NTP_DELTA = 2208988800  # 1970-01-01 00:00:00

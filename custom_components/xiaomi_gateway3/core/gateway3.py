@@ -575,7 +575,7 @@ class GatewayEntry(GatewayNetwork):
                 lumi = json.loads(raw)['devInfo']
 
                 # read Xiaomi devices DB
-                raw = await sh.read_file(sh.zigbee_db, as_base64=True)
+                raw = await sh.read_file(shell.DB_ZIGBEE, as_base64=True)
                 if raw:
                     raw = re.sub(br'}\s*{', b',', raw)
                     xiaomi = json.loads(raw)
@@ -625,8 +625,7 @@ class GatewayEntry(GatewayNetwork):
 
             # 3. Read bluetooth devices
             if self.ble_mode:
-                raw = await sh.read_file('/data/miio/mible_local.db',
-                                         as_base64=True)
+                raw = await sh.read_file(shell.DB_BLUETOOTH, as_base64=True)
                 try:
                     db = SQLite(raw)
 
