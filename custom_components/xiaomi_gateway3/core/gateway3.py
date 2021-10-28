@@ -736,38 +736,38 @@ class GatewayEntry(GatewayNetwork):
             apatches = []
 
             if self.zha_mode and await sh.check_zigbee_tcp():
-                _LOGGER.debug("Init ZHA or z2m mode")
+                self.debug("Init ZHA or z2m mode")
                 apatches += [shell.PATCH_ZIGBEE_TCP1, shell.PATCH_ZIGBEE_TCP2]
 
             if self.ble_mode and await sh.check_bt():
-                _LOGGER.debug("Patch Bluetooth")
+                self.debug("Patch Bluetooth")
                 mpatches.append(shell.PATCH_BLETOOTH_MQTT)
 
             if self.options.get('buzzer'):
-                _LOGGER.debug("Disable Buzzer")
+                self.debug("Disable Buzzer")
                 mpatches += [shell.PATCH_DISABLE_BUZZER1,
                              shell.PATCH_DISABLE_BUZZER2]
 
             if self.options.get('memory'):
                 if shell.PATCH_BLETOOTH_MQTT in mpatches:
-                    _LOGGER.debug("Init Bluetooth in memory storage")
+                    self.debug("Init Bluetooth in memory storage")
                     mpatches += [shell.PATCH_MEMORY_BLUETOOTH1,
                                  shell.PATCH_MEMORY_BLUETOOTH2]
                 else:
-                    _LOGGER.debug("Disable Bluetooth")
+                    self.debug("Disable Bluetooth")
                     mpatches.append(shell.PATCH_DISABLE_BLUETOOTH)
                 if shell.PATCH_ZIGBEE_TCP1 not in apatches:
-                    _LOGGER.debug("Init Zigbee in memory storage")
+                    self.debug("Init Zigbee in memory storage")
                     apatches += [shell.PATCH_MEMORY_ZIGBEE1,
                                  shell.PATCH_MEMORY_ZIGBEE2,
                                  shell.PATCH_MEMORY_ZIGBEE3]
                 await sh.exec(shell.SAVE_SERIAL_STATS)
 
             if sh.miio_ps(mpatches) not in ps:
-                _LOGGER.debug(f"Patch daemon_miio.sh with {len(mpatches)}")
+                self.debug(f"Patch daemon_miio.sh with {len(mpatches)}")
                 await sh.update_daemon_miio(mpatches)
             if sh.app_ps(apatches) not in ps:
-                _LOGGER.debug(f"Patch daemon_app.sh with {len(apatches)}")
+                self.debug(f"Patch daemon_app.sh with {len(apatches)}")
                 await sh.update_daemon_app(apatches)
 
             return True
@@ -969,7 +969,6 @@ class GatewayEntry(GatewayNetwork):
                 break
 
     async def process_pair(self, raw: bytes):
-        _LOGGER.debug(f"!!! {raw}")
         # get shortID and eui64 of paired device
         if b'lumi send-nwk-key' in raw:
             # create model response
