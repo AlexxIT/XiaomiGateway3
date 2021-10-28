@@ -41,7 +41,7 @@ MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 MD5_SER2NET = 'f27a481e54f94ea7613b461bda090b0f'
 
 
-def sed(app: str, pattern: str, repl: str, g: str = ''):
+def sed(app: str, pattern: str, repl: str):
     """sed with extended regex and edit file in-place"""
     repl = repl.replace('$', '\$').replace('&', '\&').replace('=', '\='). \
         replace('`', '\`').replace('"', '\\"').replace('\n', '\\n')
@@ -111,7 +111,7 @@ PATCH_DISABLE_BLUETOOTH = sed(
     "miio", "^ +if.+bt_dont_need_startup.+$", "if false; then"
 )
 PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
-PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw", 'g')
+PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw")
 
 SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|cut -d' ' -f1`" ] && cp /tmp/{0} /data/{0}"""
 
