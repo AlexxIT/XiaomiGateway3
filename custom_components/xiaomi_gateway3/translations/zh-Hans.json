@@ -50,11 +50,11 @@
 					"ble": "支持 BLE 设备",
 					"stats": "Zigbee 和 BLE 效能数据",
 					"debug": "调试信息",
-					"buzzer": "关闭蜂鸣器 [PRO]",
-					"parent": "统计上端装置 [PRO]",
-					"zha": "模式 [PRO]"
+					"buzzer": "关闭蜂鸣器 [ADV]",
+                    "memory": "Use storage in memory [ADV]",
+                    "zha": "Mode ZHA or zigbee2mqtt [ADV]"
 				},
-				"description": "如果您不清楚了解带有 **PRO** 选项的作用，建议不要更改它们。"
+				"description": "如果您不清楚了解带有 **ADV** 选项的作用，建议不要更改它们。"
 			}
 		}
 	},

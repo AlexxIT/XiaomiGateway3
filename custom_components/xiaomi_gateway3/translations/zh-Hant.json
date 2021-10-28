@@ -52,11 +52,11 @@
           "ble": "支援 BLE 設備",
           "stats": "Zigbee 與 BLE 效能資料",
           "debug": "Debug",
-          "buzzer": "關閉蜂鳴器 [PRO]",
-          "parent": "統計上端裝置 [PRO]",
-          "zha": "模式 [PRO]"
+          "buzzer": "關閉蜂鳴器 [ADV]",
+          "memory": "Use storage in memory [ADV]",
+          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
         },
-        "description": "僅於了解可能之風險後，才建議變更 **PRO** 選項"
+        "description": "僅於了解可能之風險後，才建議變更 **ADV** 選項"
       }
     }
   },
