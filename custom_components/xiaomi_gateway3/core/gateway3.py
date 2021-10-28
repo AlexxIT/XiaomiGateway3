@@ -454,8 +454,6 @@ class GatewayEntry(GatewayNetwork):
                     continue
 
                 self.setup_devices(devices)
-                await self.update_time_offset()
-                await self.update_serial_stats()
                 self.mesh_start()
 
             # if not mqtt - enable it (handle Mi Home and ZHA mode)
@@ -483,6 +481,8 @@ class GatewayEntry(GatewayNetwork):
         self.available = True
         await self.process_gw_stats()
         await self.update_entities_states()
+        await self.update_serial_stats()
+        await self.update_time_offset()
 
         for device in list(self.devices.values()):
             if self in device['gateways'] and device['type'] == 'zigbee':
