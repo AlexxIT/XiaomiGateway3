@@ -57,17 +57,17 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 1
         }])
 
-    async def alarm_arm_away(self, code=None):
+    async def async_alarm_arm_away(self, code=None):
         await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 2
         }])
 
-    async def alarm_arm_night(self, code=None):
+    async def async_alarm_arm_night(self, code=None):
         await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 3
         }])
 
-    async def alarm_trigger(self, code=None):
+    async def async_alarm_trigger(self, code=None):
         await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 22, 'value': 1
         }])
