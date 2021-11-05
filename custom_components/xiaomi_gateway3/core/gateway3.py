@@ -486,10 +486,11 @@ class GatewayNetwork(GatewayBLE):
                 return
             serial = await sh.read_file('/proc/tty/driver/serial')
             lines = serial.decode().split('\n')
-            stats = {
-                s: {k: int(v) for k, v in RE_SERIAL.findall(lines[i])}
-                for i, s in enumerate(('bluetooth', 'zigbee'), 2)
-            }
+            stats = {}
+            for k, v in RE_SERIAL.findall(lines[2]):
+                stats[f"bluetooth_{k}"] = int(v)
+            for k, v in RE_SERIAL.findall(lines[3]):
+                stats[f"zigbee_{k}"] = int(v)
             await self.process_gw_stats(stats)
 
         finally:
