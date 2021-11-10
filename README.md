@@ -27,6 +27,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 # Table of Contents
 
 - [FAQ](#faq)
+- [Requirements](#requirements)
 - [Supported Firmwares](#supported-firmwares)
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
@@ -85,6 +86,24 @@ A. Yes, but it needs to be turned on in the Mi Home app.
 
 **Q. Why does the two-button switch only have one entity action?**  
 A. All button clicks are displayed in the status of that one entity.
+
+# Requirements
+
+All requirements are **important** or you may have an unstable operation of the gateway.
+
+- Xiaomi Mijia Smart Multi-Mode Gateway `ZNDMWG03LM` (China) or `ZNDMWG02LM` (Euro)
+- Gateway firmware `v1.4.7` and more
+- Home Assistant `v2021.6` and more
+- **Shared LAN** between Gateway and Hass server. You may use VPN, but both IP-address should be in **same network subnet**!
+- **Open ping** (accept ICMP) from Gateway to Router
+- **Fixed IP-address** for Gateway on your Router
+- Wi-Fi Router settings:
+   - **Fixed channel** from 1 to 11
+   - Channel width: **20MHz**
+   - Authentication: WPA2
+   - Group key update interval: **1 hour** and more
+
+With the following settings the operation of the gateway may be **unstable**: different subnets, closed ping to router, Wi-Fi channel 40MHz, WPA3. 
 
 # Supported Firmwares
 
