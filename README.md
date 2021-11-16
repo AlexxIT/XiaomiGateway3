@@ -191,7 +191,7 @@ Tested Devices:
 [![Xiaomi Rubik's Cube](https://img.youtube.com/vi/4D_vqvUre_0/mqdefault.jpg)](https://www.youtube.com/watch?v=4D_vqvUre_0)
 
 Tested Devices:
-- Aqara Door Lock N100 (ZNMS16LM)
+- Aqara Door Lock N100 (ZNMS16LM) **Attention:** Zigbee version not supported!
 - Aqara Door Lock N200 (ZNMS17LM)
 - Honeywell Smoke Alarm (JTYJ-GD-03MI)
 - Xiaomi Alarm Clock (CGD1)
