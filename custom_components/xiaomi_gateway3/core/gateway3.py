@@ -982,15 +982,13 @@ class GatewayEntry(Thread, GatewayBLE):
 
             # https://github.com/Koenkk/zigbee2mqtt/issues/798
             # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
-            if (prop == 'temperature' and
-                    device['model'] != 'lumi.airmonitor.acn01'):
+            if prop == 'temperature' and device['lumi_spec']:
                 if -4000 < param['value'] < 12500:
                     payload[prop] = param['value'] / 100.0
-            elif (prop == 'humidity' and
-                  device['model'] != 'lumi.airmonitor.acn01'):
+            elif prop == 'humidity' and device['lumi_spec']:
                 if 0 <= param['value'] <= 10000:
                     payload[prop] = param['value'] / 100.0
-            elif prop == 'pressure':
+            elif prop == 'pressure' and device['lumi_spec']:
                 payload[prop] = param['value'] / 100.0
             elif prop == 'battery':
                 # I do not know if the formula is correct, so battery is more

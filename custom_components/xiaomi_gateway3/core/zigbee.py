@@ -237,7 +237,6 @@ DEVICES = [{
 }, {
     # temperature, humidity and pressure sensor
     'lumi.weather': ["Aqara", "TH Sensor", "WSDCGQ11LM"],
-    'lumi.sensor_ht.agl02': ["Aqara", "TH Sensor", "WSDCGQ12LM"],
     'lumi_spec': [
         ['0.1.85', 'temperature', 'temperature', 'sensor'],
         ['0.2.85', 'humidity', 'humidity', 'sensor'],
@@ -245,6 +244,14 @@ DEVICES = [{
         # old gateway fw v1.4.6 doesn't send voltage, only percent
         ['8.0.2001', 'battery', 'battery_percent', None],
         ['8.0.2008', 'voltage', 'battery', 'sensor'],
+    ]
+}, {
+    'lumi.sensor_ht.agl02': ["Aqara", "TH Sensor T1", "WSDCGQ12LM"],
+    'miot_spec': [
+        ['2.1', '2.1', 'temperature', 'sensor'],
+        ['2.2', '2.2', 'humidity', 'sensor'],
+        ['2.3', '2.3', 'pressure', 'sensor'],
+        ['3.1', '3.1', 'battery', 'sensor'],
     ]
 }, {
     # door window sensor
@@ -590,7 +597,7 @@ def get_device(zigbee_model: str) -> Optional[dict]:
 def fix_xiaomi_props(model, params) -> dict:
     for k, v in params.items():
         if k in ('temperature', 'humidity', 'pressure'):
-            if model != 'lumi.airmonitor.acn01':
+            if model not in ('lumi.airmonitor.acn01', 'lumi.sensor_ht.agl02'):
                 params[k] = v / 100.0
         elif k == 'voltage' and v and v > 1000:
             # retain 'load_voltage': 234721
