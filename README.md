@@ -16,11 +16,11 @@ This method does not change the device firmware. Gateway continues to work with 
 
 Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
 
-**Important:** Use another integrations for support:
-
-- Xiaomi Gateway 2 (DGNWG02LM) - [external link](https://www.home-assistant.io/integrations/xiaomi_aqara/)
-- Xiaomi Gateway EU (DGNWG05LM), Aqara Hub (ZHWG11LM) - [external link](https://openlumi.github.io/)
-- Aqara E1 CN (ZHWG16LM), Aqara G2H (ZNSXJ12LM), Aqara H1 CN (QBCZWG11LM), Aqara M1S CN (ZHWG15LM), Aqara M2 CN (ZHWG12LM), Aqara P3 CN (KTBL12LM) - [external link](https://github.com/niceboygithub/AqaraGateway)
+> **Note:** Use another integrations for support:
+> 
+> - Xiaomi Gateway 2 (DGNWG02LM) - [external link](https://www.home-assistant.io/integrations/xiaomi_aqara/)
+> - Xiaomi Gateway EU (DGNWG05LM), Aqara Hub (ZHWG11LM) - [external link](https://openlumi.github.io/)
+> - Aqara E1 CN (ZHWG16LM), Aqara G2H (ZNSXJ12LM), Aqara H1 CN (QBCZWG11LM), Aqara M1S CN (ZHWG15LM), Aqara M2 CN (ZHWG12LM), Aqara P3 CN (KTBL12LM) - [external link](https://github.com/niceboygithub/AqaraGateway)
 
 **Attention:** The component is under active development. Breaking changes may appear.
 
@@ -105,6 +105,10 @@ All requirements are **important** or you may have an unstable operation of the 
 
 With the following settings the operation of the gateway may be **unstable**: different subnets, closed ping to router, Wi-Fi channel 40MHz, WPA3. 
 
+> **Important:** Integration supports gateway on **ORIGINAL** firmware. You don't need to solder, or custom firmware!
+>
+> Additionally, the integration supports [custom firmware](https://github.com/zvldz/mgl03_fw/tree/main/firmware). The custom firmware works the same way as the original firmware and will not give you new features or support for new devices. Use it only if you know why you need it.
+
 # Supported Firmwares
 
 The component is only tested with these firmware versions:
@@ -122,6 +126,8 @@ Component can block fw updates with **Lock Firmware** switch. Mi Home app will c
 [![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
 
 # Supported Zigbee Devices
+
+> **Note:** this devices supported in default (Mi Home) mode. To support devices from other companies, read below.
 
 Tested Devices:
 - Aqara Bulb (ZNLDP12LM)
@@ -403,6 +409,10 @@ You can discuss the feature [here](https://github.com/AlexxIT/XiaomiGateway3/iss
 
 # Zigbee Home Automation Mode
 
+You **do not need** to solder or flash the gate. It is ready to work with the ZHA out of the box.
+
+> **Note:** ZHA developers do [not recommend](https://github.com/zigpy/bellows#hardware-requirement) using ZHA with EZSP radios for WiFi-based bridges because of possible stability problems. But a range of users use the gate in this mode without issues.
+
 **Video DEMO**
 
 [![Zigbee Home Automation (ZHA) with Xiaomi Gateway 3 on original firmware without soldering](https://img.youtube.com/vi/AEkiUK7wGbs/mqdefault.jpg)](https://www.youtube.com/watch?v=AEkiUK7wGbs)
@@ -426,6 +436,8 @@ You can change the operating mode at any time. Your gateway firmware does not ch
 Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
 
 # Zigbee2MQTT Mode
+
+> **Important:** Support for EFR32 chips (EZSP v8) in the zigbee2mqtt project is [experimental](https://www.zigbee2mqtt.io/guide/adapters/#experimental). At the moment they work not good and are **not recommended for use**.
 
 **Video DEMO**
 
