@@ -1,5 +1,3 @@
-import logging
-
 from homeassistant.const import STATE_ON
 from homeassistant.core import callback
 from homeassistant.helpers.entity import ToggleEntity
@@ -9,8 +7,6 @@ from . import DOMAIN
 from .core.converters import Converter
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, add_entities):

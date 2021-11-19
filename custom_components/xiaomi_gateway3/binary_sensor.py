@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import time
 from datetime import timedelta
 
@@ -14,8 +13,6 @@ from . import DOMAIN
 from .core.converters import Converter, GATEWAY
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
-
-_LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=60)
 

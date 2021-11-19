@@ -1,5 +1,3 @@
-import logging
-
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, OptionsFlow, ConfigEntry
@@ -10,8 +8,6 @@ from . import DOMAIN
 from .core import utils
 from .core.device import GATEWAY, ZIGBEE
 from .core.xiaomi_cloud import MiCloud
-
-_LOGGER = logging.getLogger(__name__)
 
 ACTIONS = {
     "cloud": "Add Mi Cloud Account",

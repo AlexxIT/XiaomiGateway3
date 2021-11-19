@@ -1,5 +1,3 @@
-import logging
-
 from homeassistant.components.alarm_control_panel import \
     SUPPORT_ALARM_ARM_AWAY, SUPPORT_ALARM_ARM_HOME, SUPPORT_ALARM_ARM_NIGHT, \
     SUPPORT_ALARM_TRIGGER, AlarmControlPanelEntity
@@ -13,7 +11,6 @@ from .core.converters import Converter
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
 
-_LOGGER = logging.getLogger(__name__)
 
 ALARM_STATES = [STATE_ALARM_DISARMED, STATE_ALARM_ARMED_HOME,
                 STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_NIGHT]

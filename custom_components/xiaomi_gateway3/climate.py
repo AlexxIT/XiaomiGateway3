@@ -7,8 +7,6 @@ from .core.converters import Converter
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
 
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):

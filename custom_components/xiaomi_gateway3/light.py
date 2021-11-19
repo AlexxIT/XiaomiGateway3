@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
     SUPPORT_COLOR_TEMP, SUPPORT_TRANSITION, ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, \
@@ -12,8 +11,6 @@ from . import DOMAIN
 from .core.converters import MESH_GROUP_MODEL, Converter
 from .core.device import XDevice, XEntity, ZIGBEE
 from .core.gateway import XGateway
-
-_LOGGER = logging.getLogger(__name__)
 
 CONF_DEFAULT_TRANSITION = 'default_transition'
 
