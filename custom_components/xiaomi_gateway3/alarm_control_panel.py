@@ -1,19 +1,13 @@
 from homeassistant.components.alarm_control_panel import \
     SUPPORT_ALARM_ARM_AWAY, SUPPORT_ALARM_ARM_HOME, SUPPORT_ALARM_ARM_NIGHT, \
     SUPPORT_ALARM_TRIGGER, AlarmControlPanelEntity
-from homeassistant.const import STATE_ALARM_ARMED_AWAY, \
-    STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_NIGHT, STATE_ALARM_DISARMED, \
-    STATE_ALARM_TRIGGERED
+from homeassistant.const import STATE_ALARM_TRIGGERED
 from homeassistant.core import callback
 
 from . import DOMAIN
 from .core.converters import Converter
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
-
-
-ALARM_STATES = [STATE_ALARM_DISARMED, STATE_ALARM_ARMED_HOME,
-                STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_NIGHT]
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -26,14 +20,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiAlarm(XEntity, AlarmControlPanelEntity):
-    @property
-    def supported_features(self):
-        return (SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY |
-                SUPPORT_ALARM_ARM_NIGHT | SUPPORT_ALARM_TRIGGER)
-
-    @property
-    def code_arm_required(self):
-        return False
+    _attr_code_arm_required = False
+    _attr_supported_features = (
+            SUPPORT_ALARM_ARM_HOME | SUPPORT_ALARM_ARM_AWAY |
+            SUPPORT_ALARM_ARM_NIGHT | SUPPORT_ALARM_TRIGGER
+    )
 
     @callback
     def async_set_state(self, data: dict):
@@ -58,5 +49,4 @@ class XiaomiAlarm(XEntity, AlarmControlPanelEntity):
         await self.device_send({"alarm_trigger": True})
 
     async def async_update(self):
-        # we should not call write_ha_state from async_update function
         await self.device_read(self.subscribed_attrs)
