@@ -69,8 +69,6 @@ class XDevice:
 
         # device brand, model, name and converters
         self.info = converters.get_device_info(model, type)
-        # TODO: rename
-        # self.setup_attrs = set()
         # all device entities
         self.entities: Dict[str, 'XEntity'] = {}
         # device gateways (one for GW and Zigbee), multiple for BLE and Mesh
@@ -78,7 +76,6 @@ class XDevice:
 
         # internal device storage from any useful data
         self.extra: Dict[str, Any] = {}
-        # self.restore_state: Dict[str, Any] = {}
         self.lazy_setup = set()
 
     @property
@@ -107,10 +104,6 @@ class XDevice:
         if not self.converters:
             return False
         return any(True for conv in self.converters if conv.zigbee)
-
-    # @property
-    # def hass_attrs(self) -> List[str]:
-    #     return [conv.hass_attr for conv in self.converters if conv.hass_attr]
 
     def update_model(self, value: str):
         self.model = value
@@ -146,22 +139,6 @@ class XDevice:
             attrs |= set(conv.childs)
         attrs.update(c.attr for c in self.converters if c.parent == conv.attr)
         return attrs
-
-    # noinspection PyUnusedLocal
-    # TODO: remove
-    # def init(self, entities: list = None, device_name: str = None,
-    #          entity_name: str = None, **kwargs):
-    #     self.converters = self.info.req_converters.copy()
-    #
-    #     if entities:
-    #         for attr in entities:
-    #             self.add_converter(attr)
-    #
-    #     if device_name:
-    #         self.info.name = device_name
-    #
-    #     if entity_name:
-    #         self.extra["entity_name"] = entity_name
 
     def __str__(self):
         s = f"XDevice({self.type}, {self.model}, {self.mac}"
@@ -218,19 +195,6 @@ class XDevice:
                     assert conv not in self.converters
                     self.converters.append(conv)
 
-    # TODO: rename attributes
-    # def add_attributes(self, gateway: 'GatewayBase', value: dict):
-    #     for attr, value in value.items():
-    #         if attr in self.entities:
-    #             continue
-    #
-    #         conv = self.add_converter(attr)
-    #         if not conv or not conv.domain:
-    #             continue
-    #
-    #         # self.setup_attrs.add(conv.attr)
-    #         gateway.setups[conv.domain](gateway, self, conv)
-
     def decode(self, attr_name: str, value: Any) -> Optional[dict]:
         """Find converter by attr_name and decode value."""
         for conv in self.converters:
@@ -284,33 +248,6 @@ class XDevice:
             if conv.zigbee == value["cluster"]:
                 conv.decode(self, payload, value)
         return payload
-
-    # def encode_lumi(self, value: dict) -> dict:
-    #     """Encode value to Zigbee Lumi/MIoT spec."""
-    #     did = self.did if self.type != GATEWAY else "lumi.0"
-    #     payload = {"cmd": "write", "did": did}
-    #
-    #     for k, v in value.items():
-    #         for conv in self.converters:
-    #             if conv.attr == k:
-    #                 conv.encode(self, payload, v)
-    #
-    #     return payload
-
-    # def encode_miot(self, value: dict) -> list:
-    #     """Decode value to Mesh MIoT spec."""
-    #     payload = self.encode_lumi(value)
-    #     for item in payload['mi_spec']:
-    #         item['did'] = self.did
-    #     return payload['mi_spec']
-
-    # def encode_zidbee(self, value: dict) -> dict:
-    #     payload = {"commands": []}
-    #     for k, v in value.items():
-    #         for conv in self.converters:
-    #             if conv.attr == k:
-    #                 conv.encode(self, payload, v)
-    #     return payload
 
     def encode(self, value: dict) -> dict:
         """Encode payload to supported spec, depends on attrs.
@@ -529,9 +466,6 @@ class XEntity(Entity):
 
         if hasattr(self, "async_update"):
             await self.async_device_update(warning=False)
-
-        # if self.attr in self.device.restore_state:
-        #     self.async_set_state(self.device.restore_state)
 
     async def async_will_remove_from_hass(self) -> None:
         """Also run when rename entity_id"""

@@ -67,10 +67,6 @@ OTHERS = ["reboot", "ftp", "dump"]
 class CommandSelect(XiaomiSelectBase):
     _attr_current_option = "Idle"
 
-    # @callback
-    # def async_set_state(self, data: dict):
-    #     self._attr_current_option = COMMANDS.get(data[self.attr])
-
     async def async_select_option(self, option: str):
         self._attr_current_option = option
         self.async_write_ha_state()
