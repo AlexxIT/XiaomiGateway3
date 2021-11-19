@@ -5,18 +5,11 @@ from homeassistant.const import *
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceEntry
 
-try:
-    from homeassistant.components.device_automation import TRIGGER_BASE_SCHEMA
-except ImportError:
-    from homeassistant.components.device_automation import (
-        DEVICE_TRIGGER_BASE_SCHEMA as TRIGGER_BASE_SCHEMA,
-    )
-
 from . import DOMAIN
-from .core import zigbee
-from .sensor import BUTTON
+from .core import converters
+from .core.converters.base import BUTTON
 
-TRIGGER_SCHEMA = TRIGGER_BASE_SCHEMA.extend(
+TRIGGER_SCHEMA = cv.TRIGGER_BASE_SCHEMA.extend(
     {
         vol.Required(CONF_TYPE): cv.string,
         vol.Required('action'): cv.string
@@ -56,7 +49,9 @@ async def async_attach_trigger(hass, config, action, automation_info):
 async def async_get_triggers(hass, device_id):
     device_registry = await hass.helpers.device_registry.async_get_registry()
     device: DeviceEntry = device_registry.async_get(device_id)
-    buttons = zigbee.get_buttons(device.model)
+    # zigbee device model has market model
+    model, _ = device.model.split(" ", 1)
+    buttons = converters.get_zigbee_buttons(device.model)
     if not buttons:
         return None
 
@@ -68,6 +63,7 @@ async def async_get_triggers(hass, device_id):
     } for button in buttons]
 
 
+# noinspection PyUnusedLocal
 async def async_get_trigger_capabilities(hass, config):
     return {
         "extra_fields": vol.Schema({

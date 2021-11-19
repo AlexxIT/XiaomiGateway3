@@ -145,6 +145,7 @@ class MiniMQTT:
     def __init__(self, keepalive=15, timeout=5):
         self.keepalive = keepalive
         self.timeout = timeout
+        self.pub_buffer = []
 
     async def read_varlen(self) -> int:
         var = 0
@@ -171,7 +172,10 @@ class MiniMQTT:
 
     async def connect(self, host: str):
         try:
-            return await asyncio.wait_for(self._connect(host), self.timeout)
+            resp = await asyncio.wait_for(self._connect(host), self.timeout)
+            if resp and self.pub_buffer:
+                asyncio.create_task(self.empty_buffer())
+            return resp
         except:
             return False
 
@@ -187,6 +191,9 @@ class MiniMQTT:
         await self.writer.drain()
 
     async def publish(self, topic: str, payload, retain=False):
+        if self.writer is None:
+            self.pub_buffer.append([topic, payload, retain])
+            return
         if isinstance(payload, str):
             payload = payload.encode()
         elif isinstance(payload, dict):
@@ -234,6 +241,12 @@ class MiniMQTT:
         if self.writer:
             self.writer.close()
             await self.writer.wait_closed()
+
+    async def empty_buffer(self):
+        for args in self.pub_buffer:
+            await self.publish(*args)
+
+        self.pub_buffer.clear()
 
     def __aiter__(self):
         return self

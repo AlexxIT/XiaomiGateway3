@@ -5,7 +5,6 @@ import logging
 import random
 import socket
 import time
-import traceback
 from asyncio import DatagramProtocol, Future
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
@@ -149,8 +148,8 @@ class SyncMiIO(BasemiIO):
 
             except socket.timeout:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
-            except:
-                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]}", exc_info=e)
 
             # init ping again
             self.delta_ts = None
@@ -202,6 +201,7 @@ class SyncMiIO(BasemiIO):
         return self.send('miIO.info')
 
 
+# noinspection PyUnusedLocal
 class AsyncSocket(DatagramProtocol):
     timeout = 0
     transport: DatagramTransport = None
@@ -225,7 +225,8 @@ class AsyncSocket(DatagramProtocol):
         self.transport.sendto(data)
 
     def close(self):
-        self.transport.close()
+        if self.transport:
+            self.transport.close()
 
     async def connect(self, addr: tuple):
         await asyncio.get_event_loop().create_datagram_endpoint(
@@ -306,8 +307,8 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             except asyncio.TimeoutError:
                 # _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
                 pass
-            except:
-                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]}", exc_info=e)
             finally:
                 sock.close()
 

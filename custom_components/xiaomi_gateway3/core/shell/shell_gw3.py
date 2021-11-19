@@ -1,13 +1,9 @@
 import asyncio
-import base64
 import hashlib
-import logging
 import re
-import socket
-from asyncio import StreamReader, StreamWriter
-from typing import Union
 
-_LOGGER = logging.getLogger(__name__)
+from .base import TelnetShell
+from ..unqlite import SQLite
 
 # We should use HTTP-link because wget don't support HTTPS and curl removed in
 # lastest fw. But it's not a problem because we check md5
@@ -51,7 +47,7 @@ def sed(app: str, pattern: str, repl: str):
 # grep output to cloud and send it to MQTT, use awk because buffer
 PATCH_MIIO_MQTT = sed(
     "miio", "^ +miio_client .+$",
-    "miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
+    "miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)|record_offline/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 )
 # use patched silabs_ncp_bt from sourceforge and send stderr to MQTT
 PATCH_BLETOOTH_MQTT = sed(
@@ -111,171 +107,49 @@ fi; N=$N.
 # just for statistics
 SAVE_SERIAL_STATS = "[ -f /tmp/serial ] || cp /proc/tty/driver/serial /tmp"
 
+# don't run bt utility in all cases
 # if [ ! -e /tmp/bt_dont_need_startup ]; then
 PATCH_DISABLE_BLUETOOTH = sed(
     "miio", "^ +if.+bt_dont_need_startup.+$", "if false; then"
 )
+# patch basic_gw file to not beeps with 5 sec Motion Sensors
 PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
+# use patched binary instead of original
 PATCH_DISABLE_BUZZER2 = sed("miio", "^ +basic_gw", "/tmp/basic_gw")
 
+# compare md5sum of two files and copy if not equal
 SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|cut -d' ' -f1`" ] && cp /tmp/{0} /data/{0}"""
 
+# `ls -1t` - sort files by change time, `sed q` - leave only first row
 DB_BLUETOOTH = "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
+# `sed...` - remove filename and adds "*.json" on its place
 DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
 
 
-class TelnetShell:
-    reader: StreamReader = None
-    writer: StreamWriter = None
+class ShellGw3(TelnetShell):
+    model = "gw3"
 
-    ver: str = None
+    apatches: list = None
+    mpatches: list = None
 
-    async def connect(self, host: str, port=23) -> bool:
-        try:
-            coro = asyncio.open_connection(host, port, limit=1_000_000)
-            self.reader, self.writer = await asyncio.wait_for(coro, 5)
+    db: SQLite = None
 
-            coro = self.reader.readuntil(b"login: ")
-            await asyncio.wait_for(coro, 3)
+    async def login(self):
+        self.writer.write(b"admin\n")
 
-            self.writer.write(b"admin\n")
+        coro = self.reader.readuntil(b"\r\n# ")
+        raw = await asyncio.wait_for(coro, timeout=3)
+        if b"Password:" in raw:
+            raise Exception("Telnet with password don't supported")
 
-            coro = self.reader.readuntil(b"\r\n# ")
-            raw = await asyncio.wait_for(coro, timeout=3)
-            if b'Password:' in raw:
-                raise Exception("Telnet with password don't supported")
+    async def prepare(self):
+        await self.exec("stty -echo")
 
-            self.writer.write(b"stty -echo\n")
-            coro = self.reader.readuntil(b"# ")
-            await asyncio.wait_for(coro, timeout=3)
+        self.apatches = []
+        self.mpatches = []
 
-            self.ver = await self.get_version()
-
-            return True
-        except:
-            return False
-
-    async def close(self):
-        if self.writer:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-    async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
-        """Run command and return it result."""
-        self.writer.write(command.encode() + b"\n")
-        coro = self.reader.readuntil(b"# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
-        return raw[:-2] if as_bytes else raw[:-2].decode()
-
-    async def read_file(self, filename: str, as_base64=False):
-        command = f"cat {filename}|base64" if as_base64 else f"cat {filename}"
-        try:
-            raw = await self.exec(command, as_bytes=True)
-            # b"cat: can't open ..."
-            return base64.b64decode(raw) if as_base64 else raw
-        except:
-            return None
-
-    async def check_bin(self, filename: str, md5: str, url=None) -> bool:
-        """Check binary md5 and download it if needed."""
-        if md5 in await self.exec("md5sum /data/" + filename):
-            return True
-        elif url:
-            await self.exec(WGET.format(url, filename))
-            return await self.check_bin(filename, md5)
-        else:
-            return False
-
-    async def check_zigbee_tcp(self):
-        return await self.check_bin('ser2net', MD5_SER2NET, 'bin/ser2net')
-
-    async def run_zigbee_flash(self) -> bool:
-        if not await self.check_zigbee_tcp():
-            return False
-        await self.exec("killall daemon_app.sh")
-        await self.exec("killall Lumi_Z3GatewayHost_MQTT ser2net socat")
-        await self.exec(RUN_ZIGBEE_FLASH)
-        return True
-
-    async def update_daemon_app(self, patches: list):
-        await self.exec("killall daemon_app.sh")
-        await self.exec(
-            "killall Lumi_Z3GatewayHost_MQTT ser2net socat zigbee_gw; pkill -f log/z3"
-        )
-
-        if not patches:
-            await self.exec(f"daemon_app.sh &")
-            return
-
-        await self.exec("cp /bin/daemon_app.sh /tmp")
-        for patch in patches:
-            await self.exec(patch)
-
-        await self.exec(f"/tmp/daemon_app.sh {self.app_ps(patches)} &")
-
-    async def update_daemon_miio(self, patches: list):
-        """Run default daemon_miio if no patches. Or run patched daemon_miio
-        with patches hash in process list.
-        """
-        await self.exec("killall daemon_miio.sh")
-        await self.exec(
-            "killall miio_client silabs_ncp_bt; killall -9 basic_gw; pkill -f 'log/ble|log/miio'"
-        )
-
-        if not patches:
-            await self.exec(f"daemon_miio.sh &")
-            return
-
-        await self.exec("cp /bin/daemon_miio.sh /tmp")
-        for patch in patches:
-            await self.exec(patch)
-
-        await self.exec(f"/tmp/daemon_miio.sh {self.miio_ps(patches)} &")
-
-    async def memory_sync(self):
-        resp = await self.exec(
-            "ls --color=never /tmp/miio/mible_local.db /tmp/zigbee_gw/*"
-        )
-        for file in resp.split('\r\n'):
-            if not file.startswith('/tmp/'):
-                continue
-            command = SYNC_MEMORY_FILE.format(file[5:])
-            await self.exec(command)
-
-    @staticmethod
-    def app_ps(patches: list):
-        if patches:
-            return hashlib.md5('\n'.join(patches).encode()).hexdigest()
-        return '/bin/daemon_app.sh'
-
-    @staticmethod
-    def miio_ps(patches: list):
-        if patches:
-            return hashlib.md5('\n'.join(patches).encode()).hexdigest()
-        return '/bin/daemon_miio.sh'
-
-    async def check_firmware_lock(self) -> bool:
-        """Check if firmware update locked. And create empty file if needed."""
-        resp = await self.exec(CHECK_FIRMWARE)
-        return '-i-' in resp
-
-    async def lock_firmware(self, enable: bool):
-        if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
-            command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
-            await self.exec(command)
-
-    def run_ftp(self):
-        if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
-            self.exec(RUN_FTP)
-
-    async def check_bt(self) -> bool:
-        md5 = MD5_BT.get(self.ver)
-        if not md5:
-            return False
-        # we use same name for bt utis so gw can kill it in case of update etc.
-        return await self.check_bin(
-            'silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt'
-        )
+    async def get_running_ps(self) -> str:
+        return await self.exec("ps -ww | grep -v ' 0 SW'")
 
     async def run_public_mosquitto(self):
         await self.exec("killall mosquitto")
@@ -288,25 +162,59 @@ class TelnetShell:
     async def run_ntpd(self):
         await self.exec("ntpd -l")
 
-    async def get_running_ps(self) -> str:
-        return await self.exec("ps -ww | grep -v ' 0 SW'")
+    async def run_ftp(self):
+        if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
+            await self.exec(RUN_FTP)
 
-    async def tar_data(self):
-        self.writer.write(TAR_DATA)
-        coro = self.reader.readuntil(b"\r\n")
-        await asyncio.wait_for(coro, timeout=3)  # skip command
-        coro = self.reader.readuntil(b"# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
-        return base64.b64decode(raw)
+    async def check_bin(self, filename: str, md5: str, url=None) -> bool:
+        """Check binary md5 and download it if needed."""
+        if md5 in await self.exec("md5sum /data/" + filename):
+            return True
+        elif url:
+            await self.exec(WGET.format(url, filename))
+            return await self.check_bin(filename, md5)
+        else:
+            return False
+
+    async def check_bt(self) -> bool:
+        md5 = MD5_BT.get(self.ver)
+        if not md5:
+            return False
+        # we use same name for bt utis so gw can kill it in case of update etc.
+        return await self.check_bin(
+            'silabs_ncp_bt', md5, md5 + '/silabs_ncp_bt'
+        )
+
+    async def check_zigbee_tcp(self):
+        return await self.check_bin('ser2net', MD5_SER2NET, 'bin/ser2net')
+
+    async def check_firmware_lock(self) -> bool:
+        """Check if firmware update locked. And create empty file if needed."""
+        resp = await self.exec(CHECK_FIRMWARE)
+        return '-i-' in resp
+
+    async def lock_firmware(self, enable: bool):
+        if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
+            command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
+            await self.exec(command)
+
+    async def memory_sync(self):
+        # get exists file list from /tmp
+        resp = await self.exec(
+            "ls -1 /tmp/miio/mible_local.db /tmp/zigbee_gw/* 2>/dev/null"
+        )
+        for file in resp.split('\r\n'):
+            # sync file if md5sum not equal
+            command = SYNC_MEMORY_FILE.format(file[5:])
+            await self.exec(command)
+
+    async def prevent_unpair(self):
+        await self.exec("killall zigbee_gw")
 
     async def get_version(self):
         raw = await self.read_file('/etc/rootfs_fw_info')
         m = re.search(r'version=([0-9._]+)', raw.decode())
-        return m[1]
-
-    async def get_token(self):
-        raw = await self.read_file('/data/miio/device.token')
-        return raw.rstrip().hex()
+        self.ver = m[1]
 
     async def get_did(self):
         raw = await self.read_file('/data/miio/device.conf')
@@ -315,7 +223,13 @@ class TelnetShell:
 
     async def get_wlan_mac(self) -> str:
         raw = await self.read_file('/sys/class/net/wlan0/address')
-        return raw.decode().rstrip().upper()
+        return raw.decode().rstrip().replace(":", "")
+
+    async def read_db_bluetooth(self) -> SQLite:
+        if not self.db:
+            raw = await self.read_file(DB_BLUETOOTH, as_base64=True)
+            self.db = SQLite(raw)
+        return self.db
 
     @property
     def mesh_group_table(self) -> str:
@@ -325,33 +239,91 @@ class TelnetShell:
     def mesh_device_table(self) -> str:
         return 'mesh_device_v3' if self.ver >= '1.4.7_0160' else 'mesh_device'
 
+    ############################################################################
 
-NTP_DELTA = 2208988800  # 1970-01-01 00:00:00
-NTP_QUERY = b'\x1b' + 47 * b'\0'
+    def patch_miio_mqtt(self):
+        self.mpatches.append(PATCH_MIIO_MQTT)
 
+    def patch_disable_buzzer(self):
+        self.mpatches += [PATCH_DISABLE_BUZZER1, PATCH_DISABLE_BUZZER2]
 
-def ntp_time(host: str) -> float:
-    """Return server send time"""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(2)
-    try:
-        sock.sendto(NTP_QUERY, (host, 123))
-        raw = sock.recv(1024)
+    def patch_memory_zigbee(self):
+        self.apatches += [
+            PATCH_MEMORY_ZIGBEE1, PATCH_MEMORY_ZIGBEE2, PATCH_MEMORY_ZIGBEE3
+        ]
 
-        integ = int.from_bytes(raw[-8:-4], 'big')
-        fract = int.from_bytes(raw[-4:], 'big')
-        return integ + float(fract) / 2 ** 32 - NTP_DELTA
-    except:
-        return 0
-    finally:
-        sock.close()
+    def patch_zigbee_tcp(self):
+        self.apatches += [PATCH_ZIGBEE_TCP1, PATCH_ZIGBEE_TCP2]
 
+    def patch_bluetooth_mqtt(self):
+        self.mpatches.append(PATCH_BLETOOTH_MQTT)
 
-def check_port(host: str, port: int):
-    """Check if gateway port open."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(2)
-    try:
-        return s.connect_ex((host, port)) == 0
-    finally:
-        s.close()
+    def patch_memory_bluetooth(self):
+        self.mpatches += [PATCH_MEMORY_BLUETOOTH1, PATCH_MEMORY_BLUETOOTH2]
+
+    def patch_disable_bluetooth(self):
+        self.mpatches.append(PATCH_DISABLE_BLUETOOTH)
+
+    def patch_zigbee_parents(self):
+        self.apatches.append(PATCH_ZIGBEE_PARENTS)
+
+    ############################################################################
+
+    @property
+    def app_ps(self):
+        if self.apatches:
+            return hashlib.md5('\n'.join(self.apatches).encode()).hexdigest()
+        return '/bin/daemon_app.sh'
+
+    async def update_daemon_app(self) -> int:
+        await self.exec("killall daemon_app.sh")
+        await self.exec(
+            "killall Lumi_Z3GatewayHost_MQTT ser2net socat zigbee_gw; pkill -f log/z3"
+        )
+
+        if not self.apatches:
+            await self.exec(f"daemon_app.sh &")
+            return 0
+
+        await self.exec("cp /bin/daemon_app.sh /tmp")
+        for patch in self.apatches:
+            await self.exec(patch)
+
+        await self.exec(f"/tmp/daemon_app.sh {self.app_ps} &")
+
+        return len(self.apatches)
+
+    @property
+    def miio_ps(self):
+        if self.mpatches:
+            return hashlib.md5('\n'.join(self.mpatches).encode()).hexdigest()
+        return '/bin/daemon_miio.sh'
+
+    async def update_daemon_miio(self) -> int:
+        """Run default daemon_miio if no patches. Or run patched daemon_miio
+        with patches hash in process list.
+        """
+        await self.exec("killall daemon_miio.sh")
+        await self.exec(
+            "killall miio_client silabs_ncp_bt; killall -9 basic_gw; pkill -f 'log/ble|log/miio'"
+        )
+
+        if not self.mpatches:
+            await self.exec(f"daemon_miio.sh &")
+            return 0
+
+        await self.exec("cp /bin/daemon_miio.sh /tmp")
+        for patch in self.mpatches:
+            await self.exec(patch)
+
+        await self.exec(f"/tmp/daemon_miio.sh {self.miio_ps} &")
+
+        return len(self.mpatches)
+
+    async def apply_patches(self, ps: str) -> int:
+        n = 0
+        if self.app_ps not in ps:
+            n += await self.update_daemon_app()
+        if self.miio_ps not in ps:
+            n += await self.update_daemon_miio()
+        return n
