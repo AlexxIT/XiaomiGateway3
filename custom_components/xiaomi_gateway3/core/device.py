@@ -157,14 +157,10 @@ class XDevice:
         if "entity_name" in kwargs:
             self.extra["entity_name"] = kwargs["entity_name"]
 
-        self.converters = self.info.req_converters.copy()
+        self.setup_converters(kwargs.get("entities"))
 
-        if "entities" in kwargs:
-            for attr in kwargs["entities"]:
-                self.add_converter(attr)
-
-        if self.lazy_setup:
-            return
+        # if self.lazy_setup:
+        #     return
 
         for conv in self.converters:
             if conv.domain is None or conv.attr in self.entities:
@@ -172,27 +168,41 @@ class XDevice:
             if conv.lazy:
                 self.lazy_setup.add(conv.attr)
                 continue
-            # self.setup_attrs.add(conv.attr)
             gateway.setups[conv.domain](gateway, self, conv)
 
-    def add_converter(self, name: str):
-        """Support adds converters from:
+    def setup_converters(self, entities: list = None):
+        """If no entities - use only required converters. Otherwise search for
+        converters in:
            - LUMI_GLOBALS list
-           - spec converters list
-           - spec converters childs list (always sensor)
+           - optional converters list
+           - required converters childs list (always sensor)
+           - optional converters childs list (always sensor)
         """
-        for conv in LUMI_GLOBALS.values():
-            if conv.attr == name:
-                assert conv not in self.converters
-                self.converters.append(conv)
+        if not entities:
+            self.converters = self.info.req_converters
+            return
 
-        if self.info.opt_converters:
-            for conv in self.info.opt_converters:
-                if conv.childs and name in conv.childs:
-                    conv = Converter(name, "sensor")
-                    self.converters.append(conv)
-                if conv.attr == name:
+        self.converters = self.info.req_converters.copy()
+        for attr in entities:
+            for conv in LUMI_GLOBALS.values():
+                if conv.attr == attr:
                     assert conv not in self.converters
+                    self.converters.append(conv)
+
+            for conv in self.info.req_converters:
+                if conv.childs and attr in conv.childs:
+                    conv = Converter(attr, "sensor")
+                    self.converters.append(conv)
+
+            if not self.info.opt_converters:
+                continue
+
+            for conv in self.info.opt_converters:
+                if conv.attr == attr:
+                    assert conv not in self.converters
+                    self.converters.append(conv)
+                if conv.childs and attr in conv.childs:
+                    conv = Converter(attr, "sensor")
                     self.converters.append(conv)
 
     def decode(self, attr_name: str, value: Any) -> Optional[dict]:
