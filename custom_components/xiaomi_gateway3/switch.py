@@ -19,7 +19,7 @@ async def async_setup_entry(hass, config_entry, add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiSwitch(XEntity, ToggleEntity, RestoreEntity):
-    _attr_is_on: bool = False
+    _attr_is_on: bool = None
 
     @callback
     def async_set_state(self, data: dict):
