@@ -6,7 +6,6 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
 from .core import utils
-from .core.device import GATEWAY, ZIGBEE
 from .core.xiaomi_cloud import MiCloud
 
 ACTIONS = {
@@ -25,10 +24,9 @@ SERVERS = {
 
 OPT_DEBUG = {
     "true": "Basic logs",
-    "mqtt": "MQTT logs"
+    "mqtt": "MQTT logs",
+    "zigbee": "Zigbee logs",
 }
-
-OPT_ENTITIES = [GATEWAY, ZIGBEE]
 
 
 class FlowHandler(ConfigFlow, domain=DOMAIN):
@@ -42,8 +40,10 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             elif user_input["action"] == "token":
                 return await self.async_step_token()
             else:
-                device = next(d for d in self.hass.data[DOMAIN]["devices"]
-                              if d["did"] == user_input["action"])
+                device = next(
+                    device for device in self.hass.data[DOMAIN]["devices"]
+                    if device["did"] == user_input["action"]
+                )
                 return self.async_show_form(
                     step_id="token",
                     data_schema=vol.Schema({
@@ -74,11 +74,13 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
 
             session = async_create_clientsession(self.hass)
             cloud = MiCloud(session)
-            if await cloud.login(user_input["username"],
-                                 user_input["password"]):
+            if await cloud.login(
+                    user_input["username"], user_input["password"]
+            ):
                 user_input.update(cloud.auth)
-                return self.async_create_entry(title=user_input["username"],
-                                               data=user_input)
+                return self.async_create_entry(
+                    title=user_input["username"], data=user_input
+                )
 
             else:
                 return await self.async_step_cloud(error="cant_login")
@@ -101,8 +103,9 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             if error:
                 return await self.async_step_token(error=error)
 
-            return self.async_create_entry(title=user_input["host"],
-                                           data=user_input)
+            return self.async_create_entry(
+                title=user_input["host"], data=user_input
+            )
 
         return self.async_show_form(
             step_id="token",
@@ -155,8 +158,10 @@ class OptionsFlowHandler(OptionsFlow):
     async def async_step_cloud(self, user_input=None):
         if user_input is not None:
             did = user_input["did"]
-            device = next(d for d in self.hass.data[DOMAIN]["devices"]
-                          if d["did"] == did)
+            device = next(
+                device for device in self.hass.data[DOMAIN]["devices"]
+                if device["did"] == did
+            )
 
             if device["pid"] != "6":
                 device_info = (
