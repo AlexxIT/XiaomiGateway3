@@ -51,14 +51,22 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 
 # FAQ
 
-**Q. Can Xiaomi close support for this integration in firmware updates?**  
-A. Yes, they can and are already doing it. But if you have a worked hub and you do not update it, it will continue to work. Component can block fw updates with **Lock Firmware** switch.
-
 **Q. Does this integration support hubs DGNWG02LM, DGNWG05LM, Aqara Hub...?**  
 A. No. The integration only supports ZNDMWG03LM (China version) and ZNDMWG02LM (Euro version).
 
 **Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**  
 A. No. The integration does not support Xiaomi Wi-Fi devices.
+
+**Q. Which Mi Home region is best to use?**  
+A. Most devices are supported in the China region. In European regions may not work new Zigbee devices E1/H1/T1-series and some Mesh devices. You can connect Euro Gateway to China region or China Gateway to Euro region if you want.
+
+**Q. What means device beeps?**  
+A. Beeps AFTER adding Zigbee devices:
+1. No new devices found, the pair is stopped.
+2. New device successfully added.
+3. Unsupported device model.
+
+Also, if you using hacked motion sensor - the getaway will periodically beeps. You can disable it in integration settings. 
 
 **Q. Does the integration work without internet?**  
 A. Partially. The component connects to a hub on the local network. Zigbee devices work without internet. But adding new Zigbee devices to Mi Home requires Internet. Updating BLE device data may not work without Internet.
@@ -75,8 +83,8 @@ A. No. The token is obtained automatically using the login / password from the M
 **Q. Should I open or solder the hub?**  
 A. No. Read [supported firmwares](#supported-firmwares) section.
 
-**Q. Should I use ZHA or z2m mode?**  
-A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA or z2m mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
+**Q. Should I use ZHA mode?**  
+A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
 
 **Q. How many Zigbee devices does the hub support?**  
 A. The hub can connect directly up to 32 battery-powered devices (end devices). And **additionaly** up to 26 powered devices (routers). Other devices on your network can work through routers. The maximum number of devices is unknown. Official Xiaomi documentation writes about 128 devices.
@@ -93,7 +101,7 @@ All requirements are **important** or you may have an unstable operation of the 
 
 - Xiaomi Mijia Smart Multi-Mode Gateway `ZNDMWG03LM` (China) or `ZNDMWG02LM` (Euro)
 - Gateway firmware `v1.4.7` and more
-- Home Assistant `v2021.6` and more
+- Home Assistant `v2021.7` and more
 - **Shared LAN** between Gateway and Hass server. You may use VPN, but both IP-address should be in **same network subnet**!
 - **Open ping** (accept ICMP) from Gateway to Router
 - **Fixed IP-address** for Gateway on your Router
@@ -117,7 +125,7 @@ The component is only tested with these firmware versions:
 
 If you have problems with other firmware, don't even ask to fix it.
 
-The component can work with these firmware versions, but they may have bugs: v1.4.4_0003, v1.4.5_0012, v1.4.5_0016, v1.4.6_0012, v1.4.6_0030, v1.4.6_0043, v1.4.7_0063, v1.4.7_0065, v1.4.7_0115, v1.4.7_0160, v1.5.0_0026.
+The component can work with these firmware versions, but they may have bugs: v1.4.7_0063, v1.4.7_0065, v1.4.7_0115, v1.4.7_0160, v1.5.0_0026, v1.5.1_0032.
 
 Optionally you can flash gateway with custom firmware: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
 
@@ -227,8 +235,6 @@ XMMF01JQD don't sends edge info, only direction!
 
 Other BLE devices also maybe supported...
 
-Kettles and scooters are not BLE devices. It is not known whether the gateway can work with them. Currently not supported.
-
 BLE devices and their attributes **don't appear immediately**! Data collected and stored at the gateway. After rebooting Hass - data restored from the gateway. Rebooting the gateway will clear the saved data!
 
 # Supported Bluetooth Mesh Devices
@@ -279,6 +285,14 @@ Other Mesh devices also maybe supported...
 
 If the integration is not in the list, you need to clear the browser cache.
 
+You need to install integration two times:
+1. Cloud version. It used ONLY to load tokens and names for your devices from cloud.
+2. Gateway. It adds your gateway and all connected Zigbee, BLE and Mesh devices.
+
+You may skip 1st step if you know token for you Gateway. If you have multiple Gateways - repeat step 2 for each of them.
+
+**ATTENTION:** If you using two Hass with one gateway - you should use same integration version on both of them! 
+
 # Zigbee and BLE performance table
 
 ![](zigbee_table.png)
@@ -286,11 +300,7 @@ If the integration is not in the list, you need to clear the browser cache.
 1. To enable stats sensors go to:
 
    > Configuration > Integrations > Xiaomi Gateway 3 > Options > Zigbee and BLE performance data
-   
-   Optional you can enable pereodical updates about device parent routers.
-   
-   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Parent devices in stats: Hourly
-   
+
 2. Install [Flex Table](https://github.com/custom-cards/flex-table-card) from HACS
 
 3. Add new Lovelace tab with **Panel Mode**
@@ -397,7 +407,7 @@ command: pair
 device: ikea.light.led1623g12  # change to your device model
 ```
 
-You need to choose the most similar Xiaomi model for your device from [this file](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/utils.py).
+You need to choose the most similar Xiaomi model for your device from [this file](https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/zigbee.py).
 
 For example, for a lamp or dimmer - choose an IKEA lamp `ikea.light.led1623g12`.
 
@@ -423,7 +433,7 @@ You **do not need** to solder or flash the gate. It is ready to work with the ZH
 
 **Attention: ZHA mode cannot work simultaneously with Mi Home!**
 
-When you turn on ZHA mode - zigbee devices in Mi Home will stop working. Bluetooth devices will continue to work.
+When you turn on ZHA mode - zigbee devices in Mi Home will stop working. Bluetooth devices (BLE and Mesh) will continue to work in Mi Home and Hass.
 
 To switch the mode go to:
 
@@ -431,7 +441,7 @@ To switch the mode go to:
 
 Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them again with ZHA.
 
-You can change the operating mode at any time. Your gateway firmware does not change! Just reboot the gateway and it is back in stock.
+You can change the operating mode at any time. This mode will flash firmware of Gateway Zigbee chip to a new version with reduced speed, to avoid errors in the data. And flash it back when you switch back to Mi Home mode. Switch back before any Gateway firmware updates via Mi Home.
 
 Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
 
@@ -449,7 +459,7 @@ Unlike the ZHA you should install to your host or Hass.io system: [Mosquitto bro
 
 **Attention: Zigbee2MQTT mode cannot work simultaneously with Mi Home!**
 
-When you turn on Zigbee2MQTT mode - zigbee devices in Mi Home will stop working. Bluetooth devices will continue to work.
+When you turn on Zigbee2MQTT mode - zigbee devices in Mi Home will stop working. Bluetooth devices (BLE and Mesh) will continue to work in Mi Home and Hass.
 
 To switch the mode go to:
 
@@ -461,7 +471,7 @@ This mode will flash firmware of Gateway Zigbee chip automatically! And flash it
 
 You can use this mode with thank to this peoples:
 
-- [@kirovilya](https://github.com/kirovilya) and [@G1K](https://github.com/G1K) - developed support EFR32 chips in z2m project
+- [@kirovilya](https://github.com/kirovilya) - developed support EFR32 chips in z2m project
 - [@CODeRUS](https://github.com/CODeRUS) and [@zvldz](https://github.com/zvldz) - adapted the script to flash the chip
 - [@faronov](https://github.com/faronov) - complied a new version of firmware 
 
@@ -497,122 +507,7 @@ automation:
 
 <img src="bluetooth_lock.png" width="810">
 
-BLE locks have an action entity, just like buttons.
-
-The state changes to `door`, `lock`, `fingerprint`,` armed` when an event occurs. Details of the event are in the entity attributes.
-
-`action`: **fingerprint**
-- `key_id` - Key ID in full hex format
-- `action_id`: 0, `message`: Match successful
-- `action_id`: 1, `message`: Match failed
-- `action_id`: 2, `message`: Timeout
-- `action_id`: 3, `message`: Low quality
-- `action_id`: 4, `message`: Insufficient area
-- `action_id`: 5, `message`: Skin is too dry
-- `action_id`: 5, `message`: Skin is too wet
-
-`action`: **door**
-- `action_id`: 0, `message`: Door is open
-- `action_id`: 1, `message`: Door is closed
-- `action_id`: 2, `message`: Timeout is not closed
-- `action_id`: 3, `message`: Knock on the door
-- `action_id`: 4, `message`: Breaking the door
-- `action_id`: 5, `message`: Door is stuck
-
-`action`: **lock**
-- `key_id` - Key ID in short decimal format
-- `action_id`: 0, `message`: Unlock outside the door
-- `action_id`: 1, `message`: Lock
-- `action_id`: 2, `message`: Turn on anti-lock
-- `action_id`: 3, `message`: Turn off anti-lock
-- `action_id`: 4, `message`: Unlock inside the door
-- `action_id`: 5, `message`: Lock inside the door
-- `action_id`: 6, `message`: Turn on child lock
-- `action_id`: 7, `message`: Turn off child lock
-- `method_id`: 0, `method`: bluetooth
-- `method_id`: 1, `method`: password
-- `method_id`: 2, `method`: biological
-- `method_id`: 3, `method`: key
-- `method_id`: 4, `method`: turntable
-- `method_id`: 5, `method`: nfc
-- `method_id`: 6, `method`: one-time password
-- `method_id`: 7, `method`: two-step verification
-- `method_id`: 8, `method`: coercion
-- `method_id`: 10, `method`: manual
-- `method_id`: 11, `method`: automatic
-- `key_id`: 0xc0de0000, `error`: Frequent unlocking with incorrect password
-- `key_id`: 0xc0de0001, `error`: Frequent unlocking with wrong fingerprints
-- `key_id`: 0xc0de0002, `error`: Operation timeout (password input timeout)
-- `key_id`: 0xc0de0003, `error`: Lock picking
-- `key_id`: 0xc0de0004, `error`: Reset button is pressed
-- `key_id`: 0xc0de0005, `error`: The wrong key is frequently unlocked
-- `key_id`: 0xc0de0006, `error`: Foreign body in the keyhole
-- `key_id`: 0xc0de0007, `error`: The key has not been taken out
-- `key_id`: 0xc0de0008, `error`: Error NFC frequently unlocks
-- `key_id`: 0xc0de0009, `error`: Timeout is not locked as required
-- `key_id`: 0xc0de000a, `error`: Failure to unlock frequently in multiple ways
-- `key_id`: 0xc0de000b, `error`: Unlocking the face frequently fails
-- `key_id`: 0xc0de000c, `error`: Failure to unlock the vein frequently
-- `key_id`: 0xc0de000d, `error`: Hijacking alarm
-- `key_id`: 0xc0de000e, `error`: Unlock inside the door after arming
-- `key_id`: 0xc0de000f, `error`: Palmprints frequently fail to unlock
-- `key_id`: 0xc0de0010, `error`: The safe was moved
-- `key_id`: 0xc0de1000, `error`: The battery level is less than 10%
-- `key_id`: 0xc0de1001, `error`: The battery is less than 5%
-- `key_id`: 0xc0de1002, `error`: The fingerprint sensor is abnormal
-- `key_id`: 0xc0de1003, `error`: The accessory battery is low
-- `key_id`: 0xc0de1004, `error`: Mechanical failure
-
-Write me if the values are wrong somewhere. I translated from Chinese [documentation](https://iot.mi.com/new/doc/embedded-development/ble/object-definition).
-
-Example of several automations:
-
-```yaml
-automation:
-- alias: Doorbell
-  trigger:
-    platform: state
-    entity_id: sensor.ble_1010274797_action
-    to: door
-  condition:
-    condition: template
-    value_template: "{{ trigger.to_state.attributes['action_id'] == 3 }}"
-  action:
-    service: persistent_notification.create
-    data_template:
-      title: Doorbell
-      message: The doorbell is ringing
-
-- alias: Lock Error
-  trigger:
-    platform: state
-    entity_id: sensor.ble_1010274797_action
-    to: lock
-  condition:
-    condition: template
-    value_template: "{{ trigger.to_state.attributes['error'] }}"
-  action:
-    service: persistent_notification.create
-    data_template:
-      title: Lock ERROR
-      message: "{{ trigger.to_state.attributes['error'] }}"
-
-- alias: Open lock
-  trigger:
-    platform: state
-    entity_id: sensor.ble_1010274797_action
-    to: lock
-  condition:
-    condition: template
-    value_template: "{{ trigger.to_state.attributes['action_id'] == 0 }}"
-  action:
-    service: persistent_notification.create
-    data_template:
-      title: Lock is open
-      message: |
-        Opening method: {{ trigger.to_state.attributes['method'] }}
-        User ID: {{ trigger.to_state.attributes['key_id'] }}
-```
+Read more in [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki/Handle-BLE-Locks).
 
 # Obtain Mi Home device token
 
@@ -632,13 +527,7 @@ Also you can get:
 
 # Disable Buzzer
 
-If you have a hacked motion sensor, the gateway will beep periodically.
-
-The gateway has an application that handle the **button, LED and beeper**. This option can turn off this application.
-
-**Attention:** I don't know what else this app does and will the gateway work fine without it.
-
-To disable buzzer:
+This option disable only beeps from hacked motion sensor (5 sec):
 
 > Configuration > Integrations > Xiaomi Gateway 3 > Options > Disable buzzer
 
@@ -674,9 +563,9 @@ command: power 7  # I saw values: 0, 7, 30
 
 # How it works
 
-The component enables **Telnet** on Gateway via [Miio protocol](https://github.com/rytilahti/python-miio). Only this Gateway supports this command. Do not try to execute it on other Xiaomi/Aqara Gateways.
+The component enables **Telnet** on Gateway via [Miio protocol](https://github.com/rytilahti/python-miio).
 
-The component starts the **MQTT Server** on the public port of the Gateway. All the logic in the Gateway runs on top of the built-in MQTT Server. By default, access to it is closed from the outside.
+The component starts the **MQTT Server** on the public port of the Gateway. All the Zigbee logic in the Gateway runs on top of the built-in MQTT Server. By default, access to it is closed from the outside.
 
 **ATTENTION:** Telnet and MQTT work without a password! Do not use this method on public networks.
 
@@ -692,7 +581,7 @@ Logging can be setup from:
 
 Shows only component logs. The link to the logs is always random and will apear in Notifications.
 
-You can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
+By adding params to url, you can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
 
 ```
 http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2&t=100
