@@ -27,11 +27,11 @@ class Converter:
     mi: Optional[str] = None
     parent: Optional[str] = None
 
-    lazy: bool = False  # lazy setup will create entities with first data
+    lazy: bool = False  # lazy setup will create entities only with first data
     poll: bool = False  # hass should_poll
 
     # don't init with dataclass because no type:
-    childs = None  # set or dict of children attributes
+    childs = None  # set or dict? of children attributes
     zigbee = None  # str or set? with zigbee cluster
 
     def decode(self, device: "XDevice", payload: dict, value: Any):
@@ -41,7 +41,6 @@ class Converter:
         if not self.mi:
             payload[self.attr] = value
             return
-
         if ".p." in self.mi:
             siid, piid = self.mi.split(".p.")
             cmd = {"siid": int(siid), "piid": int(piid), "value": value}
@@ -66,7 +65,7 @@ class BoolConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
         payload[self.attr] = bool(value)
 
-    def encode(self, device: "XDevice", payload: dict, value: Any):
+    def encode(self, device: "XDevice", payload: dict, value: bool):
         super().encode(device, payload, int(value))
 
 
@@ -74,7 +73,7 @@ class BoolConv(Converter):
 class ConstConv(Converter):
     value: Any = None
 
-    def decode(self, device: "XDevice", payload: dict, value):
+    def decode(self, device: "XDevice", payload: dict, value: Any):
         payload[self.attr] = self.value
 
 
@@ -125,10 +124,10 @@ class ColorTempKelvin(Converter):
 
     def decode(self, device: "XDevice", payload: dict, value: int):
         """Convert degrees kelvin to mired shift."""
-        payload[self.attr] = int(1000000 / value)
+        payload[self.attr] = int(1000000.0 / value)
 
-    def encode(self, device: "XDevice", payload: dict, value: Any):
-        value = int(1000000 / value)
+    def encode(self, device: "XDevice", payload: dict, value: int):
+        value = int(1000000.0 / value)
         if value < self.mink:
             value = self.mink
         if value > self.maxk:
@@ -142,8 +141,9 @@ class ButtonConv(Converter):
         if self.attr == "button":
             payload["action"] = BUTTON.get(value, UNKNOWN)
         elif self.attr.startswith("button_both"):
-            payload["action"] = self.attr + "_" + \
-                                BUTTON_BOTH.get(value, UNKNOWN)
+            both = BUTTON_BOTH.get(value, UNKNOWN)
+            payload["action"] = self.attr + "_" + both
+
         elif self.attr.startswith("button"):
             payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
 
