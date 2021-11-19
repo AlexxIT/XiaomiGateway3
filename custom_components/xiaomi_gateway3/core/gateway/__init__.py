@@ -152,26 +152,25 @@ class XGateway(GateGW3, GateE1):
         """Launching the required utilities on the gw, if they are not already
         running.
         """
-        sh = await shell.connect(self.host)
-        if not sh:
-            self.debug("Can't connect to gateway")
-            return False
-
+        sh: shell.TelnetShell = await shell.connect(self.host)
         try:
+            # should fail if no connection
             await sh.get_version()
-            self.debug(f"Prepare gateway {sh.model} with firmware {sh.ver}")
 
-            if sh.model == "gw3":
+            self.debug(f"Prepare gateway {sh.model} with firmware {sh.ver}")
+            if isinstance(sh, shell.ShellGw3):
                 return await self.gw3_prepare_gateway(sh)
-            elif sh.model == "e1":
+            elif isinstance(sh, shell.ShellE1):
                 return await self.e1_prepare_gateway(sh)
+            else:
+                raise NotImplementedError
 
         except Exception as e:
             self.debug(f"Can't prepare gateway", e)
+            return False
+
         finally:
             await sh.close()
-
-        return False
 
     def async_update_available(self, value: bool):
         self.available = value

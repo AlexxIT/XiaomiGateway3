@@ -32,14 +32,20 @@ class TelnetShell:
         except:
             return None
 
+    async def get_version(self) -> str:
+        raise NotImplementedError
+
+    async def get_token(self) -> str:
+        raise NotImplementedError
+
     async def prevent_unpair(self):
         raise NotImplementedError
 
     async def run_ftp(self):
-        pass
+        raise NotImplementedError
 
     async def tar_data(self):
-        pass
+        raise NotImplementedError
 
     def patch_zigbee_parents(self):
-        pass
+        raise NotImplementedError

@@ -20,9 +20,9 @@ from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.template import Template
 from homeassistant.requirements import async_process_requirements
 
+from . import shell
 from .ezsp import EzspUtils
 from .mini_miio import AsyncMiIO
-from .shell import TelnetShell
 from .xiaomi_cloud import MiCloud
 
 if TYPE_CHECKING:
@@ -142,9 +142,9 @@ def migrate_options(data):
 async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
-    sh = TelnetShell()
+    sh: shell.TelnetShell = await shell.connect(host)
     try:
-        if await sh.connect(host):
+        if sh.model:
             # 1.1. check token with telnet
             return None if await sh.get_token() == token else 'wrong_token'
 
@@ -164,7 +164,7 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
             return 'wrong_token'
 
         # 3. check if right model
-        if info['model'] != 'lumi.gateway.mgl03':
+        if info['model'] not in ('lumi.gateway.mgl03', 'lumi.gateway.aqcn02'):
             return 'wrong_model'
 
         raw = json.loads(telnet_cmd)
@@ -174,7 +174,8 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
         # waiting for telnet to start
         await asyncio.sleep(1)
 
-        if not await sh.connect(host):
+        sh = await shell.connect(host)
+        if not sh.model:
             return 'wrong_telnet'
 
         return None
@@ -306,12 +307,11 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
 
-    sh = TelnetShell()
+    sh: shell.ShellGw3 = await shell.connect(host)
     try:
-        if not await sh.connect(host) or not await sh.run_zigbee_flash():
-            return False
+        assert await sh.run_zigbee_flash()
     except:
-        pass
+        return False
     finally:
         await sh.close()
 

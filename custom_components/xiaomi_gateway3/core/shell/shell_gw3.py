@@ -166,6 +166,14 @@ class ShellGw3(TelnetShell):
         if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
             await self.exec(RUN_FTP)
 
+    async def run_zigbee_flash(self) -> bool:
+        if not await self.check_zigbee_tcp():
+            return False
+        await self.exec("killall daemon_app.sh")
+        await self.exec("killall Lumi_Z3GatewayHost_MQTT ser2net socat")
+        await self.exec(RUN_ZIGBEE_FLASH)
+        return True
+
     async def check_bin(self, filename: str, md5: str, url=None) -> bool:
         """Check binary md5 and download it if needed."""
         if md5 in await self.exec("md5sum /data/" + filename):
@@ -215,6 +223,10 @@ class ShellGw3(TelnetShell):
         raw = await self.read_file('/etc/rootfs_fw_info')
         m = re.search(r'version=([0-9._]+)', raw.decode())
         self.ver = m[1]
+
+    async def get_token(self) -> str:
+        raw = await self.read_file('/data/miio/device.token')
+        return raw.rstrip().hex()
 
     async def get_did(self):
         raw = await self.read_file('/data/miio/device.conf')
