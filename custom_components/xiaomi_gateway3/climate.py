@@ -18,49 +18,22 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiClimate(XEntity, ClimateEntity):
-    _state: dict = None
-
-    @property
-    def precision(self) -> float:
-        return PRECISION_WHOLE
-
-    @property
-    def temperature_unit(self):
-        return TEMP_CELSIUS
-
-    @property
-    def hvac_mode(self) -> str:
-        return self._state.get("hvac_mode") if self._state else None
-
-    @property
-    def current_temperature(self):
-        return self._state.get("current_temp") if self._state else None
-
-    @property
-    def target_temperature(self):
-        # fix scenes with turned off climate
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
-        return self._state.get("target_temp") if self._state else 0
-
-    @property
-    def fan_mode(self):
-        return self._state.get("fan_mode")
-
-    @property
-    def hvac_modes(self):
-        return [HVAC_MODE_OFF, HVAC_MODE_COOL, HVAC_MODE_HEAT]
-
-    @property
-    def fan_modes(self):
-        return [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
-
-    @property
-    def supported_features(self):
-        return SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
+    _attr_fan_mode = None
+    _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
+    _attr_hvac_mode = None
+    _attr_hvac_modes = [HVAC_MODE_OFF, HVAC_MODE_COOL, HVAC_MODE_HEAT]
+    _attr_precision = PRECISION_WHOLE
+    _attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
+    _attr_temperature_unit = TEMP_CELSIUS
 
     @callback
     def async_set_state(self, data: dict):
-        self._state = data
+        self._attr_current_temperature = data.get("current_temp")
+        self._attr_fan_mode = data.get("fan_mode")
+        self._attr_hvac_mode = data.get("hvac_mode")
+        # fix scenes with turned off climate
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
+        self._attr_target_temperature = data.get("target_temp", 0)
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
