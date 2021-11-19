@@ -405,15 +405,16 @@ class XEntity(Entity):
         self._attr_name = device.name(attr)
         self._attr_should_poll = conv.poll
         self._attr_unique_id = device.unique_id(attr)
-        if conv.domain == "sensor":  # binary_sensor moisture problem
-            self._attr_unit_of_measurement = UNITS.get(attr)
         self.entity_id = device.entity_id(conv)
 
-        if attr in STATE_CLASSES:
-            self._attr_state_class = STATE_CLASSES[attr]
-        # by default all sensors with units is measurement sensors
-        elif attr in UNITS:
-            self._attr_state_class = STATE_CLASS_MEASUREMENT
+        if conv.domain == "sensor":  # binary_sensor moisture problem
+            self._attr_unit_of_measurement = UNITS.get(attr)
+
+            if attr in STATE_CLASSES:
+                self._attr_state_class = STATE_CLASSES[attr]
+            elif attr in UNITS:
+                # by default all sensors with units is measurement sensors
+                self._attr_state_class = STATE_CLASS_MEASUREMENT
 
         if self.device.model == MESH_GROUP_MODEL:
             connections = None
