@@ -1,13 +1,28 @@
 import asyncio
 import socket
 from typing import Union
+
 from .base import TelnetShell
 from .shell_e1 import ShellE1
 from .shell_gw3 import ShellGw3
 
 
 async def connect(host: str, port=23) -> Union[TelnetShell, ShellGw3, ShellE1]:
-    """Return TelnetShell class for specific gateway."""
+    """Return TelnetShell class for specific gateway. Returns the object in any
+    case. To be able to execute the `close()` function.
+
+    Example of usage:
+
+        sh: shell.TelnetShell = await shell.connect(host)
+        try:
+            # should fail if no connection
+            await sh.get_version()
+            return True
+        except Exception as e:
+            return False
+        finally:
+            await sh.close()
+    """
     reader = writer = None
 
     try:

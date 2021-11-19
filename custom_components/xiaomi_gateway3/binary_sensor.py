@@ -39,6 +39,7 @@ class XiaomiBinaryBase(XEntity, BinarySensorEntity):
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
+            # support invert_state for sensor
             self._attr_is_on = not data[self.attr] \
                 if self.customize.get(CONF_INVERT_STATE, False) \
                 else data[self.attr]
@@ -60,6 +61,7 @@ class XiaomiBinarySensor(XiaomiBinaryBase, RestoreEntity):
 class XiaomiGateway(XiaomiBinaryBase):
     @callback
     def async_update_available(self):
+        # sensor state=connected when whole gateway available
         self._attr_is_on = self.gw.available
 
 

@@ -14,6 +14,9 @@ CLUSTERS = {}
 
 # noinspection PyTypeChecker
 def decode(data: dict):
+    """Decode Silabs Z3 GatewayHost MQTT message using zigpy library. Supports
+    ZDO payload and ZCL payload.
+    """
     try:
         if data["sourceEndpoint"] == "0x00":
             # decode ZDO
@@ -214,6 +217,7 @@ def decode(data: dict):
 
 
 def zcl_on_off(nwk: str, ep: int, value: bool) -> list:
+    """Generate Silabs Z3 command (cluster 6)."""
     value = "on" if value else "off"
     return [
         {"commandcli": f"zcl on-off {value}"},
@@ -223,6 +227,7 @@ def zcl_on_off(nwk: str, ep: int, value: bool) -> list:
 
 # zcl level-control mv-to-level [level:1] [transitionTime:2] [optionMask:1] [optionOverride:1]
 def zcl_level(nwk: str, ep: int, br: int, tr: float) -> list:
+    """Generate Silabs Z3 command (cluster 8)."""
     tr = int(tr * 10.0)  # zcl format - tenths of a seconds
     return [
         {"commandcli": f"zcl level-control o-mv-to-level {br} {tr}"},
@@ -231,6 +236,7 @@ def zcl_level(nwk: str, ep: int, br: int, tr: float) -> list:
 
 
 def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
+    """Generate Silabs Z3 command (cluster 0x0300)."""
     tr = int(tr * 10.0)  # zcl format - tenths of a seconds
     return [
         {"commandcli": f"zcl color-control movetocolortemp {ct} {tr} 0 0"},
@@ -240,6 +246,7 @@ def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
 
 # zcl global read [cluster:2] [attributeId:2]
 def zcl_read(nwk: str, ep: int, cluster: int, attr) -> list:
+    """Generate Silabs Z3 read attribute command. Support multiple attrs."""
     if isinstance(attr, list):
         raw = "".join([int(a).to_bytes(2, "little").hex() for a in attr])
         return [
@@ -256,6 +263,7 @@ def zcl_read(nwk: str, ep: int, cluster: int, attr) -> list:
 # zcl global write [cluster:2] [attributeId:2] [type:4] [data:-1]
 def zcl_write(nwk: str, ep: int, cluster: int, attr: int, type: int,
               data, mfg: int = None) -> list:
+    """Generate Silabs Z3 write attribute command."""
     if type == 0x30:
         data = f"{{{data:02x}}}"
     pre = [
@@ -268,6 +276,7 @@ def zcl_write(nwk: str, ep: int, cluster: int, attr: int, type: int,
 
 
 def zdo_bind(nwk: str, ep: int, cluster: int, src: str, dst: str) -> list:
+    """Generate Silabs Z3 bind command."""
     return [{
         "commandcli": f"zdo bind {nwk} {ep} 1 {cluster} {{{src}}} {{{dst}}}"
     }]
