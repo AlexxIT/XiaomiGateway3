@@ -1,8 +1,6 @@
 import asyncio
 
-from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
-    SUPPORT_COLOR_TEMP, SUPPORT_TRANSITION, ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, \
-    ATTR_TRANSITION
+from homeassistant.components.light import *
 from homeassistant.const import STATE_ON
 from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -32,6 +30,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiLight(XEntity, LightEntity, RestoreEntity):
+    _attr_is_on = None
+
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
 
@@ -49,14 +49,10 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
                     self._attr_min_mireds = int(1000000 / conv.maxk)
                     self._attr_max_mireds = int(1000000 / conv.mink)
 
-    @property
-    def is_on(self):
-        return self._attr_state is True
-
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
-            self._attr_state = data[self.attr]
+            self._attr_is_on = data[self.attr]
         # sometimes brightness and color_temp stored as string in Xiaomi DB
         if ATTR_BRIGHTNESS in data:
             self._attr_brightness = data[ATTR_BRIGHTNESS]
