@@ -5,9 +5,11 @@ import logging
 import random
 import socket
 import time
+import traceback
+from asyncio import DatagramProtocol, Future
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
-from typing import Union, Optional
+from typing import Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
@@ -81,7 +83,7 @@ class BasemiIO:
         return self._decrypt(raw[32:])
 
 
-class SyncmiIO(BasemiIO):
+class SyncMiIO(BasemiIO):
     """Synchronous miIO protocol."""
 
     def __init__(self, host: str, token: str, timeout: float = 3):
@@ -147,8 +149,8 @@ class SyncmiIO(BasemiIO):
 
             except socket.timeout:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
-            except Exception as e:
-                _LOGGER.debug(f"{self.addr[0]} | exception {e}")
+            except:
+                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
 
             # init ping again
             self.delta_ts = None
@@ -200,74 +202,139 @@ class SyncmiIO(BasemiIO):
         return self.send('miIO.info')
 
 
-# noinspection PyMethodMayBeStatic,PyTypeChecker
-class AsyncmiIO(BasemiIO, BaseProtocol):
-    response = None
-    sock: Optional[DatagramTransport] = None
+class AsyncSocket(DatagramProtocol):
+    timeout = 0
+    transport: DatagramTransport = None
+    response: Future = None
+
+    def __init__(self):
+        self.response = asyncio.get_event_loop().create_future()
+
+    def connection_made(self, transport: DatagramTransport):
+        # _LOGGER.debug(f"connection_made {transport}")
+        self.transport = transport
 
     def datagram_received(self, data: bytes, addr):
-        # hello message
-        if len(data) == 32:
-            if data[:2] == b'\x21\x31':
-                self.device_id = int.from_bytes(data[8:12], 'big')
-                ts = int.from_bytes(data[12:16], 'big')
-                self.delta_ts = time.time() - ts
-                result = True
-            else:
-                result = False
-        else:
-            result = self._unpack_raw(data)
+        # _LOGGER.debug(f"datagram_received {data}")
+        self.response.set_result(data)
 
-        self.response.set_result(result)
+    def settimeout(self, value: int):
+        self.timeout = value
 
-    def error_received(self, exc):
-        print('Error received:', exc)
+    def sendto(self, data: bytes):
+        self.transport.sendto(data)
 
-    def connection_lost(self, exc):
-        print("Connection closed")
-        self.sock = None
+    def close(self):
+        self.transport.close()
 
-    async def send_raw(self, data: bytes):
-        loop = asyncio.get_running_loop()
-        if not self.sock:
-            self.sock, _ = await loop.create_datagram_endpoint(
-                lambda: self, remote_addr=self.addr)
+    async def connect(self, addr: tuple):
+        await asyncio.get_event_loop().create_datagram_endpoint(
+            lambda: self, remote_addr=addr
+        )
 
-        self.response = loop.create_future()
-        # this method does not block
-        self.sock.sendto(data)
+    async def recv(self, *args):
+        self.response = asyncio.get_event_loop().create_future()
+        if self.timeout:
+            return await asyncio.wait_for(self.response, self.timeout)
         return await self.response
 
-    async def ping(self):
-        return await self.send_raw(HELLO)
+
+# noinspection PyMethodMayBeStatic,PyTypeChecker
+class AsyncMiIO(BasemiIO, BaseProtocol):
+    async def ping(self, sock: AsyncSocket) -> bool:
+        """Returns `true` if the connection to the miio device is working. The
+        token is not verified at this stage.
+        """
+        try:
+            sock.sendto(HELLO)
+            raw = await sock.recv(1024)
+            if raw[:2] == b'\x21\x31':
+                self.device_id = int.from_bytes(raw[8:12], 'big')
+                self.delta_ts = time.time() - int.from_bytes(raw[12:16], 'big')
+                return True
+        except:
+            pass
+        return False
 
     async def send(self, method: str, params: Union[dict, list] = None):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
+
+        Possible results:
+        - None - device offline
+        - {} (empty dict) - device online but can't response on cmd
+        - {'id':123,'result':...} - device answered on cmd with good result
+        - {'id':123,'error':...}
         """
-        if not self.device_id and not await self.ping():
+        offline = False
+        for times in range(1, 4):
+            sock = AsyncSocket()
+            sock.settimeout(5)
+            try:
+                # create socket every time for reset connection, because we can
+                # reseive answer on previous request or request from another
+                # thread
+                await sock.connect(self.addr)
+
+                # need device_id for send command, can get it from ping cmd
+                if self.delta_ts is None and not await self.ping(sock):
+                    # device doesn't answered on ping
+                    offline = True
+                    continue
+
+                # pack each time for new message id
+                msg_id = random.randint(100000000, 999999999)
+                raw_send = self._pack_raw(msg_id, method, params)
+                sock.sendto(raw_send)
+                # can receive more than 1024 bytes (1056 approximate maximum)
+                raw_recv = await sock.recv(10240)
+                data = self._unpack_raw(raw_recv).rstrip(b'\x00')
+
+                if data == b'':
+                    # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
+                    # command with empty answer
+                    continue
+
+                data = json.loads(data)
+                # check if we received response for our cmd
+                if data['id'] != msg_id:
+                    _LOGGER.debug(f"{self.addr[0]} | wrong answer ID")
+                    continue
+
+                return data
+
+            except asyncio.TimeoutError:
+                # _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+                pass
+            except:
+                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
+            finally:
+                sock.close()
+
+            # init ping again
+            self.delta_ts = None
+
+        if offline:
+            _LOGGER.warning(f"{self.addr[0]} | Device offline")
             return None
 
-        try:
-            raw = self._pack_raw(method, params)
-            data = await self.send_raw(raw)
-            return json.loads(data.rstrip(b'\x00'))['result']
-        except Exception as e:
-            _LOGGER.warning(f"Can't send: {e}")
-            return None
+        _LOGGER.info(f"{self.addr[0]} | No answer on {method} {params}")
+        return {}
 
-    async def send_bulk(self, method: str, params: list):
+    async def send_bulk(self, method: str, params: list) -> list:
         """Sends a command with a large number of parameters. Splits into
         multiple requests when the size of one request is exceeded.
         """
         try:
             result = []
             for i in range(0, len(params), 15):
-                result += await self.send(method, params[i:i + 15])
+                resp = await self.send(method, params[i:i + 15])
+                result += resp['result']
             return result
         except:
             return None
 
     async def info(self):
         """Get info about miIO device."""
-        return await self.send('miIO.info')
+        resp = await self.send('miIO.info')
+        return resp.get('result') if resp else resp

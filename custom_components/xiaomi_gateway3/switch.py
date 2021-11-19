@@ -28,7 +28,7 @@ class XiaomiZigbeeSwitch(XiaomiEntity, ToggleEntity):
     def is_on(self):
         return self._state
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         # thread.run > mqtt.loop_forever > ... > thread.on_message
         #   > entity.update
         #   > entity.schedule_update_ha_state *
@@ -45,13 +45,13 @@ class XiaomiZigbeeSwitch(XiaomiEntity, ToggleEntity):
         #   > loop.call_soon
         if self.attr in data:
             self._state = bool(data[self.attr])
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def turn_on(self):
-        self.gw.send(self.device, {self.attr: 1})
+    async def async_turn_on(self):
+        await self.gw.send_zigbee(self.device, {self.attr: 1})
 
-    def turn_off(self):
-        self.gw.send(self.device, {self.attr: 0})
+    async def async_turn_off(self):
+        await self.gw.send_zigbee(self.device, {self.attr: 0})
 
 
 class XiaomiMeshSwitch(XiaomiEntity, ToggleEntity):
@@ -63,7 +63,7 @@ class XiaomiMeshSwitch(XiaomiEntity, ToggleEntity):
     def is_on(self):
         return self._state
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if data is None:
             self.gw.mesh_force_update()
             return
@@ -76,21 +76,21 @@ class XiaomiMeshSwitch(XiaomiEntity, ToggleEntity):
             else:
                 self.device['online'] = False
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs):
         self._state = True
 
-        self.gw.send_mesh(self.device, {self.attr: True})
+        await self.gw.send_mesh(self.device, {self.attr: True})
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         self._state = False
 
-        self.gw.send_mesh(self.device, {self.attr: False})
+        await self.gw.send_mesh(self.device, {self.attr: False})
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class FirmwareLock(XiaomiZigbeeSwitch):
@@ -98,17 +98,17 @@ class FirmwareLock(XiaomiZigbeeSwitch):
     def icon(self):
         return 'mdi:cloud-lock'
 
-    def turn_on(self):
-        if self.gw.lock_firmware(enable=True):
+    async def async_turn_on(self):
+        if await self.gw.lock_firmware(enable=True):
             self._state = True
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
-            persistent_notification.create(
+            persistent_notification.async_create(
                 self.hass, "Firmware update is locked. You can sleep well.",
                 "Xiaomi Gateway 3"
             )
 
-    def turn_off(self):
-        if self.gw.lock_firmware(enable=False):
+    async def async_turn_off(self):
+        if await self.gw.lock_firmware(enable=False):
             self._state = False
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()

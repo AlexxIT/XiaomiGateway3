@@ -79,7 +79,7 @@ class XiaomiClimate(XiaomiEntity, ClimateEntity):
     def supported_features(self):
         return SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         try:
             if 'power' in data:  # 0 - off, 1 - on
                 self._is_on = data['power']
@@ -122,26 +122,26 @@ class XiaomiClimate(XiaomiEntity, ClimateEntity):
         except:
             _LOGGER.exception(f"Can't read climate data: {data}")
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
-    def set_temperature(self, **kwargs) -> None:
+    async def async_set_temperature(self, **kwargs) -> None:
         if not self._state or kwargs[ATTR_TEMPERATURE] == 0:
             self.debug(f"Can't set climate temperature: {self._state}")
             return
         self._state[2] = int(kwargs[ATTR_TEMPERATURE])
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self.attr: state})
+        await self.gw.send_zigbee(self.device, {self.attr: state})
 
-    def set_fan_mode(self, fan_mode: str) -> None:
+    async def async_set_fan_mode(self, fan_mode: str) -> None:
         if not self._state:
             return
         self._state[1] = AC_STATE_FAN[fan_mode]
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self.attr: state})
+        await self.gw.send_zigbee(self.device, {self.attr: state})
 
-    def set_hvac_mode(self, hvac_mode: str) -> None:
+    async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         if not self._state:
             return
         self._state[0] = AC_STATE_HVAC[hvac_mode]
         state = int.from_bytes(self._state, 'big')
-        self.gw.send(self.device, {self.attr: state})
+        await self.gw.send_zigbee(self.device, {self.attr: state})

@@ -6,7 +6,7 @@
   "issue_tracker": "https://github.com/AlexxIT/XiaomiGateway3/issues",
   "codeowners": ["@AlexxIT"],
   "dependencies": ["http"],
-  "requirements": ["paho-mqtt>=1.5.0"],
+  "requirements": [],
   "version": "1.5.1",
   "iot_class": "local_push"
 }

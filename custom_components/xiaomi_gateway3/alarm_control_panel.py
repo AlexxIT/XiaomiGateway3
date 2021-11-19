@@ -47,32 +47,32 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
     def code_arm_required(self):
         return False
 
-    def alarm_disarm(self, code=None):
-        self.gw.miio.send('set_properties', [{
+    async def async_alarm_disarm(self, code=None):
+        await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 0
         }])
 
-    def alarm_arm_home(self, code=None):
-        self.gw.miio.send('set_properties', [{
+    async def async_alarm_arm_home(self, code=None):
+        await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 1
         }])
 
-    def alarm_arm_away(self, code=None):
-        self.gw.miio.send('set_properties', [{
+    async def async_alarm_arm_away(self, code=None):
+        await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 2
         }])
 
-    def alarm_arm_night(self, code=None):
-        self.gw.miio.send('set_properties', [{
+    async def async_alarm_arm_night(self, code=None):
+        await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 1, 'value': 3
         }])
 
-    def alarm_trigger(self, code=None):
-        self.gw.miio.send('set_properties', [{
+    async def async_alarm_trigger(self, code=None):
+        await self.gw.miio.send('set_properties', [{
             'did': self.miio_did, 'siid': 3, 'piid': 22, 'value': 1
         }])
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if data:
             if self.attr in data:
                 state = data[self.attr]
@@ -80,19 +80,19 @@ class XiaomiAlarm(XiaomiEntity, AlarmControlPanelEntity):
             elif data.get('alarm_trigger'):
                 self._state = STATE_ALARM_TRIGGERED
 
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
         else:
             try:
-                resp = self.gw.miio.send('get_properties', [{
+                resp = await self.gw.miio.send('get_properties', [{
                     'did': self.miio_did, 'siid': 3, 'piid': 22
                 }])
-                if resp[0]['value'] == 1:
+                if resp['result'][0]['value'] == 1:
                     self._state = STATE_ALARM_TRIGGERED
                 else:
-                    resp = self.gw.miio.send('get_properties', [{
+                    resp = await self.gw.miio.send('get_properties', [{
                         'did': self.miio_did, 'siid': 3, 'piid': 1
                     }])
-                    state = resp[0]['value']
+                    state = resp['result'][0]['value']
                     self._state = ALARM_STATES[state]
             except:
                 pass

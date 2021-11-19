@@ -50,11 +50,11 @@
           "ble": "Dispozitive BLE suportate",
           "stats": "Date despre performanta dispozitivelor Zigbee si BLE",
           "debug": "Debug",
-          "buzzer": "Dezactiveaza buzzer [PRO]",
-          "parent": "Afiseaza dispozitivele tip parinte in statistici [PRO]",
-          "zha": "Mod [PRO]"
+          "buzzer": "Dezactiveaza buzzer [ADV]",
+          "memory": "Use storage in memory [ADV]",
+          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
         },
-        "description": "Nu schimba optiunile **PRO** DECAT daca stii ce fac!"
+        "description": "Nu schimba optiunile **ADV** DECAT daca stii ce fac!"
       }
     }
   },

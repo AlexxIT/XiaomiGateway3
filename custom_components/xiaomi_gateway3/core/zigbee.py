@@ -510,7 +510,7 @@ DEVICES = [{
 }]
 
 GLOBAL_PROP = {
-    # '8.0.2001': 'battery',
+    '8.0.2001': 'battery_percent',
     '8.0.2002': 'reset_cnt',
     '8.0.2003': 'send_all_cnt',
     '8.0.2004': 'send_fail_cnt',
@@ -521,6 +521,7 @@ GLOBAL_PROP = {
     '8.0.2009': 'pv_state',
     '8.0.2010': 'cur_state',
     '8.0.2011': 'pre_state',
+    '8.0.2012': 'tx_power',
     '8.0.2013': 'CCA',
     '8.0.2014': 'protect',
     '8.0.2015': 'power',
@@ -529,15 +530,21 @@ GLOBAL_PROP = {
     '8.0.2030': 'poweroff_memory',
     '8.0.2031': 'charge_protect',
     '8.0.2032': 'en_night_tip_light',
+    '8.0.2033': 'resend_succ_avg_cnt',
     '8.0.2034': 'load_s0',  # ctrl_dualchn
     '8.0.2035': 'load_s1',  # ctrl_dualchn
     '8.0.2036': 'parent',
+    '8.0.2037': 'invalid_count',
+    '8.0.2038': 'wakeup_num',
+    '8.0.2039': 'disturbance_num',
+    '8.0.2040': 'param_version',
     '8.0.2041': 'model',
     '8.0.2042': 'max_power',
     '8.0.2044': 'plug_detection',
     '8.0.2091': 'ota_progress',
     '8.0.2101': 'nl_invert',  # ctrl_86plug
     '8.0.2102': 'alive',
+    '8.0.2154': 'device_deletion_report',
     '8.0.2157': 'network_pan_id',
     '8.0.9001': 'battery_end_of_life'
 }
@@ -577,7 +584,7 @@ def get_device(zigbee_model: str) -> Optional[dict]:
             return {
                 # 'model': zigbee_model,
                 'device_manufacturer': desc[0],
-                'device_name': desc[0] + ' ' + desc[1],
+                'device_name': f"{desc[0]} {desc[1]}",
                 'device_model': (
                     zigbee_model + ' ' + desc[2]
                     if len(desc) > 2 else zigbee_model

@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import time
 from datetime import timedelta
 
 from homeassistant.const import *
@@ -101,10 +101,10 @@ class XiaomiSensor(XiaomiEntity, SensorEntity):
         elif self.attr in UNITS:
             self._attr_state_class = "measurement"
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         if self.attr in data:
             self._state = data[self.attr]
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class GatewayStats(XiaomiSensor):
@@ -123,25 +123,45 @@ class GatewayStats(XiaomiSensor):
 
     async def async_added_to_hass(self):
         self.gw.set_stats(self)
-        self.hass.add_job(self.update)
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         # empty data - update state to available time
         if not data:
             self._state = now().isoformat(timespec='seconds') \
                 if self.gw.available else None
         else:
+            if 'networkUp' in data:
+                # {"networkUp":false}
+                data = {
+                    'network_pan_id': data.get('networkPanId'),
+                    'radio_tx_power': data.get('radioTxPower'),
+                    'radio_channel': data.get('radioChannel'),
+                }
+            elif 'free_mem' in data:
+                s = data['run_time']
+                d = s // (3600 * 24)
+                h = s % (3600 * 24) // 3600
+                m = s % 3600 // 60
+                s = s % 60
+                data = {
+                    'free_mem': data['free_mem'],
+                    'load_avg': data['load_avg'],
+                    'rssi': -data['rssi'],
+                    'uptime': f"{d} days, {h:02}:{m:02}:{s:02}",
+                }
+
             self._attrs.update(data)
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class ZigbeeStats(XiaomiSensor):
     last_seq1 = None
     last_seq2 = None
+    last_rst = None
 
     @property
     def state(self):
@@ -162,11 +182,13 @@ class ZigbeeStats(XiaomiSensor):
             self._attrs = {
                 'ieee': ieee,
                 'nwk': self.device['nwk'],
+                'parent': self.parent(),
                 'msg_received': 0,
                 'msg_missed': 0,
                 'unresponsive': 0,
                 'last_missed': 0,
             }
+            self.last_rst = self.device['init'].get('reset_cnt')
             self.render_attributes_template()
 
         self.gw.set_stats(self)
@@ -174,7 +196,11 @@ class ZigbeeStats(XiaomiSensor):
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
+        if data is None:
+            return
+
+        # from Z3 MessageReceived topic
         if 'sourceAddress' in data:
             self._attrs['link_quality'] = data['linkQuality']
             self._attrs['rssi'] = data['rssi']
@@ -191,7 +217,8 @@ class ZigbeeStats(XiaomiSensor):
                 raw = data['APSPlayload']
                 manufact_spec = int(raw[2:4], 16) & 4
                 new_seq2 = int(raw[8:10] if manufact_spec else raw[4:6], 16)
-                if self.last_seq1 is not None:
+                # new_seq2 == 0 -> probably device reset
+                if self.last_seq1 is not None and new_seq2 != 0:
                     miss = min(
                         (new_seq1 - self.last_seq1 - 1) & 0xFF,
                         (new_seq2 - self.last_seq2 - 1) & 0xFF
@@ -211,16 +238,33 @@ class ZigbeeStats(XiaomiSensor):
 
             self._state = now().isoformat(timespec='seconds')
 
-        elif 'parent' in data:
+        # from gw.process_parent_scan (Z3 utility timer)
+        elif 'ago' in data:
             ago = timedelta(seconds=data['ago'])
             self._state = (now() - ago).isoformat(timespec='seconds')
             self._attrs['type'] = data['type']
             self._attrs['parent'] = data['parent']
 
+        # from battery sensors heartbeat
+        elif 'parent' in data:
+            self._attrs['parent'] = self.parent(data['parent'])
+
+        # from zigbee_agent utility (disabled)
+        elif 'alive' in data:
+            ago = timedelta(seconds=data['alive']['time'])
+            self._state = (now() - ago).isoformat(timespec='seconds')
+
+        # from device heartbeat
+        elif 'reset_cnt' in data:
+            self._attrs.setdefault('reset_cnt', 0)
+            if self.last_rst is not None:
+                self._attrs['reset_cnt'] += data['reset_cnt'] - self.last_rst
+            self.last_rst = data['reset_cnt']
+
         elif data.get('deviceState') == 17:
             self._attrs['unresponsive'] += 1
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 class BLEStats(XiaomiSensor):
@@ -246,15 +290,15 @@ class BLEStats(XiaomiSensor):
             self.render_attributes_template()
 
         self.gw.set_stats(self)
-        self.hass.add_job(self.update)
+        self.hass.async_create_task(self.async_update())
 
     async def async_will_remove_from_hass(self) -> None:
         self.gw.remove_stats(self)
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         self._attrs['msg_received'] += 1
         self._state = now().isoformat(timespec='seconds')
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
 
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/converters/fromZigbee.js#L4738
@@ -301,7 +345,7 @@ class XiaomiAction(XiaomiEntity):
     def device_state_attributes(self):
         return self._action_attrs or self._attrs
 
-    def update(self, data: dict = None):
+    async def async_update(self, data: dict = None):
         for k, v in data.items():
             if k == 'button':
                 # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
@@ -330,15 +374,15 @@ class XiaomiAction(XiaomiEntity):
         if self.attr in data:
             self._action_attrs = {**self._attrs, **data}
             self._state = data[self.attr]
-            self.schedule_update_ha_state()
+            self.async_write_ha_state()
 
             # repeat event from Aqara integration
-            self.hass.bus.fire('xiaomi_aqara.click', {
+            self.hass.bus.async_fire('xiaomi_aqara.click', {
                 'entity_id': self.entity_id, 'click_type': self._state
             })
 
-            time.sleep(.3)
+            await asyncio.sleep(.3)
 
             self._state = ''
 
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
