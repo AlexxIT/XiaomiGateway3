@@ -48,7 +48,7 @@
 					"host": "主机",
 					"token": "Token",
 					"ble": "支持 BLE 设备",
-					"stats": "Zigbee 和 BLE 效能数据",
+					"entities": "Additional entities",
 					"debug": "调试信息",
 					"buzzer": "关闭蜂鸣器 [ADV]",
                     "memory": "Use storage in memory [ADV]",

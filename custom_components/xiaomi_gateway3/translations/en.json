@@ -50,8 +50,8 @@
           "token": "Token",
           "telnet_cmd": "Open Telnet command",
           "ble": "Support Bluetooth devices",
-          "stats": "Add statistic sensors",
-          "debug": "Debug",
+          "entities": "Additional entities",
+          "debug": "Debug logs",
           "buzzer": "Disable buzzer [ADV]",
           "memory": "Use storage in memory [ADV]",
           "zha": "Mode ZHA or zigbee2mqtt [ADV]"

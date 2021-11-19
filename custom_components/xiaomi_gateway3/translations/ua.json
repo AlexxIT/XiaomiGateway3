@@ -46,7 +46,7 @@
           "host": "IP-адреса",
           "token": "Токен",
           "ble": "Підтримка BLE пристроїв",
-          "stats": "Деталізація роботи Zigbee і BLE",
+          "entities": "Additional entities",
           "debug": "Відлагодження",
           "buzzer": "Вимкнути спікер [ADV]",
           "memory": "Use storage in memory [ADV]",

@@ -50,7 +50,7 @@
           "token": "密鑰",
           "telnet_cmd": "開啟 Telnet 指令",
           "ble": "支援 BLE 設備",
-          "stats": "Zigbee 與 BLE 效能資料",
+          "entities": "Additional entities",
           "debug": "Debug",
           "buzzer": "關閉蜂鳴器 [ADV]",
           "memory": "Use storage in memory [ADV]",
