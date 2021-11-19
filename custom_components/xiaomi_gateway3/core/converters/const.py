@@ -32,36 +32,22 @@ BUTTON_BOTH = {
     16: HOLD,
     17: RELEASE,
 }
-VIBRATION = {
-    1: "vibration",
-    2: "tilt",
-    3: "drop",
-}
+VIBRATION = {1: "vibration", 2: "tilt", 3: "drop"}
 LOCK_STATE = {
-    1: "door_open",
-    2: "door_close",
-    3: "lock_close",
-    4: "tongue_close",
+    1: "door_open", 2: "door_close", 3: "lock_close", 4: "tongue_close",
 }
 LOCK_CONTROL = {
-    0: "in_unlocked",
-    1: "out_unlocked",
-    2: "in_locked",
-    3: "out_locked",
+    0: "in_unlocked", 1: "out_unlocked", 2: "in_locked", 3: "out_locked",
 }
-MOTOR = {
-    0: "close",
-    1: "open",
-    2: "stop",
-}
-RUN_STATE = {
-    0: "closing",  # offing
-    1: "opening",  # oning
-    2: "stop",
-}
+MOTOR = {0: "close", 1: "open", 2: "stop"}
+RUN_STATE = {0: "closing", 1: "opening", 2: "stop"}
 GATE_ALARM = {
     0: "disarmed", 1: "armed_home", 2: "armed_away", 3: "armed_night"
 }
+POWEROFF_MEMORY = {0: "off", 1: "previous"}
+# Hass: On means low, Off means normal
+BATTERY_LOW = {1: False, 2: True}
+SWITCH_MODE = {1: "250 ms", 2: "500 ms", 3: "750 ms", 4: "1 sec"}
 
 GATE_COMMANDS = {
     "idle": "Idle",

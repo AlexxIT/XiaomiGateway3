@@ -146,7 +146,7 @@ class BLEStatsConv(Converter):
         if 'msg_received' in device.extra:
             device.extra['msg_received'] += 1
         else:
-            device.extra.update({'msg_received': 1})
+            device.extra['msg_received'] = 1
 
         payload.update({
             BLE: now().isoformat(timespec='seconds'),

@@ -188,8 +188,8 @@ DEVICES += [{
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.switch.b1nacn02": ["Aqara", "Single Wall Switch D1", "QBKG23LM"],
     "required": [
+        BoolConv("switch", "switch", mi="4.1.85"),
         Power, Energy, Action, Button,
-        BoolConv("switch", "switch", mi="4.1.85")
     ],
     "optional": [ZigbeeStats],
 }, {
@@ -241,11 +241,12 @@ DEVICES += [{
     # with neutral wire, thanks @Mantoui
     "lumi.switch.n3acn3": ["Aqara", "Triple Wall Switch D1", "QBKG26LM"],
     "required": [
-        ChannelC1, ChannelC2, ChannelC3, Power,
+        ChannelC1, ChannelC2, ChannelC3, Power, Voltage,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
     ],
     "optional": [ZigbeeStats, Energy],
 }, {
+    # we using lumi+zigbee covnerters for support heartbeats and transition
     # light with brightness and color temp
     "lumi.light.cwopcn02": ["Aqara", "Opple MX650", "XDD12LM"],
     "lumi.light.cwopcn03": ["Aqara", "Opple MX480", "XDD13LM"],
@@ -316,7 +317,10 @@ DEVICES += [{
     # temperature, humidity and pressure sensor
     "lumi.weather": ["Aqara", "TH Sensor", "WSDCGQ11LM"],
     "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor", "WSDCGQ12LM"],
-    "required": [Temperature, Humidity, Pressure, Battery],
+    "required": [
+        Temperature, Humidity, Battery,
+        MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01),
+    ],
     "optional": [ZigbeeStats, BatteryPer],
 }, {
     # door window sensor
@@ -331,15 +335,19 @@ DEVICES += [{
 }, {
     # motion sensor
     "lumi.sensor_motion": ["Xiaomi", "Motion Sensor", "RTCGQ01LM"],
-    "required": [Motion, Battery],
+    "required": [
+        BoolConv("motion", "binary_sensor", mi="3.1.85"),
+        Battery,
+    ],
     "optional": [ZigbeeStats, BatteryPer],
 }, {
     # motion sensor with illuminance
     "lumi.sensor_motion.aq2": ["Aqara", "Motion Sensor", "RTCGQ11LM"],
     "required": [
-        Motion, Battery,
+        BoolConv("motion", "binary_sensor", mi="3.1.85"),
         # Converter("illuminance_lux", None, "0.3.85", "lux"),
-        Converter("illuminance", "sensor", mi="0.4.85")
+        Converter("illuminance", "sensor", mi="0.4.85"),
+        Battery,
     ],
     "optional": [ZigbeeStats, BatteryPer],
 }, {
@@ -353,6 +361,7 @@ DEVICES += [{
 }, {
     # vibration sensor
     "lumi.vibration.aq1": ["Aqara", "Vibration Sensor", "DJT11LM"],
+    "support": 2,  # TODO: need some tests
     "required": [
         Action, Battery,
         Converter("bed_activity", mi="0.1.85"),
@@ -366,6 +375,7 @@ DEVICES += [{
     # cube action, no retain
     "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
     "lumi.sensor_cube.aqgl01": ["Aqara", "Cube", "MFKZQ01LM"],  # tested
+    "support": 3,  # TODO: need some tests
     "required": [
         ZAqaraCubeMain("action", "sensor"),
         # ZAqaraCubeRotate("angle"),
@@ -462,12 +472,14 @@ DEVICES += [{
         Converter("channels", "sensor", mi="13.1.85"),
     ],
     "optional": [ZigbeeStats],
-}, {
+}]
+
+DEVICES += [{
     "lumi.sen_ill.mgl01": ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
     "support": 5,
     "required": [
         Converter("illuminance", "sensor", mi="2.p.1"),
-        BatteryC("battery", "sensor", mi="3.p.1"),
+        BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
     ],
     "optional": [
         ZigbeeStats,
@@ -475,58 +487,105 @@ DEVICES += [{
     ]
 }, {
     # no N, https://www.aqara.com/en/single_switch_T1_no-neutral.html
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l0agl1:1
     "lumi.switch.l0agl1": ["Aqara", "Relay T1", "SSM-U02"],
     "required": [Switch_MI21],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        Converter("chip_temperature", "sensor", mi="2.p.6"),
+    ],
 }, {
+    # Aqara Plug has same spec as Aqara Relay T1 (led, poweroff)
     # with N, https://www.aqara.com/en/single_switch_T1_with-neutral.html
-    "lumi.switch.n0agl1": ["Aqara", "Relay T1", "SSM-U01"],
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n0agl1:1
+    "lumi.switch.n0agl1": ["Aqara", "Relay T1", "SSM-U01"],  # no spec
     "lumi.switch.n0acn2": ["Aqara", "Relay T1", "DLKZMK11LM"],
-    "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
+    "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],  # no spec
+    "support": 5,
     "required": [
         Switch_MI21,
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
         MathConv("power", "sensor", mi="3.p.2", round=2),
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+    ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:motion-sensor:0000A014:lumi-agl04:1:0000C813
+    # for spec names Fibaro has good example: https://manuals.fibaro.com/motion-sensor/
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
+    "support": 4,  # TODO: blind_time number setting
     "required": [
         ConstConv("motion", "binary_sensor", mi="4.e.1", value=True),
-        BatteryC("battery", "sensor", mi="3.p.1"),
+        BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        MapConv("sensitivity", "select", mi="8.p.1", map={
+            1: "low", 2: "medium", 3: "high"
+        }),
+        Converter("blind_time", mi="10.p.1"),  # from 2 to 180
+        MapConv("battery_low", "binary_sensor", mi="5.p.1", map=BATTERY_LOW),
+    ],
 }, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
     "lumi.airmonitor.acn01": [
-        "Aqara", "TVOC Air Quality Monitor", "VOCKQJK11LM"
+        "Aqara", "TVOC Air Quality Monitor", "VOCKQJK11LM"  # no spec
     ],
+    "support": 5,
     "required": [
-        Converter("temperature", "sensor", mi="3.p.1"),
-        Converter("humidity", "sensor", mi="3.p.2"),
-        Converter("tvoc", "sensor", mi="3.p.3"),
-        Converter("tvoc_level", "binary_sensor", mi="4.p.1"),
-        Converter("battery", "sensor", mi="4.p.2"),
+        Converter("temperature", "sensor", mi="3.p.1"),  # celsius
+        Converter("humidity", "sensor", mi="3.p.2"),  # percentage
+        Converter("tvoc", "sensor", mi="3.p.3"),  # ppb
+        BatteryConv("battery", "sensor", mi="4.p.2"),  # voltage, mV
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW),
+        MapConv("display_unit", "select", mi="6.p.1", map={
+            0: "℃, mg/m³", 1: "℃, ppb", 16: "℉, mg/m³", 17: "℉, ppb"
+        })
+    ],
 }, {
     "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1", "QBKG38LM"],
+    "support": 5,
     "required": [
-        Switch_MI21, Action,
+        Converter("switch", "switch", mi="2.p.1"),
         ButtonMIConv("button", mi="6.e.1", value=1),
         ButtonMIConv("button", mi="6.e.2", value=2),
+        Action,
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("smart", "switch", mi="6.p.1"),
+        BoolConv("led", "switch", mi="3.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE)
+    ],
 }, {
     "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1", "QBKG39LM"],
+    "support": 5,
     "required": [
-        Channel1_MI21, Channel2_MI31, Action,
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         ButtonMIConv("button_1", mi="7.e.1", value=1),
         ButtonMIConv("button_1", mi="7.e.2", value=2),
         ButtonMIConv("button_2", mi="8.e.1", value=1),
         ButtonMIConv("button_2", mi="8.e.2", value=2),
         ButtonMIConv("button_both", mi="9.e.1", value=4),
+        Action,
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("smart_1", "switch", mi="7.p.1"),
+        BoolConv("smart_2", "switch", mi="8.p.1"),
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        MapConv("mode", "select", mi="15.p.1", map=SWITCH_MODE)
+    ],
 }, {
     # with neutral wire
     "lumi.switch.b1nc01": ["Aqara", "Single Wall Switch E1", "QBKG40LM"],
@@ -591,10 +650,9 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    # https://miot-base.org/miot-base-v2/instance?type=urn:miot-base-v2:device:curtain:0000A00C:lumi-acn002:1
     "lumi.curtain.acn002": ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
+    "support": 5,
     "required": [
-        # Conv("fault", None, "2.p.1", "2.1"),
         MapConv("motor", "cover", mi="2.p.2", map={
             0: "stop", 1: "close", 2: "open"
         }),
@@ -606,10 +664,16 @@ DEVICES += [{
     "optional": [
         ZigbeeStats,
         BoolConv("fault", "sensor", mi="2.p.1"),
-        Converter("mode", "sensor", mi="2.p.3"),
-        Converter("low_energy", "sensor", mi="3.p.1"),
+        Converter("motor_reverse", "switch", mi="2.p.7"),
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW),
         Converter("battery_voltage", "sensor", mi="3.p.2"),
-        Converter("charging", "sensor", mi="3.p.3"),
+        MapConv("battery_charging", "binary_sensor", mi="3.p.3", map={
+            0: False, 1: True, 2: False
+        }),
+        MapConv("motor_speed", "select", mi="5.p.5", map={
+            0: "low", 1: "mid", 2: "high"
+        }),
+        # Converter("mode", "sensor", mi="2.p.3"),  # only auto
     ]
 }]
 
@@ -753,6 +817,11 @@ DEVICES += [{
     "required": [MiBeacon, Action],
     "optional": [BLEStats],
 }, {
+    # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
+    2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
+    "required": [BLEMotion, BLEIlluminance, BLEBattery],
+    "optional": [BLEStats, BLEIdleTime, BLEAction],
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -771,8 +840,6 @@ DEVICES += [{
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
-    # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
-    2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
     "required": [
         MiBeacon, BLEBatteryLazy,
         # sensors:

@@ -64,12 +64,7 @@ BLE_LOCK_ERROR = {
     0xC0DE1004: "Mechanical failure",
 }
 
-KETTLE = {
-    0: "idle",
-    1: "heat",
-    2: "cool_down",
-    3: "warm_up",
-}
+KETTLE = {0: "idle", 1: "heat", 2: "cool_down", 3: "warm_up"}
 
 ACTIONS = {
     1249: {0: 'right', 1: 'left'},

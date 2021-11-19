@@ -202,7 +202,7 @@ class ClimateTempConv(Converter):
 
 
 @dataclass
-class BatteryC(Converter):
+class BatteryConv(Converter):
     childs = {"battery_voltage"}
     min = 2700
     max = 3200
@@ -306,14 +306,12 @@ Temperature = MathConv(
 Humidity = MathConv(
     "humidity", "sensor", mi="0.2.85", multiply=0.01, min=0, max=10000
 )
-Pressure = MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01)
+# Pressure = MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01)
 
-Motion = BoolConv("motion", "binary_sensor", mi="3.1.85")
+# Motion = BoolConv("motion", "binary_sensor", mi="3.1.85")
 
 # power measurements
-Voltage = MathConv(
-    "voltage", "sensor", mi="0.11.85", multiply=0.001, round=2
-)
+Voltage = MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2)
 Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
@@ -323,12 +321,12 @@ PlugN0 = BoolConv("plug", "switch", mi="4.1.85")
 # PlugC0 = BoolConv("plug", "switch", "4.1.85", "channel_0")
 # SwitchC0 = BoolConv("switch", "switch", "4.1.85", "channel_0")
 # SwitchN0 = BoolConv("switch", "switch", "4.1.85", "neutral_0")
-ChannelC1 = BoolConv("channel 1", "switch", mi="4.1.85")
-ChannelC2 = BoolConv("channel 2", "switch", mi="4.2.85")
-ChannelC3 = BoolConv("channel 3", "switch", mi="4.2.85")
-ChannelN1 = BoolConv("channel 1", "switch", mi="4.1.85")
-ChannelN2 = BoolConv("channel 2", "switch", mi="4.2.85")
-ChannelN3 = BoolConv("channel 3", "switch", mi="4.3.85")
+ChannelC1 = BoolConv("channel_1", "switch", mi="4.1.85")
+ChannelC2 = BoolConv("channel_2", "switch", mi="4.2.85")
+ChannelC3 = BoolConv("channel_3", "switch", mi="4.2.85")
+ChannelN1 = BoolConv("channel_1", "switch", mi="4.1.85")
+ChannelN2 = BoolConv("channel_2", "switch", mi="4.2.85")
+ChannelN3 = BoolConv("channel_3", "switch", mi="4.3.85")
 
 Action = Converter("action", "sensor")
 Button = ButtonConv("button", mi="13.1.85")
@@ -351,7 +349,7 @@ Button23 = ButtonConv("button_both_23", mi="13.7.85")
 
 # converts voltage to percent and shows voltage in attributes
 # users can adds separate voltage sensor or original percent sensor
-Battery = BatteryC("battery", "sensor", mi="8.0.2008")
+Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
 BatteryPer = Converter("battery_percent", "sensor", mi="8.0.2001")
 BatteryEnd = BoolConv("battery_end", "binary_sensor", mi="8.0.9001")
 
