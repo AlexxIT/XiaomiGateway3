@@ -75,8 +75,8 @@ class LumiGateway(GatewayBase):
     async def lumi_read(self, device: XDevice, payload: dict):
         assert "params" in payload or "mi_spec" in payload, payload
         # self.debug_device(device, "read", payload, tag="LUMI")
-        did = device.did if device.type != GATEWAY else "lumi.0"
-        payload.update({"cmd": "read", "did": did})
+        payload["did"] = device.did if device.type != GATEWAY else "lumi.0"
+        payload.setdefault("cmd", "read")
         await self.mqtt.publish('zigbee/recv', payload)
 
     async def lumi_process_lumi(self, data: dict):

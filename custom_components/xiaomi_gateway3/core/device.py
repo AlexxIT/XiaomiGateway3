@@ -198,7 +198,7 @@ class XDevice:
             # self.setup_attrs.add(conv.attr)
             gateway.setups[conv.domain](gateway, self, conv)
 
-    def add_converter(self, name: str) -> Optional[Converter]:
+    def add_converter(self, name: str):
         """Support adds converters from:
            - LUMI_GLOBALS list
            - spec converters list
@@ -208,18 +208,15 @@ class XDevice:
             if conv.attr == name:
                 assert conv not in self.converters
                 self.converters.append(conv)
-                return conv
 
         if self.info.opt_converters:
             for conv in self.info.opt_converters:
                 if conv.childs and name in conv.childs:
                     conv = Converter(name, "sensor")
+                    self.converters.append(conv)
                 if conv.attr == name:
                     assert conv not in self.converters
                     self.converters.append(conv)
-                    return conv
-
-        return None
 
     # TODO: rename attributes
     # def add_attributes(self, gateway: 'GatewayBase', value: dict):

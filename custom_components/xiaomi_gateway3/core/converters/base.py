@@ -237,6 +237,39 @@ class LockConv(MapConv):
         payload["action"] = "lock"
 
 
+# to get natgas sensitivity value - write: {"res_name": "4.1.85", "value": 1}
+# then it's report: {"res_name": "14.2.85", "value": <1 to 3>}
+class GasSensitivityReadConv(Converter):
+    map = {1: "low", 2: "medium", 3: "high"}
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload[self.attr] = self.map.get(value)
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        pass
+
+    def read(self, device: "XDevice", payload: dict):
+        payload["cmd"] = "write"
+        cmd = {"res_name": "4.1.85", "value": 1}  # read spec
+        payload.setdefault("params", []).append(cmd)
+
+
+# to write natgas sensitivity value - write: {"res_name": "4.1.85", "value": x}
+# then it's report {"res_name": "14.1.85", "value": x}
+class GasSensitivityWriteConv(Converter):
+    map = {0x4010000: "low", 0x4020000: "medium", 0x4030000: "high"}
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload[self.attr] = self.map.get(value)
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        value = next(k for k, v in self.map.items() if v == value)
+        super().encode(device, payload, value)
+
+    def read(self, device: "XDevice", payload: dict):
+        pass
+
+
 class ParentConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: str):
         try:

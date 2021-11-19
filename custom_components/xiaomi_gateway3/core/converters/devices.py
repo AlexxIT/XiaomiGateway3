@@ -385,11 +385,16 @@ DEVICES += [{
     "optional": [ZigbeeStats, BatteryPer],
 }, {
     "lumi.sensor_natgas": ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
+    "support": 4,  # TODO: selftest?
     "required": [
         Converter("gas_density", "sensor", mi="0.1.85"),
-        BoolConv("gas", "binary_sensor", mi="13.1.85")
+        BoolConv("gas", "binary_sensor", mi="13.1.85"),
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        GasSensitivityReadConv("sensitivity", "select", mi="14.2.85"),
+        GasSensitivityWriteConv("sensitivity", mi="14.1.85"),
+    ],
 }, {
     "lumi.curtain": ["Aqara", "Curtain", "ZNCLDJ11LM"],
     "lumi.curtain.aq2": ["Aqara", "Roller Shade", "ZNGZDJ11LM"],
