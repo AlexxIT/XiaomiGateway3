@@ -18,30 +18,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiCover(XEntity, CoverEntity):
-    _attr_current_position: int = None
-
-    @property
-    def current_cover_position(self):
-        return self._attr_current_position
-
-    @property
-    def is_opening(self):
-        return self._attr_state == STATE_OPENING
-
-    @property
-    def is_closing(self):
-        return self._attr_state == STATE_CLOSING
-
-    @property
-    def is_closed(self):
-        return self._attr_current_position == 0
+    _attr_is_closed = None
 
     @callback
     def async_set_state(self, data: dict):
         if 'run_state' in data:
             self._attr_state = data["run_state"]
+            self._attr_is_opening = self._attr_state == STATE_OPENING
+            self._attr_is_closing = self._attr_state == STATE_CLOSING
         if 'position' in data:
-            self._attr_current_position = data['position']
+            self._attr_current_cover_position = data['position']
+            self._attr_is_closed = self._attr_current_cover_position == 0
 
     async def async_open_cover(self, **kwargs):
         await self.device_send({self.attr: "open"})
