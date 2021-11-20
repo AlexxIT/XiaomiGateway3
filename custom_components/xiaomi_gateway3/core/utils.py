@@ -154,7 +154,7 @@ async def get_room_mapping(cloud: MiCloud, host: str, token: str):
         local_rooms = await device.send('get_room_mapping')
         cloud_rooms = await cloud.get_rooms()
         result = ''
-        for local_id, cloud_id in local_rooms:
+        for local_id, cloud_id in local_rooms['result']:
             cloud_name = next(
                 (p['name'] for p in cloud_rooms if p['id'] == cloud_id), '-'
             )
