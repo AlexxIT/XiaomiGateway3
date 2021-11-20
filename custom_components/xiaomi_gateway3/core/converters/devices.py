@@ -687,7 +687,7 @@ DEVICES += [{
     "support": 5,
     "required": [
         ZOnOffConv("plug", "switch"),
-        ZCurrent, ZPower, ZVoltagePoll,  # once per 30 seconds
+        ZCurrent, ZPower, ZVoltagePoll,  # once per 60 seconds
     ],
     "optional": [
         ZigbeeStats, ZTuyaPowerOn,
