@@ -176,16 +176,16 @@ DEVICES += [{
     "required": [PlugN0, Power, Voltage],
     "optional": [ZigbeeStats, Energy],
 }, {
-    "lumi.ctrl_86plug": ["Aqara", "Socket", "QBCZ11LM"],
     "lumi.ctrl_86plug.aq1": ["Aqara", "Wall Outlet", "QBCZ11LM"],
+    "lumi.ctrl_86plug": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "required": [
         BoolConv("outlet", "switch", mi="4.1.85"),
         Power,
     ],
     "optional": [ZigbeeStats, Energy],
 }, {
-    "lumi.ctrl_ln1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
+    "lumi.ctrl_ln1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.switch.b1nacn02": ["Aqara", "Single Wall Switch D1", "QBKG23LM"],
     "required": [
         BoolConv("switch", "switch", mi="4.1.85"),
@@ -202,8 +202,8 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # dual channel on/off, power measurement
-    "lumi.ctrl_ln2": ["Aqara", "Double Wall Switch", "QBKG12LM"],
     "lumi.ctrl_ln2.aq1": ["Aqara", "Double Wall Switch", "QBKG12LM"],
+    "lumi.ctrl_ln2": ["Aqara", "Double Wall Switch", "QBKG12LM"],
     "lumi.switch.b2nacn02": ["Aqara", "Double Wall Switch D1", "QBKG24LM"],
     "required": [
         ChannelC1, ChannelC2, Power,
@@ -286,9 +286,9 @@ DEVICES += [{
 }, {
     # button action, no retain
     "lumi.sensor_switch": ["Xiaomi", "Button", "WXKG01LM"],
+    "lumi.remote.b1acn01": ["Aqara", "Button", "WXKG11LM"],
     "lumi.sensor_switch.aq2": ["Aqara", "Button", "WXKG11LM"],
     "lumi.sensor_switch.aq3": ["Aqara", "Shake Button", "WXKG12LM"],
-    "lumi.remote.b1acn01": ["Aqara", "Button", "WXKG11LM"],
     "lumi.remote.b186acn01": ["Aqara", "Single Wall Button", "WXKG03LM"],
     "lumi.remote.b186acn02": ["Aqara", "Single Wall Button D1", "WXKG06LM"],
     "lumi.sensor_86sw1": ["Aqara", "Single Wall Button", "WXKG03LM"],
@@ -296,8 +296,8 @@ DEVICES += [{
     "optional": [ZigbeeStats, BatteryPer],
 }, {
     # multi button action, no retain
-    "lumi.sensor_86sw2": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.sensor_86sw2.es1": ["Aqara", "Double Wall Button", "WXKG02LM"],
+    "lumi.sensor_86sw2": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn01": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn02": ["Aqara", "Double Wall Button D1", "WXKG07LM"],
     "lumi.remote.b286opcn01": ["Aqara", "Opple Two Button", "WXCJKG11LM"],
@@ -373,8 +373,8 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # cube action, no retain
-    "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
     "lumi.sensor_cube.aqgl01": ["Aqara", "Cube", "MFKZQ01LM"],  # tested
+    "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
     "support": 3,  # TODO: need some tests
     "required": [
         ZAqaraCubeMain("action", "sensor"),
@@ -433,7 +433,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro", "ZNMS12LM"],
+    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro", "ZNMS12LM*"],
     "required": [
         Action,
         BoolConv("lock", "binary_sensor", mi="3.1.85"),

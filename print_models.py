@@ -1,40 +1,82 @@
-from custom_components.xiaomi_gateway3.core.bluetooth import DEVICES as BT
-from custom_components.xiaomi_gateway3.core.zigbee import DEVICES as ZB
+import re
 
+from custom_components.xiaomi_gateway3.core.converters.devices import DEVICES
+from custom_components.xiaomi_gateway3.core.converters.stats import BLEStats
 
-def print_list(items: list):
-    uniq = {}
+columns = [
+    "Brand", "Name", "Model", "Default entities", "Optional entities", "S"
+]
+header = ["---"] * len(columns)
 
-    for v in items:
-        uniq.setdefault(f"{v[0]} {v[1]}", []).append(v[2])
+devices = {}
 
-    for k, v in sorted(uniq.items(), key=lambda kv: kv[0]):
-        models = ','.join(sorted(set(v)))
-        print(f"- {k} ({models})")
+for device in DEVICES:
+    # skip devices with bad support
+    if device.get("support", 3) < 3:
+        continue
 
+    for k, v in device.items():
+        if not isinstance(v, list) or k in ("required", "optional", "config"):
+            continue
 
-print("Zigbee")
-print_list([
-    v for device in ZB
-    for k, v in device.items()
-    if len(v) == 3 and k not in ('lumi_spec', 'miot_spec')
-])
+        brand, name, model = v
 
-print("BLE")
-print_list([
-    v for k, v in BT[0].items()
-    if len(v) == 3
-])
+        optional = device.get("optional", [])
 
-print("Mesh Bulbs")
-print_list([
-    v for k, v in BT[1].items()
-    if len(v) == 3 and k != 'miot_spec' and v[0] != 'Unknown'
-])
+        if isinstance(k, str):
+            if "gateway" in k:
+                type = "Gateways"
+            elif k.startswith("lumi.") or k.startswith("ikea."):
+                type = "Xiaomi Zigbee"
+            else:
+                type = "Other Zigbee"
+        elif BLEStats in optional:
+            type = "Xiaomi BLE"
+        else:
+            type = "Xiaomi Mesh"
 
-print("Mesh Switches")
-print_list([
-    v for d in BT[2:]
-    for k, v in d.items()
-    if len(v) == 3 and k != 'miot_spec' and v[0] != 'Unknown'
-])
+        if type != "Other Zigbee":
+            link = f"https://home.miot-spec.com/s/{k}"
+        else:
+            link = f"https://www.zigbee2mqtt.io/supported-devices/#s={model}"
+
+        items = devices.setdefault(type, [])
+
+        # skip if model already exists
+        if any(True for i in items if model in i[2]):
+            continue
+
+        # skip BLE with unknown spec
+        if "default" not in device:
+            req = ", ".join([
+                conv.attr + "*" if conv.lazy else conv.attr
+                for conv in device["required"] if conv.domain
+            ])
+        else:
+            req = "*"
+
+        opt = ", ".join([
+            conv.attr for conv in device.get("optional", []) if conv.domain
+        ])
+
+        support = str(device.get("support", ""))
+
+        model = f'[{model}]({link})'
+
+        items.append([brand, name, model, req, opt, support])
+
+out = "<!--supported-->\n"
+for k, v in devices.items():
+    out += f"## Supported {k}\n\nTotal devices: {len(v)}\n\n"
+    out += "|".join(columns) + "\n"
+    out += "|".join(header) + "\n"
+    for line in sorted(v):
+        out += "|".join(line) + "\n"
+    out += "\n"
+out += "<!--supported-->"
+
+raw = open("README.md", "r", encoding="utf-8").read()
+raw = re.sub(
+    r"<!--supported-->(.+?)<!--supported-->", out, raw, flags=re.DOTALL
+)
+open("README.md", "w", encoding="utf-8").write(raw)
