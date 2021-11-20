@@ -42,9 +42,6 @@ class XDevice:
         """Base class to handle device of any type."""
         assert type in (GATEWAY, ZIGBEE, BLE, MESH)
         if type == ZIGBEE:
-            # zigbee: lumi.xxx.v1 or v2 or v3
-            if model[-3:-1] == ".v":
-                model = model[:-3]
             assert isinstance(model, str)
             assert RE_DID.match(did)
             assert RE_ZIGBEE_MAC.match(mac)
@@ -106,8 +103,9 @@ class XDevice:
         return any(True for conv in self.converters if conv.zigbee)
 
     def update_model(self, value: str):
-        self.model = value
-        self.info = converters.get_device_info(value, self.type)
+        # xiaomi soft adds tail to some models: .v1 or .v2 or .v3
+        self.model = value[:-3] if value[-3:-1] == ".v" else value
+        self.info = converters.get_device_info(self.model, self.type)
 
     def unique_id(self, attr: str):
         # backward compatibility

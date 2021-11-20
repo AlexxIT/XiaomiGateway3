@@ -40,6 +40,8 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
             market = f"BLE {info[2]}"
         elif type == MESH:
             market = f"Mesh {info[2]}"
+        else:
+            raise RuntimeError
 
         return XDeviceInfo(
             manufacturer=info[0],
