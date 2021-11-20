@@ -457,6 +457,8 @@ class XEntity(Entity):
 
     @property
     def customize(self) -> dict:
+        if not self.hass:
+            return {}
         return self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
 
     def debug(self, msg: str, exc_info=None):
