@@ -762,9 +762,15 @@ DEVICES += [{
     ]
 }, {
     "default": "zigbee",  # default zigbee device
-    "required": [],
-    "optional": [
-        ZigbeeStats, ZOnOffConv("on_off", "switch"),
+    "required": [
+        ZOnOffConv("switch", "switch", ep=1, lazy=True),
+        ZOnOffConv("channel_2", "switch", ep=2, lazy=True),
+        ZOnOffConv("channel_3", "switch", ep=3, lazy=True),
+        ZOnOffConv("channel_4", "switch", ep=4, lazy=True),
+    ],
+    "optional": [ZigbeeStats],
+    "config": [
+        ZBindConfig(clusters={6, 8}, ep=1),  # maybe button
     ]
 }]
 
