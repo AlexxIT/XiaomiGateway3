@@ -356,8 +356,8 @@ BatteryEnd = BoolConv("battery_end", "binary_sensor", mi="8.0.9001")
 # zigbee3 devices
 
 Switch_MI21 = Converter("switch", "switch", mi="2.p.1")
-Channel1_MI21 = Converter("channel 1", "switch", mi="2.p.1")
-Channel2_MI31 = Converter("channel 2", "switch", mi="3.p.1")
+Channel1_MI21 = Converter("channel_1", "switch", mi="2.p.1")
+Channel2_MI31 = Converter("channel_2", "switch", mi="3.p.1")
 
 # global props
 LUMI_GLOBALS = {
