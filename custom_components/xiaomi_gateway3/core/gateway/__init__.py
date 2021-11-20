@@ -189,6 +189,8 @@ class XGateway(GateGW3, GateE1):
                 filename = Path().absolute() / f"{self.host}.tar.gz"
                 with open(filename, "wb") as f:
                     f.write(raw)
+            elif command == "reboot":
+                await sh.reboot()
             else:
                 await sh.exec(command)
 

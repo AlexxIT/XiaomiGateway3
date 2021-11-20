@@ -32,6 +32,13 @@ class TelnetShell:
         except:
             return None
 
+    async def reboot(self):
+        # should not wait for response
+        self.writer.write(b"reboot\n")
+        await self.writer.drain()
+        # have to wait or the magic won't happen
+        await asyncio.sleep(1)
+
     async def get_version(self) -> str:
         raise NotImplementedError
 
