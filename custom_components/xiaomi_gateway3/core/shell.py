@@ -265,9 +265,15 @@ class TelnetShell:
             command = LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE
             await self.exec(command)
 
-    def run_ftp(self):
-        if self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
-            self.exec(RUN_FTP)
+    async def run_ftp(self):
+        if await self.check_bin('busybox', MD5_BUSYBOX, 'bin/busybox'):
+            await self.exec(RUN_FTP)
+
+    async def reboot(self):
+        # should not wait for response
+        self.writer.write(b"reboot\n")
+        await self.writer.drain()
+        await asyncio.sleep(1)
 
     async def check_bt(self) -> bool:
         md5 = MD5_BT.get(self.ver)

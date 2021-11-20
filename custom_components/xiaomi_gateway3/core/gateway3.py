@@ -1174,21 +1174,28 @@ class GatewayEntry(GatewayNetwork):
 
     async def send_telnet(self, *args: str):
         sh = shell.TelnetShell()
-        if not await sh.connect(self.host):
-            return
+        try:
+            if not await sh.connect(self.host):
+                self.debug("Can't connect to gateway")
+                return
 
-        for command in args:
-            if command == 'ftp':
-                sh.run_ftp()
-            elif command == 'dump':
-                raw = await sh.tar_data()
-                filename = Path().absolute() / f"{self.host}.tar.gz"
-                with open(filename, 'wb') as f:
-                    f.write(raw)
-            else:
-                await sh.exec(command)
+            for command in args:
+                if command == 'ftp':
+                    await sh.run_ftp()
+                elif command == 'dump':
+                    raw = await sh.tar_data()
+                    filename = Path().absolute() / f"{self.host}.tar.gz"
+                    with open(filename, 'wb') as f:
+                        f.write(raw)
+                elif command == 'reboot':
+                    await sh.reboot()
+                else:
+                    await sh.exec(command)
 
-        await sh.close()
+        except Exception as e:
+            self.debug(f"Can't run telnet command: {args}")
+        finally:
+            await sh.close()
 
     async def send_mqtt(self, cmd: str):
         if cmd == 'publishstate':
