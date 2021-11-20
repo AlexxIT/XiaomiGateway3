@@ -92,8 +92,15 @@ class DataSelect(XEntity, SelectEntity):
     command = None
 
     def set_current(self, value):
-        self._attr_current_option = value
+        # force update dropdown in GUI
+        self._attr_current_option = None
         self._attr_options = [value] if value else None
+        self.async_write_ha_state()
+
+        if not value:
+            return
+
+        self._attr_current_option = value
         self.async_write_ha_state()
 
     def process_command(self, data: json):
