@@ -216,14 +216,17 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
 async def get_lan_key(host: str, token: str):
     device = AsyncMiIO(host, token)
     resp = await device.send('get_lumi_dpf_aes_key')
-    if resp is None:
+    if not resp:
         return "Can't connect to gateway"
+    if 'result' not in resp:
+        return f"Wrong response: {resp}"
+    resp = resp['result']
     if len(resp[0]) == 16:
         return resp[0]
     key = ''.join(random.choice(string.ascii_lowercase + string.digits)
                   for _ in range(16))
     resp = await device.send('set_lumi_dpf_aes_key', [key])
-    if resp[0] == 'ok':
+    if resp.get('result') == ['ok']:
         return key
     return "Can't update gateway key"
 
@@ -234,7 +237,7 @@ async def get_room_mapping(cloud: MiCloud, host: str, token: str):
         local_rooms = await device.send('get_room_mapping')
         cloud_rooms = await cloud.get_rooms()
         result = ''
-        for local_id, cloud_id in local_rooms:
+        for local_id, cloud_id in local_rooms['result']:
             cloud_name = next(
                 (p['name'] for p in cloud_rooms if p['id'] == cloud_id), '-'
             )
