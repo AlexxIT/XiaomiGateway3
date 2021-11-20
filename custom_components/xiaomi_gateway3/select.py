@@ -157,6 +157,7 @@ class DataSelect(XEntity, SelectEntity):
             did = data['remove_did']
             utils.remove_device(self.hass, did)
             self.set_current(f"Removed: {did[5:]}")
+            self.device.update({"command": "idle"})
 
         elif "ota_progress" in data:
             percent = data["ota_progress"]
