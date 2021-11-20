@@ -202,7 +202,7 @@ class GatewayStats(GatewayMesh):
 
     @property
     def stats_enable(self):
-        return self.options.get('stats')
+        return self.options.get('stats', False)
 
     async def process_gw_stats(self, payload: dict = None):
         # empty payload - update available state
