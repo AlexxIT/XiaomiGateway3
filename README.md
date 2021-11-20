@@ -127,7 +127,7 @@ If you have problems with other firmware, don't even ask to fix it.
 
 The component can work with these firmware versions, but they may have bugs: v1.4.7_0063, v1.4.7_0065, v1.4.7_0115, v1.4.7_0160, v1.5.0_0026, v1.5.1_0032.
 
-Optionally you can flash gateway with custom firmware: [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki).
+If your Mi Home doesn't offer to you new firmware - you can [update using telnet](https://github.com/zvldz/mgl03_fw/tree/main/firmware).
 
 Component can block fw updates with **Lock Firmware** switch. Mi Home app will continue to offer you update. But won't be able to install it. It should fail at 0%.
 
