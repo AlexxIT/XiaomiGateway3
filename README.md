@@ -176,6 +176,10 @@ Every device has support level (column S):
 - empty - Unknown level, but device may work well
 - 1/2 - The device doesn't work well (they don't show in the table)
 
+You can change the operation of an existing device or add support for any **Xiaomi Zigbee**, **Xiaomi BLE**, **Xiaomi Mesh** or any **other brand Zigbee** device by writing an [external converter](https://github.com/AlexxIT/XiaomiGateway3/wiki/Converters).
+
+It is welcomed if you return a working converter to integration. You can create an issue or make a pull request.
+
 <!--supported-->
 ## Supported Gateways
 
