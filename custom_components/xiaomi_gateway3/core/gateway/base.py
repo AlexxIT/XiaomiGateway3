@@ -64,6 +64,9 @@ class GatewayBase:
         if 'true' in self.debug_mode:
             self.log.debug(f"{self.host} [BASE] {msg}", exc_info=exc_info)
 
+    def warning(self, msg: str, exc_info=None):
+        self.log.warning(f"{self.host} | {msg}", exc_info=exc_info)
+
     def error(self, msg: str, exc_info=None):
         self.log.error(f"{self.host} | {msg}", exc_info=exc_info)
 

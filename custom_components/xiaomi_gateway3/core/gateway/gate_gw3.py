@@ -37,10 +37,6 @@ class GateGW3(
         self.add_device(device)
 
     async def gw3_prepare_gateway(self, sh: shell.ShellGw3):
-        if sh.ver < "1.4.7_0000":
-            self.error(f"Unsupported gateway firmware: {sh.ver}")
-            return False
-
         # run all inits from subclasses
         self.miot_init()  # GW3 and Mesh depends on MIoT
         self.gw3_init()
@@ -86,8 +82,12 @@ class GateGW3(
 
         await self.dispatcher_send(SIGNAL_PREPARE_GW, sh=sh)
 
-        n = await sh.apply_patches(ps)
-        self.debug(f"Applied {n} patches to daemons")
+        if sh.ver >= "1.4.7_0000":
+            n = await sh.apply_patches(ps)
+            self.debug(f"Applied {n} patches to daemons")
+        else:
+            await sh.patch_miio_mqtt_fw146(ps)
+            self.warning(f"Firmware {sh.ver} support is very limited!")
 
         return True
 

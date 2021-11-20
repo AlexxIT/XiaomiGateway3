@@ -25,8 +25,8 @@ TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
            b"ble_info miioconfig.db 2>/dev/null | base64\n"
 
 MD5_BT = {
-    '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
-    '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
+    # '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
+    # '1.4.6_0043': 'c4fa99797438f21d0ae4a6c855b720d2',
     '1.4.7_0115': 'be4724fbc5223fcde60aff7f58ffea28',
     '1.4.7_0160': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.0_0026': '9290241cd9f1892d2ba84074f07391d4',
@@ -124,6 +124,9 @@ SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|
 DB_BLUETOOTH = "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
 # `sed...` - remove filename and adds "*.json" on its place
 DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
+
+# limited partial support on old firmwares
+MIIO2MQTT_FW146 = "miio_client -l 4 -d /data/miio | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 
 
 class ShellGw3(TelnetShell):
@@ -245,11 +248,28 @@ class ShellGw3(TelnetShell):
 
     @property
     def mesh_group_table(self) -> str:
-        return 'mesh_group_v3' if self.ver >= '1.4.7_0160' else 'mesh_group_v1'
+        if self.ver >= '1.4.7_0160':
+            return 'mesh_group_v3'
+        elif self.ver >= '1.4.6_0043':
+            return 'mesh_group_v1'
+        else:
+            return 'mesh_group'
 
     @property
     def mesh_device_table(self) -> str:
         return 'mesh_device_v3' if self.ver >= '1.4.7_0160' else 'mesh_device'
+
+    ############################################################################
+
+    async def patch_miio_mqtt_fw146(self, ps: str):
+        assert self.ver < "1.4.7_0000", self.ver
+        if "-t log/miio" in ps:
+            return
+        await self.exec("killall daemon_miio.sh")
+        await self.exec("killall miio_client; pkill -f log/miio")
+        await asyncio.sleep(.5)
+        await self.exec(MIIO2MQTT_FW146)
+        await self.exec("daemon_miio.sh &")
 
     ############################################################################
 
