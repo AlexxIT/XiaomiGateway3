@@ -28,16 +28,27 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     earlier. Should be the latest spec in the list.
     """
     for spec in DEVICES:
-        if model in spec or spec.get("default") == type:
-            info = spec.get(model) or ["Unknown", type.upper(), model]
-            return XDeviceInfo(
-                manufacturer=info[0],
-                model=info[2],
-                name=f"{info[0]} {info[1]}",
-                req_converters=spec["required"],
-                opt_converters=spec.get("optional"),
-                config=spec.get("config"),
-            )
+        if model not in spec and spec.get("default") != type:
+            continue
+        info = spec.get(model) or ["Unknown", type.upper(), model]
+
+        if type == GATEWAY:
+            market = f"Wi-Fi {info[2]}"
+        elif type == ZIGBEE:
+            market = f"Zigbee {info[2]}"
+        elif type == BLE:
+            market = f"BLE {info[2]}"
+        elif type == MESH:
+            market = f"Mesh {info[2]}"
+
+        return XDeviceInfo(
+            manufacturer=info[0],
+            model=market,
+            name=f"{info[0]} {info[1]}",
+            req_converters=spec["required"],
+            opt_converters=spec.get("optional"),
+            config=spec.get("config"),
+        )
     return None
 
 

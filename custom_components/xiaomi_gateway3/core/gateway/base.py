@@ -117,5 +117,5 @@ class GatewayBase:
             self.debug_device(device, "Join to gateway", device.model)
             return
 
-        self.debug_device(device, "setup entities", device.model)
+        self.debug_device(device, "setup entities", device.info.model)
         device.setup_entitites(self, entities=self.entities)
