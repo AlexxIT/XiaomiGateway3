@@ -254,7 +254,6 @@ class GatewayStats(GatewayMesh):
             {'commandcli': "plugin concentrator print-table"},
             {'commandcli': "debugprint all_off"},
         ]}
-        payload = json.dumps(payload, separators=(',', ':'))
         await self.mqtt.publish(self.gw_topic + 'commands', payload)
 
     async def process_parent_scan(self):
@@ -1160,6 +1159,10 @@ class GatewayEntry(GatewayNetwork):
 
         self.debug(f"{device['did']} {device['model']} => {payload}")
         await self.mqtt.publish('zigbee/recv', payload)
+
+    async def send_zigbee_cli(self, commands: list):
+        payload = {"commands": [{"commandcli": c} for c in commands]}
+        await self.mqtt.publish(self.gw_topic + 'commands', payload)
 
     async def read_zigbee_alive(self, device: dict):
         did = device['did'] if device['did'] != self.did else 'lumi.0'

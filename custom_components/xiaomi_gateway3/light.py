@@ -2,7 +2,8 @@ import logging
 import math
 
 from homeassistant.components.light import LightEntity, SUPPORT_BRIGHTNESS, \
-    ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP, ATTR_TRANSITION
+    ATTR_BRIGHTNESS, SUPPORT_COLOR_TEMP, ATTR_COLOR_TEMP, ATTR_TRANSITION, \
+    SUPPORT_TRANSITION
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.util import color
 
@@ -47,7 +48,7 @@ class XiaomiZigbeeLight(XiaomiEntity, LightEntity):
 
     @property
     def supported_features(self):
-        return SUPPORT_BRIGHTNESS | SUPPORT_COLOR_TEMP
+        return SUPPORT_BRIGHTNESS | SUPPORT_COLOR_TEMP | SUPPORT_TRANSITION
 
     async def async_update(self, data: dict = None):
         if self.attr in data:
