@@ -151,9 +151,9 @@ class DataSelect(XEntity, SelectEntity):
         elif "pair_command" in data:
             data = data["pair_command"]
             if data["install_code"]:
-                self.set_current("Pair with code")
+                self.set_current("Send network key (secure)")
             else:
-                self.set_current("Legacy pairing")
+                self.set_current("Send network key (legacy)")
 
         elif "added_device" in data:
             data = data["added_device"]
