@@ -63,14 +63,19 @@ def async_migrate_unique_id(hass: HomeAssistant):
     - gateway, ble, mesh - 12 symb mac, lowercase
     - mesh groups - 14 symb hex numb, lowercase
     """
+    replaces = {}
+
     dr: DeviceRegistry = hass.data["device_registry"]
     er: EntityRegistry = hass.data['entity_registry']
-    for entity in er.entities.values():
+    for entity in list(er.entities.values()):
         if entity.platform != DOMAIN:
             continue
 
         # split mac and attr in unique id
         mac, attr = entity.unique_id.split("_", 1)
+
+        # save original mac
+        mac0 = mac
 
         # remove unnecessary gateway entities
         if attr in ("firmware lock", "pair"):
@@ -99,9 +104,31 @@ def async_migrate_unique_id(hass: HomeAssistant):
             attr = attr.replace(" ", "_")
 
         new_id = f"{mac}_{attr}"
+        # skip if nothing changed
         if entity.unique_id == new_id:
             continue
+
+        # save replaces to fix device item
+        replaces[mac0] = mac
+
         er.async_update_entity(entity.entity_id, new_unique_id=new_id)
+
+    for device in list(dr.devices.values()):
+        i = next((i for i in device.identifiers if i[0] == DOMAIN), None)
+        if not i:
+            continue
+
+        # separate domain and mac
+        _, mac = i
+
+        # skip if nothing changed
+        if mac not in replaces:
+            continue
+
+        # update device identifiers to new format
+        dr.async_update_device(device.id, new_identifiers={
+            (DOMAIN, replaces[mac])
+        })
 
 
 # new miio adds colors to logs

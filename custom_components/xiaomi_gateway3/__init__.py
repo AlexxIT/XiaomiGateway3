@@ -130,6 +130,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
     if entry.version == 1:
+        _LOGGER.debug("Migrate config and entities to new version")
+
         options = dict(entry.options)
         if "debug" in options and "miio" in options["debug"]:
             options["debug"].pop("miio")
@@ -140,6 +142,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.config_entries.async_update_entry(entry, options=options)
 
         utils.async_migrate_unique_id(hass)
+
     return True
 
 
