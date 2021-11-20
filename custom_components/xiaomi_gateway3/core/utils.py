@@ -32,6 +32,8 @@ if TYPE_CHECKING:
 DOMAIN = 'xiaomi_gateway3'
 TITLE = "Xiaomi Gateway 3"
 
+SUPPORTED_MODELS = ('lumi.gateway.mgl03', 'lumi.gateway.aqcn02')
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -166,7 +168,7 @@ def migrate_options(data):
     return {'data': data, 'options': options}
 
 
-async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
+async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
     sh: shell.TelnetShell = await shell.connect(host)
@@ -191,7 +193,7 @@ async def check_mgl03(host: str, token: str, telnet_cmd: Optional[str]) \
             return 'wrong_token'
 
         # 3. check if right model
-        if info['model'] not in ('lumi.gateway.mgl03', 'lumi.gateway.aqcn02'):
+        if info['model'] not in SUPPORTED_MODELS:
             return 'wrong_model'
 
         raw = json.loads(telnet_cmd)

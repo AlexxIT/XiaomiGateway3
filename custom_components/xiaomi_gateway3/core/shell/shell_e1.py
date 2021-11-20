@@ -31,7 +31,7 @@ class ShellE1(TelnetShell):
         self.ver = f"{raw1.rstrip()}_{raw2.rstrip()}"
 
     async def get_token(self) -> str:
-        raw = await self.exec("agetprop persist.app.miio_dtoken")
+        raw = await self.exec("agetprop persist.app.miio_dtoken", as_bytes=True)
         return raw.rstrip().hex()
 
     async def get_did(self):

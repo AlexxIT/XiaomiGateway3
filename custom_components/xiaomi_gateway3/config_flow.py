@@ -55,7 +55,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
 
         if DOMAIN in self.hass.data and "devices" in self.hass.data[DOMAIN]:
             for device in self.hass.data[DOMAIN]["devices"]:
-                if (device["model"] == "lumi.gateway.mgl03" and
+                if (device["model"] in utils.SUPPORTED_MODELS and
                         device["did"] not in ACTIONS):
                     name = f"Add {device['name']} ({device['localip']})"
                     ACTIONS[device["did"]] = name
@@ -99,7 +99,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_token(self, user_input=None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         if user_input is not None:
-            error = await utils.check_mgl03(**user_input)
+            error = await utils.check_gateway(**user_input)
             if error:
                 return await self.async_step_token(error=error)
 
