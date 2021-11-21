@@ -810,8 +810,8 @@ DEVICES += [{
     "optional": [BLEStats],
 }, {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
-    "required": [MiBeacon, BLEBattery, BLELight, BLEMotion, BLEIdleTime],
-    "optional": [BLEStats],
+    "required": [MiBeacon, BLEBattery, BLELight, BLEMotion],
+    "optional": [BLEStats, BLEIdleTime],
 }, {
     131: ["Xiaomi", "Kettle", "YM-K1501"],  # CH, HK, RU version
     275: ["Xiaomi", "Kettle", "YM-K1501"],  # international
