@@ -23,11 +23,22 @@ async def async_setup_entry(hass, entry, add_entities):
     gw.add_setup(__name__, setup)
 
 
-class XiaomiSensor(XEntity, SensorEntity, RestoreEntity):
+# this class do nothing in Hass 2021.9 and more, and fix sensors in Hass 2021.7
+class Support20217:
+    @property
+    def _attr_native_value(self):
+        return self._attr_state
+
+    @_attr_native_value.setter
+    def _attr_native_value(self, value):
+        self._attr_state = value
+
+
+class XiaomiSensor(XEntity, SensorEntity, RestoreEntity, Support20217):
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
-            self._attr_state = data[self.attr]
+            self._attr_native_value = data[self.attr]
         for k, v in data.items():
             if k in self.subscribed_attrs and k != self.attr:
                 self._attr_extra_state_attributes[k] = v
@@ -35,7 +46,7 @@ class XiaomiSensor(XEntity, SensorEntity, RestoreEntity):
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
         """Restore previous state."""
-        self._attr_state = state
+        self._attr_native_value = state
         for k, v in attrs.items():
             if k in self.subscribed_attrs:
                 self._attr_extra_state_attributes[k] = v
