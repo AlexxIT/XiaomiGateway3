@@ -222,7 +222,7 @@ Aqara|Opple MX480|[XDD13LM](https://home.miot-spec.com/s/lumi.light.cwopcn03)|li
 Aqara|Opple MX650|[XDD12LM](https://home.miot-spec.com/s/lumi.light.cwopcn02)|light|zigbee|
 Aqara|Opple Six Button|[WXCJKG13LM](https://home.miot-spec.com/s/lumi.remote.b686opcn01)|action, battery|zigbee, battery_percent|
 Aqara|Opple Two Button|[WXCJKG11LM](https://home.miot-spec.com/s/lumi.remote.b286opcn01)|action, battery|zigbee, battery_percent|
-Aqara|Plug|[SP-EUC01](https://home.miot-spec.com/s/lumi.plug.maeu01)|switch, energy, power|zigbee, led, power_on_state|5
+Aqara|Plug|[SP-EUC01](https://home.miot-spec.com/s/lumi.plug.maeu01)|plug, energy, power|zigbee, led, power_on_state|5
 Aqara|Precision Motion Sensor|[RTCGQ13LM](https://home.miot-spec.com/s/lumi.motion.agl04)|motion, battery|zigbee, sensitivity, battery_low|4
 Aqara|Relay|[LLKZMK11LM](https://home.miot-spec.com/s/lumi.relay.c2acn01)|channel_1, channel_2, current, power, voltage, action|zigbee, energy, interlock|
 Aqara|Relay T1|[DLKZMK11LM](https://home.miot-spec.com/s/lumi.switch.n0acn2)|switch, energy, power|zigbee, led, power_on_state|5
@@ -301,7 +301,7 @@ Xiaomi|Kettle|[YM-K1501](https://home.miot-spec.com/s/131)|power, temperature|bl
 Xiaomi|Magic Cube|[XMMF01JQD](https://home.miot-spec.com/s/1249)|action|ble|
 Xiaomi|Mosquito Repellent|[WX08ZM](https://home.miot-spec.com/s/1034)|*|ble|
 Xiaomi|Motion Sensor 2|[RTCGQ02LM](https://home.miot-spec.com/s/2701)|motion, illuminance, battery|ble, idle_time, action|
-Xiaomi|Night Light 2|[MJYD02YL-A](https://home.miot-spec.com/s/2038)|battery, light, motion, idle_time|ble|
+Xiaomi|Night Light 2|[MJYD02YL-A](https://home.miot-spec.com/s/2038)|battery, light, motion|ble, idle_time|
 Xiaomi|Qingping Door Sensor|[CGH1](https://home.miot-spec.com/s/982)|*|ble|
 Xiaomi|Qingping Motion Sensor|[CGPR1](https://home.miot-spec.com/s/2691)|*|ble|
 Xiaomi|Qingping TH Lite|[CGDK2](https://home.miot-spec.com/s/1647)|temperature, humidity, battery*|ble|
