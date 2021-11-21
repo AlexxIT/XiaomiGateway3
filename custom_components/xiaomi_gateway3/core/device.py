@@ -48,7 +48,7 @@ class XDevice:
             assert RE_NWK.match(nwk)
         elif type == BLE:
             assert isinstance(model, int)
-            assert did.startswith("blt.3.")
+            assert did.startswith("blt.")
             assert RE_NETWORK_MAC.match(mac)
         elif model == MESH_GROUP_MODEL:
             assert did.startswith("group.")
