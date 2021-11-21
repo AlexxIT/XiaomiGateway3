@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -11,6 +12,8 @@ try:
     from xiaomi_gateway3 import DEVICES
 except ModuleNotFoundError:
     pass
+except:
+    logging.getLogger(__name__).exception("Can't load external converters")
 
 
 @dataclass
