@@ -504,7 +504,7 @@ DEVICES += [{
     "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],  # no spec
     "support": 5,
     "required": [
-        Switch_MI21,
+        Converter("plug", "switch", mi="2.p.1"),
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
         MathConv("power", "sensor", mi="3.p.2", round=2),
     ],
