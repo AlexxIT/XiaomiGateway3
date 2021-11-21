@@ -104,7 +104,7 @@ class SilabsGateway(GatewayBase):
         if device.model == UNKNOWN:
             self.debug_device(device, "paired", data)
             device.update_model(data["model"])
-            device.extra["fw_ver"] = int(data["version"])
+            device.extra["fw_ver"] = parse_version(data["version"])
             self.add_device(device)
         else:
             self.debug_device(device, "model exist on pairing")
@@ -164,3 +164,13 @@ class SilabsGateway(GatewayBase):
             "firstjoined": 1
         }
         await self.mqtt.publish(f"gw/{self.ieee}/devicejoined", payload)
+
+
+def parse_version(value: str) -> int:
+    """Support version `0.0.0_0017`."""
+    try:
+        if "_" in value:
+            _, value = value.split("_")
+        return int(value)
+    except:
+        return 0
