@@ -375,13 +375,13 @@ DEVICES += [{
     # cube action, no retain
     "lumi.sensor_cube.aqgl01": ["Aqara", "Cube", "MFKZQ01LM"],  # tested
     "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
-    "support": 3,  # TODO: need some tests
+    "support": 4,
     "required": [
         ZAqaraCubeMain("action", "sensor"),
-        # ZAqaraCubeRotate("angle"),
+        ZAqaraCubeRotate("angle"),
         # Converter("action", mi="13.1.85"),
-        Converter("duration", mi="0.2.85", parent="action"),
-        Converter("angle", mi="0.3.85", parent="action"),
+        # Converter("duration", mi="0.2.85", parent="action"),
+        # Converter("angle", mi="0.3.85", parent="action"),
         Battery,
     ],
     "optional": [ZigbeeStats, BatteryPer],
