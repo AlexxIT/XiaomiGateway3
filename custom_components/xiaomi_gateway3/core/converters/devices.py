@@ -489,17 +489,30 @@ DEVICES += [{
     # no N, https://www.aqara.com/en/single_switch_T1_no-neutral.html
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l0agl1:1
     "lumi.switch.l0agl1": ["Aqara", "Relay T1", "SSM-U02"],
-    "required": [Switch_MI21],
+    "required": [
+        Converter("switch", "switch", mi="2.p.1")
+    ],
     "optional": [
         ZigbeeStats,
         Converter("chip_temperature", "sensor", mi="2.p.6"),
     ],
 }, {
-    # Aqara Plug has same spec as Aqara Relay T1 (led, poweroff)
     # with N, https://www.aqara.com/en/single_switch_T1_with-neutral.html
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n0agl1:1
     "lumi.switch.n0agl1": ["Aqara", "Relay T1", "SSM-U01"],  # no spec
     "lumi.switch.n0acn2": ["Aqara", "Relay T1", "DLKZMK11LM"],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+    ],
+}, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
     "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],  # no spec
     "support": 5,
@@ -592,9 +605,10 @@ DEVICES += [{
     # without neutral wire
     "lumi.switch.l1aeu1": ["Aqara", "Single Wall Switch H1", "WS-EUK01"],
     "required": [
-        Switch_MI21, Action,
+        Converter("switch", "switch", mi="2.p.1"),
         ButtonMIConv("button", mi="7.e.1", value=1),
         ButtonMIConv("button", mi="7.e.2", value=2),
+        Action,
     ],
     "optional": [ZigbeeStats],
 }, {
