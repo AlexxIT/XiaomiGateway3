@@ -324,8 +324,8 @@ DEVICES += [{
     "optional": [ZigbeeStats, BatteryPer],
 }, {
     # door window sensor
-    "lumi.sensor_magnet": ["Xiaomi", "Door Sensor", "MCCGQ01LM"],
-    "lumi.sensor_magnet.aq2": ["Aqara", "Door Sensor", "MCCGQ11LM"],
+    "lumi.sensor_magnet": ["Xiaomi", "Door/Window Sensor", "MCCGQ01LM"],
+    "lumi.sensor_magnet.aq2": ["Aqara", "Door/Window Sensor", "MCCGQ11LM"],
     "required": [
         # hass: On means open, Off means closed
         BoolConv("contact", "binary_sensor", mi="3.1.85"),
