@@ -732,8 +732,20 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
-    "support": 3,  # TODO: battery, tests
-    "required": [ZMotionConv("motion", "binary_sensor")],
+    "support": 5,
+    "required": [
+        ZIASZoneConv("motion", "binary_sensor"),
+        ZBatteryConv("battery", "sensor"),
+    ],
+    "optional": [ZigbeeStats],
+}, {
+    # wrong zigbee model (ewelink bug)
+    "TH01": ["Sonoff", "Door/Window Sensor", "SNZB-04"],
+    "support": 5,
+    "required": [
+        ZIASZoneConv("contact", "binary_sensor"),
+        ZBatteryConv("battery", "sensor"),
+    ],
     "optional": [ZigbeeStats],
 }, {
     "FNB56-ZSC01LX1.2": ["Unknown", "Dimmer", "LXZ8-02A"],

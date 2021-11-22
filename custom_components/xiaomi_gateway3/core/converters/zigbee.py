@@ -6,6 +6,7 @@ import zigpy.device
 import zigpy.quirks
 from zigpy.const import SIG_ENDPOINTS
 from zigpy.device import Device
+
 from .base import Config, Converter, MathConv
 from .silabs import *
 
@@ -167,11 +168,13 @@ class ZAnalogInput(Converter):
             payload[self.attr] = round(value['present_value'], 2)
 
 
-class ZMotionConv(Converter):
+class ZIASZoneConv(Converter):
     zigbee = "ias_zone"
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        payload[self.attr] = value["value"][0] == 1
+        value = value.get("value")
+        if isinstance(value, list) and len(value) == 4:
+            payload[self.attr] = value[0] == 1
 
 
 class ZEnergyConv(MathConv):
@@ -182,14 +185,15 @@ class ZEnergyConv(MathConv):
             super().decode(device, payload, value["current_summ_delivered"])
 
 
-# {'endpoint': 1, 'cluster': 'power', 'command': 'Command.Report_Attributes', 'battery_voltage': 32}
-class ZBatteryVoltageConv(Converter):
+class ZBatteryConv(Converter):
+    childs = {"battery_voltage"}
     zigbee = "power"
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        value = value.get("battery_voltage")
-        if isinstance(value, int):
-            payload[self.attr] = value
+        if isinstance(value.get("battery_percentage_remaining"), int):
+            payload[self.attr] = int(value["battery_percentage_remaining"] / 2)
+        elif isinstance(value.get("battery_voltage"), int):
+            payload["battery_voltage"] = value["battery_voltage"] * 100
 
 
 # {'endpoint': 1, 'cluster': 'power', 'command': 'Command.Report_Attributes', 'battery_percentage_remaining': 200}
