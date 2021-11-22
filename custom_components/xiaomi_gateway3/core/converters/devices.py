@@ -720,6 +720,8 @@ DEVICES += [{
     "optional": [ZigbeeStats, ZTuyaPowerOn],
 }, {
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
+    "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
+    "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
     "support": 5,
     "required": [ZOnOffConv("switch", "switch")],
     "optional": [ZigbeeStats],
