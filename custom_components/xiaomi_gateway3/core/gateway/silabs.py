@@ -63,7 +63,7 @@ class SilabsGateway(GatewayBase):
             self.debug_device(device, "new unknown device", tag="SLBS")
             return
 
-        if device.model is None:
+        if device.model == UNKNOWN:
             # Sonoff Mini has a bug: it hasn't app_ver, so gw can't add it
             if data["clusterId"] == "0x0000":
                 if not zb_msg:
