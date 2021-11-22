@@ -56,6 +56,9 @@ class GatewayBase(DevicesRegistry):
         if 'true' in self.debug_mode:
             _LOGGER.debug(f"{self.host} | {message}")
 
+    def warning(self, message: str):
+        _LOGGER.warning(f"{self.host} | {message}")
+
 
 class GatewayMesh(GatewayBase):
     mesh_params: list = None
@@ -828,12 +831,6 @@ class GatewayEntry(GatewayNetwork):
             if not await sh.connect(self.host):
                 return False
 
-            if sh.ver < '1.4.7_0000':
-                _LOGGER.error(
-                    f"Gateway {self.host} firmware {sh.ver} unsupported"
-                )
-                return False
-
             self.debug(f"Version: {sh.ver}")
 
             ps = await sh.get_running_ps()
@@ -884,6 +881,11 @@ class GatewayEntry(GatewayNetwork):
                                  shell.PATCH_MEMORY_ZIGBEE2,
                                  shell.PATCH_MEMORY_ZIGBEE3]
                 await sh.exec(shell.SAVE_SERIAL_STATS)
+
+            if sh.ver < '1.4.7_0000':
+                await sh.patch_miio_mqtt_fw146(ps)
+                self.warning(f"Firmware {sh.ver} support is very limited!")
+                return True
 
             if sh.miio_ps(mpatches) not in ps:
                 self.debug(f"Patch daemon_miio.sh with {len(mpatches)}")
