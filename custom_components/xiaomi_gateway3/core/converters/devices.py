@@ -729,9 +729,15 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
-    "support": 1,  # TODO: binding, battery, tests
-    "required": [ZSonoffButtonConv("action", "sensor")],
+    "support": 5,
+    "required": [
+        ZSonoffButtonConv("action", "sensor"),
+        ZBatteryConv("battery", "sensor"),
+    ],
     "optional": [ZigbeeStats],
+    "config": [
+        ZBindConf(clusters={6}, ep=1),
+    ]
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
     "support": 5,
