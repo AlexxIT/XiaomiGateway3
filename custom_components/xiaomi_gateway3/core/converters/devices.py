@@ -784,9 +784,9 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
     "config": [
-        ZBindConfig(clusters={6, 8}, ep=1),
-        ZBindConfig(clusters={1, 64512}, ep=2),
-        ZHueConfig(),
+        ZBindConf(clusters={6, 8}, ep=1),
+        ZBindConf(clusters={1, 64512}, ep=2),
+        ZHueConf(),
     ]
 }, {
     "default": "zigbee",  # default zigbee device
@@ -798,7 +798,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
     "config": [
-        ZBindConfig(clusters={6, 8}, ep=1),  # maybe button
+        ZBindConf(clusters={6, 8}, ep=1),  # maybe button
     ]
 }]
 

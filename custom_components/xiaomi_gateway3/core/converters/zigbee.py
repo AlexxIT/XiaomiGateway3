@@ -322,7 +322,7 @@ ZTuyaPowerOn = ZTuyaPowerOnConv("power_on_state", "select")
 
 
 @dataclass
-class ZBindConfig(Config):
+class ZBindConf(Config):
     clusters: set = None
     ep: int = 1
 
