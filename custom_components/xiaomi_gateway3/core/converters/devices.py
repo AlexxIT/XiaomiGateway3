@@ -58,6 +58,8 @@ battery not exist on some firmwares of some devices.
 The name of the attribute defines the device class, icon and unit of measure.
 Recommended attributes names:
 
+- motion - the sensor can only send motion detection (timeout in Hass)
+- occupancy - the sensor can send motion start and motion stop
 - plug - for sockets with male connector
 - outlet - for sockets with only female connector (wall installation)
 - switch - for relays and switches with buttons (wall installation, remotes)
@@ -734,7 +736,7 @@ DEVICES += [{
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
     "support": 5,
     "required": [
-        ZIASZoneConv("motion", "binary_sensor"),
+        ZIASZoneConv("occupancy", "binary_sensor"),
         ZBatteryConv("battery", "sensor"),
     ],
     "optional": [ZigbeeStats],
