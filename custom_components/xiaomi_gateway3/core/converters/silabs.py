@@ -264,7 +264,7 @@ def zcl_read(nwk: str, ep: int, cluster: int, attr) -> list:
 def zcl_write(nwk: str, ep: int, cluster: int, attr: int, type: int,
               data, mfg: int = None) -> list:
     """Generate Silabs Z3 write attribute command."""
-    if type == 0x30:
+    if type in (0x10, 0x30):
         data = f"{{{data:02x}}}"
     pre = [
         {"commandcli": f"zcl mfg-code {mfg}"}

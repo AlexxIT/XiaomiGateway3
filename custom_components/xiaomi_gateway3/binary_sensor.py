@@ -57,6 +57,9 @@ class XiaomiBinarySensor(XiaomiBinaryBase, RestoreEntity):
             if k in self.subscribed_attrs:
                 self._attr_extra_state_attributes[k] = v
 
+    async def async_update(self):
+        await self.device_read(self.subscribed_attrs)
+
 
 class XiaomiGateway(XiaomiBinaryBase):
     @callback

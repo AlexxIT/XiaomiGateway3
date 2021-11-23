@@ -761,6 +761,24 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
+    "SML001": ["Philips", "Hue motion sensor", "9290012607"],
+    "support": 4,  # TODO: sensitivity, occupancy_timeout, led
+    "required": [
+        ZOccupancyConv("occupancy", "binary_sensor", ep=2),
+        ZIlluminance("illuminance", "sensor", ep=2),
+        ZTemperatureConv("temperature", "sensor", ep=2),
+        ZBatteryConv("battery", "sensor", ep=2),
+        # ZHueLed("led", "switch"),
+    ],
+    "optional": [ZigbeeStats],
+    "config": [
+        ZBindConf(clusters={1, 0x400, 0x402, 0x406}, ep=2),
+        ZReportConf(type="battery_percentage_remaining", ep=2),
+        ZReportConf(type="occupancy", ep=2),
+        ZReportConf(type="temperature", ep=2),
+        ZReportConf(type="illuminance", ep=2),
+    ]
+}, {
     "LWB010": ["Philips", "Hue white 806 lm", "9290011370B"],
     "support": 2,  # TODO: state change, effect?
     "required": [
