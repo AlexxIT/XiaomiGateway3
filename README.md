@@ -615,6 +615,16 @@ Also you can get:
 
 <img src="cloud_tokens.png" width="1202">
 
+# Multiple Hass
+
+It's safe to use multiple Hass servers (main and reserve) with integration, but:
+
+- You should use the same integration version and same integration settings on both servers
+- You may use different Hass versions on both servers
+- If you using ZHA mode:
+   - ZHA integration should be installed only on one Hass
+   - Gateway integration may be installed only on one Hass or on both, but with same integration version and same integration settings
+
 # Disable Buzzer
 
 This option disable only beeps from hacked motion sensor (5 sec):
