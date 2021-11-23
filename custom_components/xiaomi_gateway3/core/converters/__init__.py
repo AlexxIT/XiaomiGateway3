@@ -38,7 +38,7 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
         if type == GATEWAY:
             market = f"Wi-Fi {info[2]}"
         elif type == ZIGBEE:
-            market = f"Zigbee {info[2]}"
+            market = f"Zigbee {info[2]} ({model})"
         elif type == BLE:
             market = f"BLE {info[2]}"
         elif type == MESH:
