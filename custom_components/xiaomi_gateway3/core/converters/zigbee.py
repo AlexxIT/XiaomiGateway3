@@ -334,7 +334,26 @@ class ZBindConfig(Config):
             payload.setdefault("commands", []).extend(cmd)
 
 
-class ZHueConfig(Config):
+@dataclass
+class ZReportConf(Config):
+    type: str
+    ep: int = 1
+
+    def encode(self, device: "XDevice", payload: dict, gateway):
+        if self.type == "battery_percentage_remaining":
+            cmd = zdb_report(device.nwk, self.ep, 1, 0x21, 0x20, 3600, 62000, 0)
+        elif self.type == "occupancy":
+            cmd = zdb_report(device.nwk, self.ep, 0x406, 0, 24, 0, 3600, 0)
+        elif self.type == "temperature":
+            cmd = zdb_report(device.nwk, self.ep, 0x402, 0, 0x29, 10, 3600, 100)
+        elif self.type == "illuminance":
+            cmd = zdb_report(device.nwk, self.ep, 0x400, 0, 0x21, 10, 3600, 5)
+        else:
+            raise NotImplementedError
+        payload.setdefault("commands", []).extend(cmd)
+
+
+class ZHueConf(Config):
     def encode(self, device: "XDevice", payload: dict, gateway):
         # Thanks to zigbee2mqtt and ZHA (some unknown magic)
         cmd = zcl_write(device.nwk, ep=2, cluster=0, attr=0x0031, type=0x19,
