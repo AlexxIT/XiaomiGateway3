@@ -543,12 +543,19 @@ class XEntity(Entity):
             assert "mi_spec" in payload, payload
 
             ok = await self.gw.miot_send(self.device, payload)
-            if not ok:
+            if not ok or self.attr == "group":
                 return
-            # 2 seconds are selected experimentally
-            await asyncio.sleep(2)
-            await self.device_read(self.subscribed_attrs)
-            self._async_write_ha_state()
+
+            payload = self.device.encode_read(self.subscribed_attrs)
+            for _ in range(10):
+                await asyncio.sleep(.5)
+                data = await self.gw.miot_read(self.device, payload)
+                # check that all read attrs are equal to send attrs
+                if not data or any(data.get(k) != v for k, v in value.items()):
+                    continue
+                self.async_set_state(data)
+                self._async_write_ha_state()
+                break
 
     async def device_read(self, attrs: set):
         payload = self.device.encode_read(attrs)
