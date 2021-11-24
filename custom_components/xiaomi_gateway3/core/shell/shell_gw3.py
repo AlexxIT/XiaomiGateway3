@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import hashlib
 import re
 
@@ -222,6 +223,12 @@ class ShellGw3(TelnetShell):
 
     async def prevent_unpair(self):
         await self.exec("killall zigbee_gw")
+
+    async def tar_data(self):
+        self.writer.write(TAR_DATA)
+        coro = self.reader.readuntil(b"\r\n# ")
+        raw = await asyncio.wait_for(coro, timeout=10)
+        return base64.b64decode(raw)
 
     async def get_version(self):
         raw = await self.read_file('/etc/rootfs_fw_info')
