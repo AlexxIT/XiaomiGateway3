@@ -97,7 +97,7 @@ class MathConv(Converter):
     round: int = None
 
     def decode(self, device: "XDevice", payload: dict, value: float):
-        if self.min < value < self.max:
+        if self.min <= value <= self.max:
             if self.multiply:
                 value *= self.multiply
             if self.round is not None:
