@@ -1,3 +1,4 @@
+import struct
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -229,6 +230,15 @@ class MiBeaconConv(Converter):
                 payload['action'] = 'timeout'
             elif data[0] == 3:
                 payload['action'] = 'reset'
+
+        elif eid == 0x4803:
+            payload['battery'] = data[0]
+
+        elif eid == 0x4c01 and len(data) == 4:
+            payload['temperature'] = round(struct.unpack('<f', data)[0], 2)
+
+        elif eid == 0x4c08 and len(data) == 4:
+            payload['humidity'] = round(struct.unpack('<f', data)[0], 2)
 
         elif eid == 0x0006 and len(data) == 5:
             action = int.from_bytes(data[4:], 'little')

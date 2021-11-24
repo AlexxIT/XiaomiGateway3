@@ -871,6 +871,7 @@ DEVICES += [{
     1647: ["Xiaomi", "Qingping TH Lite", "CGDK2"],
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
+    4611: ["Xiaomi", "TH Sensor", "XMWSDJ04MMC"],
     "required": [
         MiBeacon, BLETemperature, BLEHumidity,
         BLEBatteryLazy,  # no battery info in new firmwares
