@@ -483,9 +483,17 @@ DEVICES += [{
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
     ],
+    "optional": [ZigbeeStats]
+}, {
+    "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1", "MCCGQ14LM"],
+    "support": 5,
+    "required": [
+        MapConv("contact", "binary_sensor", mi="2.p.1", map=INVERSE),
+        BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
+    ],
     "optional": [
         ZigbeeStats,
-        Converter("battery_voltage", "sensor", mi="3.p.1"),
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW),
     ]
 }, {
     # no N, https://www.aqara.com/en/single_switch_T1_no-neutral.html
