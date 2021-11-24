@@ -47,11 +47,11 @@ def test_():
         "APSPlayload": "0x190300000000000000",
     })
     p = device.decode_zigbee(p)
-    assert p == {'motion': False}
+    assert p == {'occupancy': False}
 
     p = silabs.decode({
         "clusterId": "0x0500", "sourceEndpoint": "0x01",
         "APSPlayload": "0x190400010000000000"
     })
     p = device.decode_zigbee(p)
-    assert p == {'motion': True}
+    assert p == {'occupancy': True}
