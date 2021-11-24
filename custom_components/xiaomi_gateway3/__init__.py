@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAINS = [
     'alarm_control_panel', 'binary_sensor', 'climate', 'cover', 'light',
-    'select', 'sensor', 'switch'
+    'number', 'select', 'sensor', 'switch'
 ]
 
 CONF_DEVICES = 'devices'
