@@ -887,6 +887,7 @@ DEVICES += [{
     # each device
     "default": "ble",  # default BLE device
     794: ["Xiaomi", "Door Lock", "MJZNMS02LM"],
+    955: ["Unknown", "Lock M2", "ydhome.lock.m2silver"],
     982: ["Xiaomi", "Qingping Door Sensor", "CGH1"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1161: ["Xiaomi", "Toothbrush T500", "MES601"],
