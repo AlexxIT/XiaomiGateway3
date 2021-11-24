@@ -7,7 +7,16 @@ ZNWK = "0x12ab"
 
 
 def test_cli():
-    p = silabs.zcl_read("0x1234", 1, 0x0B04, [1285, 1288, 1291])
+    p = silabs.zcl_read("0x1234", 1, "on_off", "on_off")
+    assert p == [
+        {'commandcli': 'zcl global read 6 0'},
+        {'commandcli': 'send 0x1234 1 1'}
+    ]
+
+    p = silabs.zcl_read(
+        "0x1234", 1, "electrical_measurement", "rms_voltage", "rms_current",
+        "active_power"
+    )
     assert p == [
         {'commandcli': 'raw 2820 {100000050508050b05}'},
         {'commandcli': 'send 0x1234 1 1'}

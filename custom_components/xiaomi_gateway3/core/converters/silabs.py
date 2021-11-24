@@ -3,7 +3,7 @@ import logging
 from zigpy.types import EUI64
 from zigpy.zcl import Cluster
 from zigpy.zcl.foundation import Command, ZCLHeader, Attribute, \
-    ReadAttributeRecord
+    ReadAttributeRecord, DATA_TYPES
 from zigpy.zdo import ZDO
 from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
 
@@ -171,7 +171,10 @@ def decode(data: dict):
 
             elif hdr.command_id == Command.Configure_Reporting:
                 attrs, = args
-                # payload["value"] = [str(attr) for attr in attrs]
+                # fix __repr__ bug
+                for attr in attrs:
+                    if not hasattr(attr, "reportable_change"):
+                        attr.reportable_change = None
                 payload["value"] = attrs
 
             elif (hdr.command_id == Command.Write_Attributes_rsp or
@@ -216,6 +219,29 @@ def decode(data: dict):
         return None
 
 
+def get_cluster(cluster: str) -> Cluster:
+    # noinspection PyProtectedMember
+    return next(
+        cls for cls in Cluster._registry.values() if
+        cls.ep_attribute == cluster
+    )
+
+
+def get_attr(attributes: dict, attr) -> int:
+    if isinstance(attr, int):
+        return attr
+    return next(k for k, v in attributes.items() if v[0] == attr)
+
+
+def get_attr_type(attributes: dict, attr: str) -> (int, int):
+    attr, attr_type = next(
+        (k, v[1]) for k, v in attributes.items()
+        if v[0] == attr
+    )
+    type = next(k for k, v in DATA_TYPES.items() if v[1] == attr_type)
+    return attr, type
+
+
 def zcl_on_off(nwk: str, ep: int, value: bool) -> list:
     """Generate Silabs Z3 command (cluster 6)."""
     value = "on" if value else "off"
@@ -245,49 +271,78 @@ def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
 
 
 # zcl global read [cluster:2] [attributeId:2]
-def zcl_read(nwk: str, ep: int, cluster: int, attr) -> list:
+def zcl_read(nwk: str, ep: int, cluster: str, *attrs) -> list:
     """Generate Silabs Z3 read attribute command. Support multiple attrs."""
-    if isinstance(attr, list):
-        raw = "".join([int(a).to_bytes(2, "little").hex() for a in attr])
+    # convert string to object
+    cluster = get_cluster(cluster)
+    cid = cluster.cluster_id
+
+    # convert List[str] to List[int]
+    attrs = [get_attr(cluster.attributes, attr) for attr in attrs]
+
+    if len(attrs) > 1:
+        raw = "".join([int(a).to_bytes(2, "little").hex() for a in attrs])
         return [
-            {"commandcli": f"raw {cluster} {{100000{raw}}}"},
+            {"commandcli": f"raw {cid} {{100000{raw}}}"},
             {"commandcli": f"send {nwk} 1 {ep}"},
         ]
 
     return [
-        {"commandcli": f"zcl global read {cluster} {attr}"},
+        {"commandcli": f"zcl global read {cid} {attrs[0]}"},
         {"commandcli": f"send {nwk} 1 {ep}"}
     ]
 
 
 # zcl global write [cluster:2] [attributeId:2] [type:4] [data:-1]
-def zcl_write(nwk: str, ep: int, cluster: int, attr: int, type: int,
-              data, mfg: int = None) -> list:
+def zcl_write(
+        nwk: str, ep: int, cluster: str, attr, data, mfg: int = None,
+        type: int = None
+) -> list:
     """Generate Silabs Z3 write attribute command."""
+    cluster = get_cluster(cluster)
+    cid = cluster.cluster_id
+
+    if isinstance(attr, str):
+        attr, type = get_attr_type(cluster.attributes, attr)
+
+    # TODO: other types...
     if type in (0x10, 0x30):
         data = f"{{{data:02x}}}"
+    elif type == 33:
+        data = "{" + int(data).to_bytes(2, "little").hex() + "}"
+
     pre = [
         {"commandcli": f"zcl mfg-code {mfg}"}
     ] if mfg is not None else []
     return pre + [
-        {"commandcli": f"zcl global write {cluster} {attr} {type} {data}"},
+        {"commandcli": f"zcl global write {cid} {attr} {type} {data}"},
         {"commandcli": f"send {nwk} 1 {ep}"}
     ]
 
 
-def zdo_bind(nwk: str, ep: int, cluster: int, src: str, dst: str) -> list:
+def zdo_bind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
     """Generate Silabs Z3 bind command."""
+    cluster = get_cluster(cluster)
+    cid = cluster.cluster_id
     return [{
-        "commandcli": f"zdo bind {nwk} {ep} 1 {cluster} {{{src}}} {{{dst}}}"
+        "commandcli": f"zdo bind {nwk} {ep} 1 {cid} {{{src}}} {{{dst}}}"
     }]
 
 
 # zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2] [reportableChange:-1]
-def zdb_report(nwk: str, ep: int, cluster: int, attr: int, type: int,
-               mint: int, maxt: int, change: int):
+def zdb_report(
+        nwk: str, ep: int, cluster: str, attr: str, mint: int, maxt: int,
+        change: int, type: int = None
+):
+    cluster = get_cluster(cluster)
+    cid = cluster.cluster_id
+
+    if isinstance(attr, str):
+        attr, type = get_attr_type(cluster.attributes, attr)
+
     change = int(change).to_bytes(2, "little").hex()
     return [{
-        "commandcli": f"zcl global send-me-a-report {cluster} {attr} {type} {mint} {maxt} {{{change}}}"
+        "commandcli": f"zcl global send-me-a-report {cid} {attr} {type} {mint} {maxt} {{{change}}}"
     }, {
         "commandcli": f"send {nwk} 1 {ep}"
     }]

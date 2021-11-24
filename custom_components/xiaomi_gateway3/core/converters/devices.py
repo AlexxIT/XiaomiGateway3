@@ -736,7 +736,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
     "config": [
-        ZBindConf(clusters={6}, ep=1),
+        ZBindConf(ZSonoffButtonConv, ep=1),
     ]
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
@@ -768,21 +768,26 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
-    "support": 4,  # TODO: sensitivity, occupancy_timeout, led
+    "support": 4,  # TODO: sensitivity, led
     "required": [
         ZOccupancyConv("occupancy", "binary_sensor", ep=2),
-        ZIlluminance("illuminance", "sensor", ep=2),
+        ZIlluminanceConv("illuminance", "sensor", ep=2),
         ZTemperatureConv("temperature", "sensor", ep=2),
         ZBatteryConv("battery", "sensor", ep=2),
-        # ZHueLed("led", "switch"),
     ],
-    "optional": [ZigbeeStats],
+    "optional": [
+        ZigbeeStats,
+        ZOccupancyTimeoutConv("occupancy_timeout", "number", ep=2),
+    ],
     "config": [
-        ZBindConf(clusters={1, 0x400, 0x402, 0x406}, ep=2),
-        ZReportConf(type="battery_percentage_remaining", ep=2),
-        ZReportConf(type="occupancy", ep=2),
-        ZReportConf(type="temperature", ep=2),
-        ZReportConf(type="illuminance", ep=2),
+        ZBindConf(ZOccupancyConv, ep=2),
+        ZBindConf(ZIlluminanceConv, ep=2),
+        ZBindConf(ZTemperatureConv, ep=2),
+        ZBindConf(ZBatteryConv, ep=2),
+        ZReportConf(ZOccupancyConv, mint=0, maxt=3600, change=0, ep=2),
+        ZReportConf(ZIlluminanceConv, mint=10, maxt=3600, change=5, ep=2),
+        ZReportConf(ZTemperatureConv, mint=10, maxt=3600, change=100, ep=2),
+        ZReportConf(ZBatteryConv, mint=3600, maxt=62000, change=0, ep=2),
     ]
 }, {
     "LWB010": ["Philips", "Hue white 806 lm", "9290011370B"],
@@ -810,8 +815,9 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
     "config": [
-        ZBindConf(clusters={6, 8}, ep=1),
-        ZBindConf(clusters={1, 64512}, ep=2),
+        ZBindConf(ZHueDimmerOnConv),
+        ZBindConf(ZHueDimmerLevelConv),
+        # ZBindConf("power", 64512, ep=2),
         ZHueConf(),
     ]
 }, {
@@ -824,7 +830,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
     "config": [
-        ZBindConf(clusters={6, 8}, ep=1),  # maybe button
+        ZBindConf(ZOnOffConv),  # maybe button
     ]
 }]
 
