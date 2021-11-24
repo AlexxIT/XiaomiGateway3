@@ -86,6 +86,10 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
 
     @callback
     def async_set_state(self, data: dict):
+        # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
+        if "battery" in data:
+            return
+
         assert data[self.attr] == True
 
         # don't trigger motion right after illumination
