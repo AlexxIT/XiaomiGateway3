@@ -7,7 +7,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
-from .core.converters import Converter
+from .core.converters import Converter, ZIGBEE, BLE
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
 
@@ -16,7 +16,12 @@ SCAN_INTERVAL = timedelta(seconds=60)
 
 async def async_setup_entry(hass, entry, add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        cls = XiaomiAction if conv.attr == "action" else XiaomiSensor
+        if conv.attr == "action":
+            cls = XiaomiAction
+        elif conv.attr in (ZIGBEE, BLE):
+            cls = XiaomiBaseSensor
+        else:
+            cls = XiaomiSensor
         add_entities([cls(gateway, device, conv)])
 
     gw: XGateway = hass.data[DOMAIN][entry.entry_id]
@@ -34,7 +39,7 @@ class Support20217:
         self._attr_state = value
 
 
-class XiaomiSensor(XEntity, SensorEntity, RestoreEntity, Support20217):
+class XiaomiBaseSensor(XEntity, SensorEntity, Support20217):
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
@@ -43,6 +48,8 @@ class XiaomiSensor(XEntity, SensorEntity, RestoreEntity, Support20217):
             if k in self.subscribed_attrs and k != self.attr:
                 self._attr_extra_state_attributes[k] = v
 
+
+class XiaomiSensor(XiaomiBaseSensor, RestoreEntity):
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
         """Restore previous state."""
