@@ -144,10 +144,13 @@ class XDevice:
         return s
 
     def setup_entitites(self, gateway: 'GatewayBase', entities: list = None):
-        kwargs = {"entities": entities} if entities else {}
+        kwargs: Dict[str, Any] = {"entities": entities} if entities else {}
         for key in ("global", self.model, self.mac, self.did):
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
+
+        if "model" in kwargs:
+            self.update_model(kwargs["model"])
 
         if "device_name" in kwargs:
             self.info.name = kwargs["device_name"]
