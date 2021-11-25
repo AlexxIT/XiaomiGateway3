@@ -21,9 +21,7 @@ RUN_FTP = "/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &"
 # flash on another ports because running ZHA or z2m can breake process
 RUN_ZIGBEE_FLASH = "/data/ser2net -C '8115:raw:60:/dev/ttyS2:115200 8DATABITS NONE 1STOPBIT' -C '8038:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT'"
 
-TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
-           b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
-           b"ble_info miioconfig.db 2>/dev/null | base64\n"
+TAR_DATA = "tar -czOC /data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info miioconfig.db 2>/dev/null | base64"
 
 MD5_BT = {
     # '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
@@ -225,9 +223,7 @@ class ShellGw3(TelnetShell):
         await self.exec("killall zigbee_gw")
 
     async def tar_data(self):
-        self.writer.write(TAR_DATA)
-        coro = self.reader.readuntil(b"\r\n# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
+        raw = await self.exec(TAR_DATA, as_bytes=True)
         return base64.b64decode(raw)
 
     async def get_version(self):

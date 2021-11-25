@@ -3,8 +3,7 @@ import base64
 
 from .base import TelnetShell
 
-TAR_DATA = b"tar -czOC /data mha_master miio storage zigbee " \
-           b"devices.txt gatewayInfoJson.info 2>/dev/null | base64\n"
+TAR_DATA = "tar -czOC /data mha_master miio storage zigbee devices.txt gatewayInfoJson.info 2>/dev/null | base64"
 
 
 class ShellE1(TelnetShell):
@@ -30,9 +29,7 @@ class ShellE1(TelnetShell):
         await self.exec("killall mha_master")
 
     async def tar_data(self):
-        self.writer.write(TAR_DATA)
-        coro = self.reader.readuntil(b"\r\n# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
+        raw = await self.exec(TAR_DATA, as_bytes=True)
         return base64.b64decode(raw)
 
     async def get_version(self):
