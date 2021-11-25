@@ -215,13 +215,14 @@ DEVICES += [{
     "optional": [ZigbeeStats, Energy],
 }, {
     "lumi.relay.c2acn01": ["Aqara", "Relay", "LLKZMK11LM"],  # tested
+    "support": 4,  # TODO: test load_s0 8.0.2034 load_s1 8.0.2035
     "required": [
         ChannelC1, ChannelC2, Current, Power, Voltage,
         Action, Button1, Button2, ButtonBoth,
     ],
     "optional": [
         ZigbeeStats, Energy,
-        Converter("interlock", "switch", mi="4.9.85"),
+        BoolConv("interlock", "switch", mi="4.9.85"),
     ]
 }, {
     "lumi.ctrl_neutral2": ["Aqara", "Double Wall Switch", "QBKG03LM"],
