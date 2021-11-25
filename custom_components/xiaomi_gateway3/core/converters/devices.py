@@ -765,17 +765,6 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "FNB56-ZSC01LX1.2": ["Unknown", "Dimmer", "LXZ8-02A"],
-    "support": 3,  # TODO: tests, effect?
-    "TRADFRI bulb E27 W opal 1000lm": [
-        "IKEA", "Bulb E27 1000 lm", "LED1623G12"
-    ],
-    "required": [
-        ZOnOffConv("light", "light"),
-        ZBrightnessConv("brightness", parent="light"),
-    ],
-    "optional": [ZigbeeStats],
-}, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # TODO: sensitivity, led
     "required": [
@@ -828,6 +817,26 @@ DEVICES += [{
         ZBindConf(ZHueDimmerLevelConv),
         # ZBindConf("power", 64512, ep=2),
         ZHueConf(),
+    ]
+}, {
+    "FNB56-ZSC01LX1.2": ["Unknown", "Dimmer", "LXZ8-02A"],
+    "TRADFRI bulb E27 W opal 1000lm": [
+        "IKEA", "Bulb E27 1000 lm", "LED1623G12"
+    ],
+    "support": 3,  # TODO: tests, effect?
+    "required": [
+        ZOnOffConv("light", "light"),
+        ZBrightnessConv("brightness", parent="light"),
+    ],
+    "optional": [ZigbeeStats],
+}, {
+    "TRADFRI remote control": ["IKEA", "TRADFRI remote control", "E1524/E1810"],
+    "required": [
+        IKEARemoteConv1("action", "sensor"),
+        IKEARemoteConv2("action"),
+    ],
+    "config": [
+        ZBindConf(ZOnOffConv),
     ]
 }, {
     "default": "zigbee",  # default zigbee device

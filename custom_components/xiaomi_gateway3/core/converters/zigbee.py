@@ -346,6 +346,31 @@ class ZHueLed(Converter):
         payload.setdefault("commands", []).extend(cmd)
 
 
+class IKEARemoteConv1(ZConverter):
+    zigbee = "on_off"
+
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        if value.get("command_id") == 2:
+            payload["button"] = "toggle"
+
+
+class IKEARemoteConv2(ZConverter):
+    zigbee = "level"
+    map = {
+        1: "brightness_down_hold",
+        2: "brightness_down_click",
+        3: "brightness_down_release",
+        4: "toggle_hold",
+        5: "brightness_up_hold",
+        6: "brightness_up_click",
+        7: "brightness_up_release",
+    }
+
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        if "command_id" in value:
+            payload["button"] = self.map.get(value["command_id"])
+
+
 ################################################################################
 # Final converter classes
 ################################################################################
