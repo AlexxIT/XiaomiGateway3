@@ -1101,6 +1101,20 @@ DEVICES += [{
         Converter("baby_mode", "switch", mi="11.p.1"),
     ]
 }, {
+    4160: ["Xiaomi", "Mosquito Repeller 2", "WX10ZM"],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),  # bool
+        Converter("battery", "sensor", mi="3.p.1"),  # percentage 0-100
+        Converter("supply", "sensor", mi="4.p.1"),  # percentage 0-100
+    ],
+    "optional": [
+        Converter("led", "switch", mi="9.p.1"),  # bool
+        MapConv("mode", "select", mi="2.p.2", map={
+            0: "auto", 1: "battery", 2: "usb"
+        })
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "required": [],
     "optional": [
