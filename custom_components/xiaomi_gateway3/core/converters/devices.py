@@ -782,10 +782,10 @@ DEVICES += [{
         ZBindConf(ZIlluminanceConv, ep=2),
         ZBindConf(ZTemperatureConv, ep=2),
         ZBindConf(ZBatteryConv, ep=2),
-        ZReportConf(ZOccupancyConv, mint=0, maxt=3600, change=0, ep=2),
-        ZReportConf(ZIlluminanceConv, mint=10, maxt=3600, change=5, ep=2),
-        ZReportConf(ZTemperatureConv, mint=10, maxt=3600, change=100, ep=2),
-        ZReportConf(ZBatteryConv, mint=3600, maxt=62000, change=0, ep=2),
+        ZReportConf(ZOccupancyConv, mint=0, maxt=HOUR, change=0, ep=2),
+        ZReportConf(ZIlluminanceConv, mint=10, maxt=HOUR, change=5, ep=2),
+        ZReportConf(ZTemperatureConv, mint=10, maxt=HOUR, change=100, ep=2),
+        ZReportConf(ZBatteryConv, mint=HOUR, maxt=HOUR12, change=0, ep=2),
     ]
 }, {
     "LWB010": ["Philips", "Hue white 806 lm", "9290011370B"],

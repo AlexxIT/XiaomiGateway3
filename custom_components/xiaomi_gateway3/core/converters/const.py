@@ -5,6 +5,9 @@ MESH = "mesh"
 
 MESH_GROUP_MODEL = 1054
 
+HOUR = 3600
+HOUR12 = HOUR * 12
+
 UNKNOWN = "unknown"
 SINGLE = "single"
 DOUBLE = "double"
