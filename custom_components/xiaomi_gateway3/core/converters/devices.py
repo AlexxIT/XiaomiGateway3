@@ -948,36 +948,32 @@ DEVICES += [{
 
 DEVICES += [{
     # brightness 1..65535, color_temp 2700..6500
-    948: ["Yeelight", "Mesh Downlight", "YLSD01YL"],
-    995: ["Yeelight", "Mesh Bulb E14", "YLDP09YL"],
-    996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],
-    997: ["Yeelight", "Mesh Spotlight", "YLSD04YL"],
-    1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],
-    1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],
-    2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],
-    2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
-    "required": [
-        Converter("light", "light", mi="2.p.1"),
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
-    ]
-}, {
-    1054: ["Xiaomi", "Mesh Group", "yeelink.light.mb1grp"],
-    "required": [
-        Converter("group", "light", mi="2.p.1"),
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
-    ]
-}, {
-    2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],
+    948: ["Yeelight", "Mesh Downlight", "YLSD01YL"],  # flex
+    995: ["Yeelight", "Mesh Bulb E14", "YLDP09YL"],  # flex
+    996: ["Yeelight", "Mesh Bulb E27", "YLDP10YL"],  # flex
+    997: ["Yeelight", "Mesh Spotlight", "YLSD04YL"],  # flex
+    1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],  # flex
+    1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],  # flex
+    2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],  # flex
+    2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],  # flex
+    "support": 4,  # TODO: power_on_state values
     "required": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
     ],
     "optional": [
-        BoolConv("smart", "binary_sensor", mi="3.p.5"),
-        BoolConv("powerup", "binary_sensor", mi="3.p.11"),
+        BoolConv("flex_switch", "switch", mi="3.p.5"),  # uint8
+        BoolConv("power_on_state", "switch", mi="3.p.11"),
+    ]
+}, {
+    # brightness 1..65535, color_temp 2700..6500
+    1054: ["Xiaomi", "Mesh Group", "yeelink.light.mb1grp"],
+    "support": 4,  # TODO: check if support flex and power on
+    "required": [
+        Converter("group", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
     ]
 }, {
     # brightness 1..100, color_temp 2700..6500
