@@ -756,8 +756,23 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    # wrong zigbee model (ewelink bug)
-    "TH01": ["Sonoff", "Door/Window Sensor", "SNZB-04"],
+    "TH01": ["Sonoff", "TH Sensor", "SNZB-02"],
+    "required": [
+        ZTemperatureConv("temperature", "sensor"),
+        ZHumidityConv("humidity", "sensor"),
+        ZBatteryConv("battery", "sensor"),
+    ],
+    "optional": [ZigbeeStats],
+    "config": [
+        # temperature, humidity and battery binds by default
+        # report config for battery_voltage also by default
+        ZReportConf(ZTemperatureConv, mint=10, maxt=HOUR, change=100),
+        ZReportConf(ZHumidityConv, mint=10, maxt=HOUR, change=100),
+        ZReportConf(ZBatteryConv, mint=HOUR, maxt=HOUR12, change=0),
+    ],
+}, {
+    # wrong zigbee model, some devices have model TH01 (ewelink bug)
+    "DS01": ["Sonoff", "Door/Window Sensor", "SNZB-04"],
     "support": 5,
     "required": [
         ZIASZoneConv("contact", "binary_sensor"),

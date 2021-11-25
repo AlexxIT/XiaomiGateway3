@@ -173,6 +173,15 @@ class ZTemperatureConv(ZConverter):
             payload[self.attr] = value[self.zattr] / 100
 
 
+class ZHumidityConv(ZConverter):
+    zigbee = "humidity"
+    zattr = "measured_value"
+
+    def decode(self, device: 'XDevice', payload: dict, value: dict):
+        if isinstance(value.get(self.zattr), int):
+            payload[self.attr] = value[self.zattr] / 100
+
+
 class ZEnergyConv(MathConv):
     zigbee = "smartenergy_metering"
     zattr = "current_summ_delivered"
