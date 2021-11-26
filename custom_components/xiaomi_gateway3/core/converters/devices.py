@@ -272,9 +272,7 @@ DEVICES += [{
     ],
     "optional": [
         ZigbeeStats,
-        MapConv("power_on_state", "select", mi="8.0.2030", map={
-            0: "on", 1: "previous"
-        })
+        MapConv("power_on_state", "select", mi="8.0.2030", map=BULB_MEMORY)
     ],
 }, {
     # light with brightness

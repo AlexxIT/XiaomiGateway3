@@ -53,6 +53,7 @@ RUN_STATE = {0: "closing", 1: "opening", 2: "stop"}
 GATE_ALARM = {
     0: "disarmed", 1: "armed_home", 2: "armed_away", 3: "armed_night"
 }
+BULB_MEMORY = {0: "on", 1: "previous"}
 POWEROFF_MEMORY = {0: "off", 1: "previous"}
 # Hass: On means low, Off means normal
 BATTERY_LOW = {1: False, 2: True}

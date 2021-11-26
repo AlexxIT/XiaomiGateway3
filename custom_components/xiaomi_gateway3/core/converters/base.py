@@ -384,8 +384,8 @@ Button23 = ButtonConv("button_both_23", mi="13.7.85")
 # converts voltage to percent and shows voltage in attributes
 # users can adds separate voltage sensor or original percent sensor
 Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
+BatteryLow = BoolConv("battery_low", "binary_sensor", mi="8.0.9001")
 BatteryPer = Converter("battery_percent", "sensor", mi="8.0.2001")
-BatteryEnd = BoolConv("battery_end", "binary_sensor", mi="8.0.9001")
 
 # zigbee3 devices
 
