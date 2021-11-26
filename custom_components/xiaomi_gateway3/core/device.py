@@ -396,6 +396,11 @@ STATE_CLASSES = {
     DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
 }
 
+# Config: An entity which allows changing the configuration of a device
+ENTITY_CATEGORY_CONFIG: Final = "config"
+# Diagnostic: An entity exposing some configuration parameter or diagnostics of a device
+ENTITY_CATEGORY_DIAGNOSTIC: Final = "diagnostic"
+
 ENTITY_CATEGORIES = {
     BLE: ENTITY_CATEGORY_DIAGNOSTIC,
     GATEWAY: ENTITY_CATEGORY_DIAGNOSTIC,
