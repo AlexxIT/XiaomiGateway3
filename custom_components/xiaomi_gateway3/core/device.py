@@ -396,6 +396,37 @@ STATE_CLASSES = {
     DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
 }
 
+ENTITY_CATEGORIES = {
+    BLE: ENTITY_CATEGORY_DIAGNOSTIC,
+    GATEWAY: ENTITY_CATEGORY_DIAGNOSTIC,
+    ZIGBEE: ENTITY_CATEGORY_DIAGNOSTIC,
+    "baby_mode": ENTITY_CATEGORY_CONFIG,
+    "battery": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_charging": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_low": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_percent": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_voltage": ENTITY_CATEGORY_DIAGNOSTIC,
+    "blind_time": ENTITY_CATEGORY_CONFIG,
+    "charge_protect": ENTITY_CATEGORY_CONFIG,
+    "chip_temperature": ENTITY_CATEGORY_DIAGNOSTIC,
+    "cloud_link": ENTITY_CATEGORY_DIAGNOSTIC,
+    "display_unit": ENTITY_CATEGORY_CONFIG,
+    "fault": ENTITY_CATEGORY_DIAGNOSTIC,
+    "flex_switch": ENTITY_CATEGORY_CONFIG,
+    "led": ENTITY_CATEGORY_CONFIG,
+    "idle_time": ENTITY_CATEGORY_DIAGNOSTIC,
+    "max_power": ENTITY_CATEGORY_DIAGNOSTIC,
+    "mode": ENTITY_CATEGORY_CONFIG,
+    "motor_reverse": ENTITY_CATEGORY_CONFIG,
+    "motor_speed": ENTITY_CATEGORY_CONFIG,
+    "occupancy_timeout": ENTITY_CATEGORY_CONFIG,
+    "power_on_state": ENTITY_CATEGORY_CONFIG,
+    "sensitivity": ENTITY_CATEGORY_CONFIG,
+    "smart": ENTITY_CATEGORY_CONFIG,
+    "smart_1": ENTITY_CATEGORY_CONFIG,
+    "smart_2": ENTITY_CATEGORY_CONFIG,
+}
+
 STATE_TIMEOUT = timedelta(minutes=10)
 
 
@@ -419,6 +450,7 @@ class XEntity(Entity):
         self._attr_name = device.name(attr)
         self._attr_should_poll = conv.poll
         self._attr_unique_id = device.unique_id(attr)
+        self._attr_entity_category = ENTITY_CATEGORIES.get(attr)
         self.entity_id = device.entity_id(conv)
 
         if conv.domain == "sensor":  # binary_sensor moisture problem
