@@ -450,7 +450,8 @@ class XEntity(Entity):
             model=device.info.model,
             name=device.info.name,
             sw_version=device.fw_ver,
-            via_device=via_device
+            via_device=via_device,
+            configuration_url=device.info.url
         )
 
         # stats sensors always available

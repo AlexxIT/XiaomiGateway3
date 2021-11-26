@@ -21,6 +21,7 @@ class XDeviceInfo:
     manufacturer: str
     model: str
     name: str
+    url: str
     req_converters: List[Converter]
     opt_converters: List[Converter]
     config: List[Config]
@@ -50,10 +51,16 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
         else:
             raise RuntimeError
 
+        if type == ZIGBEE and not is_mihome_zigbee(model):
+            url = "https://www.zigbee2mqtt.io/supported-devices/#s=" + info[2]
+        else:
+            url = f"https://home.miot-spec.com/s/{model}"
+
         return XDeviceInfo(
             manufacturer=info[0],
             model=market,
             name=f"{info[0]} {info[1]}",
+            url=url,
             req_converters=spec["required"],
             opt_converters=spec.get("optional"),
             config=spec.get("config"),
