@@ -159,9 +159,9 @@ DEVICES += [{
     # don"t work: protect 8.0.2014, power 8.0.2015, plug_detection 8.0.2044
     "lumi.plug": ["Xiaomi", "Plug", "ZNCZ02LM"],  # tested
     "support": 5,
-    "required": [PlugN0, Power],
+    "required": [PlugN0, Power, Energy],
     "optional": [
-        ZigbeeStats, Energy,
+        ZigbeeStats,
         Converter("chip_temperature", "sensor", mi="8.0.2006"),
         MapConv("power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY),
         BoolConv("charge_protect", "switch", mi="8.0.2031"),
@@ -171,20 +171,20 @@ DEVICES += [{
 }, {
     "lumi.plug.mitw01": ["Xiaomi", "Plug TW", "ZNCZ03LM"],
     "lumi.plug.maus01": ["Xiaomi", "Plug US", "ZNCZ12LM"],
-    "required": [PlugN0, Power],
-    "optional": [ZigbeeStats, Energy]
+    "required": [PlugN0, Power, Energy],
+    "optional": [ZigbeeStats]
 }, {
     "lumi.plug.mmeu01": ["Xiaomi", "Plug EU", "ZNCZ04LM"],
-    "required": [PlugN0, Power, Voltage],
-    "optional": [ZigbeeStats, Energy],
+    "required": [PlugN0, Power, Voltage, Energy],
+    "optional": [ZigbeeStats],
 }, {
     "lumi.ctrl_86plug.aq1": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "lumi.ctrl_86plug": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "required": [
         BoolConv("outlet", "switch", mi="4.1.85"),
-        Power,
+        Power, Energy
     ],
-    "optional": [ZigbeeStats, Energy],
+    "optional": [ZigbeeStats],
 }, {
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.ctrl_ln1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
@@ -208,20 +208,20 @@ DEVICES += [{
     "lumi.ctrl_ln2": ["Aqara", "Double Wall Switch", "QBKG12LM"],
     "lumi.switch.b2nacn02": ["Aqara", "Double Wall Switch D1", "QBKG24LM"],
     "required": [
-        ChannelC1, ChannelC2, Power,
+        ChannelC1, ChannelC2, Power, Energy,
         Action, Button1, Button2, ButtonBoth,
 
     ],
-    "optional": [ZigbeeStats, Energy],
+    "optional": [ZigbeeStats],
 }, {
     "lumi.relay.c2acn01": ["Aqara", "Relay", "LLKZMK11LM"],  # tested
     "support": 4,  # TODO: test load_s0 8.0.2034 load_s1 8.0.2035
     "required": [
-        ChannelC1, ChannelC2, Current, Power, Voltage,
+        ChannelC1, ChannelC2, Current, Power, Voltage, Energy,
         Action, Button1, Button2, ButtonBoth,
     ],
     "optional": [
-        ZigbeeStats, Energy,
+        ZigbeeStats,
         BoolConv("interlock", "switch", mi="4.9.85"),
     ]
 }, {
@@ -244,10 +244,10 @@ DEVICES += [{
     # with neutral wire, thanks @Mantoui
     "lumi.switch.n3acn3": ["Aqara", "Triple Wall Switch D1", "QBKG26LM"],
     "required": [
-        ChannelC1, ChannelC2, ChannelC3, Power, Voltage,
+        ChannelC1, ChannelC2, ChannelC3, Power, Voltage, Energy,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
     ],
-    "optional": [ZigbeeStats, Energy],
+    "optional": [ZigbeeStats],
 }, {
     # we using lumi+zigbee covnerters for support heartbeats and transition
     # light with brightness and color temp
@@ -728,10 +728,10 @@ DEVICES += [{
     "required": [
         ZOnOffConv("plug", "switch"),
         ZCurrent, ZPower, ZVoltagePoll,  # once per 60 seconds
+        ZEnergyConv("energy", "sensor", multiply=0.01),  # once per 5 minutes
     ],
     "optional": [
         ZigbeeStats, ZTuyaPowerOn,
-        ZEnergyConv("energy", "sensor", multiply=0.01),  # once per 5 minutes
     ],
 }, {
     "TS0115": ["UseeLink", "Power Strip", "SM-SO306E"],
