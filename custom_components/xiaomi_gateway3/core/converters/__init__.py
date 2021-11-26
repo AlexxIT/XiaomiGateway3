@@ -26,6 +26,10 @@ class XDeviceInfo:
     config: List[Config]
 
 
+def is_mihome_zigbee(model: str) -> bool:
+    return model.startswith(("lumi.", "ikea."))
+
+
 def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     """Type is used to select the default spec if the model didn't match
     earlier. Should be the latest spec in the list.
