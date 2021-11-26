@@ -163,7 +163,7 @@ DEVICES += [{
     "optional": [
         ZigbeeStats, Energy,
         Converter("chip_temperature", "sensor", mi="8.0.2006"),
-        BoolConv("poweroff_memory", "switch", mi="8.0.2030"),
+        MapConv("power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY),
         BoolConv("charge_protect", "switch", mi="8.0.2031"),
         BoolConv("led", "switch", mi="8.0.2032"),
         Converter("max_power", "sensor", mi="8.0.2042"),
