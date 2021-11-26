@@ -29,7 +29,8 @@ class XiaomiNumber(XEntity, NumberEntity):
 
     @callback
     def async_set_state(self, data: dict):
-        self._attr_value = data[self.attr]
+        if self.attr in data:
+            self._attr_value = data[self.attr]
 
     @callback
     def async_restore_last_state(self, state: float, attrs: dict):

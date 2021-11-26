@@ -39,7 +39,8 @@ class XiaomiSelectBase(XEntity, SelectEntity):
 
     @callback
     def async_set_state(self, data: dict):
-        self._attr_current_option = data[self.attr]
+        if self.attr in data:
+            self._attr_current_option = data[self.attr]
 
 
 # noinspection PyAbstractClass

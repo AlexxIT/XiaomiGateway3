@@ -24,7 +24,8 @@ class XiaomiSwitch(XEntity, ToggleEntity, RestoreEntity):
     @callback
     def async_set_state(self, data: dict):
         """Handle state update from gateway."""
-        self._attr_is_on = data[self.attr]
+        if self.attr in data:
+            self._attr_is_on = data[self.attr]
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
