@@ -161,8 +161,7 @@ DEVICES += [{
     "support": 5,
     "required": [PlugN0, Power, Energy],
     "optional": [
-        ZigbeeStats,
-        Converter("chip_temperature", "sensor", mi="8.0.2006"),
+        ZigbeeStats, ChipTemp,
         MapConv("power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY),
         BoolConv("charge_protect", "switch", mi="8.0.2031"),
         BoolConv("led", "switch", mi="8.0.2032"),
@@ -184,7 +183,7 @@ DEVICES += [{
         BoolConv("outlet", "switch", mi="4.1.85"),
         Power, Energy
     ],
-    "optional": [ZigbeeStats],
+    "optional": [ZigbeeStats, ChipTemp],
 }, {
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.ctrl_ln1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
@@ -221,7 +220,7 @@ DEVICES += [{
         Action, Button1, Button2, ButtonBoth,
     ],
     "optional": [
-        ZigbeeStats,
+        ZigbeeStats, ChipTemp,
         BoolConv("interlock", "switch", mi="4.9.85"),
     ]
 }, {
@@ -294,13 +293,14 @@ DEVICES += [{
     "lumi.remote.b186acn02": ["Aqara", "Single Wall Button D1", "WXKG06LM"],
     "lumi.sensor_86sw1": ["Aqara", "Single Wall Button", "WXKG03LM"],
     "required": [Action, Button, Battery],
-    "optional": [ZigbeeStats, BatteryPer],
+    "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
 }, {
     # multi button action, no retain
     "lumi.sensor_86sw2.es1": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.sensor_86sw2": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn01": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn02": ["Aqara", "Double Wall Button D1", "WXKG07LM"],
+    # TODO: check opple chip temp
     "lumi.remote.b286opcn01": ["Aqara", "Opple Two Button", "WXCJKG11LM"],
     "lumi.remote.b486opcn01": ["Aqara", "Opple Four Button", "WXCJKG12LM"],
     "lumi.remote.b686opcn01": ["Aqara", "Opple Six Button", "WXCJKG13LM"],
@@ -308,12 +308,12 @@ DEVICES += [{
         Action, Button1, Button2, Button3, Button4, Button5, Button6,
         ButtonBoth, Battery
     ],
-    "optional": [ZigbeeStats, BatteryPer],
+    "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
 }, {
     # temperature and humidity sensor
     "lumi.sensor_ht": ["Xiaomi", "TH Sensor", "WSDCGQ01LM"],
     "required": [Temperature, Humidity, Battery],
-    "optional": [ZigbeeStats, BatteryPer],
+    "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
 }, {
     # temperature, humidity and pressure sensor
     "lumi.weather": ["Aqara", "TH Sensor", "WSDCGQ11LM"],
@@ -332,7 +332,7 @@ DEVICES += [{
         BoolConv("contact", "binary_sensor", mi="3.1.85"),
         Battery,
     ],
-    "optional": [ZigbeeStats, BatteryPer],
+    "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
 }, {
     # motion sensor
     "lumi.sensor_motion": ["Xiaomi", "Motion Sensor", "RTCGQ01LM"],
@@ -340,7 +340,7 @@ DEVICES += [{
         BoolConv("motion", "binary_sensor", mi="3.1.85"),
         Battery,
     ],
-    "optional": [ZigbeeStats, BatteryPer],
+    "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
 }, {
     # motion sensor with illuminance
     "lumi.sensor_motion.aq2": ["Aqara", "Motion Sensor", "RTCGQ11LM"],

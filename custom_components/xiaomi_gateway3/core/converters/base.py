@@ -355,6 +355,8 @@ Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
 
+ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006")
+
 # switches and relays
 PlugN0 = BoolConv("plug", "switch", mi="4.1.85")
 # PlugC0 = BoolConv("plug", "switch", "4.1.85", "channel_0")
