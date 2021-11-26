@@ -436,20 +436,35 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro", "ZNMS12LM*"],
+    # it's better to read only one property 13.26.85 and ignore others
+    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro", "ZNMS13LM"],
     "required": [
-        Action,
-        BoolConv("lock", "binary_sensor", mi="3.1.85"),
-        # lumi: 0-open, 1-close, 2-ajar / hass: True - open, False - closed
-        MapConv("door", "binary_sensor", mi="13.26.85", map={
-            0: True, 1: False, 2: True
-        }),
+        # corner_bolt or door_state or 13.26.85 (only on S2 Pro)
+        LockConv("lock", "binary_sensor", mi="13.16.85", mask=0x40),
+        # dead_bolt or square_locked or 13.22.85
+        LockConv("square", "binary_sensor", mi="13.16.85", mask=0x10),
+        # anti_bolt or reverse_locked or 3.1.85
+        LockConv("reverse", "binary_sensor", mi="13.16.85", mask=0x04),
+        # latch_bolt
+        LockConv("latch", "binary_sensor", mi="13.16.85", mask=0x01),
+        # other sensors
         Converter("battery", "sensor", mi="8.0.2001"),
-        LockConv("key_id", "sensor", mi="13.1.85"),
-        BoolConv("open_verified", mi="13.15.85"),
-        Converter("tongue_state", mi="13.16.85"),
-        LockConv("lock_control", mi="13.25.85", map=LOCK_CONTROL),
-        LockConv("lock_state", mi="13.28.85", map=LOCK_STATE),
+        # action sensor
+        LockActionConv("key_id", "sensor", mi="13.1.85"),
+        LockActionConv("lock_control", mi="13.25.85", map=LOCK_CONTROL),
+        LockActionConv("door_state", mi="13.26.85", map=DOOR_STATE),
+        LockActionConv("lock_state", mi="13.28.85", map=LOCK_STATE),
+        LockActionConv("alarm", mi="13.5.85", map=LOCK_ALARM),
+        LockActionConv("card_wrong", mi="13.2.85"),
+        LockActionConv("psw_wrong", mi="13.3.85"),
+        LockActionConv("fing_wrong", mi="13.4.85"),
+        LockActionConv("verified_wrong", mi="13.6.85"),
+        Action,
+        # BoolConv("reverse_locked", "binary_sensor", mi="3.1.85"),
+        # BoolConv("square_locked", mi="13.22.85"),
+        # BoolConv("open_verified", mi="13.15.85"),
+        # BoolConv("elekey_verified", mi="13.27.85"),
+        # BoolConv("key_not_pull", mi="13.35.85"),
     ],
     "optional": [ZigbeeStats],
 }, {

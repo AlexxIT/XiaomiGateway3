@@ -92,58 +92,57 @@ def test_light():
     assert p == {'brightness': 204.0}
 
 
-def test_lock():
+def test_lock_s2_pro():
     device = XDevice(ZIGBEE, 'lumi.lock.acn03', ZDID, ZMAC, ZNWK)
     assert device.info.name == 'Aqara Door Lock S2 Pro'
     device.setup_converters()
 
     p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 64},
-        {"res_name": "13.26.85", "value": 1},
-        {"res_name": "13.28.85", "value": 2}
-    ])
-    assert p == {
-        'action': 'lock', 'door': False, 'lock_state': 'door_close',
-        'tongue_state': 64
-    }
-
-    p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 64},
-        {"res_name": "13.25.85", "value": 1},
-        {"res_name": "13.28.85", "value": 2}
-    ])
-    assert p == {
-        'action': 'lock', 'lock_control': 'out_unlocked',
-        'lock_state': 'door_close', 'tongue_state': 64
-    }
-
-    p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 1},
-        {"res_name": "13.26.85", "value": 0},
-        {"res_name": "13.28.85", "value": 1}
-    ])
-    assert p == {
-        'action': 'lock', 'door': True, 'lock_state': 'door_open',
-        'tongue_state': 1
-    }
-
-    p = device.decode_lumi([
         {"res_name": "13.16.85", "value": 81},
-        {"res_name": "13.26.85", "value": 1},
+        {"res_name": "3.1.85", "value": 0},
         {"res_name": "13.28.85", "value": 3}
     ])
     assert p == {
-        'action': 'lock', 'door': False, 'lock_state': 'lock_close',
-        'tongue_state': 81
+        'lock': True, 'square': True, 'reverse': False, 'latch': True,
+        'action': 'lock', 'lock_state': 'door_locked'
     }
 
     p = device.decode_lumi([
-        {"res_name": "13.1.85", "value": 65537},
-        {"res_name": "13.15.85", "value": 1}
+        {"res_name": "13.16.85", "value": 64},
+        {"res_name": "13.25.85", "value": 0},
+        {"res_name": "13.28.85", "value": 2}
     ])
     assert p == {
-        'action': 'lock', 'key_id': 65537, 'open_verified': True
+        'lock': True, 'square': False, 'reverse': False, 'latch': False,
+        'action': 'lock', 'lock_control': 'in_unlocked',
+        'lock_state': 'door_without_lift'
     }
+
+    p = device.decode_lumi([{"res_name": "13.5.85", "value": 512}])
+    assert p == {'action': 'doorbell'}
+
+    p = device.decode_lumi([
+        {"res_name": "13.1.85", "value": 131072},
+        {"res_name": "13.15.85", "value": 2}
+    ])
+    assert p == {'action': 'lock', 'key_id': 131072}
+
+    p = device.decode_lumi([{"res_name": "13.5.85", "value": 4}])
+    assert p == {'action': 'alarm', 'alarm': 'unlocked'}
+
+    p = device.decode_lumi([
+        {"res_name": "13.26.85", "value": 2},
+        {"res_name": "13.28.85", "value": 1}
+    ])
+    assert p == {
+        'action': 'lock', 'door_state': 'ajar', 'lock_state': 'door_opened'
+    }
+
+    p = device.decode_lumi([{"res_name": "13.4.85", "value": 1}])
+    assert p == {'action': 'error', 'error': 'fing_wrong', 'fing_wrong': 1}
+
+    p = device.decode_lumi([{"res_name": "13.3.85", "value": 3}])
+    assert p == {'action': 'error', 'error': 'psw_wrong', 'psw_wrong': 3}
 
 
 def test_climate():

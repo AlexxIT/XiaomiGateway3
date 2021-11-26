@@ -5,7 +5,7 @@ from datetime import timedelta
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR, \
-    DEVICE_CLASS_CONNECTIVITY, DEVICE_CLASS_MOISTURE
+    DEVICE_CLASS_CONNECTIVITY, DEVICE_CLASS_MOISTURE, DEVICE_CLASS_LOCK
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.const import *
@@ -318,8 +318,11 @@ DEVICE_CLASSES = {
     BLE: DEVICE_CLASS_TIMESTAMP,
     GATEWAY: DEVICE_CLASS_CONNECTIVITY,
     ZIGBEE: DEVICE_CLASS_TIMESTAMP,
-    "contact": DEVICE_CLASS_DOOR,
     "cloud_link": DEVICE_CLASS_CONNECTIVITY,
+    "contact": DEVICE_CLASS_DOOR,
+    "latch": DEVICE_CLASS_LOCK,
+    "reverse": DEVICE_CLASS_LOCK,
+    "square": DEVICE_CLASS_LOCK,
     "water_leak": DEVICE_CLASS_MOISTURE,
 }
 

@@ -236,39 +236,35 @@ class ClimateTempConv(Converter):
 
 
 @dataclass
-class BatteryConv(Converter):
-    childs = {"battery_voltage"}
-    min = 2700
-    max = 3200
+class LockActionConv(Converter):
+    map: dict = None
 
-    def decode(self, device: "XDevice", payload: dict, value: int):
-        payload["battery_voltage"] = value
-
-        if value <= self.min:
-            payload[self.attr] = 0
-        elif value >= self.max:
-            payload[self.attr] = 100
-        else:
-            payload[self.attr] = int(
-                100.0 * (value - self.min) / (self.max - self.min)
-            )
+    def decode(self, device: "XDevice", payload: dict, value: Any):
+        if self.attr in ("lock_control", "door_state", "lock_state"):
+            payload["action"] = "lock"
+            payload[self.attr] = self.map.get(value)
+        elif self.attr == "key_id":
+            payload["action"] = "lock"
+            payload[self.attr] = value
+        elif self.attr == "alarm":
+            v = self.map.get(value)
+            if v != "doorbell":
+                payload["action"] = self.attr
+                payload[self.attr] = v
+            else:
+                payload["action"] = v
+        elif self.attr.endswith("_wrong"):
+            payload["action"] = "error"
+            payload["error"] = self.attr
+            payload[self.attr] = value
 
 
 @dataclass
-class ButtonMIConv(ButtonConv):
-    value: int = None
+class LockConv(Converter):
+    mask: int = 0
 
     def decode(self, device: "XDevice", payload: dict, value: int):
-        super().decode(device, payload, self.value)
-
-
-class LockConv(MapConv):
-    def decode(self, device: "XDevice", payload: dict, value: int):
-        if self.map:
-            super().decode(device, payload, value)
-        else:
-            payload[self.attr] = value
-        payload["action"] = "lock"
+        payload[self.attr] = bool(value & self.mask)
 
 
 # to get natgas sensitivity value - write: {"res_name": "4.1.85", "value": 1}
