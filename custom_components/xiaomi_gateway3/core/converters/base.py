@@ -108,6 +108,11 @@ class MathConv(Converter):
                 value = round(value, self.round)
             payload[self.attr] = value
 
+    def encode(self, device: "XDevice", payload: dict, value: float):
+        if self.multiply:
+            value /= self.multiply
+        super().encode(device, payload, value)
+
 
 @dataclass
 class BrightnessConv(Converter):

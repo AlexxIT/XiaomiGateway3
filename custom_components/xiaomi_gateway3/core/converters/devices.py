@@ -1081,7 +1081,8 @@ DEVICES += [{
         BoolConv("right_smart", "switch", mi="8.p.3"),
     ]
 }, {
-    3083: ["Xiaomi", "Mi Smart Electrical Outlet", "ZNCZ01ZM"],
+    # https://www.ixbt.com/live/chome/umnaya-rozetka-xiaomi-zncz01zm-s-energomonitoringom-i-bluetooth-mesh-integraciya-v-home-assistant.html
+    3083: ["Xiaomi", "Electrical Outlet", "ZNCZ01ZM"],
     "required": [
         Converter("outlet", "switch", mi="2.p.1"),
         MathConv("power", "sensor", mi="3.p.1", multiply=0.01),
@@ -1089,6 +1090,10 @@ DEVICES += [{
     "optional": [
         Converter("led", "switch", mi="4.p.1"),
         Converter("power_protect", "switch", mi="7.p.1"),
+        MathConv(
+            "power_value", "number", mi="7.p.2", multiply=0.01,
+            min=0, max=1638400
+        ),
     ]
 }, {
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
