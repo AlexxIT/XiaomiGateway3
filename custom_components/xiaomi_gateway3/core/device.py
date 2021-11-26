@@ -430,14 +430,14 @@ class XEntity(Entity):
                 # by default all sensors with units is measurement sensors
                 self._attr_state_class = STATE_CLASS_MEASUREMENT
 
-        if self.device.model == MESH_GROUP_MODEL:
+        if device.model == MESH_GROUP_MODEL:
             connections = None
-        elif self.device.type in (GATEWAY, BLE, MESH):
+        elif device.type in (GATEWAY, BLE, MESH):
             connections = {(CONNECTION_NETWORK_MAC, device.mac)}
         else:
             connections = {(CONNECTION_ZIGBEE, device.ieee)}
 
-        if self.device.type != GATEWAY and gateway.device:
+        if device.type != GATEWAY and gateway.device:
             via_device = (DOMAIN, gateway.device.mac)
         else:
             via_device = None
@@ -445,11 +445,11 @@ class XEntity(Entity):
         # https://developers.home-assistant.io/docs/device_registry_index/
         self._attr_device_info = DeviceInfo(
             connections=connections,
-            identifiers={(DOMAIN, self.device.mac)},
-            manufacturer=self.device.info.manufacturer,
-            model=self.device.info.model,
-            name=self.device.info.name,
-            sw_version=self.device.fw_ver,
+            identifiers={(DOMAIN, device.mac)},
+            manufacturer=device.info.manufacturer,
+            model=device.info.model,
+            name=device.info.name,
+            sw_version=device.fw_ver,
             via_device=via_device
         )
 
