@@ -16,6 +16,10 @@ class Config:
         return self.__class__.__name__
 
 
+################################################################################
+# Base (global) converters
+################################################################################
+
 @dataclass
 class Converter:
     attr: str  # hass attribute
@@ -135,6 +139,25 @@ class ColorTempKelvin(Converter):
         super().encode(device, payload, value)
 
 
+@dataclass
+class BatteryConv(Converter):
+    childs = {"battery_voltage"}
+    min = 2700
+    max = 3200
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload["battery_voltage"] = value
+
+        if value <= self.min:
+            payload[self.attr] = 0
+        elif value >= self.max:
+            payload[self.attr] = 100
+        else:
+            payload[self.attr] = int(
+                100.0 * (value - self.min) / (self.max - self.min)
+            )
+
+
 class ButtonConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
         payload[self.attr] = value
@@ -147,6 +170,18 @@ class ButtonConv(Converter):
         elif self.attr.startswith("button"):
             payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
 
+
+@dataclass
+class ButtonMIConv(ButtonConv):
+    value: int = None
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        super().decode(device, payload, self.value)
+
+
+################################################################################
+# Device converters
+################################################################################
 
 class VibrationConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
@@ -172,11 +207,10 @@ class CloudLinkConv(Converter):
         payload[self.attr] = value["offline_time"] == 0
 
 
-HVAC_MODES = {"off": 0x01, "heat": 0x10, "cool": 0x11}
-FAN_MODES = {"low": 0x00, "medium": 0x10, "high": 0x20, "auto": 0x30}
-
-
 class ClimateConv(Converter):
+    hvac = {"off": 0x01, "heat": 0x10, "cool": 0x11}
+    fan = {"low": 0x00, "medium": 0x10, "high": 0x20, "auto": 0x30}
+
     def decode(self, device: "XDevice", payload: dict, value: Any):
         # use payload to push data to climate entity
         # use device extra to pull data on encode
@@ -187,9 +221,9 @@ class ClimateConv(Converter):
             return
         b = bytearray(device.extra[self.attr].to_bytes(4, 'big'))
         if "hvac_mode" in value:
-            b[0] = HVAC_MODES[value["hvac_mode"]]
+            b[0] = self.hvac[value["hvac_mode"]]
         if "fan_mode" in value:
-            b[1] = FAN_MODES[value["fan_mode"]]
+            b[1] = self.fan[value["fan_mode"]]
         if "target_temp" in value:
             b[3] = int(value["target_temp"])
         value = int.from_bytes(b, 'big')
@@ -297,6 +331,10 @@ class OnlineConv(Converter):
         payload[self.attr] = value["status"] == "online"
         device.last_seen = time.time() - value["time"]
 
+
+################################################################################
+# Final converter classes
+################################################################################
 
 # https://github.com/Koenkk/zigbee2mqtt/issues/798
 # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
