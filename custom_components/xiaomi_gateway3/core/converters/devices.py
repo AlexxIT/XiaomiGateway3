@@ -743,12 +743,20 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats, ZTuyaPowerOn],
 }, {
+    # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
     "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
     "support": 5,
-    "required": [ZOnOffConv("switch", "switch")],
+    "required": [ZSwitch],
     "optional": [ZigbeeStats],
+}, {
+    # very simple relays with binding
+    "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0011"],
+    "support": 5,
+    "required": [ZSwitch],
+    "optional": [ZigbeeStats],
+    "config": [ZBindOnOff]
 }, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
     "support": 5,
@@ -757,9 +765,7 @@ DEVICES += [{
         ZBatteryConv("battery", "sensor"),
     ],
     "optional": [ZigbeeStats],
-    "config": [
-        ZBindConf(ZSonoffButtonConv, ep=1),
-    ]
+    "config": [ZBindOnOff]
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
     "support": 5,
@@ -863,9 +869,7 @@ DEVICES += [{
         IKEARemoteConv1("action", "sensor"),
         IKEARemoteConv2("action"),
     ],
-    "config": [
-        ZBindConf(ZOnOffConv),
-    ]
+    "config": [ZBindOnOff]
 }, {
     "default": "zigbee",  # default zigbee device
     "required": [
@@ -875,9 +879,7 @@ DEVICES += [{
         ZOnOffConv("channel_4", "switch", ep=4, lazy=True),
     ],
     "optional": [ZigbeeStats],
-    "config": [
-        ZBindConf(ZOnOffConv),  # maybe button
-    ]
+    "config": [ZBindOnOff]
 }]
 
 ################################################################################

@@ -384,6 +384,8 @@ class IKEARemoteConv2(ZConverter):
 # Final converter classes
 ################################################################################
 
+ZSwitch = ZOnOffConv("switch", "switch")
+
 ZCurrent = ZElectricalConv(
     "current", "sensor", zattr="rms_current", multiply=0.001
 )
@@ -446,3 +448,6 @@ class ZHueConf(Config):
             mfg=0x100B, type=0x19
         )
         payload.setdefault("commands", []).extend(cmd)
+
+
+ZBindOnOff = ZBindConf(ZOnOffConv)
