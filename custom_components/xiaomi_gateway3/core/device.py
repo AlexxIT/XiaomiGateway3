@@ -150,12 +150,15 @@ class XDevice:
                 update(kwargs, gateway.defaults[key])
 
         if "model" in kwargs:
+            # support change device model in config
             self.update_model(kwargs["model"])
 
         if "device_name" in kwargs:
+            # support set device name in config
             self.info.name = kwargs["device_name"]
 
         if "entity_name" in kwargs:
+            # support change entity name in config
             self.extra["entity_name"] = kwargs["entity_name"]
 
         self.setup_converters(kwargs.get("entities"))
@@ -164,12 +167,14 @@ class XDevice:
         #     return
 
         for conv in self.converters:
-            if conv.domain is None or conv.attr in self.entities:
+            # support change attribute domain in config
+            domain = kwargs.get(conv.attr, conv.domain)
+            if domain is None or conv.attr in self.entities:
                 continue
             if conv.lazy:
                 self.lazy_setup.add(conv.attr)
                 continue
-            gateway.setups[conv.domain](gateway, self, conv)
+            gateway.setups[domain](gateway, self, conv)
 
     def setup_converters(self, entities: list = None):
         """If no entities - use only required converters. Otherwise search for
