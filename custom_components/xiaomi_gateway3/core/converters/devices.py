@@ -956,6 +956,7 @@ DEVICES += [{
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
+    3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     "required": [
         MiBeacon, BLEBatteryLazy,
         # sensors:
