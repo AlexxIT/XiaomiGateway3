@@ -994,6 +994,7 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "TRADFRI remote control": ["IKEA", "TRADFRI remote control", "E1524/E1810"],
+    "support": 1,
     "required": [
         IKEARemoteConv1("action", "sensor"),
         IKEARemoteConv2("action"),
