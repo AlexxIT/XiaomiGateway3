@@ -213,7 +213,8 @@ class GatewayStats(GatewayMesh):
         if self.device.get('stats'):
             await self.device['stats'].async_update(payload)
 
-        if self.parent_scan_ts and time.time() > self.parent_scan_ts:
+        if self.available and self.parent_scan_ts and \
+                time.time() > self.parent_scan_ts:
             # block any auto updates in 10 seconds
             self.parent_scan_ts = time.time() + 10
             await self.run_parent_scan()
