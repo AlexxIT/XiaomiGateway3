@@ -13,11 +13,12 @@ from homeassistant.core import callback, State
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
     CONNECTION_ZIGBEE
 from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.template import Template
 
 from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
-from .utils import DOMAIN, attributes_template
+from .utils import DOMAIN
 
 if TYPE_CHECKING:
     from .gateway import XGateway
@@ -444,6 +445,8 @@ class XEntity(Entity):
     # duplicate here because typing problem
     _attr_extra_state_attributes: dict = None
 
+    attributes_template: Template = None
+
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
         attr = conv.attr
 
@@ -502,6 +505,9 @@ class XEntity(Entity):
 
         device.entities[attr] = self
 
+        if self.attributes_template:
+            self.render_attributes_template()
+
     @property
     def customize(self) -> dict:
         if not self.hass:
@@ -516,8 +522,6 @@ class XEntity(Entity):
         # self.platform._async_add_entity => self.add_to_platform_finish
         #   => self.async_internal_added_to_hass => self.async_added_to_hass
         #   => self.async_write_ha_state
-        self.render_attributes_template()
-
         self.device.entities[self.attr] = self  # fix rename entity_id
 
         if hasattr(self, "async_get_last_state"):
@@ -554,7 +558,7 @@ class XEntity(Entity):
     @callback
     def render_attributes_template(self):
         try:
-            attrs = attributes_template(self.hass).async_render({
+            attrs = self.attributes_template.async_render({
                 "attr": self.attr,
                 "device": self.device,
                 "gateway": self.gw.device

@@ -12,6 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.storage import Store
 
 from .core import logger, utils
+from .core.device import XEntity
 from .core.gateway import XGateway
 from .core.utils import DOMAIN, XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud
@@ -62,9 +63,11 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
             k = k.replace(':', '').lower()
             XGateway.defaults[k] = v
 
-    hass.data[DOMAIN] = {
-        CONF_ATTRIBUTES_TEMPLATE: config.get(CONF_ATTRIBUTES_TEMPLATE)
-    }
+    if CONF_ATTRIBUTES_TEMPLATE in config:
+        XEntity.attributes_template = config[CONF_ATTRIBUTES_TEMPLATE]
+        XEntity.attributes_template.hass = hass
+
+    hass.data[DOMAIN] = {}
 
     return True
 
