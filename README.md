@@ -555,7 +555,7 @@ Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.de
 
 # Zigbee2MQTT Mode
 
-> **Important:** Support for EFR32 chips (EZSP v8) in the zigbee2mqtt project is [experimental](https://www.zigbee2mqtt.io/guide/adapters/#experimental). At the moment they work not good and are **not recommended for use**.
+> **Important:** The zigbee chip of this gateway (EFR32 EZSP v8) is supported in zigbee2mqtt in [experimental mode](https://www.zigbee2mqtt.io/guide/adapters/#experimental). At the moment it is not working well and **not recommended for use**.
 
 **Video DEMO**
 
