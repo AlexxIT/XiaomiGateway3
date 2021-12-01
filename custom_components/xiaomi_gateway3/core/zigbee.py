@@ -643,7 +643,7 @@ def fix_xiaomi_battery(value: int) -> int:
 
 
 def get_buttons(device_model: str):
-    zigbee_model, _ = device_model.split(' ', 1)
+    zigbee_model = device_model.split(' ', 1)[0]
     for device in DEVICES:
         if zigbee_model not in device:
             continue
