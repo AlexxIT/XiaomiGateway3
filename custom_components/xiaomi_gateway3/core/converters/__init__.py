@@ -38,28 +38,26 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     for spec in DEVICES:
         if model not in spec and spec.get("default") != type:
             continue
-        info = spec.get(model) or ["Unknown", type.upper(), model]
-
-        if type == GATEWAY:
-            market = f"Wi-Fi {info[2]}"
-        elif type == ZIGBEE:
-            market = f"Zigbee {info[2]} ({model})"
-        elif type == BLE:
-            market = f"BLE {info[2]}"
-        elif type == MESH:
-            market = f"Mesh {info[2]}"
-        else:
-            raise RuntimeError
+        info = spec.get(model) or ["Unknown", type.upper(), None]
+        brand, name, market = info if len(info) == 3 else info + [None]
 
         if type == ZIGBEE and not is_mihome_zigbee(model):
-            url = "https://www.zigbee2mqtt.io/supported-devices/#s=" + info[2]
+            url = "https://www.zigbee2mqtt.io/supported-devices/#s=" + market \
+                if market else None
         else:
             url = f"https://home.miot-spec.com/s/{model}"
 
+        if market and type == ZIGBEE:
+            market = f"{type} {market} ({model})"
+        elif market:
+            market = f"{type} {market}"
+        else:
+            market = f"{type} ({model})"
+
         return XDeviceInfo(
-            manufacturer=info[0],
+            manufacturer=brand,
             model=market,
-            name=f"{info[0]} {info[1]}",
+            name=f"{brand} {name}",
             url=url,
             req_converters=spec["required"],
             opt_converters=spec.get("optional"),

@@ -19,7 +19,7 @@ for device in DEVICES:
         if not isinstance(v, list) or k in ("required", "optional", "config"):
             continue
 
-        brand, name, model = v
+        brand, name, model = v if len(v) == 3 else v + [k]
 
         optional = device.get("optional", [])
 
