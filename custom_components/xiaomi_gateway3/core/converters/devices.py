@@ -459,8 +459,7 @@ DEVICES += [{
         LockConv("latch", "binary_sensor", mi="13.16.85", mask=0x01),
         # other sensors
         Converter("battery", "sensor", mi="8.0.2001"),
-        # action sensor
-        LockActionConv("key_id", "sensor", mi="13.1.85"),
+        LockActionConv("key_id", mi="13.1.85"),
         LockActionConv("lock_control", mi="13.25.85", map=LOCK_CONTROL),
         LockActionConv("door_state", mi="13.26.85", map=DOOR_STATE),
         LockActionConv("lock_state", mi="13.28.85", map=LOCK_STATE),
