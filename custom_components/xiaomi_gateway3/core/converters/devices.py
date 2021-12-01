@@ -289,7 +289,7 @@ DEVICES += [{
     # light with brightness
     "ikea.light.led1623g12": ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
     "ikea.light.led1650r5": ["IKEA", "Bulb GU10 400 lm", "LED1650R5"],
-    "ikea.light.led1649c5": ["IKEA", "Bulb E14", "LED1649C5"],  # tested
+    "ikea.light.led1649c5": ["IKEA", "Bulb E14 400 lm", "LED1649C5"],  # tested
     "required": [
         BoolConv("light", "light", mi="4.1.85"),
         ZXiaomiBrightnessConv("brightness", mi="14.1.85", parent="light"),
