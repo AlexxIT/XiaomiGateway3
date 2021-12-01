@@ -523,50 +523,9 @@ DEVICES += [{
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW),
     ]
 }, {
-    # no N, https://www.aqara.com/en/single_switch_T1_no-neutral.html
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l0agl1:1
-    "lumi.switch.l0agl1": ["Aqara", "Relay T1", "SSM-U02"],
-    "required": [
-        Converter("switch", "switch", mi="2.p.1")
-    ],
-    "optional": [
-        ZigbeeStats,
-        Converter("chip_temperature", "sensor", mi="2.p.6"),
-    ],
-}, {
-    # with N, https://www.aqara.com/en/single_switch_T1_with-neutral.html
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n0agl1:1
-    "lumi.switch.n0agl1": ["Aqara", "Relay T1", "SSM-U01"],  # no spec
-    "lumi.switch.n0acn2": ["Aqara", "Relay T1", "DLKZMK11LM"],
-    "support": 5,
-    "required": [
-        Converter("switch", "switch", mi="2.p.1"),
-        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
-        MathConv("power", "sensor", mi="3.p.2", round=2),
-    ],
-    "optional": [
-        ZigbeeStats,
-        BoolConv("led", "switch", mi="4.p.1"),  # uint8
-        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
-    ],
-}, {
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
-    "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],  # no spec
-    "support": 5,
-    "required": [
-        Converter("plug", "switch", mi="2.p.1"),
-        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
-        MathConv("power", "sensor", mi="3.p.2", round=2),
-    ],
-    "optional": [
-        ZigbeeStats,
-        BoolConv("led", "switch", mi="4.p.1"),  # uint8
-        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
-    ],
-}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:motion-sensor:0000A014:lumi-agl04:1:0000C813
     # for spec names Fibaro has good example: https://manuals.fibaro.com/motion-sensor/
-    "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
+    "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
     "support": 5,
     "required": [
         ConstConv("motion", "binary_sensor", mi="4.e.1", value=True),
@@ -582,9 +541,7 @@ DEVICES += [{
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
-    "lumi.airmonitor.acn01": [
-        "Aqara", "TVOC Air Quality Monitor", "VOCKQJK11LM"  # no spec
-    ],
+    "lumi.airmonitor.acn01": ["Aqara", "Air Quality Monitor CN", "VOCKQJK11LM"],
     "support": 5,
     "required": [
         Converter("temperature", "sensor", mi="3.p.1"),  # celsius
@@ -600,108 +557,7 @@ DEVICES += [{
         })
     ],
 }, {
-    "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1", "QBKG38LM"],
-    "support": 5,
-    "required": [
-        Converter("switch", "switch", mi="2.p.1"),
-        ButtonMIConv("button", mi="6.e.1", value=1),
-        ButtonMIConv("button", mi="6.e.2", value=2),
-        Action,
-    ],
-    "optional": [
-        ZigbeeStats,
-        BoolConv("smart", "switch", mi="6.p.1"),
-        BoolConv("led", "switch", mi="3.p.1"),  # uint8
-        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
-        MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE)
-    ],
-}, {
-    "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1", "QBKG39LM"],
-    "support": 5,
-    "required": [
-        Converter("channel_1", "switch", mi="2.p.1"),
-        Converter("channel_2", "switch", mi="3.p.1"),
-        ButtonMIConv("button_1", mi="7.e.1", value=1),
-        ButtonMIConv("button_1", mi="7.e.2", value=2),
-        ButtonMIConv("button_2", mi="8.e.1", value=1),
-        ButtonMIConv("button_2", mi="8.e.2", value=2),
-        ButtonMIConv("button_both", mi="9.e.1", value=4),
-        Action,
-    ],
-    "optional": [
-        ZigbeeStats,
-        BoolConv("smart_1", "switch", mi="7.p.1"),
-        BoolConv("smart_2", "switch", mi="8.p.1"),
-        BoolConv("led", "switch", mi="4.p.1"),  # uint8
-        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
-        MapConv("mode", "select", mi="15.p.1", map=SWITCH_MODE)
-    ],
-}, {
-    # with neutral wire
-    "lumi.switch.b1nc01": ["Aqara", "Single Wall Switch E1", "QBKG40LM"],
-    # without neutral wire
-    "lumi.switch.l1aeu1": ["Aqara", "Single Wall Switch H1", "WS-EUK01"],
-    "required": [
-        Converter("switch", "switch", mi="2.p.1"),
-        ButtonMIConv("button", mi="7.e.1", value=1),
-        ButtonMIConv("button", mi="7.e.2", value=2),
-        Action,
-    ],
-    "optional": [ZigbeeStats],
-}, {
-    # with neutral wire
-    "lumi.switch.b2nc01": ["Aqara", "Double Wall Switch E1", "QBKG41LM"],
-    # without neutral wire
-    "lumi.switch.l2aeu1": ["Aqara", "Double Wall Switch H1", "WS-EUK02"],
-    "required": [
-        Channel1_MI21, Channel2_MI31, Action,
-        ButtonMIConv("button_1", mi="8.e.1", value=1),
-        ButtonMIConv("button_1", mi="8.e.2", value=2),
-        ButtonMIConv("button_2", mi="9.e.1", value=1),
-        ButtonMIConv("button_2", mi="9.e.2", value=2),
-        ButtonMIConv("button_both", mi="10.e.1", value=4),
-    ],
-    "optional": [ZigbeeStats],
-}, {
-    # required switch firmware 0.0.0_0030
-    "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US", "WS-USC04"],
-    "required": [
-        Channel1_MI21, Channel2_MI31, Action,
-        MathConv("energy", "sensor", mi="4.p.1", multiply=0.001, round=2),
-        MathConv("power", "sensor", mi="4.p.2", round=2),
-        ButtonMIConv("button_1", mi="7.e.1", value=1),
-        ButtonMIConv("button_1", mi="7.e.2", value=2),
-        ButtonMIConv("button_2", mi="8.e.1", value=1),
-        ButtonMIConv("button_2", mi="8.e.2", value=2),
-        ButtonMIConv("button_both", mi="9.e.1", value=4),
-    ],
-    "optional": [ZigbeeStats],
-}, {
-    "lumi.remote.acn003": ["Aqara", "Single Wall Button E1", "WXKG16LM"],
-    "required": [
-        Action,
-        ButtonMIConv("button", mi="2.e.1", value=1),  # single
-        ButtonMIConv("button", mi="2.e.2", value=2),  # double
-        ButtonMIConv("button", mi="2.e.3", value=16),  # long
-        Converter("battery", "sensor", mi="3.p.2"),
-    ],
-    "optional": [ZigbeeStats],
-}, {
-    "lumi.remote.acn004": ["Aqara", "Double Wall Button E1", "WXKG17LM"],
-    "required": [
-        Action,
-        ButtonMIConv("button_1", mi="2.e.1", value=1),  # single
-        ButtonMIConv("button_1", mi="2.e.2", value=2),  # double
-        ButtonMIConv("button_1", mi="2.e.3", value=16),  # long
-        ButtonMIConv("button_2", mi="7.e.1", value=1),  # single
-        ButtonMIConv("button_2", mi="7.e.2", value=2),  # double
-        ButtonMIConv("button_2", mi="7.e.3", value=16),  # long
-        ButtonMIConv("button_both", mi="8.e.1", value=4),  # single
-        Converter("battery", "sensor", mi="3.p.2"),
-    ],
-    "optional": [ZigbeeStats],
-}, {
-    "lumi.curtain.acn002": ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
+    "lumi.curtain.acn002": ["Aqara", "Roller Shade E1 CN", "ZNJLBL01LM"],
     "support": 5,
     "required": [
         MapConv("motor", "cover", mi="2.p.2", map={
@@ -726,6 +582,267 @@ DEVICES += [{
         }),
         # Converter("mode", "sensor", mi="2.p.3"),  # only auto
     ]
+}, {
+    "lumi.remote.acn003": ["Aqara", "Single Wall Button E1 CN", "WXKG16LM"],
+    "required": [
+        Action,
+        ButtonMIConv("button", mi="2.e.1", value=1),  # single
+        ButtonMIConv("button", mi="2.e.2", value=2),  # double
+        ButtonMIConv("button", mi="2.e.3", value=16),  # long
+        Converter("battery", "sensor", mi="3.p.2"),
+    ],
+    "optional": [ZigbeeStats],
+}, {
+    "lumi.remote.acn004": ["Aqara", "Double Wall Button E1 CN", "WXKG17LM"],
+    "required": [
+        Action,
+        ButtonMIConv("button_1", mi="2.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="2.e.2", value=2),  # double
+        ButtonMIConv("button_1", mi="2.e.3", value=16),  # long
+        ButtonMIConv("button_2", mi="7.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="7.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="7.e.3", value=16),  # long
+        ButtonMIConv("button_both", mi="8.e.1", value=4),  # single
+        Converter("battery", "sensor", mi="3.p.2"),
+    ],
+    "optional": [ZigbeeStats],
+}]
+
+# relays and switches
+DEVICES += [{
+    # https://www.aqara.com/en/single_switch_T1_no-neutral.html
+    "lumi.switch.l0agl1": ["Aqara", "Single Relay T1 EU (no N)", "SSM-U02"],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1")
+    ],
+    "optional": [
+        ZigbeeStats,
+        Converter("chip_temperature", "sensor", mi="2.p.6"),
+    ],
+}, {
+    # https://www.aqara.com/en/single_switch_T1_with-neutral.html
+    "lumi.switch.n0agl1": ["Aqara", "Relay T1 EU (with N)", "SSM-U01"],
+    "lumi.switch.n0acn2": ["Aqara", "Relay T1 CN (with N)", "DLKZMK11LM"],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+    ],
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
+    "lumi.plug.maeu01": ["Aqara", "Plug EU", "SP-EUC01"],  # no spec
+    "support": 5,
+    "required": [
+        Converter("plug", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+    ],
+}, {
+    "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1 (no N)", "QBKG38LM"],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        ButtonMIConv("button", mi="6.e.1", value=1),
+        ButtonMIConv("button", mi="6.e.2", value=2),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="3.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart", "switch", mi="6.p.1"),
+        MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE)
+    ],
+}, {
+    "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1 (no N)", "QBKG39LM"],
+    "support": 5,
+    "required": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+        ButtonMIConv("button_1", mi="7.e.2", value=2),
+        ButtonMIConv("button_2", mi="8.e.1", value=1),
+        ButtonMIConv("button_2", mi="8.e.2", value=2),
+        ButtonMIConv("button_both", mi="9.e.1", value=4),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("smart_1", "switch", mi="7.p.1"),
+        BoolConv("smart_2", "switch", mi="8.p.1"),
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        MapConv("mode", "select", mi="15.p.1", map=SWITCH_MODE)
+    ],
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b1nc01:1
+    "lumi.switch.b1nc01": [
+        "Aqara", "Single Wall Switch E1 (with N)", "QBKG40LM"
+    ],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        ButtonMIConv("button", mi="7.e.1", value=1),
+        ButtonMIConv("button", mi="7.e.2", value=2),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart", "switch", mi="7.p.1"),
+    ],
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2nc01:1
+    "lumi.switch.b2nc01": [
+        "Aqara", "Double Wall Switch E1 (with N)", "QBKG41LM"
+    ],
+    "support": 5,
+    "required": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),
+        ButtonMIConv("button_1", mi="8.e.2", value=2),
+        ButtonMIConv("button_2", mi="9.e.1", value=1),
+        ButtonMIConv("button_2", mi="9.e.2", value=2),
+        ButtonMIConv("button_both", mi="10.e.1", value=4),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="5.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart_1", "switch", mi="8.p.1"),
+        BoolConv("smart_2", "switch", mi="9.p.1"),
+    ],
+}, {
+    # required switch firmware 0.0.0_0030
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1
+    "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US", "WS-USC04"],
+    "support": 5,
+    "required": [
+        Channel1_MI21, Channel2_MI31, Action,
+        MathConv("energy", "sensor", mi="4.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="4.p.2", round=2),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),
+        ButtonMIConv("button_1", mi="8.e.2", value=2),
+        ButtonMIConv("button_2", mi="9.e.1", value=1),
+        ButtonMIConv("button_2", mi="9.e.2", value=2),
+        ButtonMIConv("button_both", mi="10.e.1", value=4),
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="5.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart_1", "switch", mi="8.p.1"),  # uint8
+        BoolConv("smart_2", "switch", mi="9.p.1"),  # uint8
+    ],
+}, {
+    # don't know China market model
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l1acn1:1
+    "lumi.switch.l1acn1": ["Aqara", "Single Wall Switch H1 CN (no N)"],
+    "lumi.switch.l1aeu1": [
+        "Aqara", "Single Wall Switch H1 EU (no N)", "WS-EUK01"
+    ],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        ButtonMIConv("button", mi="6.e.1", value=1),  # single
+        ButtonMIConv("button", mi="6.e.2", value=2),  # double
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="3.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart", "switch", mi="6.p.1"),  # uint8
+    ],
+}, {
+    # don't know China market model
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l2acn1:1
+    "lumi.switch.l2acn1": ["Aqara", "Double Wall Switch H1 CN (no N)"],
+    "lumi.switch.l2aeu1": [
+        "Aqara", "Double Wall Switch H1 EU (no N)", "WS-EUK02"
+    ],
+    "support": 5,
+    "required": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        ButtonMIConv("button_1", mi="7.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="7.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="8.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="8.e.2", value=2),  # double
+        ButtonMIConv("button_both", mi="9.e.1", value=4),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart_1", "switch", mi="7.p.1"),  # uint8
+        BoolConv("smart_2", "switch", mi="8.p.1"),  # uint8
+    ],
+}, {
+    # don't know China market model
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n1acn1:1
+    "lumi.switch.n1acn1": ["Aqara", "Single Wall Switch H1 CN (with N)"],
+    "lumi.switch.n1aeu1": [
+        "Aqara", "Single Wall Switch H1 EU (with N)", "WS-EUK03"
+    ],
+    "support": 5,
+    "required": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),
+        ButtonMIConv("button", mi="7.e.1", value=1),  # single
+        ButtonMIConv("button", mi="7.e.2", value=2),  # double
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart", "switch", mi="7.p.1"),  # uint8
+    ],
+}, {
+    # don't know China market model
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n2acn1:1
+    "lumi.switch.n2acn1": ["Aqara", "Double Wall Switch H1 CN (no N)"],
+    "lumi.switch.n2aeu1": [
+        "Aqara", "Double Wall Switch H1 EU (no N)", "WS-EUK04"
+    ],
+    "support": 5,
+    "required": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        MathConv("energy", "sensor", mi="4.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="4.p.2", round=2),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="8.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_both", mi="10.e.1", value=4),
+        Action,
+    ],
+    "optional": [
+        ZigbeeStats,
+        BoolConv("led", "switch", mi="5.p.1"),  # uint8
+        MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY),
+        BoolConv("smart_1", "switch", mi="8.p.1"),  # uint8
+        BoolConv("smart_2", "switch", mi="9.p.1"),  # uint8
+    ],
 }]
 
 ################################################################################
