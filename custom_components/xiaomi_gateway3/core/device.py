@@ -518,6 +518,8 @@ class XEntity(Entity):
         #   => self.async_write_ha_state
         self.render_attributes_template()
 
+        self.device.entities[self.attr] = self  # fix rename entity_id
+
         if hasattr(self, "async_get_last_state"):
             state: State = await self.async_get_last_state()
             if state:
