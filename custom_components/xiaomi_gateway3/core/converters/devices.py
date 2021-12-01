@@ -89,7 +89,7 @@ from .zigbee import *
 ################################################################################
 
 DEVICES = [{
-    "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM"],
+    "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM/ZNDMWG02LM"],
     "support": 5,
     "required": [
         # write pair=60 => report discovered_mac => report 8.0.2166? =>
@@ -123,7 +123,7 @@ DEVICES = [{
         BoolConv("led", "switch", mi="6.p.6"),
     ]
 }, {
-    "lumi.gateway.aqcn02": ["Aqara", "Hub E1 (CN)", "ZHWG16LM"],
+    "lumi.gateway.aqcn02": ["Aqara", "Hub E1 CN", "ZHWG16LM"],
     "support": 3,
     "required": [
         MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),
@@ -147,7 +147,7 @@ DEVICES = [{
     ],
     "optional": [],
 }, {
-    "lumi.gateway.aqcn03": ["Aqara", "Hub E1 (EU)", "HE1-G01"],
+    "lumi.gateway.aqcn03": ["Aqara", "Hub E1 EU", "HE1-G01"],
     "support": 1,
 }]
 
@@ -157,7 +157,7 @@ DEVICES = [{
 
 DEVICES += [{
     # don"t work: protect 8.0.2014, power 8.0.2015, plug_detection 8.0.2044
-    "lumi.plug": ["Xiaomi", "Plug", "ZNCZ02LM"],  # tested
+    "lumi.plug": ["Xiaomi", "Plug CN", "ZNCZ02LM"],  # tested
     "support": 5,
     "required": [PlugN0, Power, Energy],
     "optional": [
@@ -187,7 +187,9 @@ DEVICES += [{
 }, {
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
     "lumi.ctrl_ln1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
-    "lumi.switch.b1nacn02": ["Aqara", "Single Wall Switch D1", "QBKG23LM"],
+    "lumi.switch.b1nacn02": [
+        "Aqara", "Single Wall Switch D1 CN (with N)", "QBKG23LM"
+    ],
     "required": [
         BoolConv("switch", "switch", mi="4.1.85"),
         Power, Energy, Action, Button,
@@ -195,7 +197,9 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "lumi.ctrl_neutral1": ["Aqara", "Single Wall Switch", "QBKG04LM"],
-    "lumi.switch.b1lacn02": ["Aqara", "Single Wall Switch D1", "QBKG21LM"],
+    "lumi.switch.b1lacn02": [
+        "Aqara", "Single Wall Switch D1 CN (no N)", "QBKG21LM"
+    ],
     "required": [
         BoolConv("switch", "switch", mi="4.1.85"),
         Action, Button,
@@ -205,7 +209,9 @@ DEVICES += [{
     # dual channel on/off, power measurement
     "lumi.ctrl_ln2.aq1": ["Aqara", "Double Wall Switch", "QBKG12LM"],
     "lumi.ctrl_ln2": ["Aqara", "Double Wall Switch", "QBKG12LM"],
-    "lumi.switch.b2nacn02": ["Aqara", "Double Wall Switch D1", "QBKG24LM"],
+    "lumi.switch.b2nacn02": [
+        "Aqara", "Double Wall Switch D1 CN (with N)", "QBKG24LM"
+    ],
     "required": [
         ChannelC1, ChannelC2, Power, Energy,
         Action, Button1, Button2, ButtonBoth,
@@ -213,7 +219,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.relay.c2acn01": ["Aqara", "Relay", "LLKZMK11LM"],  # tested
+    "lumi.relay.c2acn01": ["Aqara", "Relay CN", "LLKZMK11LM"],  # tested
     "support": 4,  # TODO: test load_s0 8.0.2034 load_s1 8.0.2035
     "required": [
         ChannelC1, ChannelC2, Current, Power, Voltage, Energy,
@@ -224,16 +230,20 @@ DEVICES += [{
         BoolConv("interlock", "switch", mi="4.9.85"),
     ]
 }, {
-    "lumi.ctrl_neutral2": ["Aqara", "Double Wall Switch", "QBKG03LM"],
+    "lumi.ctrl_neutral2": ["Aqara", "Double Wall Switch (no N)", "QBKG03LM"],
     "required": [ChannelN1, ChannelN2, Action, Button1, Button2, ButtonBoth],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.switch.b2lacn02": ["Aqara", "Double Wall Switch D1", "QBKG22LM"],
+    "lumi.switch.b2lacn02": [
+        "Aqara", "Double Wall Switch D1 CN (no N)", "QBKG22LM"
+    ],
     "required": [ChannelC1, ChannelC2, Action, Button1, Button2, ButtonBoth],
     "optional": [ZigbeeStats],
 }, {
     # triple channel on/off, no neutral wire
-    "lumi.switch.l3acn3": ["Aqara", "Triple Wall Switch D1", "QBKG25LM"],
+    "lumi.switch.l3acn3": [
+        "Aqara", "Triple Wall Switch D1 CN (no N)", "QBKG25LM"
+    ],
     "required": [
         ChannelN1, ChannelN2, ChannelN3,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
@@ -241,7 +251,9 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # with neutral wire, thanks @Mantoui
-    "lumi.switch.n3acn3": ["Aqara", "Triple Wall Switch D1", "QBKG26LM"],
+    "lumi.switch.n3acn3": [
+        "Aqara", "Triple Wall Switch D1 CN (with N)", "QBKG26LM"
+    ],
     "required": [
         ChannelC1, ChannelC2, ChannelC3, Power, Voltage, Energy,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
@@ -250,8 +262,8 @@ DEVICES += [{
 }, {
     # we using lumi+zigbee covnerters for support heartbeats and transition
     # light with brightness and color temp
-    "lumi.light.cwopcn02": ["Aqara", "Opple MX650", "XDD12LM"],
-    "lumi.light.cwopcn03": ["Aqara", "Opple MX480", "XDD13LM"],
+    "lumi.light.cwopcn02": ["Aqara", "Opple MX650 CN", "XDD12LM"],
+    "lumi.light.cwopcn03": ["Aqara", "Opple MX480 CN", "XDD13LM"],
     "ikea.light.led1545g12": ["IKEA", "Bulb E27 980 lm", "LED1545G12"],
     "ikea.light.led1546g12": ["IKEA", "Bulb E27 950 lm", "LED1546G12"],
     "ikea.light.led1536g5": ["IKEA", "Bulb E14 400 lm", "LED1536G5"],
@@ -263,7 +275,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.light.aqcn02": ["Aqara", "Bulb", "ZNLDP12LM"],
+    "lumi.light.aqcn02": ["Aqara", "Bulb CN", "ZNLDP12LM"],
     "required": [
         BoolConv("light", "light", mi="4.1.85"),
         ZXiaomiBrightnessConv("brightness", mi="14.1.85", parent="light"),
@@ -286,11 +298,11 @@ DEVICES += [{
 }, {
     # button action, no retain
     "lumi.sensor_switch": ["Xiaomi", "Button", "WXKG01LM"],
-    "lumi.remote.b1acn01": ["Aqara", "Button", "WXKG11LM"],
+    "lumi.remote.b1acn01": ["Aqara", "Button CN", "WXKG11LM"],
     "lumi.sensor_switch.aq2": ["Aqara", "Button", "WXKG11LM"],
     "lumi.sensor_switch.aq3": ["Aqara", "Shake Button", "WXKG12LM"],
-    "lumi.remote.b186acn01": ["Aqara", "Single Wall Button", "WXKG03LM"],
-    "lumi.remote.b186acn02": ["Aqara", "Single Wall Button D1", "WXKG06LM"],
+    "lumi.remote.b186acn01": ["Aqara", "Single Wall Button CN", "WXKG03LM"],
+    "lumi.remote.b186acn02": ["Aqara", "Single Wall Button D1 CN", "WXKG06LM"],
     "lumi.sensor_86sw1": ["Aqara", "Single Wall Button", "WXKG03LM"],
     "required": [Action, Button, Battery],
     "optional": [ZigbeeStats, BatteryLow, BatteryPer, ChipTemp],
@@ -374,7 +386,7 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # cube action, no retain
-    "lumi.sensor_cube.aqgl01": ["Aqara", "Cube", "MFKZQ01LM"],  # tested
+    "lumi.sensor_cube.aqgl01": ["Aqara", "Cube EU", "MFKZQ01LM"],  # tested
     "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
     "support": 3,  # TODO: need some tests
     "required": [
@@ -416,7 +428,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.curtain.hagl04": ["Aqara", "Curtain B1", "ZNCLDJ12LM"],
+    "lumi.curtain.hagl04": ["Aqara", "Curtain B1 EU", "ZNCLDJ12LM"],
     "required": [
         MapConv("motor", "cover", mi="14.2.85", map=MOTOR),
         Converter("position", mi="1.1.85", parent="motor"),
@@ -426,7 +438,7 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     "lumi.lock.aq1": ["Aqara", "Door Lock S1", "ZNMS11LM"],
-    "lumi.lock.acn02": ["Aqara", "Door Lock S2", "ZNMS12LM"],
+    "lumi.lock.acn02": ["Aqara", "Door Lock S2 CN", "ZNMS12LM"],
     "required": [
         Action, Battery,
         LockConv("key_id", "sensor", mi="13.1.85"),
@@ -435,7 +447,7 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # it's better to read only one property 13.26.85 and ignore others
-    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro", "ZNMS13LM"],
+    "lumi.lock.acn03": ["Aqara", "Door Lock S2 Pro CN", "ZNMS13LM"],
     "required": [
         # corner_bolt or door_state or 13.26.85 (only on S2 Pro)
         LockConv("lock", "binary_sensor", mi="13.16.85", mask=0x40),
@@ -467,7 +479,7 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/101
-    "lumi.airrtc.tcpecn02": ["Aqara", "Thermostat S2", "KTWKQ03ES"],
+    "lumi.airrtc.tcpecn02": ["Aqara", "Thermostat S2 CN", "KTWKQ03ES"],
     "required": [
         # BoolConv("power", mi="3.1.85", xiaomi="power_status"),
         ClimateConv("climate", "climate", mi="14.2.85"),
@@ -482,7 +494,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats],
 }, {
-    "lumi.airrtc.vrfegl01": ["Xiaomi", "VRF Air Conditioning"],
+    "lumi.airrtc.vrfegl01": ["Xiaomi", "VRF Air Conditioning EU"],
     "support": 1,
     "required": [
         Converter("channels", "sensor", mi="13.1.85"),
@@ -490,8 +502,9 @@ DEVICES += [{
     "optional": [ZigbeeStats],
 }]
 
+# Xiaomi Zigbee MIoT spec
 DEVICES += [{
-    "lumi.sen_ill.mgl01": ["Xiaomi", "Light Sensor", "GZCGQ01LM"],
+    "lumi.sen_ill.mgl01": ["Xiaomi", "Light Sensor EU", "GZCGQ01LM"],
     "support": 5,
     "required": [
         Converter("illuminance", "sensor", mi="2.p.1"),
@@ -499,7 +512,7 @@ DEVICES += [{
     ],
     "optional": [ZigbeeStats]
 }, {
-    "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1", "MCCGQ14LM"],
+    "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
     "support": 5,
     "required": [
         MapConv("contact", "binary_sensor", mi="2.p.1", map=INVERSE),
