@@ -564,7 +564,7 @@ DEVICES += [{
 # relays and switches
 DEVICES += [{
     # https://www.aqara.com/en/single_switch_T1_no-neutral.html
-    "lumi.switch.l0agl1": ["Aqara", "Single Relay T1 EU (no N)", "SSM-U02"],
+    "lumi.switch.l0agl1": ["Aqara", "Relay T1 EU (no N)", "SSM-U02"],
     "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),

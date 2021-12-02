@@ -8,7 +8,7 @@ ZNWK = "0x12ab"
 
 def test_plug_heartbeat():
     device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Xiaomi Plug'
+    assert device.info.name == 'Xiaomi Plug CN'
     device.setup_converters(["energy"])
     params = [
         {"res_name": "4.1.85", "value": 1},
@@ -24,7 +24,7 @@ def test_plug_heartbeat():
     ]
     assert device.decode_lumi(params) == {
         'plug': True, 'power': 14.56, 'energy': 357.7, 'resets': 24,
-        'fw_ver': 90
+        'fw_ver': 90, 'chip_temperature': 39
     }
 
 
@@ -54,7 +54,8 @@ def test_sensor_ht_heartbeat():
     ])
     assert p == {
         'battery': 51, "battery_voltage": 2955, 'resets': 11651,
-        'temperature': 23.84, 'humidity': 45.09, 'parent': "-", 'fw_ver': 0
+        'temperature': 23.84, 'humidity': 45.09, 'parent': "-", 'fw_ver': 0,
+        'battery_original': 59
     }
 
 
@@ -94,7 +95,7 @@ def test_light():
 
 def test_lock_s2_pro():
     device = XDevice(ZIGBEE, 'lumi.lock.acn03', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Door Lock S2 Pro'
+    assert device.info.name == 'Aqara Door Lock S2 Pro CN'
     device.setup_converters()
 
     p = device.decode_lumi([
@@ -147,7 +148,7 @@ def test_lock_s2_pro():
 
 def test_climate():
     device = XDevice(ZIGBEE, "lumi.airrtc.tcpecn02", ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Thermostat S2'
+    assert device.info.name == 'Aqara Thermostat S2 CN'
     device.setup_converters()
 
     p = device.decode_lumi([
@@ -188,14 +189,14 @@ def test_climate():
 
 def test_mi_spec():
     device = XDevice(ZIGBEE, 'lumi.sen_ill.mgl01', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Xiaomi Light Sensor'
+    assert device.info.name == 'Xiaomi Light Sensor EU'
     device.setup_converters()
 
     p = device.decode_lumi([{'siid': 3, 'piid': 1, 'value': 3100}])
     assert p == {'battery': 80, 'battery_voltage': 3100}
 
     device = XDevice(ZIGBEE, 'lumi.motion.agl04', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Precision Motion Sensor'
+    assert device.info.name == 'Aqara Precision Motion Sensor EU'
     device.setup_converters()
 
     p = device.decode_lumi([{'siid': 4, 'eiid': 1, 'arguments': []}])
@@ -210,7 +211,7 @@ def test_lumi_encode():
     assert p == {"params": [{'res_name': '4.1.85', 'value': 1}]}
 
     device = XDevice(ZIGBEE, 'lumi.switch.l0agl1', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Relay T1'
+    assert device.info.name == 'Aqara Relay T1 EU (no N)'
     device.setup_converters()
 
     p = device.encode({'switch': True})
@@ -237,7 +238,7 @@ def test_lumi_curtain():
 
 def test_mi_curtain():
     device = XDevice(ZIGBEE, 'lumi.curtain.acn002', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Roller Shade E1'
+    assert device.info.name == 'Aqara Roller Shade E1 CN'
     device.setup_converters()
 
     p = device.decode_lumi([
@@ -254,7 +255,10 @@ def test_mi_curtain():
         {"siid": 3, "piid": 3, "value": 0},
         {"siid": 3, "piid": 4, "value": 48}
     ])
-    assert p == {'battery': 48}
+    assert p == {
+        'battery': 48, 'battery_charging': False, 'battery_low': False,
+        'battery_voltage': 7317
+    }
 
     p = device.decode_lumi([{"siid": 2, "piid": 6, "value": 0}])
     assert p == {'run_state': 'closing'}
