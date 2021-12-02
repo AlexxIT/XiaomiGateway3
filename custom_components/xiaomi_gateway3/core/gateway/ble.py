@@ -82,6 +82,9 @@ class BLEGateway(GatewayBase):
             return
         device.extra['seq'] = data['frmCnt']
 
+        if BLE in device.entities:
+            device.update(device.decode(BLE, None))
+
         if isinstance(data['evt'], list):
             payload = device.decode("mibeacon", data['evt'][0])
         elif isinstance(data['evt'], dict):
@@ -107,6 +110,9 @@ class BLEGateway(GatewayBase):
         if device.extra.get('seq') == payload['seq']:
             return
         device.extra['seq'] = payload['seq']
+
+        if BLE in device.entities:
+            device.update(device.decode(BLE, None))
 
         payload = device.decode("mibeacon", payload)
         device.update(payload)
