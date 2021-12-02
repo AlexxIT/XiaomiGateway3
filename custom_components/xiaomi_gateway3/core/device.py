@@ -445,7 +445,7 @@ class XEntity(Entity):
 
         # minimum support version: Hass v2021.6
         self._attr_device_class = DEVICE_CLASSES.get(attr, attr)
-        self._attr_entity_registry_enabled_default = conv.enabled
+        self._attr_entity_registry_enabled_default = conv.enabled != False
         self._attr_extra_state_attributes = {}
         self._attr_icon = ICONS.get(attr)
         self._attr_name = device.name(attr)
