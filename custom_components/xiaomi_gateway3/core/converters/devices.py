@@ -1017,6 +1017,7 @@ DEVICES += [{
     "spec": [
         MiBeacon,
         # sensors:
+        Converter("action", "sensor", enabled=None),
         Converter("battery", "sensor", enabled=None),
         Converter("conductivity", "sensor", enabled=None),
         Converter("formaldehyde", "sensor", enabled=None),
