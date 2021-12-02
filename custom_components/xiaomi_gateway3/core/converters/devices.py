@@ -994,6 +994,9 @@ DEVICES += [{
         Converter("idle_time", "sensor", enabled=False),
     ],
 }, {
+    1983: ["Yeelight", "Button S1", "YLAI003"],
+    "spec": [MiBeacon, BLEAction, BLEBattery]
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1006,7 +1009,6 @@ DEVICES += [{
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM"],
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
-    1983: ["Yeelight", "Button S1", "YLAI003"],
     2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
