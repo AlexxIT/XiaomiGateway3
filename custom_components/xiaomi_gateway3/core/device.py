@@ -18,6 +18,7 @@ from homeassistant.helpers.template import Template
 from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
+from .converters.stats import STAT_GLOBALS
 from .utils import DOMAIN
 
 if TYPE_CHECKING:
@@ -172,7 +173,7 @@ class XDevice:
             domain = kwargs.get(conv.attr, conv.domain)
             if domain is None or conv.attr in self.entities:
                 continue
-            if conv.lazy:
+            if conv.enabled is None:
                 self.lazy_setup.add(conv.attr)
                 continue
             gateway.setups[domain](gateway, self, conv)
@@ -181,33 +182,19 @@ class XDevice:
         """If no entities - use only required converters. Otherwise search for
         converters in:
            - LUMI_GLOBALS list
-           - optional converters list
-           - required converters childs list (always sensor)
-           - optional converters childs list (always sensor)
+           - STAT_GLOBALS list
+           - converters childs list (always sensor)
         """
-        if not entities:
-            self.converters = self.info.req_converters
-            return
+        self.converters = self.info.spec.copy()
 
-        self.converters = self.info.req_converters.copy()
         for attr in entities:
-            for conv in LUMI_GLOBALS.values():
-                if conv.attr == attr:
-                    assert conv not in self.converters
-                    self.converters.append(conv)
+            if attr in LUMI_GLOBALS:
+                self.converters.append(LUMI_GLOBALS[attr])
 
-            for conv in self.info.req_converters:
-                if conv.childs and attr in conv.childs:
-                    conv = Converter(attr, "sensor")
-                    self.converters.append(conv)
+            if attr == self.type and attr in STAT_GLOBALS:
+                self.converters.append(STAT_GLOBALS[attr])
 
-            if not self.info.opt_converters:
-                continue
-
-            for conv in self.info.opt_converters:
-                if conv.attr == attr:
-                    assert conv not in self.converters
-                    self.converters.append(conv)
+            for conv in self.info.spec:
                 if conv.childs and attr in conv.childs:
                     conv = Converter(attr, "sensor")
                     self.converters.append(conv)
@@ -458,6 +445,7 @@ class XEntity(Entity):
 
         # minimum support version: Hass v2021.6
         self._attr_device_class = DEVICE_CLASSES.get(attr, attr)
+        self._attr_entity_registry_enabled_default = conv.enabled
         self._attr_extra_state_attributes = {}
         self._attr_icon = ICONS.get(attr)
         self._attr_name = device.name(attr)
@@ -505,9 +493,6 @@ class XEntity(Entity):
 
         device.entities[attr] = self
 
-        if self.attributes_template:
-            self.render_attributes_template()
-
     @property
     def customize(self) -> dict:
         if not self.hass:
@@ -523,6 +508,8 @@ class XEntity(Entity):
         #   => self.async_internal_added_to_hass => self.async_added_to_hass
         #   => self.async_write_ha_state
         self.device.entities[self.attr] = self  # fix rename entity_id
+
+        self.render_attributes_template()
 
         if hasattr(self, "async_get_last_state"):
             state: State = await self.async_get_last_state()

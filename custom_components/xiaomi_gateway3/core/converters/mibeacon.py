@@ -319,13 +319,11 @@ class MiBeaconConv(Converter):
 MiBeacon = MiBeaconConv('mibeacon')
 
 BLEAction = Converter("action", "sensor")
-BLEActionLazy = Converter("action", "sensor", lazy=True)
-BLEAction.childs = BLEActionLazy.childs = {
+BLEAction.childs = {
     "action_id", "counter", "error", "key_id", "message", "method", "method_id",
     "score", "state", "timestamp"
 }
 BLEBattery = Converter("battery", "sensor")
-BLEBatteryLazy = Converter("battery", "sensor", lazy=True)
 BLEConductivity = Converter("conductivity", "sensor")
 BLEFormaldehyde = Converter("formaldehyde", "sensor")
 BLEHumidity = Converter("humidity", "sensor")

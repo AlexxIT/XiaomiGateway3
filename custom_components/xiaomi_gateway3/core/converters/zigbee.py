@@ -400,7 +400,7 @@ ZLight = ZOnOffConv("light", "light")
 ZBrightness = ZBrightnessConv("brightness", parent="light")
 ZColorTemp = ZColorTempConv("color_temp", parent="light")
 
-ZTuyaPowerOn = ZTuyaPowerOnConv("power_on_state", "select")
+ZTuyaPowerOn = ZTuyaPowerOnConv("power_on_state", "select", enabled=False)
 
 
 ################################################################################

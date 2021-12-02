@@ -31,7 +31,7 @@ class Converter:
     mi: Optional[str] = None
     parent: Optional[str] = None
 
-    lazy: bool = False  # lazy setup will create entities only with first data
+    enabled: Optional[bool] = True  # support: True, False, None (lazy setup)
     poll: bool = False  # hass should_poll
 
     # don't init with dataclass because no type:
@@ -146,7 +146,7 @@ class ColorTempKelvin(Converter):
 
 @dataclass
 class BatteryConv(Converter):
-    childs = {"battery_voltage"}
+    childs = {"battery_voltage", "battery_original"}
     min = 2700
     max = 3200
 
@@ -355,7 +355,7 @@ Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
 
-ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006")
+ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006", enabled=False)
 
 # switches and relays
 PlugN0 = BoolConv("plug", "switch", mi="4.1.85")
@@ -391,8 +391,10 @@ Button23 = ButtonConv("button_both_23", mi="13.7.85")
 # converts voltage to percent and shows voltage in attributes
 # users can adds separate voltage sensor or original percent sensor
 Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
-BatteryLow = BoolConv("battery_low", "binary_sensor", mi="8.0.9001")
-BatteryPer = Converter("battery_percent", "sensor", mi="8.0.2001")
+BatteryLow = BoolConv(
+    "battery_low", "binary_sensor", mi="8.0.9001", enabled=False
+)
+BatteryOrig = Converter("battery_original", mi="8.0.2001")
 
 # zigbee3 devices
 

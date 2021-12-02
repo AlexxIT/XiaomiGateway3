@@ -22,8 +22,7 @@ class XDeviceInfo:
     model: str
     name: str
     url: str
-    req_converters: List[Converter]
-    opt_converters: List[Converter]
+    spec: List[Converter]
     config: List[Config]
 
 
@@ -35,10 +34,10 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     """Type is used to select the default spec if the model didn't match
     earlier. Should be the latest spec in the list.
     """
-    for spec in DEVICES:
-        if model not in spec and spec.get("default") != type:
+    for desc in DEVICES:
+        if model not in desc and desc.get("default") != type:
             continue
-        info = spec.get(model) or ["Unknown", type.upper(), None]
+        info = desc.get(model) or ["Unknown", type.upper(), None]
         brand, name, market = info if len(info) == 3 else info + [None]
 
         if type == ZIGBEE and not is_mihome_zigbee(model):
@@ -59,11 +58,10 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
             model=market,
             name=f"{brand} {name}",
             url=url,
-            req_converters=spec["required"],
-            opt_converters=spec.get("optional"),
-            config=spec.get("config"),
+            spec=desc["spec"],
+            config=desc.get("config"),
         )
-    return None
+    raise RuntimeError
 
 
 def get_zigbee_buttons(model: str) -> Optional[list]:

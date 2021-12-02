@@ -154,7 +154,9 @@ class BLEStatsConv(Converter):
             'msg_received': device.extra['msg_received'],
         })
 
-
 GatewayStats = GatewayStatsConverter(GATEWAY, "binary_sensor")
-ZigbeeStats = ZigbeeStatsConverter(ZIGBEE, "sensor")
-BLEStats = BLEStatsConv(BLE, "sensor")
+
+STAT_GLOBALS = {
+    BLE: BLEStatsConv(BLE, "sensor"),
+    ZIGBEE: ZigbeeStatsConverter(ZIGBEE, "sensor"),
+}
