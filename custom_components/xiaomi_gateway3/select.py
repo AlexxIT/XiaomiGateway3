@@ -136,6 +136,9 @@ class DataSelect(XEntity, SelectEntity):
 
     @callback
     def async_set_state(self, data: dict):
+        if not self.hass:
+            return
+
         if self.attr in data:
             self.process_command(data)
 

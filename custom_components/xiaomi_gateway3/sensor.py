@@ -80,7 +80,7 @@ class XiaomiAction(XEntity):
     @callback
     def async_set_state(self, data: dict):
         # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
-        if "battery" in data or self.attr not in data:
+        if "battery" in data or self.attr not in data or not self.hass:
             return
 
         if self._clear_task:
