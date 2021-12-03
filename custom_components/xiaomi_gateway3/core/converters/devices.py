@@ -819,6 +819,7 @@ DEVICES += [{
 }, {
     # very simple relays with binding
     "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0011"],
+    "TS0011": ["Tuya", "Switch", "TS0011"],
     "support": 5,
     "spec": [ZSwitch],
     "config": [ZBindOnOff]
