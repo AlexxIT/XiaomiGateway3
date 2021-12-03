@@ -672,8 +672,10 @@ DEVICES += [{
 }, {
     # required switch firmware 0.0.0_0030
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1
-    "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US", "WS-USC04"],
-    "support": 5,
+    "lumi.switch.b2naus01": [
+        "Aqara", "Double Wall Switch US (with N)", "WS-USC04"
+    ],
+    # "support": 5,
     "spec": [
         Channel1_MI21, Channel2_MI31, Action,
         MathConv("energy", "sensor", mi="4.p.1", multiply=0.001, round=2),
@@ -756,10 +758,10 @@ DEVICES += [{
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n2acn1:1
     "lumi.switch.n2acn1": [
-        "Aqara", "Double Wall Switch H1 CN (no N)", "QBKG31LM"
+        "Aqara", "Double Wall Switch H1 CN (with N)", "QBKG31LM"
     ],
     "lumi.switch.n2aeu1": [
-        "Aqara", "Double Wall Switch H1 EU (no N)", "WS-EUK04"
+        "Aqara", "Double Wall Switch H1 EU (with N)", "WS-EUK04"
     ],
     # "support": 5,
     "spec": [
