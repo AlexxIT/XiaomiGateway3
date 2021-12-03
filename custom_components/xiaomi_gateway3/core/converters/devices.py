@@ -813,7 +813,6 @@ DEVICES += [{
 }, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
-    "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
     "support": 5,
     "spec": [ZSwitch]
@@ -823,6 +822,15 @@ DEVICES += [{
     "support": 5,
     "spec": [ZSwitch],
     "config": [ZBindOnOff]
+}, {
+    "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
+    "spec": [
+        ZOnOffConv("switch", "switch", ep=11),
+    ],
+    "config": [
+        ZBindConf(ZOnOffConv, ep=11),
+        ZReportConf(ZOnOffConv, ep=11, mint=0, maxt=HOUR, change=0),
+    ]
 }, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
     "support": 5,
