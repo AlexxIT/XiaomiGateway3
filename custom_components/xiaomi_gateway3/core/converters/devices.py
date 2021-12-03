@@ -782,13 +782,60 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
     ],
 }, {
-    "_unknown1": [
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l3acn1:1
+    "lumi.switch.l3acn1": [
         "Aqara", "Triple Wall Switch H1 CN (no N)", "QBKG29LM"
     ],
-    "_unknown2": [
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="8.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_3", mi="10.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="10.e.2", value=2),  # double
+        ButtonMIConv("button_both_12", mi="11.e.1", value=4),
+        ButtonMIConv("button_both_13", mi="12.e.1", value=4),
+        ButtonMIConv("button_both_23", mi="13.e.1", value=4),
+        Action,
+        BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
+                enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_3", "switch", mi="10.p.1", enabled=False),  # uint8
+    ]
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l3acn1:1
+    "lumi.switch.n3acn1": [
         "Aqara", "Triple Wall Switch H1 CN (with N)", "QBKG32LM"
     ],
-    "support": 1
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        MathConv("energy", "sensor", mi="5.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="5.p.2", round=2),
+        ButtonMIConv("button_1", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="10.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="10.e.2", value=2),  # double
+        ButtonMIConv("button_3", mi="11.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="11.e.2", value=2),  # double
+        ButtonMIConv("button_both_12", mi="12.e.1", value=4),
+        ButtonMIConv("button_both_13", mi="13.e.1", value=4),
+        ButtonMIConv("button_both_23", mi="14.e.1", value=4),
+        Action,
+        BoolConv("led", "switch", mi="6.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="6.p.2", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY,
+                enabled=False),
+        BoolConv("wireless_1", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="10.p.1", enabled=False),  # uint8
+        BoolConv("wireless_3", "switch", mi="11.p.1", enabled=False),  # uint8
+    ]
 }]
 
 ################################################################################
