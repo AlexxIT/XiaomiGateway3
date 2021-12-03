@@ -66,7 +66,7 @@ Recommended attributes names:
 - outlet - for sockets with only female connector (wall installation)
 - switch - for relays and switches with buttons (wall installation, remotes)
 - led - control device led light
-- smart - change mode from wired to wireless (decoupled)
+- wireless_mode - change mode from wired to wireless (decoupled)
 - power_on_state - default state when electricity is supplied
 - contact - for contact sensor
 - moisture - for water leak sensor
@@ -610,7 +610,7 @@ DEVICES += [{
         BoolConv("led", "switch", mi="3.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="6.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="6.p.1", enabled=False),
         MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE, enabled=False)
     ],
 }, {
@@ -625,8 +625,8 @@ DEVICES += [{
         ButtonMIConv("button_2", mi="8.e.2", value=2),
         ButtonMIConv("button_both", mi="9.e.1", value=4),
         Action,
-        BoolConv("smart_1", "switch", mi="7.p.1", enabled=False),
-        BoolConv("smart_2", "switch", mi="8.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="7.p.1", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.1", enabled=False),
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
@@ -646,7 +646,7 @@ DEVICES += [{
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="7.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="7.p.1", enabled=False),
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2nc01:1
@@ -666,8 +666,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),
     ],
 }, {
     # required switch firmware 0.0.0_0030
@@ -686,8 +686,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l1acn1:1
@@ -706,7 +706,7 @@ DEVICES += [{
         BoolConv("led", "switch", mi="3.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="6.p.1", enabled=False),  # uint8
+        BoolConv("wireless", "switch", mi="6.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l2acn1:1
@@ -729,8 +729,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="7.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="7.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="8.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n1acn1:1
@@ -751,7 +751,7 @@ DEVICES += [{
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="7.p.1", enabled=False),  # uint8
+        BoolConv("wireless", "switch", mi="7.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n2acn1:1
@@ -776,8 +776,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
     ],
 }, {
     "_unknown1": [
@@ -1125,26 +1125,26 @@ DEVICES += [{
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("smart", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless", "switch", mi="8.p.2", enabled=False),
     ],
 }, {
     # Mesh Switches
     1946: ["Xiaomi", "Mesh Double Wall Switch", "DHKG02ZM"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         Converter("led", "switch", mi="10.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="2.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
     ],
 }, {
     2257: ["PTX", "Mesh Double Wall Switch", "PTX-SK2M"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="8.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="8.p.3", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
     ],
 }, {
     # https://www.ixbt.com/live/chome/umnaya-rozetka-xiaomi-zncz01zm-s-energomonitoringom-i-bluetooth-mesh-integraciya-v-home-assistant.html
@@ -1161,13 +1161,13 @@ DEVICES += [{
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("middle_switch", "switch", mi="3.p.1"),
-        Converter("right_switch", "switch", mi="4.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="8.p.2", enabled=False),
-        BoolConv("middle_smart", "switch", mi="8.p.3", enabled=False),
-        BoolConv("right_smart", "switch", mi="8.p.4", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
+        BoolConv("wireless_3", "switch", mi="8.p.4", enabled=False),
     ],
 }, {
     2715: ["Xiaomi", "Mesh Single Wall Switch", "ZNKG01HL"],
@@ -1179,22 +1179,22 @@ DEVICES += [{
 }, {
     2716: ["Xiaomi", "Mesh Double Wall Switch", "ZNKG02HL"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
     ]
 }, {
     2717: ["Xiaomi", "Mesh Triple Wall Switch", "ZNKG03HL/ISA-KG03HL"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("middle_switch", "switch", mi="3.p.1"),
-        Converter("right_switch", "switch", mi="4.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
-        BoolConv("left_smart", "switch", mi="2.p.2", enabled=False),
-        BoolConv("middle_smart", "switch", mi="3.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="4.p.2", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
     ],
 }, {
