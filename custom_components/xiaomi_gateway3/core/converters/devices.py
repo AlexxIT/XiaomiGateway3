@@ -644,6 +644,7 @@ DEVICES += [{
         ButtonMIConv("button", mi="7.e.2", value=2),
         Action,
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="4.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
         BoolConv("wireless", "switch", mi="7.p.1", enabled=False),
@@ -664,6 +665,7 @@ DEVICES += [{
         ButtonMIConv("button_both", mi="10.e.1", value=4),
         Action,
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="5.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
         BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),
@@ -751,6 +753,7 @@ DEVICES += [{
         ButtonMIConv("button", mi="7.e.2", value=2),  # double
         Action,
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="4.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
         BoolConv("wireless", "switch", mi="7.p.1", enabled=False),  # uint8
@@ -776,6 +779,7 @@ DEVICES += [{
         ButtonMIConv("button_both", mi="10.e.1", value=4),
         Action,
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="5.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
         BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
@@ -808,7 +812,7 @@ DEVICES += [{
         BoolConv("wireless_3", "switch", mi="10.p.1", enabled=False),  # uint8
     ]
 }, {
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l3acn1:1
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n3acn1:1
     "lumi.switch.n3acn1": [
         "Aqara", "Triple Wall Switch H1 CN (with N)", "QBKG32LM"
     ],
