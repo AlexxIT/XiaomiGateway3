@@ -71,7 +71,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         try:
             serial = await sh.read_file('/proc/tty/driver/ms_uart | grep -v ^0 | sort -r')
             free_mem = await sh.read_file('/proc/meminfo | grep MemFree: | awk \'{print $2}\'');
-            load_avg = await sh.read_file('/proc/loadavg | cut -d\' \' -f1-3 | sed \'s/ /, /g\'')
+            load_avg = await sh.read_file('/proc/loadavg | sed \'s/ /|/g\'')
             run_time = await sh.read_file('/proc/uptime | cut -f1 -d.')
             rssi = await sh.read_file('/proc/net/wireless | grep wlan0 | awk \'{print $4}\' | cut -f1 -d.')
             payload = self.device.decode(GATEWAY, {
