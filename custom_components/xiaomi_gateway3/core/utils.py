@@ -6,7 +6,6 @@ import re
 import string
 import uuid
 from datetime import datetime
-from functools import lru_cache
 from typing import List, Optional, TYPE_CHECKING
 
 import requests
@@ -17,7 +16,6 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.helpers.template import Template
 from homeassistant.requirements import async_process_requirements
 
 from . import shell
@@ -363,13 +361,6 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     return False
 
 
-@lru_cache(maxsize=0)
-def attributes_template(hass: HomeAssistant) -> Template:
-    template = hass.data[DOMAIN]['attributes_template']
-    template.hass = hass
-    return template
-
-
 async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
     url = "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/"
 
@@ -384,12 +375,6 @@ async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
     for item in items:
         if item.get('modelId') == device.model:
             return url + item['path']
-
-    # z2m project desided to remove Aqara Relay OTA, but gw3 users have no
-    # problem with this firmware
-    # https://github.com/Koenkk/zigbee2mqtt/issues/7112
-    if device.model == 'lumi.relay.c2acn01':
-        return url + 'images/Xiaomi/20201218113852_lumi.relay.c2acn01_0.0.0_0046_20201216_6BB0FD.ota'
 
     return None
 

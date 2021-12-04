@@ -5,7 +5,7 @@ from datetime import timedelta
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR, \
-    DEVICE_CLASS_CONNECTIVITY, DEVICE_CLASS_MOISTURE
+    DEVICE_CLASS_CONNECTIVITY, DEVICE_CLASS_MOISTURE, DEVICE_CLASS_LOCK
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.const import *
@@ -13,11 +13,13 @@ from homeassistant.core import callback, State
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
     CONNECTION_ZIGBEE
 from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.template import Template
 
 from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
-from .utils import DOMAIN, attributes_template
+from .converters.stats import STAT_GLOBALS
+from .utils import DOMAIN
 
 if TYPE_CHECKING:
     from .gateway import XGateway
@@ -144,15 +146,21 @@ class XDevice:
         return s
 
     def setup_entitites(self, gateway: 'GatewayBase', entities: list = None):
-        kwargs = {"entities": entities} if entities else {}
+        kwargs: Dict[str, Any] = {"entities": entities} if entities else {}
         for key in ("global", self.model, self.mac, self.did):
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
 
+        if "model" in kwargs:
+            # support change device model in config
+            self.update_model(kwargs["model"])
+
         if "device_name" in kwargs:
+            # support set device name in config
             self.info.name = kwargs["device_name"]
 
         if "entity_name" in kwargs:
+            # support change entity name in config
             self.extra["entity_name"] = kwargs["entity_name"]
 
         self.setup_converters(kwargs.get("entities"))
@@ -161,44 +169,36 @@ class XDevice:
         #     return
 
         for conv in self.converters:
-            if conv.domain is None or conv.attr in self.entities:
+            # support change attribute domain in config
+            domain = kwargs.get(conv.attr, conv.domain)
+            if domain is None or conv.attr in self.entities:
                 continue
-            if conv.lazy:
+            if conv.enabled is None:
                 self.lazy_setup.add(conv.attr)
                 continue
-            gateway.setups[conv.domain](gateway, self, conv)
+            gateway.setups[domain](gateway, self, conv)
 
     def setup_converters(self, entities: list = None):
         """If no entities - use only required converters. Otherwise search for
         converters in:
            - LUMI_GLOBALS list
-           - optional converters list
-           - required converters childs list (always sensor)
-           - optional converters childs list (always sensor)
+           - STAT_GLOBALS list
+           - converters childs list (always sensor)
         """
         if not entities:
-            self.converters = self.info.req_converters
+            self.converters = self.info.spec
             return
 
-        self.converters = self.info.req_converters.copy()
+        self.converters = self.info.spec.copy()
+
         for attr in entities:
-            for conv in LUMI_GLOBALS.values():
-                if conv.attr == attr:
-                    assert conv not in self.converters
-                    self.converters.append(conv)
+            if attr in LUMI_GLOBALS:
+                self.converters.append(LUMI_GLOBALS[attr])
 
-            for conv in self.info.req_converters:
-                if conv.childs and attr in conv.childs:
-                    conv = Converter(attr, "sensor")
-                    self.converters.append(conv)
+            if attr == self.type and attr in STAT_GLOBALS:
+                self.converters.append(STAT_GLOBALS[attr])
 
-            if not self.info.opt_converters:
-                continue
-
-            for conv in self.info.opt_converters:
-                if conv.attr == attr:
-                    assert conv not in self.converters
-                    self.converters.append(conv)
+            for conv in self.info.spec:
                 if conv.childs and attr in conv.childs:
                     conv = Converter(attr, "sensor")
                     self.converters.append(conv)
@@ -315,8 +315,11 @@ DEVICE_CLASSES = {
     BLE: DEVICE_CLASS_TIMESTAMP,
     GATEWAY: DEVICE_CLASS_CONNECTIVITY,
     ZIGBEE: DEVICE_CLASS_TIMESTAMP,
-    "contact": DEVICE_CLASS_DOOR,
     "cloud_link": DEVICE_CLASS_CONNECTIVITY,
+    "contact": DEVICE_CLASS_DOOR,
+    "latch": DEVICE_CLASS_LOCK,
+    "reverse": DEVICE_CLASS_LOCK,
+    "square": DEVICE_CLASS_LOCK,
     "water_leak": DEVICE_CLASS_MOISTURE,
 }
 
@@ -390,12 +393,50 @@ STATE_CLASSES = {
     DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
 }
 
+# Config: An entity which allows changing the configuration of a device
+ENTITY_CATEGORY_CONFIG: Final = "config"
+# Diagnostic: An entity exposing some configuration parameter or diagnostics of a device
+ENTITY_CATEGORY_DIAGNOSTIC: Final = "diagnostic"
+
+ENTITY_CATEGORIES = {
+    BLE: ENTITY_CATEGORY_DIAGNOSTIC,
+    GATEWAY: ENTITY_CATEGORY_DIAGNOSTIC,
+    ZIGBEE: ENTITY_CATEGORY_DIAGNOSTIC,
+    "baby_mode": ENTITY_CATEGORY_CONFIG,
+    "battery": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_charging": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_low": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_percent": ENTITY_CATEGORY_DIAGNOSTIC,
+    "battery_voltage": ENTITY_CATEGORY_DIAGNOSTIC,
+    "blind_time": ENTITY_CATEGORY_CONFIG,
+    "charge_protect": ENTITY_CATEGORY_CONFIG,
+    "chip_temperature": ENTITY_CATEGORY_DIAGNOSTIC,
+    "cloud_link": ENTITY_CATEGORY_DIAGNOSTIC,
+    "display_unit": ENTITY_CATEGORY_CONFIG,
+    "fault": ENTITY_CATEGORY_DIAGNOSTIC,
+    "flex_switch": ENTITY_CATEGORY_CONFIG,
+    "led": ENTITY_CATEGORY_CONFIG,
+    "idle_time": ENTITY_CATEGORY_DIAGNOSTIC,
+    "max_power": ENTITY_CATEGORY_DIAGNOSTIC,
+    "mode": ENTITY_CATEGORY_CONFIG,
+    "motor_reverse": ENTITY_CATEGORY_CONFIG,
+    "motor_speed": ENTITY_CATEGORY_CONFIG,
+    "occupancy_timeout": ENTITY_CATEGORY_CONFIG,
+    "power_on_state": ENTITY_CATEGORY_CONFIG,
+    "sensitivity": ENTITY_CATEGORY_CONFIG,
+    "smart": ENTITY_CATEGORY_CONFIG,
+    "smart_1": ENTITY_CATEGORY_CONFIG,
+    "smart_2": ENTITY_CATEGORY_CONFIG,
+}
+
 STATE_TIMEOUT = timedelta(minutes=10)
 
 
 class XEntity(Entity):
     # duplicate here because typing problem
     _attr_extra_state_attributes: dict = None
+
+    attributes_template: Template = None
 
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
         attr = conv.attr
@@ -408,11 +449,13 @@ class XEntity(Entity):
 
         # minimum support version: Hass v2021.6
         self._attr_device_class = DEVICE_CLASSES.get(attr, attr)
+        self._attr_entity_registry_enabled_default = conv.enabled != False
         self._attr_extra_state_attributes = {}
         self._attr_icon = ICONS.get(attr)
         self._attr_name = device.name(attr)
         self._attr_should_poll = conv.poll
         self._attr_unique_id = device.unique_id(attr)
+        self._attr_entity_category = ENTITY_CATEGORIES.get(attr)
         self.entity_id = device.entity_id(conv)
 
         if conv.domain == "sensor":  # binary_sensor moisture problem
@@ -424,14 +467,14 @@ class XEntity(Entity):
                 # by default all sensors with units is measurement sensors
                 self._attr_state_class = STATE_CLASS_MEASUREMENT
 
-        if self.device.model == MESH_GROUP_MODEL:
+        if device.model == MESH_GROUP_MODEL:
             connections = None
-        elif self.device.type in (GATEWAY, BLE, MESH):
+        elif device.type in (GATEWAY, BLE, MESH):
             connections = {(CONNECTION_NETWORK_MAC, device.mac)}
         else:
             connections = {(CONNECTION_ZIGBEE, device.ieee)}
 
-        if self.device.type != GATEWAY and gateway.device:
+        if device.type != GATEWAY and gateway.device:
             via_device = (DOMAIN, gateway.device.mac)
         else:
             via_device = None
@@ -439,12 +482,13 @@ class XEntity(Entity):
         # https://developers.home-assistant.io/docs/device_registry_index/
         self._attr_device_info = DeviceInfo(
             connections=connections,
-            identifiers={(DOMAIN, self.device.mac)},
-            manufacturer=self.device.info.manufacturer,
-            model=self.device.info.model,
-            name=self.device.info.name,
-            sw_version=self.device.fw_ver,
-            via_device=via_device
+            identifiers={(DOMAIN, device.mac)},
+            manufacturer=device.info.manufacturer,
+            model=device.info.model,
+            name=device.info.name,
+            sw_version=device.fw_ver,
+            via_device=via_device,
+            configuration_url=device.info.url
         )
 
         # stats sensors always available
@@ -467,6 +511,8 @@ class XEntity(Entity):
         # self.platform._async_add_entity => self.add_to_platform_finish
         #   => self.async_internal_added_to_hass => self.async_added_to_hass
         #   => self.async_write_ha_state
+        self.device.entities[self.attr] = self  # fix rename entity_id
+
         self.render_attributes_template()
 
         if hasattr(self, "async_get_last_state"):
@@ -503,7 +549,7 @@ class XEntity(Entity):
     @callback
     def render_attributes_template(self):
         try:
-            attrs = attributes_template(self.hass).async_render({
+            attrs = self.attributes_template.async_render({
                 "attr": self.attr,
                 "device": self.device,
                 "gateway": self.gw.device
@@ -543,12 +589,19 @@ class XEntity(Entity):
             assert "mi_spec" in payload, payload
 
             ok = await self.gw.miot_send(self.device, payload)
-            if not ok:
+            if not ok or self.attr == "group":
                 return
-            # 2 seconds are selected experimentally
-            await asyncio.sleep(2)
-            await self.device_read(self.subscribed_attrs)
-            self._async_write_ha_state()
+
+            payload = self.device.encode_read(self.subscribed_attrs)
+            for _ in range(10):
+                await asyncio.sleep(.5)
+                data = await self.gw.miot_read(self.device, payload)
+                # check that all read attrs are equal to send attrs
+                if not data or any(data.get(k) != v for k, v in value.items()):
+                    continue
+                self.async_set_state(data)
+                self._async_write_ha_state()
+                break
 
     async def device_read(self, attrs: set):
         payload = self.device.encode_read(attrs)

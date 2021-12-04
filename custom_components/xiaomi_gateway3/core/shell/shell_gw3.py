@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import hashlib
 import re
 
@@ -20,9 +21,7 @@ RUN_FTP = "/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &"
 # flash on another ports because running ZHA or z2m can breake process
 RUN_ZIGBEE_FLASH = "/data/ser2net -C '8115:raw:60:/dev/ttyS2:115200 8DATABITS NONE 1STOPBIT' -C '8038:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT'"
 
-TAR_DATA = b"tar -czOC /data basic_app basic_gw conf factory miio " \
-           b"mijia_automation silicon_zigbee_host zigbee zigbee_gw " \
-           b"ble_info miioconfig.db 2>/dev/null | base64\n"
+TAR_DATA = "tar -czOC /data basic_app basic_gw conf factory miio mijia_automation silicon_zigbee_host zigbee zigbee_gw ble_info miioconfig.db 2>/dev/null | base64"
 
 MD5_BT = {
     # '1.4.6_0012': '367bf0045d00c28f6bff8d4132b883de',
@@ -31,6 +30,7 @@ MD5_BT = {
     '1.4.7_0160': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.0_0026': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.0_0102': '9290241cd9f1892d2ba84074f07391d4',
+    '1.5.1_0032': '9290241cd9f1892d2ba84074f07391d4',
 }
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 # MD5_GW3 = 'c81b91816d4b9ad9bb271a5567e36ce9'  # alpha
@@ -47,17 +47,17 @@ def sed(app: str, pattern: str, repl: str):
 # grep output to cloud and send it to MQTT, use awk because buffer
 PATCH_MIIO_MQTT = sed(
     "miio", "^ +miio_client .+$",
-    "miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)|record_offline/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
+    "pkill -f log/miio; miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)|record_offline/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 )
 # use patched silabs_ncp_bt from sourceforge and send stderr to MQTT
 PATCH_BLETOOTH_MQTT = sed(
     "miio", "^ +silabs_ncp_bt .+$",
-    "/data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
+    "pkill -f log/ble; /data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
 )
 
 PATCH_ZIGBEE_PARENTS = sed(
     "app", "^ +(Lumi_Z3GatewayHost_MQTT [^>]+).+$",
-    "\\1-l 0 | mosquitto_pub -t log/z3 -l &"
+    "pkill -f log/z3; \\1-l 0 | mosquitto_pub -t log/z3 -l &"
 )
 
 # replace default Z3 to ser2net
@@ -221,6 +221,10 @@ class ShellGw3(TelnetShell):
 
     async def prevent_unpair(self):
         await self.exec("killall zigbee_gw")
+
+    async def tar_data(self):
+        raw = await self.exec(TAR_DATA, as_bytes=True)
+        return base64.b64decode(raw)
 
     async def get_version(self):
         raw = await self.read_file('/etc/rootfs_fw_info')

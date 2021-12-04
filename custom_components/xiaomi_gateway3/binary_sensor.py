@@ -57,6 +57,9 @@ class XiaomiBinarySensor(XiaomiBinaryBase, RestoreEntity):
             if k in self.subscribed_attrs:
                 self._attr_extra_state_attributes[k] = v
 
+    async def async_update(self):
+        await self.device_read(self.subscribed_attrs)
+
 
 class XiaomiGateway(XiaomiBinaryBase):
     @callback
@@ -83,6 +86,10 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
 
     @callback
     def async_set_state(self, data: dict):
+        # fix 1.4.7_0115 heartbeat error (has motion in heartbeat)
+        if "battery" in data or not self.hass:
+            return
+
         assert data[self.attr] == True
 
         # don't trigger motion right after illumination

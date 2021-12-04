@@ -28,3 +28,14 @@ def test_kettle():
     assert p == {'power': False, 'state': 'idle', 'temperature': 99}
     p = device.decode("mibeacon", {'eid': 4101, 'edata': '0154'})
     assert p == {'power': True, 'state': 'heat', 'temperature': 84}
+
+
+def test_new_th():
+    device = XDevice(BLE, 4611, DID, MAC)
+    assert device.info.name == "Xiaomi TH Sensor"
+    device.setup_converters()
+
+    p = device.decode("mibeacon", {'eid': 19464, 'edata': 'cdcc3e42'})
+    assert p == {'humidity': 47.7}
+    p = device.decode("mibeacon", {'eid': 19457, 'edata': 'cdcca841'})
+    assert p == {'temperature': 21.1}

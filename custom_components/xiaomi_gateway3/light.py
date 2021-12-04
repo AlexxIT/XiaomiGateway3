@@ -109,8 +109,7 @@ class XiaomiZigbeeLight(XiaomiLight):
 # noinspection PyAbstractClass
 class XiaomiMeshBase(XiaomiLight):
     async def async_turn_on(self, **kwargs):
-        if not kwargs:
-            kwargs[self.attr] = True
+        kwargs[self.attr] = True
         await self.device_send(kwargs)
 
     async def async_turn_off(self):

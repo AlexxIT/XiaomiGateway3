@@ -2,7 +2,7 @@ import json
 
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB
 from .. import shell
-from ..converters import silabs, UNKNOWN
+from ..converters import silabs, UNKNOWN, is_mihome_zigbee
 from ..device import XDevice, ZIGBEE
 from ..mini_mqtt import MQTTMessage
 
@@ -63,7 +63,7 @@ class SilabsGateway(GatewayBase):
             self.debug_device(device, "new unknown device", tag="SLBS")
             return
 
-        if device.model is None:
+        if device.model == UNKNOWN:
             # Sonoff Mini has a bug: it hasn't app_ver, so gw can't add it
             if data["clusterId"] == "0x0000":
                 if not zb_msg:
@@ -96,7 +96,7 @@ class SilabsGateway(GatewayBase):
         self.debug_tag(f"{device.mac} {device.nwk} send {zb_msg}", tag="ZIGB")
 
     async def silabs_process_join(self, data: dict):
-        if not data["model"].startswith("lumi."):
+        if not is_mihome_zigbee(data["model"]):
             self.debug("Prevent unpair 3rd party model: " + data["model"])
             await self.silabs_prevent_unpair()
 

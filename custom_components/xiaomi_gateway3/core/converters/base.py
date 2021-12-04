@@ -16,6 +16,10 @@ class Config:
         return self.__class__.__name__
 
 
+################################################################################
+# Base (global) converters
+################################################################################
+
 @dataclass
 class Converter:
     attr: str  # hass attribute
@@ -27,7 +31,7 @@ class Converter:
     mi: Optional[str] = None
     parent: Optional[str] = None
 
-    lazy: bool = False  # lazy setup will create entities only with first data
+    enabled: Optional[bool] = True  # support: True, False, None (lazy setup)
     poll: bool = False  # hass should_poll
 
     # don't init with dataclass because no type:
@@ -97,12 +101,17 @@ class MathConv(Converter):
     round: int = None
 
     def decode(self, device: "XDevice", payload: dict, value: float):
-        if self.min < value < self.max:
+        if self.min <= value <= self.max:
             if self.multiply:
                 value *= self.multiply
             if self.round is not None:
                 value = round(value, self.round)
             payload[self.attr] = value
+
+    def encode(self, device: "XDevice", payload: dict, value: float):
+        if self.multiply:
+            value /= self.multiply
+        super().encode(device, payload, value)
 
 
 @dataclass
@@ -135,6 +144,25 @@ class ColorTempKelvin(Converter):
         super().encode(device, payload, value)
 
 
+@dataclass
+class BatteryConv(Converter):
+    childs = {"battery_voltage", "battery_original"}
+    min = 2700
+    max = 3200
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload["battery_voltage"] = value
+
+        if value <= self.min:
+            payload[self.attr] = 0
+        elif value >= self.max:
+            payload[self.attr] = 100
+        else:
+            payload[self.attr] = int(
+                100.0 * (value - self.min) / (self.max - self.min)
+            )
+
+
 class ButtonConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
         payload[self.attr] = value
@@ -147,6 +175,18 @@ class ButtonConv(Converter):
         elif self.attr.startswith("button"):
             payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
 
+
+@dataclass
+class ButtonMIConv(ButtonConv):
+    value: int = None
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        super().decode(device, payload, self.value)
+
+
+################################################################################
+# Device converters
+################################################################################
 
 class VibrationConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
@@ -172,11 +212,10 @@ class CloudLinkConv(Converter):
         payload[self.attr] = value["offline_time"] == 0
 
 
-HVAC_MODES = {"off": 0x01, "heat": 0x10, "cool": 0x11}
-FAN_MODES = {"low": 0x00, "medium": 0x10, "high": 0x20, "auto": 0x30}
-
-
 class ClimateConv(Converter):
+    hvac = {"off": 0x01, "heat": 0x10, "cool": 0x11}
+    fan = {"low": 0x00, "medium": 0x10, "high": 0x20, "auto": 0x30}
+
     def decode(self, device: "XDevice", payload: dict, value: Any):
         # use payload to push data to climate entity
         # use device extra to pull data on encode
@@ -187,9 +226,9 @@ class ClimateConv(Converter):
             return
         b = bytearray(device.extra[self.attr].to_bytes(4, 'big'))
         if "hvac_mode" in value:
-            b[0] = HVAC_MODES[value["hvac_mode"]]
+            b[0] = self.hvac[value["hvac_mode"]]
         if "fan_mode" in value:
-            b[1] = FAN_MODES[value["fan_mode"]]
+            b[1] = self.fan[value["fan_mode"]]
         if "target_temp" in value:
             b[3] = int(value["target_temp"])
         value = int.from_bytes(b, 'big')
@@ -202,39 +241,35 @@ class ClimateTempConv(Converter):
 
 
 @dataclass
-class BatteryConv(Converter):
-    childs = {"battery_voltage"}
-    min = 2700
-    max = 3200
+class LockActionConv(Converter):
+    map: dict = None
 
-    def decode(self, device: "XDevice", payload: dict, value: int):
-        payload["battery_voltage"] = value
-
-        if value <= self.min:
-            payload[self.attr] = 0
-        elif value >= self.max:
-            payload[self.attr] = 100
-        else:
-            payload[self.attr] = int(
-                100.0 * (value - self.min) / (self.max - self.min)
-            )
+    def decode(self, device: "XDevice", payload: dict, value: Any):
+        if self.attr in ("lock_control", "door_state", "lock_state"):
+            payload["action"] = "lock"
+            payload[self.attr] = self.map.get(value)
+        elif self.attr == "key_id":
+            payload["action"] = "lock"
+            payload[self.attr] = value
+        elif self.attr == "alarm":
+            v = self.map.get(value)
+            if v != "doorbell":
+                payload["action"] = self.attr
+                payload[self.attr] = v
+            else:
+                payload["action"] = v
+        elif self.attr.endswith("_wrong"):
+            payload["action"] = "error"
+            payload["error"] = self.attr
+            payload[self.attr] = value
 
 
 @dataclass
-class ButtonMIConv(ButtonConv):
-    value: int = None
+class LockConv(Converter):
+    mask: int = 0
 
     def decode(self, device: "XDevice", payload: dict, value: int):
-        super().decode(device, payload, self.value)
-
-
-class LockConv(MapConv):
-    def decode(self, device: "XDevice", payload: dict, value: int):
-        if self.map:
-            super().decode(device, payload, value)
-        else:
-            payload[self.attr] = value
-        payload["action"] = "lock"
+        payload[self.attr] = bool(value & self.mask)
 
 
 # to get natgas sensitivity value - write: {"res_name": "4.1.85", "value": 1}
@@ -298,6 +333,10 @@ class OnlineConv(Converter):
         device.last_seen = time.time() - value["time"]
 
 
+################################################################################
+# Final converter classes
+################################################################################
+
 # https://github.com/Koenkk/zigbee2mqtt/issues/798
 # https://www.maero.dk/aqara-temperature-humidity-pressure-sensor-teardown/
 Temperature = MathConv(
@@ -315,6 +354,8 @@ Voltage = MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2)
 Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
+
+ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006", enabled=False)
 
 # switches and relays
 PlugN0 = BoolConv("plug", "switch", mi="4.1.85")
@@ -334,8 +375,8 @@ Button1 = ButtonConv("button_1", mi="13.1.85")
 Button2 = ButtonConv("button_2", mi="13.2.85")
 Button3 = ButtonConv("button_3", mi="13.3.85")
 Button4 = ButtonConv("button_4", mi="13.4.85")
-Button5 = ButtonConv("button_3", mi="13.6.85")
-Button6 = ButtonConv("button_4", mi="13.7.85")
+Button5 = ButtonConv("button_5", mi="13.6.85")
+Button6 = ButtonConv("button_6", mi="13.7.85")
 ButtonBoth = ButtonConv("button_both", mi="13.5.85")
 Button12 = ButtonConv("button_both_12", mi="13.5.85")
 Button13 = ButtonConv("button_both_13", mi="13.6.85")
@@ -350,8 +391,10 @@ Button23 = ButtonConv("button_both_23", mi="13.7.85")
 # converts voltage to percent and shows voltage in attributes
 # users can adds separate voltage sensor or original percent sensor
 Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
-BatteryPer = Converter("battery_percent", "sensor", mi="8.0.2001")
-BatteryEnd = BoolConv("battery_end", "binary_sensor", mi="8.0.9001")
+BatteryLow = BoolConv(
+    "battery_low", "binary_sensor", mi="8.0.9001", enabled=False
+)
+BatteryOrig = Converter("battery_original", mi="8.0.2001")
 
 # zigbee3 devices
 

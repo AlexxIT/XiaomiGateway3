@@ -1,10 +1,10 @@
 import re
 
 from custom_components.xiaomi_gateway3.core.converters.devices import DEVICES
-from custom_components.xiaomi_gateway3.core.converters.stats import BLEStats
+from custom_components.xiaomi_gateway3.core.converters.mibeacon import MiBeacon
 
 columns = [
-    "Brand", "Name", "Model", "Default entities", "Optional entities", "S"
+    "Brand", "Name", "Model", "Entities", "S"
 ]
 header = ["---"] * len(columns)
 
@@ -16,12 +16,10 @@ for device in DEVICES:
         continue
 
     for k, v in device.items():
-        if not isinstance(v, list) or k in ("required", "optional", "config"):
+        if not isinstance(v, list) or k in ("spec", "config"):
             continue
 
-        brand, name, model = v
-
-        optional = device.get("optional", [])
+        brand, name, model = v if len(v) == 3 else v + [k]
 
         if isinstance(k, str):
             if "gateway" in k:
@@ -30,7 +28,7 @@ for device in DEVICES:
                 type = "Xiaomi Zigbee"
             else:
                 type = "Other Zigbee"
-        elif BLEStats in optional:
+        elif MiBeacon in device["spec"]:
             type = "Xiaomi BLE"
         else:
             type = "Xiaomi Mesh"
@@ -48,22 +46,18 @@ for device in DEVICES:
 
         # skip BLE with unknown spec
         if "default" not in device:
-            req = ", ".join([
-                conv.attr + "*" if conv.lazy else conv.attr
-                for conv in device["required"] if conv.domain
+            spec = ", ".join([
+                conv.attr + "*" if conv.enabled is None else conv.attr
+                for conv in device["spec"] if conv.domain
             ])
         else:
-            req = "*"
-
-        opt = ", ".join([
-            conv.attr for conv in device.get("optional", []) if conv.domain
-        ])
+            spec = "*"
 
         support = str(device.get("support", ""))
 
         model = f'[{model}]({link})'
 
-        items.append([brand, name, model, req, opt, support])
+        items.append([brand, name, model, spec, support])
 
 out = "<!--supported-->\n"
 for k, v in devices.items():

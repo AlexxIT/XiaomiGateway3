@@ -8,7 +8,7 @@ ZNWK = "0x12ab"
 
 def test_plug_heartbeat():
     device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Xiaomi Plug'
+    assert device.info.name == 'Xiaomi Plug CN'
     device.setup_converters(["energy"])
     params = [
         {"res_name": "4.1.85", "value": 1},
@@ -24,7 +24,7 @@ def test_plug_heartbeat():
     ]
     assert device.decode_lumi(params) == {
         'plug': True, 'power': 14.56, 'energy': 357.7, 'resets': 24,
-        'fw_ver': 90
+        'fw_ver': 90, 'chip_temperature': 39
     }
 
 
@@ -54,7 +54,8 @@ def test_sensor_ht_heartbeat():
     ])
     assert p == {
         'battery': 51, "battery_voltage": 2955, 'resets': 11651,
-        'temperature': 23.84, 'humidity': 45.09, 'parent': "-", 'fw_ver': 0
+        'temperature': 23.84, 'humidity': 45.09, 'parent': "-", 'fw_ver': 0,
+        'battery_original': 59
     }
 
 
@@ -92,63 +93,62 @@ def test_light():
     assert p == {'brightness': 204.0}
 
 
-def test_lock():
+def test_lock_s2_pro():
     device = XDevice(ZIGBEE, 'lumi.lock.acn03', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Door Lock S2 Pro'
+    assert device.info.name == 'Aqara Door Lock S2 Pro CN'
     device.setup_converters()
 
     p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 64},
-        {"res_name": "13.26.85", "value": 1},
-        {"res_name": "13.28.85", "value": 2}
-    ])
-    assert p == {
-        'action': 'lock', 'door': False, 'lock_state': 'door_close',
-        'tongue_state': 64
-    }
-
-    p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 64},
-        {"res_name": "13.25.85", "value": 1},
-        {"res_name": "13.28.85", "value": 2}
-    ])
-    assert p == {
-        'action': 'lock', 'lock_control': 'out_unlocked',
-        'lock_state': 'door_close', 'tongue_state': 64
-    }
-
-    p = device.decode_lumi([
-        {"res_name": "13.16.85", "value": 1},
-        {"res_name": "13.26.85", "value": 0},
-        {"res_name": "13.28.85", "value": 1}
-    ])
-    assert p == {
-        'action': 'lock', 'door': True, 'lock_state': 'door_open',
-        'tongue_state': 1
-    }
-
-    p = device.decode_lumi([
         {"res_name": "13.16.85", "value": 81},
-        {"res_name": "13.26.85", "value": 1},
+        {"res_name": "3.1.85", "value": 0},
         {"res_name": "13.28.85", "value": 3}
     ])
     assert p == {
-        'action': 'lock', 'door': False, 'lock_state': 'lock_close',
-        'tongue_state': 81
+        'lock': True, 'square': True, 'reverse': False, 'latch': True,
+        'action': 'lock', 'lock_state': 'door_locked'
     }
 
     p = device.decode_lumi([
-        {"res_name": "13.1.85", "value": 65537},
-        {"res_name": "13.15.85", "value": 1}
+        {"res_name": "13.16.85", "value": 64},
+        {"res_name": "13.25.85", "value": 0},
+        {"res_name": "13.28.85", "value": 2}
     ])
     assert p == {
-        'action': 'lock', 'key_id': 65537, 'open_verified': True
+        'lock': True, 'square': False, 'reverse': False, 'latch': False,
+        'action': 'lock', 'lock_control': 'in_unlocked',
+        'lock_state': 'door_without_lift'
     }
+
+    p = device.decode_lumi([{"res_name": "13.5.85", "value": 512}])
+    assert p == {'action': 'doorbell'}
+
+    p = device.decode_lumi([
+        {"res_name": "13.1.85", "value": 131072},
+        {"res_name": "13.15.85", "value": 2}
+    ])
+    assert p == {'action': 'lock', 'key_id': 131072}
+
+    p = device.decode_lumi([{"res_name": "13.5.85", "value": 4}])
+    assert p == {'action': 'alarm', 'alarm': 'unlocked'}
+
+    p = device.decode_lumi([
+        {"res_name": "13.26.85", "value": 2},
+        {"res_name": "13.28.85", "value": 1}
+    ])
+    assert p == {
+        'action': 'lock', 'door_state': 'ajar', 'lock_state': 'door_opened'
+    }
+
+    p = device.decode_lumi([{"res_name": "13.4.85", "value": 1}])
+    assert p == {'action': 'error', 'error': 'fing_wrong', 'fing_wrong': 1}
+
+    p = device.decode_lumi([{"res_name": "13.3.85", "value": 3}])
+    assert p == {'action': 'error', 'error': 'psw_wrong', 'psw_wrong': 3}
 
 
 def test_climate():
     device = XDevice(ZIGBEE, "lumi.airrtc.tcpecn02", ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Thermostat S2'
+    assert device.info.name == 'Aqara Thermostat S2 CN'
     device.setup_converters()
 
     p = device.decode_lumi([
@@ -189,14 +189,14 @@ def test_climate():
 
 def test_mi_spec():
     device = XDevice(ZIGBEE, 'lumi.sen_ill.mgl01', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Xiaomi Light Sensor'
+    assert device.info.name == 'Xiaomi Light Sensor EU'
     device.setup_converters()
 
     p = device.decode_lumi([{'siid': 3, 'piid': 1, 'value': 3100}])
     assert p == {'battery': 80, 'battery_voltage': 3100}
 
     device = XDevice(ZIGBEE, 'lumi.motion.agl04', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Precision Motion Sensor'
+    assert device.info.name == 'Aqara Precision Motion Sensor EU'
     device.setup_converters()
 
     p = device.decode_lumi([{'siid': 4, 'eiid': 1, 'arguments': []}])
@@ -211,7 +211,7 @@ def test_lumi_encode():
     assert p == {"params": [{'res_name': '4.1.85', 'value': 1}]}
 
     device = XDevice(ZIGBEE, 'lumi.switch.l0agl1', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Relay T1'
+    assert device.info.name == 'Aqara Relay T1 EU (no N)'
     device.setup_converters()
 
     p = device.encode({'switch': True})
@@ -238,7 +238,7 @@ def test_lumi_curtain():
 
 def test_mi_curtain():
     device = XDevice(ZIGBEE, 'lumi.curtain.acn002', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Roller Shade E1'
+    assert device.info.name == 'Aqara Roller Shade E1 CN'
     device.setup_converters()
 
     p = device.decode_lumi([
@@ -255,7 +255,10 @@ def test_mi_curtain():
         {"siid": 3, "piid": 3, "value": 0},
         {"siid": 3, "piid": 4, "value": 48}
     ])
-    assert p == {'battery': 48}
+    assert p == {
+        'battery': 48, 'battery_charging': False, 'battery_low': False,
+        'battery_voltage': 7317
+    }
 
     p = device.decode_lumi([{"siid": 2, "piid": 6, "value": 0}])
     assert p == {'run_state': 'closing'}

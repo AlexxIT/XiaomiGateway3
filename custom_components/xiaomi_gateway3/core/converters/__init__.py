@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -11,6 +12,8 @@ try:
     from xiaomi_gateway3 import DEVICES
 except ModuleNotFoundError:
     pass
+except:
+    logging.getLogger(__name__).exception("Can't load external converters")
 
 
 @dataclass
@@ -18,40 +21,47 @@ class XDeviceInfo:
     manufacturer: str
     model: str
     name: str
-    req_converters: List[Converter]
-    opt_converters: List[Converter]
+    url: str
+    spec: List[Converter]
     config: List[Config]
+
+
+def is_mihome_zigbee(model: str) -> bool:
+    return model.startswith(("lumi.", "ikea."))
 
 
 def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     """Type is used to select the default spec if the model didn't match
     earlier. Should be the latest spec in the list.
     """
-    for spec in DEVICES:
-        if model not in spec and spec.get("default") != type:
+    for desc in DEVICES:
+        if model not in desc and desc.get("default") != type:
             continue
-        info = spec.get(model) or ["Unknown", type.upper(), model]
+        info = desc.get(model) or ["Unknown", type.upper(), None]
+        brand, name, market = info if len(info) == 3 else info + [None]
 
-        if type == GATEWAY:
-            market = f"Wi-Fi {info[2]}"
-        elif type == ZIGBEE:
-            market = f"Zigbee {info[2]}"
-        elif type == BLE:
-            market = f"BLE {info[2]}"
-        elif type == MESH:
-            market = f"Mesh {info[2]}"
+        if type == ZIGBEE and not is_mihome_zigbee(model):
+            url = "https://www.zigbee2mqtt.io/supported-devices/#s=" + market \
+                if market else None
         else:
-            raise RuntimeError
+            url = f"https://home.miot-spec.com/s/{model}"
+
+        if market and type == ZIGBEE:
+            market = f"{type} {market} ({model})"
+        elif market:
+            market = f"{type} {market}"
+        else:
+            market = f"{type} ({model})"
 
         return XDeviceInfo(
-            manufacturer=info[0],
+            manufacturer=brand,
             model=market,
-            name=f"{info[0]} {info[1]}",
-            req_converters=spec["required"],
-            opt_converters=spec.get("optional"),
-            config=spec.get("config"),
+            name=f"{brand} {name}",
+            url=url,
+            spec=desc["spec"],
+            config=desc.get("config"),
         )
-    return None
+    raise RuntimeError
 
 
 def get_zigbee_buttons(model: str) -> Optional[list]:

@@ -3,9 +3,12 @@ http://stanford-clark.com/MQTT/
 """
 import asyncio
 import json
+import logging
 import random
 from asyncio import StreamReader, StreamWriter
 from typing import Optional
+
+_LOGGER = logging.getLogger(__name__)
 
 CONNECT = 1
 CONNACK = 2
@@ -181,14 +184,20 @@ class MiniMQTT:
 
     async def disconnect(self):
         msg = RawMessage.disconnect()
-        self.writer.write(msg)
-        await self.writer.drain()
+        try:
+            self.writer.write(msg)
+            await self.writer.drain()
+        except:
+            _LOGGER.exception("Can't disconnect from gateway")
 
     async def subscribe(self, topic: str):
         self.msg_id += 1
         msg = RawMessage.subscribe(self.msg_id, topic)
-        self.writer.write(msg)
-        await self.writer.drain()
+        try:
+            self.writer.write(msg)
+            await self.writer.drain()
+        except:
+            _LOGGER.exception(f"Can't subscribe to {topic}")
 
     async def publish(self, topic: str, payload, retain=False):
         if self.writer is None:
@@ -201,8 +210,11 @@ class MiniMQTT:
 
         # no response for QoS 0
         msg = RawMessage.publish(topic, payload, retain)
-        self.writer.write(msg)
-        await self.writer.drain()
+        try:
+            self.writer.write(msg)
+            await self.writer.drain()
+        except:
+            _LOGGER.exception(f"Can't publish {payload} to {topic}")
 
     async def read(self) -> Optional[MQTTMessage]:
         raw = await self.reader.read(1)
@@ -238,9 +250,13 @@ class MiniMQTT:
         return msg
 
     async def close(self):
-        if self.writer:
+        if not self.writer:
+            return
+        try:
             self.writer.close()
             await self.writer.wait_closed()
+        except:
+            _LOGGER.exception("Can't close connection")
 
     async def empty_buffer(self):
         for args in self.pub_buffer:

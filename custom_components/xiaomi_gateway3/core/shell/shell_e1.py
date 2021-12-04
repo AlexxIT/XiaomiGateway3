@@ -1,6 +1,9 @@
 import asyncio
+import base64
 
 from .base import TelnetShell
+
+TAR_DATA = "tar -czOC /data mha_master miio storage zigbee devices.txt gatewayInfoJson.info 2>/dev/null | base64"
 
 
 class ShellE1(TelnetShell):
@@ -24,6 +27,10 @@ class ShellE1(TelnetShell):
 
     async def prevent_unpair(self):
         await self.exec("killall mha_master")
+
+    async def tar_data(self):
+        raw = await self.exec(TAR_DATA, as_bytes=True)
+        return base64.b64decode(raw)
 
     async def get_version(self):
         raw1 = await self.exec("agetprop ro.sys.mi_fw_ver")

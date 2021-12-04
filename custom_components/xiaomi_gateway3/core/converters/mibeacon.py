@@ -1,3 +1,4 @@
+import struct
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -230,6 +231,15 @@ class MiBeaconConv(Converter):
             elif data[0] == 3:
                 payload['action'] = 'reset'
 
+        elif eid == 0x4803:
+            payload['battery'] = data[0]
+
+        elif eid == 0x4c01 and len(data) == 4:
+            payload['temperature'] = round(struct.unpack('<f', data)[0], 2)
+
+        elif eid == 0x4c08 and len(data) == 4:
+            payload['humidity'] = round(struct.unpack('<f', data)[0], 2)
+
         elif eid == 0x0006 and len(data) == 5:
             action = int.from_bytes(data[4:], 'little')
             if action >= len(BLE_FINGERPRINT_ACTION):
@@ -309,13 +319,11 @@ class MiBeaconConv(Converter):
 MiBeacon = MiBeaconConv('mibeacon')
 
 BLEAction = Converter("action", "sensor")
-BLEActionLazy = Converter("action", "sensor", lazy=True)
-BLEAction.childs = BLEActionLazy.childs = {
+BLEAction.childs = {
     "action_id", "counter", "error", "key_id", "message", "method", "method_id",
     "score", "state", "timestamp"
 }
 BLEBattery = Converter("battery", "sensor")
-BLEBatteryLazy = Converter("battery", "sensor", lazy=True)
 BLEConductivity = Converter("conductivity", "sensor")
 BLEFormaldehyde = Converter("formaldehyde", "sensor")
 BLEHumidity = Converter("humidity", "sensor")
