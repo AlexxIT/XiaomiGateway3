@@ -836,9 +836,10 @@ DEVICES += [{
         BoolConv("led_reverse", "switch", mi="6.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("wireless_1", "switch", mi="9.p.1", enabled=False),  # uint8
-        BoolConv("wireless_2", "switch", mi="10.p.1", enabled=False),  # uint8
-        BoolConv("wireless_3", "switch", mi="11.p.1", enabled=False),  # uint8
+        # bug in spec, should be uint8, but in fact - string
+        MapConv("wireless_1", "switch", mi="9.p.1", map=H1_WIRELESS),
+        MapConv("wireless_2", "switch", mi="10.p.1", map=H1_WIRELESS),
+        MapConv("wireless_3", "switch", mi="11.p.1", map=H1_WIRELESS),
     ]
 }]
 

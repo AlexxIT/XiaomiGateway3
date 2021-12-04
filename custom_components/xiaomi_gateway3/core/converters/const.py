@@ -59,6 +59,7 @@ POWEROFF_MEMORY = {0: "off", 1: "previous"}
 BATTERY_LOW = {1: False, 2: True}
 SWITCH_MODE = {1: "250 ms", 2: "500 ms", 3: "750 ms", 4: "1 sec"}
 INVERSE = {0: True, 1: False}
+H1_WIRELESS = {"0": False, "1": True}
 
 GATE_COMMANDS = {
     "idle": "Idle",
