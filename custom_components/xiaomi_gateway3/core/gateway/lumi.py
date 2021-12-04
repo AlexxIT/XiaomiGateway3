@@ -80,46 +80,49 @@ class LumiGateway(GatewayBase):
         await self.mqtt.publish('zigbee/recv', payload)
 
     async def lumi_process_lumi(self, data: dict):
-        # heartbeat from power device every 5-10 min, from battery - 55 min
+        # cmd:
+        # - heartbeat - from power device every 5-10 min, from battery - 55 min
+        # - report - new state from device
+        # - read, write - action from Hass, MiHome or Gateway software
+        # - read_rsp, write_rsp - gateway execute command (device may not
+        #   receive it)
+        # - write_ack - response from device (device receive command)
         if data['cmd'] == 'heartbeat':
             data = data['params'][0]
-            pkey = 'res_list'
-        # report - new state from device
-        elif data['cmd'] == 'report':
-            pkey = 'params' if 'params' in data else 'mi_spec'
-        elif data['cmd'] == 'read_rsp':
-            pkey = 'results'
         elif data['cmd'] == 'write_rsp':
-            pkey = 'results'
             # process write response only from Gateway
             if data['did'] != 'lumi.0':
                 return
+        elif data['cmd'] in ("report", "read_rsp"):
+            pass
         else:
-            # rsp - gateway execute command (device may not receive it)
-            # ack - response from device (device receive command)
-            # 'write', 'write_rsp', 'write_ack', 'read_rsp'
             return
 
         did = data['did'] if data['did'] != 'lumi.0' else self.did
 
         # skip without callback and without data
-        if did not in self.devices or pkey not in data:
+        if did not in self.devices:
             return
 
         device: XDevice = self.devices[did]
-        payload = device.decode_lumi(data[pkey])
+        # support multiple spec in one response
+        for k in ("res_list", "params", "results", "mi_spec"):
+            if k not in data:
+                continue
 
-        # set device available on any message except online=False
-        device.available = payload.pop('online', True)
+            payload = device.decode_lumi(data[k])
 
-        if not payload:
-            return
+            # set device available on any message except online=False
+            device.available = payload.pop('online', True)
 
-        device.last_seen = time.time()
-        device.update(payload)
+            if not payload:
+                continue
 
-        # no time in device add command
-        # ts = round(time.time() - data['time'] * 0.001 + self.time_offset, 2) \
-        #     if 'time' in data else '?'
-        # self.debug(f"{device.did} {device.model} <= {payload} [{ts}]")
-        self.debug_device(device, "recv", payload, tag="LUMI")
+            device.last_seen = time.time()
+            device.update(payload)
+
+            # no time in device add command
+            # ts = round(time.time() - data['time'] * 0.001 + self.time_offset, 2) \
+            #     if 'time' in data else '?'
+            # self.debug(f"{device.did} {device.model} <= {payload} [{ts}]")
+            self.debug_device(device, "recv", payload, tag="LUMI")
