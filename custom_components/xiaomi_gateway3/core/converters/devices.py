@@ -501,6 +501,7 @@ DEVICES += [{
                  enabled=False),
         MapConv("battery_low", "binary_sensor", mi="5.p.1", map=BATTERY_LOW,
                 enabled=False),
+        Converter("idle_time", "sensor", mi="6.p.1", enabled=False),
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
