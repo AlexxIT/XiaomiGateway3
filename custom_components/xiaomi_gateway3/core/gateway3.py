@@ -583,6 +583,8 @@ class GatewayEntry(GatewayNetwork):
             try:
                 async for msg in self.mqtt:
                     asyncio.create_task(self.on_message(msg))
+            except Exception as e:
+                self.debug(f"MQTT connection issue: {e}")
             finally:
                 await self.mqtt.disconnect()
                 await self.mqtt.close()

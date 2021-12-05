@@ -184,7 +184,7 @@ class MiniMQTT:
             self.writer.write(msg)
             await self.writer.drain()
         except:
-            _LOGGER.exception("Can't disconnect from gateway")
+            _LOGGER.debug("Can't disconnect from gateway")
 
     async def subscribe(self, topic: str):
         self.msg_id += 1
@@ -193,7 +193,7 @@ class MiniMQTT:
             self.writer.write(msg)
             await self.writer.drain()
         except:
-            _LOGGER.exception(f"Can't subscribe to {topic}")
+            _LOGGER.debug(f"Can't subscribe to {topic}")
 
     async def publish(self, topic: str, payload, retain=False):
         if isinstance(payload, str):
@@ -207,7 +207,7 @@ class MiniMQTT:
             self.writer.write(msg)
             await self.writer.drain()
         except:
-            _LOGGER.exception(f"Can't publish {payload} to {topic}")
+            _LOGGER.debug(f"Can't publish {payload} to {topic}")
 
     async def read(self) -> Optional[MQTTMessage]:
         raw = await self.reader.read(1)
@@ -249,7 +249,7 @@ class MiniMQTT:
             self.writer.close()
             await self.writer.wait_closed()
         except:
-            _LOGGER.exception("Can't close connection")
+            _LOGGER.debug("Can't close connection")
 
     def __aiter__(self):
         return self
@@ -280,6 +280,3 @@ class MiniMQTT:
                 await self.writer.drain()
 
                 wait_pong = True
-
-            except Exception as e:
-                raise e
