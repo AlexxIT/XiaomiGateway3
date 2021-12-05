@@ -66,10 +66,13 @@ Recommended attributes names:
 - outlet - for sockets with only female connector (wall installation)
 - switch - for relays and switches with buttons (wall installation, remotes)
 - led - control device led light
-- smart - change mode from wired to wireless (decoupled)
+- wireless_mode - change mode from wired to wireless (decoupled)
 - power_on_state - default state when electricity is supplied
 - contact - for contact sensor
 - moisture - for water leak sensor
+
+Support level should be set only for confirmed devices. For theoretically
+supported it should be empty. For unsupported it should be less than 3.
 
 Support levels:
 - 5 - The device can do everything it can do
@@ -77,6 +80,7 @@ Support levels:
 - 3 - The device works, but it missing some functionality
 - 2 - The device does not work well, it is not recommended to use
 - 1 - The device does not work at all
+- empty - theoretically supported, unconfirmed
 
 Nice project with MIoT spec description: https://home.miot-spec.com/
 """
@@ -92,7 +96,7 @@ from .zigbee import *
 
 DEVICES = [{
     "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM/ZNDMWG02LM"],
-    "support": 4,  # TODO: cloud link
+    "support": 4,  # @AlexxIT TODO: cloud link
     "spec": [
         # write pair=60 => report discovered_mac => report 8.0.2166? =>
         # write pair_command => report added_device => write pair=0
@@ -125,7 +129,7 @@ DEVICES = [{
     ],
 }, {
     "lumi.gateway.aqcn02": ["Aqara", "Hub E1 CN", "ZHWG16LM"],
-    "support": 3,
+    "support": 3,  # @AlexxIT
     "spec": [
         MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),
 
@@ -158,7 +162,7 @@ DEVICES = [{
 DEVICES += [{
     # don"t work: protect 8.0.2014, power 8.0.2015, plug_detection 8.0.2044
     "lumi.plug": ["Xiaomi", "Plug CN", "ZNCZ02LM"],  # tested
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [
         PlugN0, Power, Energy, ChipTemp,
         MapConv("power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY,
@@ -213,7 +217,7 @@ DEVICES += [{
     ],
 }, {
     "lumi.relay.c2acn01": ["Aqara", "Relay CN", "LLKZMK11LM"],  # tested
-    "support": 4,  # TODO: test load_s0 8.0.2034 load_s1 8.0.2035
+    "support": 4,  # @AlexxIT TODO: test load_s0 8.0.2034 load_s1 8.0.2035
     "spec": [
         ChannelC1, ChannelC2, Current, Power, Voltage, Energy,
         Action, Button1, Button2, ButtonBoth, ChipTemp,
@@ -348,7 +352,7 @@ DEVICES += [{
 }, {
     # vibration sensor
     "lumi.vibration.aq1": ["Aqara", "Vibration Sensor", "DJT11LM"],
-    "support": 2,  # TODO: need some tests
+    "support": 3,  # @AlexxIT TODO: need some tests
     "spec": [
         Action, Battery,
         Converter("bed_activity", mi="0.1.85"),
@@ -361,7 +365,7 @@ DEVICES += [{
     # cube action, no retain
     "lumi.sensor_cube.aqgl01": ["Aqara", "Cube EU", "MFKZQ01LM"],  # tested
     "lumi.sensor_cube": ["Aqara", "Cube", "MFKZQ01LM"],
-    "support": 3,  # TODO: need some tests
+    "support": 3,  # @AlexxIT TODO: need some tests
     "spec": [
         ZAqaraCubeMain("action", "sensor"),
         # ZAqaraCubeRotate("angle"),
@@ -379,7 +383,7 @@ DEVICES += [{
     ],
 }, {
     "lumi.sensor_natgas": ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
-    "support": 4,  # TODO: selftest?
+    "support": 4,  # @AlexxIT TODO: selftest?
     "spec": [
         Converter("gas_density", "sensor", mi="0.1.85"),
         BoolConv("gas", "binary_sensor", mi="13.1.85"),
@@ -468,14 +472,14 @@ DEVICES += [{
 # Xiaomi Zigbee MIoT spec
 DEVICES += [{
     "lumi.sen_ill.mgl01": ["Xiaomi", "Light Sensor EU", "GZCGQ01LM"],
-    "support": 5,
+    # "support": 5,  # @AlexxIT bug with gw fw 1.5.1
     "spec": [
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
     ],
 }, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         MapConv("contact", "binary_sensor", mi="2.p.1", map=INVERSE),
         BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
@@ -486,7 +490,7 @@ DEVICES += [{
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:motion-sensor:0000A014:lumi-agl04:1:0000C813
     # for spec names Fibaro has good example: https://manuals.fibaro.com/motion-sensor/
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
-    "support": 5,
+    # "support": 5,  # @zvldz
     "spec": [
         ConstConv("motion", "binary_sensor", mi="4.e.1", value=True),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
@@ -497,11 +501,12 @@ DEVICES += [{
                  enabled=False),
         MapConv("battery_low", "binary_sensor", mi="5.p.1", map=BATTERY_LOW,
                 enabled=False),
+        Converter("idle_time", "sensor", mi="6.p.1", enabled=False),
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
     "lumi.airmonitor.acn01": ["Aqara", "Air Quality Monitor CN", "VOCKQJK11LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("temperature", "sensor", mi="3.p.1"),  # celsius
         Converter("humidity", "sensor", mi="3.p.2"),  # percentage
@@ -515,7 +520,7 @@ DEVICES += [{
     ],
 }, {
     "lumi.curtain.acn002": ["Aqara", "Roller Shade E1 CN", "ZNJLBL01LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         MapConv("motor", "cover", mi="2.p.2", map={
             0: "stop", 1: "close", 2: "open"
@@ -565,7 +570,7 @@ DEVICES += [{
 DEVICES += [{
     # https://www.aqara.com/en/single_switch_T1_no-neutral.html
     "lumi.switch.l0agl1": ["Aqara", "Relay T1 EU (no N)", "SSM-U02"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         Converter("chip_temperature", "sensor", mi="2.p.6", enabled=False),
@@ -574,7 +579,7 @@ DEVICES += [{
     # https://www.aqara.com/en/single_switch_T1_with-neutral.html
     "lumi.switch.n0agl1": ["Aqara", "Relay T1 EU (with N)", "SSM-U01"],
     "lumi.switch.n0acn2": ["Aqara", "Relay T1 CN (with N)", "DLKZMK11LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
@@ -586,7 +591,7 @@ DEVICES += [{
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
     "lumi.plug.maeu01": ["Aqara", "Plug EU", "SP-EUC01"],  # no spec
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("plug", "switch", mi="2.p.1"),
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
@@ -597,7 +602,7 @@ DEVICES += [{
     ],
 }, {
     "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1 (no N)", "QBKG38LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         ButtonMIConv("button", mi="6.e.1", value=1),
@@ -606,12 +611,12 @@ DEVICES += [{
         BoolConv("led", "switch", mi="3.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="6.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="6.p.1", enabled=False),
         MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE, enabled=False)
     ],
 }, {
     "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1 (no N)", "QBKG39LM"],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -621,8 +626,8 @@ DEVICES += [{
         ButtonMIConv("button_2", mi="8.e.2", value=2),
         ButtonMIConv("button_both", mi="9.e.1", value=4),
         Action,
-        BoolConv("smart_1", "switch", mi="7.p.1", enabled=False),
-        BoolConv("smart_2", "switch", mi="8.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="7.p.1", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.1", enabled=False),
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
@@ -633,23 +638,24 @@ DEVICES += [{
     "lumi.switch.b1nc01": [
         "Aqara", "Single Wall Switch E1 (with N)", "QBKG40LM"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         ButtonMIConv("button", mi="7.e.1", value=1),
         ButtonMIConv("button", mi="7.e.2", value=2),
         Action,
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="4.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="7.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="7.p.1", enabled=False),
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2nc01:1
     "lumi.switch.b2nc01": [
         "Aqara", "Double Wall Switch E1 (with N)", "QBKG41LM"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -660,16 +666,19 @@ DEVICES += [{
         ButtonMIConv("button_both", mi="10.e.1", value=4),
         Action,
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="5.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),
     ],
 }, {
     # required switch firmware 0.0.0_0030
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1
-    "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US", "WS-USC04"],
-    "support": 5,
+    "lumi.switch.b2naus01": [
+        "Aqara", "Double Wall Switch US (with N)", "WS-USC04"
+    ],
+    # "support": 5,
     "spec": [
         Channel1_MI21, Channel2_MI31, Action,
         MathConv("energy", "sensor", mi="4.p.1", multiply=0.001, round=2),
@@ -682,8 +691,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l1acn1:1
@@ -693,7 +702,7 @@ DEVICES += [{
     "lumi.switch.l1aeu1": [
         "Aqara", "Single Wall Switch H1 EU (no N)", "WS-EUK01"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         ButtonMIConv("button", mi="6.e.1", value=1),  # single
@@ -702,7 +711,7 @@ DEVICES += [{
         BoolConv("led", "switch", mi="3.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="6.p.1", enabled=False),  # uint8
+        BoolConv("wireless", "switch", mi="6.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l2acn1:1
@@ -712,7 +721,7 @@ DEVICES += [{
     "lumi.switch.l2aeu1": [
         "Aqara", "Double Wall Switch H1 EU (no N)", "WS-EUK02"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -725,8 +734,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="7.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="7.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="8.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n1acn1:1
@@ -736,7 +745,7 @@ DEVICES += [{
     "lumi.switch.n1aeu1": [
         "Aqara", "Single Wall Switch H1 EU (with N)", "WS-EUK03"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
@@ -745,19 +754,20 @@ DEVICES += [{
         ButtonMIConv("button", mi="7.e.2", value=2),  # double
         Action,
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="4.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart", "switch", mi="7.p.1", enabled=False),  # uint8
+        BoolConv("wireless", "switch", mi="7.p.1", enabled=False),  # uint8
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n2acn1:1
     "lumi.switch.n2acn1": [
-        "Aqara", "Double Wall Switch H1 CN (no N)", "QBKG31LM"
+        "Aqara", "Double Wall Switch H1 CN (with N)", "QBKG31LM"
     ],
     "lumi.switch.n2aeu1": [
-        "Aqara", "Double Wall Switch H1 EU (no N)", "WS-EUK04"
+        "Aqara", "Double Wall Switch H1 EU (with N)", "WS-EUK04"
     ],
-    "support": 5,
+    # "support": 5,
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -770,19 +780,67 @@ DEVICES += [{
         ButtonMIConv("button_both", mi="10.e.1", value=4),
         Action,
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="5.p.2", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        BoolConv("smart_1", "switch", mi="8.p.1", enabled=False),  # uint8
-        BoolConv("smart_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
     ],
 }, {
-    "_unknown1": [
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-l3acn1:1
+    "lumi.switch.l3acn1": [
         "Aqara", "Triple Wall Switch H1 CN (no N)", "QBKG29LM"
     ],
-    "_unknown2": [
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="8.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_3", mi="10.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="10.e.2", value=2),  # double
+        ButtonMIConv("button_both_12", mi="11.e.1", value=4),
+        ButtonMIConv("button_both_13", mi="12.e.1", value=4),
+        ButtonMIConv("button_both_23", mi="13.e.1", value=4),
+        Action,
+        BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="6.p.1", map=POWEROFF_MEMORY,
+                enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.1", enabled=False),  # uint8
+        BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),  # uint8
+        BoolConv("wireless_3", "switch", mi="10.p.1", enabled=False),  # uint8
+    ]
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-n3acn1:1
+    "lumi.switch.n3acn1": [
         "Aqara", "Triple Wall Switch H1 CN (with N)", "QBKG32LM"
     ],
-    "support": 1
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        MathConv("energy", "sensor", mi="5.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="5.p.2", round=2),
+        ButtonMIConv("button_1", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="10.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="10.e.2", value=2),  # double
+        ButtonMIConv("button_3", mi="11.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="11.e.2", value=2),  # double
+        ButtonMIConv("button_both_12", mi="12.e.1", value=4),
+        ButtonMIConv("button_both_13", mi="13.e.1", value=4),
+        ButtonMIConv("button_both_23", mi="14.e.1", value=4),
+        Action,
+        BoolConv("led", "switch", mi="6.p.1", enabled=False),  # uint8
+        BoolConv("led_reverse", "switch", mi="6.p.2", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY,
+                enabled=False),
+        MapConv("wireless_1", "switch", mi="9.p.1", map=INVERSE),
+        MapConv("wireless_2", "switch", mi="10.p.1", map=INVERSE),
+        MapConv("wireless_3", "switch", mi="11.p.1", map=INVERSE),
+    ]
 }]
 
 ################################################################################
@@ -792,7 +850,7 @@ DEVICES += [{
 DEVICES += [{
     # only one attribute with should_poll
     "TS0121": ["BlitzWolf", "Plug", "BW-SHP13"],
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [
         ZOnOffConv("plug", "switch"),
         ZCurrent, ZPower, ZVoltagePoll,  # once per 60 seconds
@@ -801,7 +859,7 @@ DEVICES += [{
     ],
 }, {
     "TS0115": ["UseeLink", "Power Strip", "SM-SO306E"],
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [
         ZOnOffConv("channel_1", "switch", ep=1),
         ZOnOffConv("channel_2", "switch", ep=2),
@@ -813,19 +871,28 @@ DEVICES += [{
 }, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
-    "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [ZSwitch]
 }, {
     # very simple relays with binding
     "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0011"],
+    "TS0011": ["Tuya", "Switch", "TS0011"],
     "support": 5,
     "spec": [ZSwitch],
     "config": [ZBindOnOff]
 }, {
+    "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
+    "spec": [
+        ZOnOffConv("switch", "switch", ep=11),
+    ],
+    "config": [
+        ZBindConf(ZOnOffConv, ep=11),
+        ZReportConf(ZOnOffConv, ep=11, mint=0, maxt=HOUR, change=0),
+    ]
+}, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [
         ZSonoffButtonConv("action", "sensor"),
         ZBatteryConv("battery", "sensor"),
@@ -833,7 +900,7 @@ DEVICES += [{
     "config": [ZBindOnOff]
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
-    "support": 5,
+    "support": 5,  # @AlexxIT
     "spec": [
         ZIASZoneConv("occupancy", "binary_sensor"),
         ZBatteryConv("battery", "sensor"),
@@ -862,7 +929,7 @@ DEVICES += [{
     ],
 }, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
-    "support": 4,  # TODO: sensitivity, led
+    "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
         ZOccupancyConv("occupancy", "binary_sensor", ep=2),
         ZIlluminanceConv("illuminance", "sensor", ep=2),
@@ -915,7 +982,7 @@ DEVICES += [{
     "TRADFRI bulb E27 W opal 1000lm": [
         "IKEA", "Bulb E27 1000 lm", "LED1623G12"
     ],
-    "support": 3,  # TODO: tests, effect?
+    "support": 3,  # @AlexxIT TODO: tests, effect?
     "spec": [
         ZOnOffConv("light", "light"),
         ZBrightnessConv("brightness", parent="light"),
@@ -1057,7 +1124,7 @@ DEVICES += [{
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],  # flex
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],  # flex
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],  # flex
-    "support": 4,  # TODO: power_on_state values
+    "support": 4,  # @AlexxIT TODO: power_on_state values
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
@@ -1068,7 +1135,7 @@ DEVICES += [{
 }, {
     # brightness 1..65535, color_temp 2700..6500
     1054: ["Xiaomi", "Mesh Group", "yeelink.light.mb1grp"],
-    "support": 4,  # TODO: check if support flex and power on
+    "support": 4,  # @AlexxIT TODO: check if support flex and power on
     "spec": [
         Converter("group", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=65535),
@@ -1112,26 +1179,26 @@ DEVICES += [{
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("smart", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless", "switch", mi="8.p.2", enabled=False),
     ],
 }, {
     # Mesh Switches
     1946: ["Xiaomi", "Mesh Double Wall Switch", "DHKG02ZM"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         Converter("led", "switch", mi="10.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="2.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
     ],
 }, {
     2257: ["PTX", "Mesh Double Wall Switch", "PTX-SK2M"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="8.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="8.p.3", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
     ],
 }, {
     # https://www.ixbt.com/live/chome/umnaya-rozetka-xiaomi-zncz01zm-s-energomonitoringom-i-bluetooth-mesh-integraciya-v-home-assistant.html
@@ -1148,13 +1215,13 @@ DEVICES += [{
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("middle_switch", "switch", mi="3.p.1"),
-        Converter("right_switch", "switch", mi="4.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
         BoolConv("led", "switch", mi="8.p.1", enabled=False),
-        BoolConv("left_smart", "switch", mi="8.p.2", enabled=False),
-        BoolConv("middle_smart", "switch", mi="8.p.3", enabled=False),
-        BoolConv("right_smart", "switch", mi="8.p.4", enabled=False),
+        BoolConv("wireless_1", "switch", mi="8.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
+        BoolConv("wireless_3", "switch", mi="8.p.4", enabled=False),
     ],
 }, {
     2715: ["Xiaomi", "Mesh Single Wall Switch", "ZNKG01HL"],
@@ -1166,27 +1233,27 @@ DEVICES += [{
 }, {
     2716: ["Xiaomi", "Mesh Double Wall Switch", "ZNKG02HL"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("right_switch", "switch", mi="3.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
     ]
 }, {
     2717: ["Xiaomi", "Mesh Triple Wall Switch", "ZNKG03HL/ISA-KG03HL"],
     "spec": [
-        Converter("left_switch", "switch", mi="2.p.1"),
-        Converter("middle_switch", "switch", mi="3.p.1"),
-        Converter("right_switch", "switch", mi="4.p.1"),
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
-        BoolConv("left_smart", "switch", mi="2.p.2", enabled=False),
-        BoolConv("middle_smart", "switch", mi="3.p.2", enabled=False),
-        BoolConv("right_smart", "switch", mi="4.p.2", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
     ],
 }, {
     4160: ["Xiaomi", "Mosquito Repeller 2", "WX10ZM"],
-    "support": 5,
+    # "support": 5,  # @AlexxIT need some tests
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),  # bool
         Converter("battery", "sensor", mi="3.p.1"),  # percentage 0-100
