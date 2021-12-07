@@ -477,6 +477,11 @@ DEVICES += [{
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
     ],
+    # new gw firmwares has a bug - don't bind power cluster
+    "config": [
+        ZBindConf(ZBatteryConv),
+        ZReportConf(ZBatteryVoltConv, mint=HOUR, maxt=HOUR12, change=0),
+    ]
 }, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
     # "support": 5,
