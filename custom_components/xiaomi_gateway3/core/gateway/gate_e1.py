@@ -61,16 +61,26 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
     async def e1_timer(self, ts: float):
         if ts < self.e1_ts:
             return
-        await self.e1_update_serial_stats()
+        await self.e1_update_stats()
         self.e1_ts = ts + 300  # 5 min
 
-    async def e1_update_serial_stats(self):
+    async def e1_update_stats(self):
         sh: shell.ShellE1 = await shell.connect(self.host)
         if not sh:
             return
         try:
             serial = await sh.read_file('/proc/tty/driver/ms_uart | grep -v ^0 | sort -r')
-            payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
+            free_mem = await sh.read_file('/proc/meminfo | grep MemFree: | awk \'{print $2}\'');
+            load_avg = await sh.read_file('/proc/loadavg | sed \'s/ /|/g\'')
+            run_time = await sh.read_file('/proc/uptime | cut -f1 -d.')
+            rssi = await sh.read_file('/proc/net/wireless | grep wlan0 | awk \'{print $4}\' | cut -f1 -d.')
+            payload = self.device.decode(GATEWAY, {
+                "serial": serial.decode(),
+                "free_mem": int(free_mem),
+                "load_avg": load_avg.decode(),
+                "run_time": int(run_time),
+                "rssi": int(rssi) + 100
+            })
             self.device.update(payload)
         finally:
             await sh.close()
