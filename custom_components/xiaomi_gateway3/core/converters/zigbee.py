@@ -209,6 +209,15 @@ class ZBatteryConv(ZConverter):
         payload.setdefault("commands", []).extend(cmd)
 
 
+# useful for reporting description
+class ZBatteryVoltConv(ZBatteryConv):
+    zattr = "battery_voltage"
+
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        if isinstance(value.get("battery_voltage"), int):
+            payload[self.zattr] = value[self.zattr] * 100
+
+
 ################################################################################
 # Specific defices converters
 ################################################################################
