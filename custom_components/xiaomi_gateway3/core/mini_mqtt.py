@@ -182,7 +182,7 @@ class MiniMQTT:
         msg = RawMessage.disconnect()
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
             _LOGGER.debug("Can't disconnect from gateway")
 
@@ -191,7 +191,7 @@ class MiniMQTT:
         msg = RawMessage.subscribe(self.msg_id, topic)
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
             _LOGGER.debug(f"Can't subscribe to {topic}")
 
@@ -205,7 +205,7 @@ class MiniMQTT:
         msg = RawMessage.publish(topic, payload, retain)
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
             _LOGGER.debug(f"Can't publish {payload} to {topic}")
 
@@ -247,7 +247,7 @@ class MiniMQTT:
             return
         try:
             self.writer.close()
-            await self.writer.wait_closed()
+            await asyncio.wait_for(self.writer.wait_closed(), self.timeout)
         except:
             _LOGGER.debug("Can't close connection")
 
@@ -277,6 +277,6 @@ class MiniMQTT:
                     raise StopAsyncIteration
 
                 self.writer.write(RawMessage.ping())
-                await self.writer.drain()
+                await asyncio.wait_for(self.writer.drain(), self.timeout)
 
                 wait_pong = True
