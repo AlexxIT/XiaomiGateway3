@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from .base import Config, Converter, LUMI_GLOBALS
+from .base import Converter, LUMI_GLOBALS
 from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL, UNKNOWN
 from .devices import DEVICES
 
@@ -23,7 +23,6 @@ class XDeviceInfo:
     name: str
     url: str
     spec: List[Converter]
-    config: List[Config]
 
 
 def is_mihome_zigbee(model: str) -> bool:
@@ -59,7 +58,6 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
             name=f"{brand} {name}",
             url=url,
             spec=desc["spec"],
-            config=desc.get("config"),
         )
     raise RuntimeError
 

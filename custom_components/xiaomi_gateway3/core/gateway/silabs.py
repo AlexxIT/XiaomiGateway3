@@ -132,14 +132,15 @@ class SilabsGateway(GatewayBase):
 
     async def silabs_config(self, device: XDevice):
         """Run some config converters if device spec has them. Binds, etc."""
-        if not device.info.config:
+        config = device.zigbee_config()
+        if not config:
             return
 
-        self.debug_device(device, "config", device.info.config)
+        self.debug_device(device, "config", config)
 
         payload = {}
-        for config in device.info.config:
-            config.encode(device, payload, self)
+        for conv in config:
+            conv.config(device, payload, self)
         await self.mqtt.publish(f"gw/{self.ieee}/commands", payload)
 
     async def silabs_send_fake_version(self, device: XDevice, data: dict):

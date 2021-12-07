@@ -104,6 +104,9 @@ class XDevice:
             return False
         return any(True for conv in self.converters if conv.zigbee)
 
+    def zigbee_config(self) -> list:
+        return [conv for conv in self.converters if hasattr(conv, "config")]
+
     def update_model(self, value: str):
         # xiaomi soft adds tail to some models: .v1 or .v2 or .v3
         self.model = value[:-3] if value[-3:-1] == ".v" else value

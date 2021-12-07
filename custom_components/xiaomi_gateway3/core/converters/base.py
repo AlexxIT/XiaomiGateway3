@@ -8,14 +8,6 @@ if TYPE_CHECKING:
     from ..device import XDevice
 
 
-class Config:
-    def encode(self, device: "XDevice", payload: dict, gateway):
-        pass
-
-    def __repr__(self):
-        return self.__class__.__name__
-
-
 ################################################################################
 # Base (global) converters
 ################################################################################

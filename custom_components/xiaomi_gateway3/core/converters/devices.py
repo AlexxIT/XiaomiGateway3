@@ -4,13 +4,11 @@ Each device has a specification:
     {
         "<model>": ["<brand>", "<name>", "<market model>"],
         "spec": [<list of converters>],
-        "config": [<optional configs>],
         "support": <from 1 to 5>
     }
 
 - model - `lumi.xxx` for Zigbee devices, number (pdid) for BLE and Mesh devices
 - spec - list of converters
-- config - optional actions on first join (useful for 3rd party zigbee)
 - support - optional score of support from 5 to 1
 
 Each converter has:
@@ -476,12 +474,9 @@ DEVICES += [{
     "spec": [
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
+        # new gw firmwares has a bug - don't bind power cluster
+        ZBatteryVoltConv("battery", bind=True, report=True),
     ],
-    # new gw firmwares has a bug - don't bind power cluster
-    "config": [
-        ZBindConf(ZBatteryConv),
-        ZReportConf(ZBatteryVoltConv, mint=HOUR, maxt=HOUR12, change=0),
-    ]
 }, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
     # "support": 5,
@@ -884,25 +879,19 @@ DEVICES += [{
     "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0011"],
     "TS0011": ["Tuya", "Switch", "TS0011"],
     "support": 5,
-    "spec": [ZSwitch],
-    "config": [ZBindOnOff]
+    "spec": [ZOnOffConv("switch", "switch", bind=True)],
 }, {
     "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "spec": [
-        ZOnOffConv("switch", "switch", ep=11),
-    ],
-    "config": [
-        ZBindConf(ZOnOffConv, ep=11),
-        ZReportConf(ZOnOffConv, ep=11, mint=0, maxt=HOUR, change=0),
+        ZOnOffConv("switch", "switch", ep=11, bind=True, report=True),
     ]
 }, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
     "support": 5,  # @AlexxIT
     "spec": [
-        ZSonoffButtonConv("action", "sensor"),
+        ZSonoffButtonConv("action", "sensor", bind=True),
         ZBatteryConv("battery", "sensor"),
     ],
-    "config": [ZBindOnOff]
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
     "support": 5,  # @AlexxIT
@@ -913,16 +902,11 @@ DEVICES += [{
 }, {
     "TH01": ["Sonoff", "TH Sensor", "SNZB-02"],
     "spec": [
-        ZTemperatureConv("temperature", "sensor"),
-        ZHumidityConv("humidity", "sensor"),
-        ZBatteryConv("battery", "sensor"),
-    ],
-    "config": [
         # temperature, humidity and battery binds by default
         # report config for battery_voltage also by default
-        ZReportConf(ZTemperatureConv, mint=10, maxt=HOUR, change=100),
-        ZReportConf(ZHumidityConv, mint=10, maxt=HOUR, change=100),
-        ZReportConf(ZBatteryConv, mint=HOUR, maxt=HOUR12, change=0),
+        ZTemperatureConv("temperature", "sensor", report=True),
+        ZHumidityConv("humidity", "sensor", report=True),
+        ZBatteryConv("battery", "sensor", report=True),
     ],
 }, {
     # wrong zigbee model, some devices have model TH01 (ewelink bug)
@@ -936,24 +920,15 @@ DEVICES += [{
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
-        ZOccupancyConv("occupancy", "binary_sensor", ep=2),
-        ZIlluminanceConv("illuminance", "sensor", ep=2),
-        ZTemperatureConv("temperature", "sensor", ep=2),
-        ZBatteryConv("battery", "sensor", ep=2),
+        ZOccupancyConv("occupancy", "binary_sensor", ep=2, bind=True,
+                       report=True),
+        ZIlluminanceConv("illuminance", "sensor", ep=2, bind=True, report=True),
+        ZTemperatureConv("temperature", "sensor", ep=2, bind=True, report=True),
+        ZBatteryConv("battery", "sensor", ep=2, bind=True, report=True),
         ZOccupancyTimeoutConv(
             "occupancy_timeout", "number", ep=2, enabled=False
         ),
     ],
-    "config": [
-        ZBindConf(ZOccupancyConv, ep=2),
-        ZBindConf(ZIlluminanceConv, ep=2),
-        ZBindConf(ZTemperatureConv, ep=2),
-        ZBindConf(ZBatteryConv, ep=2),
-        ZReportConf(ZOccupancyConv, mint=0, maxt=HOUR, change=0, ep=2),
-        ZReportConf(ZIlluminanceConv, mint=10, maxt=HOUR, change=5, ep=2),
-        ZReportConf(ZTemperatureConv, mint=10, maxt=HOUR, change=100, ep=2),
-        ZReportConf(ZBatteryConv, mint=HOUR, maxt=HOUR12, change=0, ep=2),
-    ]
 }, {
     "LWB010": ["Philips", "Hue white 806 lm", "9290011370B"],
     "support": 2,  # TODO: state change, effect?
@@ -973,15 +948,10 @@ DEVICES += [{
     "RWL021": ["Philips", "Hue dimmer switch", "324131137411"],
     "support": 2,  # TODO: multiple clicks, tests
     "spec": [
-        ZHueDimmerOnConv("action", "sensor"),
-        ZHueDimmerLevelConv("action"),
-    ],
-    "config": [
-        ZBindConf(ZHueDimmerOnConv),
-        ZBindConf(ZHueDimmerLevelConv),
+        ZHueDimmerOnConv("action", "sensor", bind=True),
+        ZHueDimmerLevelConv("action", bind=True),
         # ZBindConf("power", 64512, ep=2),
-        ZHueConf(),
-    ]
+    ],
 }, {
     "FNB56-ZSC01LX1.2": ["Unknown", "Dimmer", "LXZ8-02A"],
     "TRADFRI bulb E27 W opal 1000lm": [
@@ -996,19 +966,17 @@ DEVICES += [{
     "TRADFRI remote control": ["IKEA", "TRADFRI remote control", "E1524/E1810"],
     "support": 1,
     "spec": [
-        IKEARemoteConv1("action", "sensor"),
+        IKEARemoteConv1("action", "sensor", bind=True),
         IKEARemoteConv2("action"),
     ],
-    "config": [ZBindOnOff]
 }, {
     "default": "zigbee",  # default zigbee device
     "spec": [
-        ZOnOffConv("switch", "switch", ep=1, enabled=None),
+        ZOnOffConv("switch", "switch", ep=1, enabled=None, bind=True),
         ZOnOffConv("channel_2", "switch", ep=2, enabled=None),
         ZOnOffConv("channel_3", "switch", ep=3, enabled=None),
         ZOnOffConv("channel_4", "switch", ep=4, enabled=None),
     ],
-    "config": [ZBindOnOff]
 }]
 
 ################################################################################
