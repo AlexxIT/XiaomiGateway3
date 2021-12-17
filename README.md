@@ -46,6 +46,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [Disable Buzzer](#disable-buzzer)
 - [Advanced commands](#advanced-commands)
 - [How it works](#how-it-works)
+- [Troubleshouting](#troubleshooting)
 - [Debug mode](#debug-mode)
 - [Useful links](#userful-links)
 
@@ -570,6 +571,27 @@ The component starts the **MQTT Server** on the public port of the Gateway. All 
 **ATTENTION:** Telnet and MQTT work without a password! Do not use this method on public networks.
 
 After rebooting the device, all changes will be reset. The component will launch Telnet and public MQTT every time it detects that they are disabled.
+
+# Troubleshooting
+
+### Can't connect to gateway
+
+- Check [Requirements](#requirements) readme section
+- Check if the Gateway really has the IP-address you set in the configuration
+- Check if the Gateway really use the MiHome token you set in the configuration. When you add a hub to MiHome - its token changes. The integration only updates tokens when Hass starts. And only if there are no problems with connection to the cloud servers. If there are problems, the old (wrong) token value will be shown.
+
+### Lost connection with Zigbee and Bluetooth devices
+
+- Check [Requirements](#requirements) readme section, gateway and Wi-Fi router settings must be fully matched to all items in the section
+- Turn on stat sesors (Configuration > Integrations > Gateway 3 > Configure > Add statisic sensors)
+- Check that the connection to the Gateway is not dropped for weeks (`_gateway` sensor value means connection uptime)
+- Check that the zigbee error rate is not increasing at a high rate (`zigbee_oe` attribute in `_gateway` sensor, normal rate: 1-2 errors per hour)
+- Check that CPU utilisation is within normal values (`load_avg` attribute in `_gateway` sensor (first 3 items), normal value: below 3)
+- Check that message skip rate for your zigbee device are not high (`msg_missed` attribute in `_zigbee` sensor)
+- Check that your zigbee device is connected via a router, the most stable operation when your devices are connected directly to the gateway (`parent` attribute in `_zigbee` sensor)
+- Make sure there are no other electronic devices within 0.5 meter from your Gateway
+- Check the distance between the Gateway and the device, greater distances and barriers - the less stable the operation
+- Check the gateway zigbee TX power, you can try to increase it if you need (`radio_tx_power` attribute in `_gateway` sensor)
 
 # Debug mode
 
