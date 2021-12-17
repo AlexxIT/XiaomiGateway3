@@ -149,8 +149,8 @@ class SyncMiIO(BasemiIO):
 
             except socket.timeout:
                 _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
-            except:
-                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]}", exc_info=e)
 
             # init ping again
             self.delta_ts = None
