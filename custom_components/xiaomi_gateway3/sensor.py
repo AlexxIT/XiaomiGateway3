@@ -342,7 +342,7 @@ class XiaomiAction(XiaomiEntity):
         return 'mdi:bell'
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return self._action_attrs or self._attrs
 
     async def async_update(self, data: dict = None):

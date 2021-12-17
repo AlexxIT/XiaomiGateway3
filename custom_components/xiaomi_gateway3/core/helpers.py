@@ -189,7 +189,7 @@ class XiaomiEntity(Entity):
                                  self._ignore_offline)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return self._attrs
 
     @property
