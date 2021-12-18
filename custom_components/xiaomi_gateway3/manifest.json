@@ -7,6 +7,6 @@
   "codeowners": ["@AlexxIT"],
   "dependencies": ["http"],
   "requirements": [],
-  "version": "1.6.4",
+  "version": "1.6.5",
   "iot_class": "local_push"
 }
