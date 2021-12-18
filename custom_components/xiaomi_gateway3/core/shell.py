@@ -52,17 +52,17 @@ def sed(app: str, pattern: str, repl: str):
 # grep output to cloud and send it to MQTT, use awk because buffer
 PATCH_MIIO_MQTT = sed(
     "miio", "^ +miio_client .+$",
-    "pkill -f log/miio; miio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
+    "pkill -f log/miio\nmiio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 )
 # use patched silabs_ncp_bt from sourceforge and send stderr to MQTT
 PATCH_BLETOOTH_MQTT = sed(
     "miio", "^ +silabs_ncp_bt .+$",
-    "pkill -f log/ble; /data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
+    "pkill -f log/ble\n/data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
 )
 
 PATCH_ZIGBEE_PARENTS = sed(
     "app", "^ +(Lumi_Z3GatewayHost_MQTT [^>]+).+$",
-    "pkill -f log/z3; \\1-l 0 | mosquitto_pub -t log/z3 -l &"
+    "pkill -f log/z3\n\\1-l 0 | mosquitto_pub -t log/z3 -l &"
 )
 
 # replace default Z3 to ser2net
