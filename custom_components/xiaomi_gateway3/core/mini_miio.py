@@ -5,7 +5,6 @@ import logging
 import random
 import socket
 import time
-import traceback
 from asyncio import DatagramProtocol, Future
 from asyncio.protocols import BaseProtocol
 from asyncio.transports import DatagramTransport
@@ -310,8 +309,8 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             except asyncio.TimeoutError:
                 # _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
                 pass
-            except:
-                _LOGGER.debug(f"{self.addr[0]} | {traceback.format_exc(1)}")
+            except Exception as e:
+                _LOGGER.debug(f"{self.addr[0]} | {method}", exc_info=e)
             finally:
                 sock.close()
 
