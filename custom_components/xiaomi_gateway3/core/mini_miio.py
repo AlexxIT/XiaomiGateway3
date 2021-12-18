@@ -224,7 +224,12 @@ class AsyncSocket(DatagramProtocol):
         self.transport.sendto(data)
 
     def close(self):
-        self.transport.close()
+        if not self.transport:
+            return
+        try:
+            self.transport.close()
+        except:
+            _LOGGER.exception("Error when closing async socket")
 
     async def connect(self, addr: tuple):
         coro = asyncio.get_event_loop().create_datagram_endpoint(
