@@ -311,8 +311,8 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
 
                 return data
 
-            except asyncio.TimeoutError:
-                # _LOGGER.debug(f"{self.addr[0]} | timeout {times}")
+            except (asyncio.TimeoutError, OSError):
+                # OSError: [Errno 101] Network unreachable
                 pass
             except Exception as e:
                 _LOGGER.debug(f"{self.addr[0]} | {method}", exc_info=e)
