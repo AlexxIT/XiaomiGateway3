@@ -1,4 +1,5 @@
 import asyncio
+import itertools
 import json
 import logging
 import re
@@ -554,10 +555,10 @@ class GatewayEntry(GatewayNetwork):
                 device['gateways'].remove(self)
 
     async def run_forever(self):
-        self.debug("Start main loop")
-
         """Main thread loop."""
-        while True:
+        for step in itertools.count():
+            self.debug(f"Main loop step {step}")
+
             # if not telnet - enable it
             if not await self.check_port(23) and \
                     not await self.enable_telnet():
