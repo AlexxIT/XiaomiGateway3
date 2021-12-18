@@ -228,9 +228,13 @@ class AsyncSocket(DatagramProtocol):
         self.transport.close()
 
     async def connect(self, addr: tuple):
-        await asyncio.get_event_loop().create_datagram_endpoint(
+        coro = asyncio.get_event_loop().create_datagram_endpoint(
             lambda: self, remote_addr=addr
         )
+        if self.timeout:
+            await asyncio.wait_for(coro, self.timeout)
+        else:
+            await coro
 
     async def recv(self, *args):
         self.response = asyncio.get_event_loop().create_future()
