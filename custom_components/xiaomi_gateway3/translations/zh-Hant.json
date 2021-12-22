@@ -53,8 +53,8 @@
           "entities": "Additional entities",
           "debug": "Debug",
           "buzzer": "關閉蜂鳴器 [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "memory": "使用記憶體空間 [ADV]",
+          "zha": "ZHA 或 zigbee2mqtt 模式 [ADV]"
         },
         "description": "僅於了解可能之風險後，才建議變更 **ADV** 選項"
       }
