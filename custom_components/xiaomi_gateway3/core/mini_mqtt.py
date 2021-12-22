@@ -186,18 +186,18 @@ class MiniMQTT:
         msg = RawMessage.disconnect()
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
-            _LOGGER.exception("Can't disconnect from gateway")
+            _LOGGER.debug("Can't disconnect from gateway")
 
     async def subscribe(self, topic: str):
         self.msg_id += 1
         msg = RawMessage.subscribe(self.msg_id, topic)
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
-            _LOGGER.exception(f"Can't subscribe to {topic}")
+            _LOGGER.debug(f"Can't subscribe to {topic}")
 
     async def publish(self, topic: str, payload, retain=False):
         if self.writer is None:
@@ -212,9 +212,9 @@ class MiniMQTT:
         msg = RawMessage.publish(topic, payload, retain)
         try:
             self.writer.write(msg)
-            await self.writer.drain()
+            await asyncio.wait_for(self.writer.drain(), self.timeout)
         except:
-            _LOGGER.exception(f"Can't publish {payload} to {topic}")
+            _LOGGER.debug(f"Can't publish {payload} to {topic}")
 
     async def read(self) -> Optional[MQTTMessage]:
         raw = await self.reader.read(1)
@@ -254,9 +254,9 @@ class MiniMQTT:
             return
         try:
             self.writer.close()
-            await self.writer.wait_closed()
+            await asyncio.wait_for(self.writer.wait_closed(), self.timeout)
         except:
-            _LOGGER.exception("Can't close connection")
+            _LOGGER.debug("Can't close connection")
 
     async def empty_buffer(self):
         for args in self.pub_buffer:
@@ -290,9 +290,6 @@ class MiniMQTT:
                     raise StopAsyncIteration
 
                 self.writer.write(RawMessage.ping())
-                await self.writer.drain()
+                await asyncio.wait_for(self.writer.drain(), self.timeout)
 
                 wait_pong = True
-
-            except Exception as e:
-                raise e
