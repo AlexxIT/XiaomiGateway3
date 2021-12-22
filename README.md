@@ -4,11 +4,15 @@
 [![Donate](https://img.shields.io/badge/donate-BuyMeCoffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
 [![Donate](https://img.shields.io/badge/donate-YooMoney-8C3FFD.svg)](https://yoomoney.ru/to/41001428278477)
 
-Control Zigbee devices from Home Assistant with **Xiaomi Gateway 3 (ZNDMWG03LM and ZNDMWG02LM)** on original firmware.
-
-Gateway support **Zigbee 3**, **Bluetooth Mesh** and **HomeKit**.
-
-This method does not change the device firmware. Gateway continues to work with Mi Home and HomeKit.
+Gateway | Xiaomi Mijia Smart<br>Multi-Mode Gateway | Aqara Hub E1 | Aqara Camera Hub G3
+---|---|---|---
+China model | **ZNDMWG03LM**<br>![](https://via.placeholder.com/10/00ff00/000000?text=+) supported | **ZHWG16LM**<br>![](https://via.placeholder.com/10/ffff00/000000?text=+) in development | **ZNSXJ13LM**<br>![](https://via.placeholder.com/10/ffff00/000000?text=+) in plans (waiting)
+Euro model | **ZNDMWG02LM**<br>![](https://via.placeholder.com/10/00ff00/000000?text=+) supported | **HE1-G01**<br>![](https://via.placeholder.com/10/ff0000/000000?text=+) can't be supported | **CH-H03**<br>![](https://via.placeholder.com/10/ffff00/000000?text=+) don't know yet
+Mi Home | **yes** | **yes** | **no**
+Aqara Home | **no** | **no** | **yes**
+Xiaomi/Aqara Zigbee | **yes** | **yes** |
+Xiaomi Bluetooth BLE | **yes** | **no** |
+Xiaomi Bluetooth Mesh | **yes** | **no** |
 
 **Real [user](https://github.com/to4ko/myconfig) config with 3 Gateways**
 
