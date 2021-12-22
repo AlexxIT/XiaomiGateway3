@@ -1,3 +1,4 @@
+import homeassistant.util.dt as dt_util
 import re
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
@@ -30,10 +31,6 @@ ZIGBEE_CLUSTERS = {
     0x0B04: 'ElectrMeasur',
     0xFCC0: 'Xiaomi'
 }
-
-
-def now():
-    return datetime.now()
 
 
 class GatewayStatsConverter(Converter):
@@ -112,7 +109,7 @@ class ZigbeeStatsConverter(Converter):
                 pass
 
             payload.update({
-                ZIGBEE: now().isoformat(timespec='seconds'),
+                ZIGBEE: dt_util.now(),
                 'ieee': value['eui64'],
                 'nwk': value['sourceAddress'],
                 'msg_received': device.extra['msg_received'],
@@ -125,7 +122,7 @@ class ZigbeeStatsConverter(Converter):
         if 'ago' in value:
             ago = timedelta(seconds=value['ago'])
             payload.update({
-                ZIGBEE: (now() - ago).isoformat(timespec='seconds'),
+                ZIGBEE: (dt_util.now() - ago),
                 'type': value['type'],
                 'parent': '0xABCD',
             })
@@ -149,7 +146,7 @@ class BLEStatsConv(Converter):
             device.extra['msg_received'] = 1
 
         payload.update({
-            BLE: now().isoformat(timespec='seconds'),
+            BLE: dt_util.now(),
             'mac': device.mac,
             'msg_received': device.extra['msg_received'],
         })
