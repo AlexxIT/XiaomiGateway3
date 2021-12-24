@@ -25,13 +25,6 @@ class LumiGateway(GatewayBase):
         self.dispatcher_connect(SIGNAL_MQTT_CON, self.lumi_mqtt_connect)
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.lumi_mqtt_publish)
 
-    @property
-    def zigbee_devices(self) -> List[XDevice]:
-        return [
-            device for device in self.devices.values()
-            if device.type == ZIGBEE and self in device.gateways
-        ]
-
     async def lumi_read_devices(self, sh: shell.TelnetShell):
         # 2. Read zigbee devices
         raw = await sh.read_file('/data/zigbee/device.info')
@@ -58,7 +51,7 @@ class LumiGateway(GatewayBase):
 
     async def lumi_mqtt_connect(self):
         payload = {"params": [{"res_name": "8.0.2102"}]}
-        for device in self.zigbee_devices:
+        for device in self.filter_devices("zigbee"):
             await self.lumi_read(device, payload)
 
     async def lumi_mqtt_publish(self, msg: MQTTMessage):

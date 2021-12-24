@@ -104,8 +104,18 @@ class XDevice:
             return False
         return any(True for conv in self.converters if conv.zigbee)
 
-    def zigbee_config(self) -> list:
-        return [conv for conv in self.converters if hasattr(conv, "config")]
+    def has_support(self, feature: str) -> bool:
+        if feature == "zigbee":
+            return self.type == ZIGBEE
+
+        if feature == "bind_from":
+            conv = self.converters[0]
+            return conv.zigbee == "on_off" and conv.domain == "sensor" and \
+                   getattr(conv, "bind", False)
+
+        if feature == "bind_to":
+            conv = self.converters[0]
+            return self.type == ZIGBEE and conv.domain in ("switch", "light")
 
     def update_model(self, value: str):
         # xiaomi soft adds tail to some models: .v1 or .v2 or .v3

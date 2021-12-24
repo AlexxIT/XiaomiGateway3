@@ -64,7 +64,7 @@ GATE_COMMANDS = {
     "idle": "Idle",
     "pair": "Zigbee Pair",
     "remove": "Zigbee Remove",
-    # "bind": "Zigbee Bind",
+    "bind": "Zigbee Bind",
     "ota": "Zigbee OTA",
     "config": "Zigbee Config",
     "miio": "MiIO Command",

@@ -91,6 +91,7 @@ class DataSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_options = None
     command = None
+    bind_from = None
 
     def set_current(self, value):
         # force update dropdown in GUI
@@ -104,19 +105,26 @@ class DataSelect(XEntity, SelectEntity):
         self._attr_current_option = value
         self.async_write_ha_state()
 
+    def set_devices(self, feature: str):
+        devices = [
+            f"{d.mac}: {d.info.name}"
+            for d in self.gw.filter_devices(feature)
+        ]
+        self._attr_current_option = None
+        self._attr_options = devices
+        self.async_write_ha_state()
+
     def process_command(self, data: json):
         self.command = data[self.attr]
         if self.command == "pair":
             self.set_current("Ready to join")
 
         elif self.command in ("remove", "config", "ota"):
-            devices = [
-                f"{d.mac}: {d.info.name}"
-                for d in self.gw.zigbee_devices
-            ]
-            self._attr_current_option = None
-            self._attr_options = devices
-            self.async_write_ha_state()
+            self.set_devices("zigbee")
+
+        elif self.command == "bind":
+            self.bind_from = None
+            self.set_devices("bind_from")
 
         elif self.command == "lock":
             self._attr_current_option = FIRMWARE_LOCK.get(data["lock"])
@@ -192,6 +200,19 @@ class DataSelect(XEntity, SelectEntity):
             device = self.gw.devices.get(did)
             resp = await utils.run_zigbee_ota(self.hass, self.gw, device)
             self.set_current(resp)
+
+        elif self.command == "bind":
+            if self.bind_from is None:
+                self.bind_from = "lumi." + option[:18].lstrip("0x")
+                self.set_devices("bind_to")
+            else:
+                bind_to = "lumi." + option[:18].lstrip("0x")
+                await self.gw.silabs_bind(
+                    self.gw.devices.get(self.bind_from),
+                    self.gw.devices.get(bind_to),
+                )
+                self.set_current("Bind command sent")
+                self.device.update({"command": "idle"})
 
         elif self.command == "lock":
             lock = next(k for k, v in FIRMWARE_LOCK.items() if v == option)

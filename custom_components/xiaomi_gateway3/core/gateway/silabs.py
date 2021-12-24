@@ -166,6 +166,12 @@ class SilabsGateway(GatewayBase):
         }
         await self.mqtt.publish(f"gw/{self.ieee}/devicejoined", payload)
 
+    async def silabs_bind(self, bind_from: XDevice, bind_to: XDevice):
+        cmd = silabs.zdo_bind(
+            bind_from.nwk, 1, "on_off", bind_from.mac[2:], bind_to.mac[2:]
+        )
+        await self.mqtt.publish(f"gw/{self.ieee}/commands", {"commands": cmd})
+
 
 def parse_version(value: str) -> int:
     """Support version `0.0.0_0017`."""

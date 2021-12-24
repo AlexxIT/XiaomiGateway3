@@ -125,3 +125,9 @@ class GatewayBase:
             device, f"setup {device.info.model}:",
             ", ".join(device.entities.keys())
         )
+
+    def filter_devices(self, feature: str) -> List[XDevice]:
+        return [
+            device for device in self.devices.values()
+            if self in device.gateways and device.has_support(feature)
+        ]
