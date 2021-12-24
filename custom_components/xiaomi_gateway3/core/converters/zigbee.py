@@ -426,6 +426,17 @@ class IKEARemoteConv2(ZConverter):
             payload["button"] = self.map.get(value["command_id"])
 
 
+class ZAqaraOppleMode(ZConverter):
+    zigbee = 0xFCC0
+    zattr = 9
+    map = {0: "binding", 1: "multiclick"}
+
+    def encode(self, device: "XDevice", payload: dict, value: Any):
+        value = next(k for k, v in self.map.items() if v == value)
+        cmd = zcl_write(device.nwk, 1, self.zigbee, self.zattr, 0x20, value)
+        payload.setdefault("commands", []).extend(cmd)
+
+
 ################################################################################
 # Final converter classes
 ################################################################################

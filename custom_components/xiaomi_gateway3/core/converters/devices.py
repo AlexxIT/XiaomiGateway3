@@ -295,13 +295,18 @@ DEVICES += [{
     "lumi.sensor_86sw2": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn01": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.remote.b286acn02": ["Aqara", "Double Wall Button D1", "WXKG07LM"],
-    # TODO: check opple chip temp
+    "spec": [
+        Action, Button1, Button2, ButtonBoth, Battery, BatteryLow, BatteryOrig,
+        ChipTemp
+    ],
+}, {
     "lumi.remote.b286opcn01": ["Aqara", "Opple Two Button", "WXCJKG11LM"],
     "lumi.remote.b486opcn01": ["Aqara", "Opple Four Button", "WXCJKG12LM"],
     "lumi.remote.b686opcn01": ["Aqara", "Opple Six Button", "WXCJKG13LM"],
     "spec": [
         Action, Button1, Button2, Button3, Button4, Button5, Button6,
-        ButtonBoth, Battery, BatteryLow, BatteryOrig, ChipTemp
+        ButtonBoth, Battery, BatteryLow, BatteryOrig, ChipTemp,
+        ZAqaraOppleMode("mode", "switch"),
     ],
 }, {
     # temperature and humidity sensor

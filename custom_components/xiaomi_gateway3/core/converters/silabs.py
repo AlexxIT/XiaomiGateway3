@@ -299,8 +299,11 @@ def zcl_write(
         type: int = None
 ) -> list:
     """Generate Silabs Z3 write attribute command."""
-    cluster = get_cluster(cluster)
-    cid = cluster.cluster_id
+    if isinstance(cluster, str):
+        cluster = get_cluster(cluster)
+        cid = cluster.cluster_id
+    else:
+        cid = cluster
 
     if isinstance(attr, str):
         attr, type = get_attr_type(cluster.attributes, attr)
