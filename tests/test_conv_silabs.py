@@ -30,6 +30,19 @@ def test_cli():
     ]
 
 
+def test_aqara_cube():
+    device = XDevice(ZIGBEE, "lumi.sensor_cube", ZDID, ZMAC, ZNWK)
+    assert device.info.name == "Aqara Cube"
+    device.setup_converters()
+
+    p = silabs.decode({
+        "clusterId": "0x0012", "sourceEndpoint": "0x02",
+        "APSPlayload": "0x18140A5500215900"
+    })
+    p = device.decode_zigbee(p)
+    assert p == {'action': 'flip90', 'from_side': 3, 'to_side': 1}
+
+
 def test_():
     device = XDevice(ZIGBEE, "MS01", ZDID, ZMAC, ZNWK)
     assert device.info.name == "Sonoff Motion Sensor"

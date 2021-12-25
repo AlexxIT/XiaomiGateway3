@@ -284,17 +284,17 @@ class ZAqaraCubeMain(Converter):
             payload["action"] = "wakeup"
         elif value == 3:
             payload["action"] = "fall"
-        elif value >= 512:
-            payload.update({"action": "tap", "side": value - 512})
-        elif value >= 256:
-            payload.update({"action": "slide", "side": value - 256})
-        elif value >= 128:
-            payload.update({"action": "flip180", "side": value - 128})
-        elif value >= 64:
+        elif value & 0x200:
+            payload.update({"action": "tap", "side": value & 0b111})
+        elif value & 0x100:
+            payload.update({"action": "slide", "side": value & 0b111})
+        elif value & 0x80:
+            payload.update({"action": "flip180", "side": value & 0b111})
+        elif value & 0x40:
             payload.update({
                 "action": "flip90",
-                "from_side": math.floor((value - 64) / 8),
-                "to_side": value % 8,
+                "from_side": (value >> 3) & 0b111,
+                "to_side": value & 0b111,
             })
 
 
