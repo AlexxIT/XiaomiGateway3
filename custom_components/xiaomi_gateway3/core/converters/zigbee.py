@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING, Optional, Union
+from typing import Any, TYPE_CHECKING, Optional
 
 import zigpy.device
 import zigpy.quirks
@@ -263,7 +263,9 @@ class ZTuyaPowerOnConv(ZConverter):
 
     def encode(self, device: "XDevice", payload: dict, value: str):
         v = next(k for k, v in self.map.items() if v == value)
-        cmd = zcl_write(device.nwk, self.ep, self.zigbee, self.attr, v, 0x30)
+        cmd = zcl_write(
+            device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30
+        )
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -393,11 +395,11 @@ class ZHueLed(Converter):
             payload[self.attr] = bool(value[51])
 
     def encode(self, device: "XDevice", payload: dict, value: bool):
-        cmd = zcl_write(device.nwk, 2, 0, 51, 0x10, int(value))
+        cmd = zcl_write(device.nwk, 2, self.zigbee, 51, int(value), type=0x10)
         payload.setdefault("commands", []).extend(cmd)
 
     def read(self, device: "XDevice", payload: dict):
-        cmd = zcl_read(device.nwk, 2, 0, 51)
+        cmd = zcl_read(device.nwk, 2, self.zigbee, 51)
         payload.setdefault("commands", []).extend(cmd)
 
 
