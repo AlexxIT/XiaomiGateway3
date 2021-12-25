@@ -137,6 +137,8 @@ class DataSelect(XEntity, SelectEntity):
         elif self.command == "other":
             self._attr_current_option = None
             self._attr_options = OTHERS
+            if hasattr(self.gw, "z3_run_parent_scan"):
+                self._attr_options += ["parentscan"]
             self.async_write_ha_state()
 
         elif self.command == "idle":
@@ -234,4 +236,6 @@ class DataSelect(XEntity, SelectEntity):
         elif self.command == "other":
             if option in ("reboot", "ftp", "dump"):
                 await self.gw.telnet_send(option)
-                self.device.update({"command": "idle"})
+            elif option == "parentscan":
+                await self.gw.z3_run_parent_scan()
+            self.device.update({"command": "idle"})
