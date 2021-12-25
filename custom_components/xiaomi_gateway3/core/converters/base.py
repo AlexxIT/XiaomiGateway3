@@ -386,7 +386,7 @@ Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
 BatteryLow = BoolConv(
     "battery_low", "binary_sensor", mi="8.0.9001", enabled=False
 )
-BatteryOrig = Converter("battery_original", mi="8.0.2001")
+BatteryOrig = Converter("battery_original", mi="8.0.2001", enabled=False)
 
 # zigbee3 devices
 
