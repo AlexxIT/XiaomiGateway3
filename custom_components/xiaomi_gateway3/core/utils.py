@@ -36,10 +36,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @callback
-def remove_device(hass: HomeAssistant, did: str):
+def remove_device(hass: HomeAssistant, mac: str):
     """Remove device by did from Hass"""
-    assert did.startswith("lumi.")
-    mac = f"0x{did[5:]:>016s}"
     registry: DeviceRegistry = hass.data['device_registry']
     device = registry.async_get_device({(DOMAIN, mac)}, None)
     if device:

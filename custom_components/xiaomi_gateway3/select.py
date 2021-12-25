@@ -176,7 +176,8 @@ class DataSelect(XEntity, SelectEntity):
 
         elif "remove_did" in data:
             did = data['remove_did']
-            utils.remove_device(self.hass, did)
+            device = self.gw.devices.get(did)
+            utils.remove_device(self.hass, device.mac)
             self.set_current(f"Removed: {did[5:]}")
             self.device.update({"command": None})
 
@@ -189,12 +190,18 @@ class DataSelect(XEntity, SelectEntity):
             raise RuntimeWarning
 
         elif self.command == "remove":
-            did = "lumi." + option[:18].lstrip("0x")
-            device = self.gw.devices.get(did)
-            if device.model:
-                await self.device_send({"remove_did": did})
+            mac = option.split(":")[0]
+            if mac.startswith("0x"):
+                did = "lumi." + mac.lstrip("0x")
+                device = self.gw.devices.get(did)
+                if device.model:
+                    await self.device_send({"remove_did": did})
+                else:
+                    await self.gw.silabs_leave(device)
             else:
-                await self.gw.silabs_leave(device)
+                device = self.gw.devices.get(mac)
+                utils.remove_device(self.hass, device.mac)
+            self.device.update({"command": None})
 
         elif self.command == "config":
             did = "lumi." + option[:18].lstrip("0x")
