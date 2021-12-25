@@ -19,7 +19,6 @@ from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
 from .converters.stats import STAT_GLOBALS
-from .converters.zigbee import ZAqaraOppleMode
 from .utils import DOMAIN
 
 if TYPE_CHECKING:
@@ -113,10 +112,15 @@ class XDevice:
         if feature == "zigbee":
             return self.type == ZIGBEE
 
+        if not self.model:
+            return False
+
         if feature == "bind_from":
-            conv = self.converters[0]
-            if isinstance(conv, ZAqaraOppleMode):
+            # Aqara Opple support binding from
+            if self.type == ZIGBEE and self.model.endswith("86opcn01"):
                 return True
+
+            conv = self.converters[0]
             return conv.zigbee == "on_off" and conv.domain == "sensor" and \
                    getattr(conv, "bind", False)
 
