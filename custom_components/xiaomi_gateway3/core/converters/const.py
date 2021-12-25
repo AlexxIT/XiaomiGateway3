@@ -60,14 +60,29 @@ BATTERY_LOW = {1: False, 2: True}
 SWITCH_MODE = {1: "250 ms", 2: "500 ms", 3: "750 ms", 4: "1 sec"}
 INVERSE = {0: True, 1: False}
 
-GATE_COMMANDS = {
+GW3_COMMANDS = {
     "idle": "Idle",
     "pair": "Zigbee Pair",
-    "remove": "Zigbee Remove",
     "bind": "Zigbee Bind",
     "ota": "Zigbee OTA",
     "config": "Zigbee Config",
+    "remove": "Zigbee and BLE Remove",
+    "parentscan": "Zigbee Table Update",
     "miio": "MiIO Command",
-    "other": "Other Commands",
+    "lock": "Firmware Lock",
+    "reboot": "Gateway Reboot",
+    "ftp": "Gateway Enable FTP",
+    "dump": "Gateway Dump Data",
 }
-GW3_COMMANDS = {**GATE_COMMANDS, "lock": "Firmware Lock"}
+E1_COMMANDS = {
+    "idle": "Idle",
+    "pair": "Zigbee Pair",
+    "bind": "Zigbee Bind",
+    "ota": "Zigbee OTA",
+    "config": "Zigbee Config",
+    "remove": "Zigbee Remove",
+    "miio": "MiIO Command",
+    "reboot": "Gateway Reboot",
+    "ftp": "Gateway Enable FTP",
+    "dump": "Gateway Dump Data",
+}

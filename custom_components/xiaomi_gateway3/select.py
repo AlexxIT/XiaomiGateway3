@@ -61,13 +61,9 @@ FIRMWARE_LOCK = {
     True: "enabled"
 }
 
-OTHERS = ["reboot", "ftp", "dump"]
-
 
 # noinspection PyAbstractClass
 class CommandSelect(XiaomiSelectBase):
-    _attr_current_option = "Idle"
-
     async def async_select_option(self, option: str):
         self._attr_current_option = option
         self.async_write_ha_state()
@@ -82,6 +78,10 @@ class CommandSelect(XiaomiSelectBase):
             lock = await self.gw.gw3_read_lock()
             self.device.update({"data": command, "lock": lock})
             return
+        elif command in ("reboot", "ftp", "dump"):
+            await self.gw.telnet_send(command)
+        elif command == "parentscan":
+            await self.gw.z3_run_parent_scan()
 
         self.device.update({"data": command})
 
@@ -119,7 +119,10 @@ class DataSelect(XEntity, SelectEntity):
         if self.command == "pair":
             self.set_current("Ready to join")
 
-        elif self.command in ("remove", "config", "ota"):
+        elif self.command == "remove":
+            self.set_devices("zigbee+ble")
+
+        elif self.command in ("config", "ota"):
             self.set_devices("zigbee")
 
         elif self.command == "bind":
@@ -134,15 +137,12 @@ class DataSelect(XEntity, SelectEntity):
         elif self.command == "miio":
             self.set_current("Use select_option service")
 
-        elif self.command == "other":
-            self._attr_current_option = None
-            self._attr_options = OTHERS
-            if hasattr(self.gw, "z3_run_parent_scan"):
-                self._attr_options += ["parentscan"]
-            self.async_write_ha_state()
-
         elif self.command == "idle":
             self.set_current(None)
+
+        elif self.command in ("reboot", "ftp", "dump", "parentscan"):
+            # ping-pong
+            self.device.update({"command": None})
 
     @callback
     def async_set_state(self, data: dict):
@@ -156,7 +156,7 @@ class DataSelect(XEntity, SelectEntity):
             if data["pair"]:
                 self.set_current("Ready to join")
             else:
-                self.device.update({"command": "idle"})
+                self.device.update({"command": None})
 
         elif "discovered_mac" in data:
             mac = data["discovered_mac"]
@@ -172,13 +172,13 @@ class DataSelect(XEntity, SelectEntity):
         elif "added_device" in data:
             data = data["added_device"]
             self.set_current(f"Paired: {data['mac']} ({data['model']})")
-            self.device.update({"command": "idle"})
+            self.device.update({"command": None})
 
         elif "remove_did" in data:
             did = data['remove_did']
             utils.remove_device(self.hass, did)
             self.set_current(f"Removed: {did[5:]}")
-            self.device.update({"command": "idle"})
+            self.device.update({"command": None})
 
         elif "ota_progress" in data:
             percent = data["ota_progress"]
@@ -226,7 +226,7 @@ class DataSelect(XEntity, SelectEntity):
                 elif option == "unbind":
                     await self.gw.silabs_unbind(**self.kwargs)
                     self.set_current("Unbind command sent")
-                self.device.update({"command": "idle"})
+                self.device.update({"command": None})
 
         elif self.command == "lock":
             lock = next(k for k, v in FIRMWARE_LOCK.items() if v == option)
@@ -234,16 +234,9 @@ class DataSelect(XEntity, SelectEntity):
                 self.set_current("Lock enabled" if lock else "Lock disabled")
             else:
                 self.set_current("Can't change lock")
-            self.device.update({"command": "idle"})
+            self.device.update({"command": None})
 
         elif self.command == "miio":
             raw = json.loads(option)
             resp = await self.gw.miio.send(raw['method'], raw.get('params'))
             persistent_notification.async_create(self.hass, str(resp), TITLE)
-
-        elif self.command == "other":
-            if option in ("reboot", "ftp", "dump"):
-                await self.gw.telnet_send(option)
-            elif option == "parentscan":
-                await self.gw.z3_run_parent_scan()
-            self.device.update({"command": "idle"})

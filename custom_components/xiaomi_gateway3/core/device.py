@@ -112,6 +112,9 @@ class XDevice:
         if feature == "zigbee":
             return self.type == ZIGBEE
 
+        if feature == "zigbee+ble":
+            return self.type in (ZIGBEE, BLE)
+
         if not self.model:
             return False
 
