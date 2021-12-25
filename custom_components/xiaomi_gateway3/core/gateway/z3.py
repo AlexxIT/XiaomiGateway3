@@ -4,7 +4,7 @@ import time
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, \
     SIGNAL_MQTT_PUB
 from .. import shell
-from ..device import ZIGBEE
+from ..device import ZIGBEE, XDevice
 from ..mini_mqtt import MQTTMessage
 
 
@@ -76,7 +76,7 @@ class Z3Gateway(GatewayBase):
         try:
             raw = self.z3_buffer["plugin device-table print"]
             dt = re.findall(
-                r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}\w+ (\d+)', raw
+                r'\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}(\w+) (\d+)', raw
             )
 
             raw = self.z3_buffer["plugin stack-diagnostics child-table"]
@@ -92,14 +92,17 @@ class Z3Gateway(GatewayBase):
 
             self.debug(f"Total zigbee devices: {len(dt)}")
 
-            for i in dt:
-                ieee = '0x' + i[1]
-                nwk = i[0]  # FFFF
-                ago = int(i[2])
+            # nwk: FFFF, ieee: FFFFFFFFFFFFFFFF, ago: int
+            # state: JOINED, LEAVE_SENT (32)
+            for nwk, ieee, state, ago in dt:
+                if state == "LEAVE_SENT":
+                    continue
 
-                if i[1] in ct:
+                ago = int(ago)
+
+                if ieee in ct:
                     type_ = 'device'
-                elif i[1] in rt:
+                elif ieee in rt:
                     type_ = 'router'
                 elif nwk in pt:
                     type_ = 'device'
@@ -111,7 +114,7 @@ class Z3Gateway(GatewayBase):
                         parent = '0x' + pt[nwk][0].lower()
                     else:
                         parent = '-'
-                elif i[1] in ct:
+                elif ieee in ct:
                     parent = '-'
                 else:
                     parent = '?'
@@ -119,7 +122,7 @@ class Z3Gateway(GatewayBase):
                 nwk = '0x' + nwk.lower()  # 0xffff
 
                 payload = {
-                    'eui64': ieee,
+                    'eui64': '0x' + ieee,
                     'nwk': nwk,
                     'ago': ago,
                     'type': type_,
