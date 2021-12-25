@@ -293,16 +293,16 @@ DEVICES += [{
     # multi button action, no retain
     "lumi.sensor_86sw2.es1": ["Aqara", "Double Wall Button", "WXKG02LM"],
     "lumi.sensor_86sw2": ["Aqara", "Double Wall Button", "WXKG02LM"],
-    "lumi.remote.b286acn01": ["Aqara", "Double Wall Button", "WXKG02LM"],
-    "lumi.remote.b286acn02": ["Aqara", "Double Wall Button D1", "WXKG07LM"],
+    "lumi.remote.b286acn01": ["Aqara", "Double Wall Button CN", "WXKG02LM"],
+    "lumi.remote.b286acn02": ["Aqara", "Double Wall Button D1 CN", "WXKG07LM"],
     "spec": [
         Action, Button1, Button2, ButtonBoth, Battery, BatteryLow, BatteryOrig,
         ChipTemp
     ],
 }, {
-    "lumi.remote.b286opcn01": ["Aqara", "Opple Two Button", "WXCJKG11LM"],
-    "lumi.remote.b486opcn01": ["Aqara", "Opple Four Button", "WXCJKG12LM"],
-    "lumi.remote.b686opcn01": ["Aqara", "Opple Six Button", "WXCJKG13LM"],
+    "lumi.remote.b286opcn01": ["Aqara", "Opple Two Button CN", "WXCJKG11LM"],
+    "lumi.remote.b486opcn01": ["Aqara", "Opple Four Button CN", "WXCJKG12LM"],
+    "lumi.remote.b686opcn01": ["Aqara", "Opple Six Button CN", "WXCJKG13LM"],
     "spec": [
         ZAqaraOppleMode("mode", "select", enabled=False),
         Action, Button1, Button2, Button3, Button4, Button5, Button6,
