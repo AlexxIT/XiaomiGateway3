@@ -57,13 +57,12 @@ class SilabsGateway(GatewayBase):
         device: XDevice = self.devices.get(did)
         if not device:
             # we need to save device to know its NWK in future
-            self.devices[did] = device = XDevice(
-                ZIGBEE, UNKNOWN, did, mac, nwk
-            )
+            device = XDevice(ZIGBEE, None, did, mac, nwk)
+            self.add_device(did, device)
             self.debug_device(device, "new unknown device", tag="SLBS")
             return
 
-        if device.model == UNKNOWN:
+        if not device.model:
             # Sonoff Mini has a bug: it hasn't app_ver, so gw can't add it
             if data["clusterId"] == "0x0000":
                 if not zb_msg:
@@ -101,11 +100,11 @@ class SilabsGateway(GatewayBase):
             await self.silabs_prevent_unpair()
 
         device = self.devices.get(data["did"])
-        if device.model == UNKNOWN:
+        if not device.model:
             self.debug_device(device, "paired", data)
             device.update_model(data["model"])
             device.extra["fw_ver"] = parse_version(data["version"])
-            self.add_device(device)
+            self.add_device(device.did, device)
         else:
             self.debug_device(device, "model exist on pairing")
 

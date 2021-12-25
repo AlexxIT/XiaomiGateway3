@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from .base import Converter, LUMI_GLOBALS
-from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL, UNKNOWN
+from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
 from .devices import DEVICES
 
 try:

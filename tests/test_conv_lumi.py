@@ -6,6 +6,11 @@ ZMAC = "0x0000112233aabbcc"
 ZNWK = "0x12ab"
 
 
+def test_empty_model():
+    device = XDevice(ZIGBEE, None, ZDID, ZMAC, ZNWK)
+    assert device.name == "Unknown"
+
+
 def test_plug_heartbeat():
     device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
     assert device.info.name == 'Xiaomi Plug CN'

@@ -129,7 +129,10 @@ class Z3Gateway(GatewayBase):
                 did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
                 device = self.devices.get(did)
                 if not device:
-                    self.debug(f"Unknown zigbee device {ieee}: {payload}")
+                    mac = payload['eui64'].lower()
+                    device = XDevice(ZIGBEE, None, did, mac, nwk)
+                    self.add_device(did, device)
+                    self.debug_device(device, "new unknown device", tag=" Z3 ")
                     continue
 
                 if ZIGBEE not in device.entities:

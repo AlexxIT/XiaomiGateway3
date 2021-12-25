@@ -108,12 +108,16 @@ class GatewayBase:
             _, domain = domain.rsplit(".", 1)
         self.setups[domain] = handler
 
-    def add_device(self, device: XDevice):
-        # don't setup if device already added to this gateway
-        if self in device.gateways:
-            return
+    def add_device(self, did: str, device: XDevice):
+        if did not in self.devices:
+            self.devices[did] = device
 
-        device.gateways.append(self)
+        if self not in device.gateways:
+            device.gateways.append(self)
+
+        # don't setup device with unknown model
+        if not device.model:
+            return
 
         if device.entities:
             # don't setup if device already has setup entities

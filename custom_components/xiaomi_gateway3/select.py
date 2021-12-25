@@ -107,7 +107,7 @@ class DataSelect(XEntity, SelectEntity):
 
     def set_devices(self, feature: str):
         devices = [
-            f"{d.mac}: {d.info.name}"
+            f"{d.mac}: {d.name}"
             for d in self.gw.filter_devices(feature)
         ]
         self._attr_current_option = None
@@ -188,7 +188,11 @@ class DataSelect(XEntity, SelectEntity):
 
         elif self.command == "remove":
             did = "lumi." + option[:18].lstrip("0x")
-            await self.device_send({"remove_did": did})
+            device = self.gw.devices.get(did)
+            if device.model:
+                await self.device_send({"remove_did": did})
+            else:
+                await self.gw.silabs_leave(device)
 
         elif self.command == "config":
             did = "lumi." + option[:18].lstrip("0x")

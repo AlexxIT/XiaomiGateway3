@@ -25,10 +25,8 @@ class MeshGateway(GatewayBase):
                 mac = row[1].replace(':', '').lower()
                 device = self.devices.get(did)
                 if not device:
-                    self.devices[did] = device = XDevice(
-                        MESH, row[2], did=did, mac=mac,
-                    )
-                self.add_device(device)
+                    device = XDevice(MESH, row[2], did, mac)
+                self.add_device(did, device)
 
                 # add bulb to group address
                 childs.setdefault(row[5], []).append(did)
@@ -41,12 +39,10 @@ class MeshGateway(GatewayBase):
                 if not device:
                     # don't know if 8 bytes enougth
                     mac = int(row[0]).to_bytes(8, 'big').hex()
-                    self.devices[did] = device = XDevice(
-                        MESH, MESH_GROUP_MODEL, did, mac
-                    )
+                    device = XDevice(MESH, MESH_GROUP_MODEL, did, mac)
                 # update childs of device
                 device.extra["childs"] = childs.get(row[1])
-                self.add_device(device)
+                self.add_device(did, device)
 
         except Exception as e:
             self.debug("Can't read mesh DB", exc_info=e)

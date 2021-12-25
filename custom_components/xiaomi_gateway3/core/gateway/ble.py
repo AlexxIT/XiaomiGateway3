@@ -24,11 +24,8 @@ class BLEGateway(GatewayBase):
                 mac = utils.reverse_mac(row[1])
                 device = self.devices.get(mac)
                 if not device:
-                    self.devices[mac] = device = XDevice(
-                        BLE, model=row[2], did=row[4], mac=mac
-                    )
-
-                self.add_device(device)
+                    device = XDevice(BLE, row[2], row[4], mac)
+                self.add_device(mac, device)
         except:
             pass
 
@@ -73,10 +70,8 @@ class BLEGateway(GatewayBase):
         if not device:
             # some devices doesn't send mac, only number did
             # https://github.com/AlexxIT/XiaomiGateway3/issues/24
-            self.devices[mac] = device = XDevice(
-                BLE, data['dev']['pdid'], did=data['dev']['did'], mac=mac,
-            )
-            self.add_device(device)
+            device = XDevice(BLE, data['dev']['pdid'], data['dev']['did'], mac)
+            self.add_device(mac, device)
 
         if device.extra.get('seq') == data['frmCnt']:
             return

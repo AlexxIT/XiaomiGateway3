@@ -30,11 +30,9 @@ class GateGW3(
     async def gw3_read_device(self, sh: shell.ShellGw3):
         self.did = await sh.get_did()
         mac = await sh.get_wlan_mac()
-        self.devices[self.did] = device = XDevice(
-            GATEWAY, MODEL, did=self.did, mac=mac,
-        )
+        device = XDevice(GATEWAY, MODEL, self.did, mac)
         device.extra = {"fw_ver": sh.ver}
-        self.add_device(device)
+        self.add_device(self.did, device)
 
     async def gw3_prepare_gateway(self, sh: shell.ShellGw3):
         # run all inits from subclasses

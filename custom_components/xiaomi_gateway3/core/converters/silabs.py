@@ -349,3 +349,8 @@ def zdb_report(
     }, {
         "commandcli": f"send {nwk} 1 {ep}"
     }]
+
+
+# zdo leave [target:2] [removeChildren:1] [rejoin:1]
+def zdo_leave(nwk: str):
+    return [{"commandcli": f"zdo leave {nwk} 0 0"}]

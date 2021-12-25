@@ -36,14 +36,14 @@ class LumiGateway(GatewayBase):
             if not device:
                 # adds leading zeroes to mac
                 mac = f"0x{item['mac'][2:]:>016s}"
-                self.devices[did] = device = XDevice(
+                device = XDevice(
                     ZIGBEE, item['model'], did, mac, item['shortId']
                 )
                 device.extra = {'fw_ver': item['appVer']}
                 # 'hw_ver': item['hardVer'],
                 # 'mod_ver': item['model_ver'],
 
-            self.add_device(device)
+            self.add_device(did, device)
 
     async def lumi_prepare_gateway(self, sh: shell.TelnetShell):
         if self.available is None:

@@ -39,12 +39,12 @@ class XDevice:
 
     _available: bool = True
 
-    def __init__(self, type: str, model: Union[str, int] = None,
-                 did: str = None, mac: str = None, nwk: str = None):
+    def __init__(self, type: str, model: Union[str, int, None], did: str,
+                 mac: str, nwk: str = None):
         """Base class to handle device of any type."""
         assert type in (GATEWAY, ZIGBEE, BLE, MESH)
         if type == ZIGBEE:
-            assert isinstance(model, str)
+            assert isinstance(model, str) or model is None
             assert RE_DID.match(did)
             assert RE_ZIGBEE_MAC.match(mac)
             assert RE_NWK.match(nwk)
@@ -67,7 +67,7 @@ class XDevice:
         self.nwk = nwk
 
         # device brand, model, name and converters
-        self.info = converters.get_device_info(model, type)
+        self.info = converters.get_device_info(model, type) if model else None
         # all device entities
         self.entities: Dict[str, 'XEntity'] = {}
         # device gateways (one for GW and Zigbee), multiple for BLE and Mesh
@@ -88,6 +88,10 @@ class XDevice:
         self._available = value
         if self.entities:
             self.async_update_available()
+
+    @property
+    def name(self) -> str:
+        return self.info.name if self.info else "Unknown"
 
     @property
     def fw_ver(self) -> Any:
@@ -128,7 +132,7 @@ class XDevice:
             attr = "switch"
         return f"{self.mac}_{attr}"
 
-    def name(self, attr: str):
+    def attr_name(self, attr: str):
         # this words always uppercase
         if attr in ("ble", "led", "rssi", "usb"):
             return self.info.name + " " + attr.upper()
@@ -465,7 +469,7 @@ class XEntity(Entity):
         self._attr_entity_registry_enabled_default = conv.enabled != False
         self._attr_extra_state_attributes = {}
         self._attr_icon = ICONS.get(attr)
-        self._attr_name = device.name(attr)
+        self._attr_name = device.attr_name(attr)
         self._attr_should_poll = conv.poll
         self._attr_unique_id = device.unique_id(attr)
         self._attr_entity_category = ENTITY_CATEGORIES.get(attr)

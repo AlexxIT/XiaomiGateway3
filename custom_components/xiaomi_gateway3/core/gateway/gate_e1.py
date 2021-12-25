@@ -19,11 +19,9 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
     async def e1_read_device(self, sh: shell.ShellE1):
         self.did = await sh.get_did()
         mac = await sh.get_wlan_mac()
-        self.devices[self.did] = device = XDevice(
-            GATEWAY, MODEL, did=self.did, mac=mac,
-        )
+        device = XDevice(GATEWAY, MODEL, self.did, mac)
         device.extra = {"fw_ver": sh.ver}
-        self.add_device(device)
+        self.add_device(self.did, device)
 
     async def e1_prepare_gateway(self, sh: shell.ShellE1):
         self.e1_init()
