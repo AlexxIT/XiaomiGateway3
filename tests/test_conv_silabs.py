@@ -22,6 +22,13 @@ def test_cli():
         {'commandcli': 'send 0x1234 1 1'}
     ]
 
+    p = silabs.zcl_write("0x1234", 1, 0xFCC0, 9, 1, type=0x20, mfg=0x115f)
+    assert p == [
+        {'commandcli': 'zcl mfg-code 4447'},
+        {'commandcli': 'zcl global write 64704 9 32 {01}'},
+        {'commandcli': 'send 0x1234 1 1'}
+    ]
+
 
 def test_():
     device = XDevice(ZIGBEE, "MS01", ZDID, ZMAC, ZNWK)

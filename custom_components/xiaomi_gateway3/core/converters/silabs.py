@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from zigpy.types import EUI64
 from zigpy.zcl import Cluster
@@ -242,6 +243,15 @@ def get_attr_type(attributes: dict, attr: str) -> (int, int):
     return attr, type
 
 
+def get_type_len(type: int) -> int:
+    t = DATA_TYPES[type][1]
+    if hasattr(t, "_length"):
+        return t._length
+    if hasattr(t, "_size"):
+        return t._size
+    raise NotImplementedError
+
+
 def zcl_on_off(nwk: str, ep: int, value: bool) -> list:
     """Generate Silabs Z3 command (cluster 6)."""
     value = "on" if value else "off"
@@ -295,40 +305,49 @@ def zcl_read(nwk: str, ep: int, cluster: str, *attrs) -> list:
 
 # zcl global write [cluster:2] [attributeId:2] [type:4] [data:-1]
 def zcl_write(
-        nwk: str, ep: int, cluster: str, attr, data, mfg: int = None,
-        type: int = None
+        nwk: str, ep: int, cluster: Union[str, int], attr: Union[str, int],
+        data: int, *, mfg: int = None, type: int = None
 ) -> list:
     """Generate Silabs Z3 write attribute command."""
     if isinstance(cluster, str):
         cluster = get_cluster(cluster)
-        cid = cluster.cluster_id
-    else:
-        cid = cluster
+        if isinstance(attr, str):
+            attr, type = get_attr_type(cluster.attributes, attr)
+        cluster = cluster.cluster_id
 
-    if isinstance(attr, str):
-        attr, type = get_attr_type(cluster.attributes, attr)
+    assert isinstance(cluster, int)
+    assert isinstance(attr, int) and isinstance(type, int)
 
-    # TODO: other types...
-    if type in (0x10, 0x30):
-        data = f"{{{data:02x}}}"
-    elif type == 33:
-        data = "{" + int(data).to_bytes(2, "little").hex() + "}"
+    type_len = get_type_len(type)
+    # data always string hex: {FFFF}
+    data = "{" + data.to_bytes(type_len, "little").hex() + "}"
 
     pre = [
         {"commandcli": f"zcl mfg-code {mfg}"}
     ] if mfg is not None else []
     return pre + [
-        {"commandcli": f"zcl global write {cid} {attr} {type} {data}"},
+        {"commandcli": f"zcl global write {cluster} {attr} {type} {data}"},
         {"commandcli": f"send {nwk} 1 {ep}"}
     ]
 
 
+# zdo bind [destination:2] [source Endpoint:1] [destEndpoint:1] [cluster:2] [remoteEUI64:8] [destEUI64:8]
 def zdo_bind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
     """Generate Silabs Z3 bind command."""
     cluster = get_cluster(cluster)
     cid = cluster.cluster_id
     return [{
         "commandcli": f"zdo bind {nwk} {ep} 1 {cid} {{{src}}} {{{dst}}}"
+    }]
+
+
+# zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1]
+def zdo_unbind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
+    """Generate Silabs Z3 bind command."""
+    cluster = get_cluster(cluster)
+    cid = cluster.cluster_id
+    return [{
+        "commandcli": f"zdo unbind unicast {nwk} {{{src}}} {ep} {cid} {{{dst}}} 1"
     }]
 
 

@@ -166,9 +166,23 @@ class SilabsGateway(GatewayBase):
         await self.mqtt.publish(f"gw/{self.ieee}/devicejoined", payload)
 
     async def silabs_bind(self, bind_from: XDevice, bind_to: XDevice):
-        cmd = silabs.zdo_bind(
-            bind_from.nwk, 1, "on_off", bind_from.mac[2:], bind_to.mac[2:]
-        )
+        cmd = []
+        for cluster in ["on_off", "level", "light_color"]:
+            cmd += silabs.zdo_bind(
+                bind_from.nwk, 1, cluster, bind_from.mac[2:], bind_to.mac[2:]
+            )
+        await self.mqtt.publish(f"gw/{self.ieee}/commands", {"commands": cmd})
+
+    async def silabs_unbind(self, bind_from: XDevice, bind_to: XDevice):
+        cmd = []
+        for cluster in ["on_off", "level", "light_color"]:
+            cmd += silabs.zdo_unbind(
+                bind_from.nwk, 1, cluster, bind_from.mac[2:], bind_to.mac[2:]
+            )
+        await self.mqtt.publish(f"gw/{self.ieee}/commands", {"commands": cmd})
+
+    async def silabs_leave(self, device: XDevice):
+        cmd = silabs.zdo_leave(device.nwk)
         await self.mqtt.publish(f"gw/{self.ieee}/commands", {"commands": cmd})
 
 

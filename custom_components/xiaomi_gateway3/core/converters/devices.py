@@ -304,9 +304,9 @@ DEVICES += [{
     "lumi.remote.b486opcn01": ["Aqara", "Opple Four Button", "WXCJKG12LM"],
     "lumi.remote.b686opcn01": ["Aqara", "Opple Six Button", "WXCJKG13LM"],
     "spec": [
+        ZAqaraOppleMode("mode", "select"),
         Action, Button1, Button2, Button3, Button4, Button5, Button6,
         ButtonBoth, Battery, BatteryLow, BatteryOrig, ChipTemp,
-        ZAqaraOppleMode("mode", "switch"),
     ],
 }, {
     # temperature and humidity sensor

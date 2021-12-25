@@ -91,7 +91,7 @@ class DataSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_options = None
     command = None
-    bind_from = None
+    kwargs = None
 
     def set_current(self, value):
         # force update dropdown in GUI
@@ -123,7 +123,7 @@ class DataSelect(XEntity, SelectEntity):
             self.set_devices("zigbee")
 
         elif self.command == "bind":
-            self.bind_from = None
+            self.kwargs = {}
             self.set_devices("bind_from")
 
         elif self.command == "lock":
@@ -208,16 +208,24 @@ class DataSelect(XEntity, SelectEntity):
             self.set_current(resp)
 
         elif self.command == "bind":
-            if self.bind_from is None:
-                self.bind_from = "lumi." + option[:18].lstrip("0x")
+            if "bind_from" not in self.kwargs:
+                did = "lumi." + option[:18].lstrip("0x")
+                self.kwargs["bind_from"] = self.gw.devices.get(did)
                 self.set_devices("bind_to")
+
+            elif "bind_to" not in self.kwargs:
+                did = "lumi." + option[:18].lstrip("0x")
+                self.kwargs["bind_to"] = self.gw.devices.get(did)
+                self._attr_options = ["bind", "unbind"]
+                self.async_write_ha_state()
+
             else:
-                bind_to = "lumi." + option[:18].lstrip("0x")
-                await self.gw.silabs_bind(
-                    self.gw.devices.get(self.bind_from),
-                    self.gw.devices.get(bind_to),
-                )
-                self.set_current("Bind command sent")
+                if option == "bind":
+                    await self.gw.silabs_bind(**self.kwargs)
+                    self.set_current("Bind command sent")
+                elif option == "unbind":
+                    await self.gw.silabs_unbind(**self.kwargs)
+                    self.set_current("Unbind command sent")
                 self.device.update({"command": "idle"})
 
         elif self.command == "lock":

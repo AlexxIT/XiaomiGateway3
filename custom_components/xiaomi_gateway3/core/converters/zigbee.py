@@ -428,13 +428,18 @@ class IKEARemoteConv2(ZConverter):
 
 class ZAqaraOppleMode(ZConverter):
     zigbee = 0xFCC0
-    zattr = 9
     map = {0: "binding", 1: "multiclick"}
 
     def encode(self, device: "XDevice", payload: dict, value: Any):
         value = next(k for k, v in self.map.items() if v == value)
-        cmd = zcl_write(device.nwk, 1, self.zigbee, self.zattr, 0x20, value)
+        cmd = zcl_write(
+            device.nwk, self.ep, self.zigbee, 9, value, type=0x20,
+            mfg=0x115f
+        )
         payload.setdefault("commands", []).extend(cmd)
+
+    def read(self, device: "XDevice", payload: dict):
+        pass
 
 
 ################################################################################

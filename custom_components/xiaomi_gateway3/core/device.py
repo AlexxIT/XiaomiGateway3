@@ -19,6 +19,7 @@ from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
 from .converters.stats import STAT_GLOBALS
+from .converters.zigbee import ZAqaraOppleMode
 from .utils import DOMAIN
 
 if TYPE_CHECKING:
@@ -114,6 +115,8 @@ class XDevice:
 
         if feature == "bind_from":
             conv = self.converters[0]
+            if isinstance(conv, ZAqaraOppleMode):
+                return True
             return conv.zigbee == "on_off" and conv.domain == "sensor" and \
                    getattr(conv, "bind", False)
 
