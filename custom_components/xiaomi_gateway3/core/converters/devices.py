@@ -415,9 +415,16 @@ DEVICES += [{
     "lumi.lock.aq1": ["Aqara", "Door Lock S1", "ZNMS11LM"],
     "lumi.lock.acn02": ["Aqara", "Door Lock S2 CN", "ZNMS12LM"],
     "spec": [
-        Action, Battery,
-        LockConv("key_id", "sensor", mi="13.1.85"),
-        BoolConv("lock", "binary_sensor", mi="13.20.85")
+        # dead_bolt or square_locked or 13.22.85
+        LockConv("square", "binary_sensor", mi="13.16.85", mask=0x10),
+        # anti_bolt or reverse_locked or 3.1.85
+        LockConv("reverse", "binary_sensor", mi="13.16.85", mask=0x04),
+        # latch_bolt
+        LockConv("latch", "binary_sensor", mi="13.16.85", mask=0x01),
+        # other sensors
+        Converter("battery", "sensor", mi="8.0.2001"),
+        LockActionConv("key_id", "sensor", mi="13.1.85"),
+        # BoolConv("lock", "binary_sensor", mi="13.20.85")
     ],
 }, {
     # it's better to read only one property 13.26.85 and ignore others

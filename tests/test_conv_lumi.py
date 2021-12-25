@@ -98,6 +98,21 @@ def test_light():
     assert p == {'brightness': 204.0}
 
 
+def test_lock_s2():
+    device = XDevice(ZIGBEE, 'lumi.lock.acn02', ZDID, ZMAC, ZNWK)
+    assert device.info.name == 'Aqara Door Lock S2 CN'
+    device.setup_converters()
+
+    p = device.decode_lumi([{"res_name": "13.16.85", "value": 17}])
+    assert p == {'square': True, 'reverse': False, 'latch': True}
+
+    p = device.decode_lumi([
+        {"res_name": "13.1.85", "value": 65536},
+        {"res_name": "13.15.85", "value": 1}
+    ])
+    assert p == {'action': 'lock', 'key_id': 65536}
+
+
 def test_lock_s2_pro():
     device = XDevice(ZIGBEE, 'lumi.lock.acn03', ZDID, ZMAC, ZNWK)
     assert device.info.name == 'Aqara Door Lock S2 Pro CN'
