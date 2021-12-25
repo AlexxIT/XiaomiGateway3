@@ -6,6 +6,7 @@ from .base import TelnetShell
 TAR_DATA = "tar -czOC /data mha_master miio storage zigbee devices.txt gatewayInfoJson.info 2>/dev/null | base64"
 
 
+# noinspection PyAbstractClass
 class ShellE1(TelnetShell):
     model = "e1"
 

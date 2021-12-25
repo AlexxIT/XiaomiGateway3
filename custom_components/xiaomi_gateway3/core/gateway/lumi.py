@@ -1,6 +1,5 @@
 import json
 import time
-from typing import List
 
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, \
     SIGNAL_MQTT_PUB
