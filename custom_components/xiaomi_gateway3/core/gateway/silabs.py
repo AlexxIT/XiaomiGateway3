@@ -2,7 +2,8 @@ import json
 
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB
 from .. import shell
-from ..converters import silabs, UNKNOWN, is_mihome_zigbee
+from ..converters import silabs, is_mihome_zigbee
+from ..converters.zigbee import ZConverter
 from ..device import XDevice, ZIGBEE
 from ..mini_mqtt import MQTTMessage
 
@@ -131,15 +132,15 @@ class SilabsGateway(GatewayBase):
 
     async def silabs_config(self, device: XDevice):
         """Run some config converters if device spec has them. Binds, etc."""
-        config = device.zigbee_config()
-        if not config:
+        payload = {}
+        for conv in device.converters:
+            if isinstance(conv, ZConverter):
+                conv.config(device, payload, self)
+
+        if not payload:
             return
 
-        self.debug_device(device, "config", config)
-
-        payload = {}
-        for conv in config:
-            conv.config(device, payload, self)
+        self.debug_device(device, "config")
         await self.mqtt.publish(f"gw/{self.ieee}/commands", payload)
 
     async def silabs_send_fake_version(self, device: XDevice, data: dict):
