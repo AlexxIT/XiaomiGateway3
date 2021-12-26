@@ -61,7 +61,7 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
-        self._attr_state = state == STATE_ON
+        self._attr_is_on = state == STATE_ON
         self._attr_brightness = attrs.get(ATTR_BRIGHTNESS)
         self._attr_color_temp = attrs.get(ATTR_COLOR_TEMP)
 
