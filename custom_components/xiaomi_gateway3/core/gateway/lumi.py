@@ -116,7 +116,6 @@ class LumiGateway(GatewayBase):
             if not payload:
                 continue
 
-            device.last_seen = time.time()
             device.update(payload)
 
             # no time in device add command
