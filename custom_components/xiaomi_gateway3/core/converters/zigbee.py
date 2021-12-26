@@ -1,4 +1,3 @@
-import math
 from dataclasses import dataclass
 from typing import Any, TYPE_CHECKING, Optional
 
@@ -322,13 +321,15 @@ class ZSonoffButtonConv(ZConverter):
 
 class ZHueDimmerOnConv(ZConverter):
     zigbee = "on_off"
-    zattr = "command_id"
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        if value[self.zattr] == 1:
+        if value["command_id"] == 1:
             payload[self.attr] = "button_1_single"
-        elif value[self.zattr] == 64:
+        elif value["command_id"] == 64:
             payload[self.attr] = "button_4_single"
+
+    def read(self, device: "XDevice", payload: dict):
+        pass
 
     def config(self, device: "XDevice", payload: dict, gateway):
         super().config(device, payload, gateway)
@@ -350,6 +351,9 @@ class ZHueDimmerLevelConv(ZConverter):
                 payload[self.attr] = "button_2_single"
             elif value["value"][0] == 1:
                 payload[self.attr] = "button_3_single"
+
+    def read(self, device: "XDevice", payload: dict):
+        pass
 
 
 class ZXiaomiBrightnessConv(Converter):
