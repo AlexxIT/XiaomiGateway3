@@ -1,5 +1,4 @@
 import json
-import time
 
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, \
     SIGNAL_MQTT_PUB
@@ -81,12 +80,19 @@ class LumiGateway(GatewayBase):
         # - write_ack - response from device (device receive command)
         if data['cmd'] == 'heartbeat':
             data = data['params'][0]
+        elif data['cmd'] == "report":
+            pass
         elif data['cmd'] == 'write_rsp':
             # process write response only from Gateway
             if data['did'] != 'lumi.0':
                 return
-        elif data['cmd'] in ("report", "read_rsp"):
-            pass
+        elif data['cmd'] == "read_rsp":
+            try:
+                # skip read_rsp with error
+                if data["results"][0]["error_code"] == -5020:
+                    return
+            except:
+                pass
         else:
             return
 

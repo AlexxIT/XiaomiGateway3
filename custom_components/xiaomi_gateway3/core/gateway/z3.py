@@ -98,8 +98,6 @@ class Z3Gateway(GatewayBase):
                 if state == "LEAVE_SENT":
                     continue
 
-                ago = int(ago)
-
                 if ieee in ct:
                     type_ = 'device'
                 elif ieee in rt:
@@ -122,17 +120,17 @@ class Z3Gateway(GatewayBase):
                 nwk = '0x' + nwk.lower()  # 0xffff
 
                 payload = {
-                    'eui64': '0x' + ieee,
-                    'nwk': nwk,
-                    'ago': ago,
+                    # 'eui64': '0x' + ieee,
+                    # 'nwk': nwk,
+                    'ago': int(ago),
                     'type': type_,
                     'parent': parent
                 }
 
-                did = 'lumi.' + str(payload['eui64']).lstrip('0x').lower()
+                did = 'lumi.' + ieee.lstrip('0').lower()
                 device = self.devices.get(did)
                 if not device:
-                    mac = payload['eui64'].lower()
+                    mac = '0x' + ieee.lower()
                     device = XDevice(ZIGBEE, None, did, mac, nwk)
                     self.add_device(did, device)
                     self.debug_device(device, "new unknown device", tag=" Z3 ")
@@ -144,6 +142,7 @@ class Z3Gateway(GatewayBase):
                 # the device remains in the gateway database after
                 # deletion and may appear on another gw with another nwk
                 if nwk == device.nwk:
+                    payload = device.decode(ZIGBEE, payload)
                     device.update(payload)
                 else:
                     self.debug(f"Zigbee device with wrong NWK: {ieee}")

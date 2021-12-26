@@ -519,8 +519,8 @@ class XEntity(Entity):
         )
 
         # stats sensors always available
-        if attr in (GATEWAY, ZIGBEE, BLE):
-            self.__dict__["available"] = True
+        # if attr in (GATEWAY, ZIGBEE, BLE):
+        #     self.__dict__["available"] = True
 
         device.entities[attr] = self
 
@@ -568,6 +568,8 @@ class XEntity(Entity):
 
     @callback
     def async_update_available(self):
+        if self.attr in (GATEWAY, ZIGBEE, BLE):
+            return
         gw_available = any(gw.available for gw in self.device.gateways)
         self._attr_available = gw_available and (
                 self.device.available or self.customize.get('ignore_offline')
