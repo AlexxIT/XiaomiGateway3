@@ -35,9 +35,6 @@ RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")
 
 class XDevice:
     converters: List[Converter] = None
-    last_seen: int = 0
-
-    _available: bool = True
 
     def __init__(self, type: str, model: Union[str, int, None], did: str,
                  mac: str, nwk: str = None):
@@ -76,6 +73,9 @@ class XDevice:
         # internal device storage from any useful data
         self.extra: Dict[str, Any] = {}
         self.lazy_setup = set()
+
+        # only gateway device available by default (maybe need to fix it)
+        self._available = type == GATEWAY
 
     @property
     def available(self):
@@ -519,8 +519,8 @@ class XEntity(Entity):
         )
 
         # stats sensors always available
-        # if attr in (GATEWAY, ZIGBEE, BLE):
-        #     self.__dict__["available"] = True
+        if attr not in (GATEWAY, ZIGBEE, BLE):
+            self._attr_available = device.available
 
         device.entities[attr] = self
 

@@ -87,6 +87,8 @@ class BLEGateway(GatewayBase):
         else:
             return
 
+        device.available = True
+
         device.update(payload)
         self.debug_device(device, "recv", payload, "BLEE")
 
@@ -108,6 +110,8 @@ class BLEGateway(GatewayBase):
 
         if BLE in device.entities:
             device.update(device.decode(BLE, None))
+
+        device.available = True
 
         payload = device.decode("mibeacon", payload)
         device.update(payload)
