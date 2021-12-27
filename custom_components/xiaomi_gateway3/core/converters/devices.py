@@ -1136,11 +1136,12 @@ DEVICES += [{
     ]
 }, {
     # brightness 1..100, color_temp 3000..6400
+    1910: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c02"],
     2293: ["Unknown", "Mesh Lightstrip (RF ready)", "crzm.light.wy0a01"],
-    2351: ["Unknown", "Mesh Downlight", "lemesh.light.wy0c05"],
+    2351: ["LeMesh", "Mesh Downlight", "lemesh.light.wy0c05"],
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
-    3164: ["Unknown", "Mesh Downlight (RF ready)", "lemesh.light.wy0c07"],
-    3531: ["Unknown", "ightctl Light", "lemesh.light.wy0c08"],
+    3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
+    3531: ["LeMesh", "Mesh Light", "lemesh.light.wy0c08"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
