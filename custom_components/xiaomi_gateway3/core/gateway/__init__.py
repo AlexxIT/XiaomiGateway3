@@ -200,7 +200,7 @@ class XGateway(GateGW3, GateE1):
             await sh.close()
 
     async def check_available(self, ts: float):
-        for device in self.devices.values():
+        for device in list(self.devices.values()):
             if self not in device.gateways:
                 continue
 
