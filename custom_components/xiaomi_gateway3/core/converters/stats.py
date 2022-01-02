@@ -137,15 +137,15 @@ class BLEStatsConv(Converter):
     childs = {"mac", "msg_received"}
 
     def decode(self, device: 'XDevice', payload: dict, value: dict):
-        if 'msg_received' in device.extra:
-            device.extra['msg_received'] += 1
+        if "msg_received" in device.extra:
+            device.extra["msg_received"] += 1
         else:
-            device.extra['msg_received'] = 1
+            device.extra["msg_received"] = 1
 
         payload.update({
             BLE: datetime.now(timezone.utc),
-            'mac': device.mac,
-            'msg_received': device.extra['msg_received'],
+            "mac": device.mac,
+            "msg_received": device.extra["msg_received"],
         })
 
 

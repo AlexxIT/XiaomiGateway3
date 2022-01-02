@@ -298,7 +298,7 @@ class MiBeaconConv(Converter):
                 'timestamp': timestamp
             })
 
-        elif eid == 0x0F:  # 15
+        elif eid == 0x000F:  # 15
             # Night Light 2: 1 - moving no light, 100 - moving with light
             # Motion Sensor 2: 0 - moving no light, 256 - moving with light
             # Qingping Motion Sensor - moving with illuminance data
@@ -308,7 +308,7 @@ class MiBeaconConv(Converter):
             else:
                 payload.update({'motion': True, 'light': bool(value >= 100)})
 
-        elif eid == 0x10 and len(data) == 2:  # 16
+        elif eid == 0x0010 and len(data) == 2:  # 16
             # Toothbrush Т500
             if data[0] == 0:
                 payload.update({'action': 'start', 'counter': data[1]})

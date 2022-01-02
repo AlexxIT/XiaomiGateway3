@@ -18,7 +18,14 @@ SIGNAL_TIMER = "timer"
 
 class GatewayBase:
     """devices and defaults are global between all gateways."""
+    # keys:
+    # - Gateway: did, "123456789", X digits
+    # - Zigbee: did, "lumi.abcdef", 8 byte hex mac without leading zeros
+    # - BLE: mac, "abcdef", 6 byte hex mac
+    # - Mesh: did, "123456789", X digits
+    # - Mesh group: did, "group.123456789"
     devices: Dict[str, XDevice] = {}
+    # key - mac, 6 byte hex for gw and bluetooth, 8 byte hex for zb with "0x"
     defaults: Dict[str, dict] = {}
 
     log: Logger = None

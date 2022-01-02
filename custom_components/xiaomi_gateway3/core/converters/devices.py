@@ -43,7 +43,7 @@ By default, the entity is updated only if the decoded payload has its attribute.
 But one entity can process multiple attributes, example bulb: `light`,
 `brightness`, `color_temp`. In this case you should set `parent` attribute name:
 
-    BoolConv("light", "light", "4.1.85", "power_status")
+    BoolConv("light", "light", "4.1.85")
     BrightnessConv("brightness", mi="14.1.85", parent="light")
     Converter("color_temp", mi="14.2.85", parent="light")
 
