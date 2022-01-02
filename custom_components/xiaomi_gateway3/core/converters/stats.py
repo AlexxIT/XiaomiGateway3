@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from .base import Converter
-from .const import GATEWAY, ZIGBEE, BLE
+from .const import GATEWAY, ZIGBEE, BLE, MESH
 
 if TYPE_CHECKING:
     from ..device import XDevice
@@ -21,6 +21,7 @@ ZIGBEE_CLUSTERS = {
     0x0012: 'Multistate',
     0x0019: 'OTA',  # illuminance sensor
     0x0101: 'DoorLock',
+    0x0300: 'LightColor',
     0x0400: 'Illuminance',  # motion sensor
     0x0402: 'Temperature',
     0x0403: 'Pressure',
@@ -29,6 +30,40 @@ ZIGBEE_CLUSTERS = {
     0x0500: 'IasZone',  # gas sensor
     0x0B04: 'ElectrMeasur',
     0xFCC0: 'Xiaomi'
+}
+
+BLE_EVENTS = {
+    0x0006: "LockFinger",
+    0x0007: "LockDoor",
+    0x0008: "LockArmed",
+    0x000B: "LockAction",
+    0x000F: "Motion",
+    0x0010: "Toothbrush",
+    0x1001: "Action",
+    0x1002: "Sleep",
+    0x1003: "RSSI",
+    0x1004: "Temperature",
+    0x1005: "Kettle",
+    0x1006: "Humidity",
+    0x1007: "Illuminance",
+    0x1008: "Moisture",
+    0x1009: "Conductivity",
+    0x100A: "Battery",
+    0x100D: "TempHum",
+    0x100E: "Lock",
+    0x100F: "Door",
+    0x1010: "Formaldehyde",
+    0x1012: "Opening",
+    0x1013: "Supply",
+    0x1014: "WaterLeak",
+    0x1015: "Smoke",
+    0x1016: "Gas",
+    0x1017: "IdleTime",
+    0x1018: "Light",
+    0x1019: "Contact",
+    0x4803: "Battery2",
+    0x4c01: "Temperature2",
+    0x4c08: "Humidity2",
 }
 
 
@@ -134,7 +169,7 @@ class ZigbeeStatsConverter(Converter):
 
 
 class BLEStatsConv(Converter):
-    childs = {"mac", "msg_received"}
+    childs = {"mac", "msg_received", "last_msg"}
 
     def decode(self, device: 'XDevice', payload: dict, value: dict):
         if "msg_received" in device.extra:
@@ -142,16 +177,21 @@ class BLEStatsConv(Converter):
         else:
             device.extra["msg_received"] = 1
 
+        eid = value.get("eid")
+
         payload.update({
             BLE: datetime.now(timezone.utc),
             "mac": device.mac,
             "msg_received": device.extra["msg_received"],
+            "last_msg": BLE_EVENTS.get(eid, eid),
         })
 
 
 GatewayStats = GatewayStatsConverter(GATEWAY, "binary_sensor")
 
 STAT_GLOBALS = {
+    GATEWAY: GatewayStats,
     BLE: BLEStatsConv(BLE, "sensor"),
+    MESH: BLEStatsConv(MESH, "sensor"),
     ZIGBEE: ZigbeeStatsConverter(ZIGBEE, "sensor"),
 }
