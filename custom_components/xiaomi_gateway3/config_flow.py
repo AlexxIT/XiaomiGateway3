@@ -30,7 +30,7 @@ OPT_DEBUG = {
 
 
 class FlowHandler(ConfigFlow, domain=DOMAIN):
-    VERSION = 2
+    VERSION = 1
     cloud = None
 
     async def async_step_user(self, user_input=None):
@@ -247,6 +247,9 @@ class OptionsFlowHandler(OptionsFlow):
         buzzer = self.entry.options.get("buzzer", False)
         memory = self.entry.options.get("memory", False)
         zha = self.entry.options.get("zha", False)
+
+        # filter only supported items
+        debug = [k for k in debug if k in OPT_DEBUG]
 
         return self.async_show_form(
             step_id="user",

@@ -12,9 +12,10 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.storage import Store
 
 from .core import logger, utils
+from .core.const import DOMAIN
 from .core.device import XEntity
 from .core.gateway import XGateway
-from .core.utils import DOMAIN, XiaomiGateway3Debug
+from .core.utils import XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
@@ -57,33 +58,13 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
         if 'debug_mode' in config[CONF_LOGGER]:
             setattr(XGateway, 'debug_mode', config[CONF_LOGGER]['debug_mode'])
 
-    if CONF_DEVICES in config:
-        for k, v in config[CONF_DEVICES].items():
-            # AA:BB:CC:DD:EE:FF => aabbccddeeff
-            k = k.replace(':', '').lower()
-            XGateway.defaults[k] = v
-
     if CONF_ATTRIBUTES_TEMPLATE in config:
         XEntity.attributes_template = config[CONF_ATTRIBUTES_TEMPLATE]
         XEntity.attributes_template.hass = hass
 
     hass.data[DOMAIN] = {}
 
-    store = Store(hass, 1, f"{DOMAIN}/devices.json")
-    devices = await store.async_load()
-    if devices:
-        for k, v in devices.items():
-            XGateway.defaults.setdefault(k, {}).update(v)
-
-    async def stop(*args):
-        data = {
-            d.mac: {"decode_ts": d.decode_ts}
-            for d in XGateway.devices.values()
-            if d.decode_ts
-        }
-        await store.async_save(data)
-
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
+    await utils.load_devices(hass, config.get(CONF_DEVICES))
 
     return True
 
@@ -147,22 +128,20 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 
-async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
-    if entry.version == 1:
-        _LOGGER.debug("Migrate config and entities to new version")
-
-        options = dict(entry.options)
-        if "debug" in options and "miio" in options["debug"]:
-            options["debug"].pop("miio")
-        if options.get("stats"):
-            options["entities"] = "zigbee,ble"
-        if "zha" in options and isinstance(options["zha"], str):
-            options["zha"] = bool(options["zha"])
-        hass.config_entries.async_update_entry(entry, options=options)
-
-        utils.async_migrate_unique_id(hass)
-
-    return True
+# async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
+#     if entry.version == 1:
+#         _LOGGER.debug("Migrate config and entities to new version")
+#
+#         options = dict(entry.options)
+#         if "debug" in options and "miio" in options["debug"]:
+#             options["debug"].pop("miio")
+#         if options.get("stats"):
+#             options["entities"] = "zigbee,ble"
+#         if "zha" in options and isinstance(options["zha"], str):
+#             options["zha"] = bool(options["zha"])
+#         hass.config_entries.async_update_entry(entry, options=options)
+#
+#     return True
 
 
 async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
@@ -232,7 +211,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
             device['mac'].replace(':', '').lower()
         XGateway.defaults.setdefault(did, {})
         # don't override name if exists
-        XGateway.defaults[did].setdefault('device_name', device['name'])
+        XGateway.defaults[did].setdefault('name', device['name'])
 
     return True
 

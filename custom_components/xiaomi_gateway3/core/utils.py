@@ -6,28 +6,28 @@ import re
 import string
 import uuid
 from datetime import datetime
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 
 import requests
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.storage import Store
 from homeassistant.requirements import async_process_requirements
 
 from . import shell
+from .const import DOMAIN
+from .device import XDevice
 from .ezsp import EzspUtils
+from .gateway import XGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
 
-if TYPE_CHECKING:
-    from .device import XDevice
-    from .gateway import XGateway
-
-DOMAIN = 'xiaomi_gateway3'
 TITLE = "Xiaomi Gateway 3"
 
 SUPPORTED_MODELS = ('lumi.gateway.mgl03', 'lumi.gateway.aqcn02')
@@ -54,79 +54,51 @@ def update_device_info(hass: HomeAssistant, did: str, **kwargs):
         registry.async_update_device(device.id, **kwargs)
 
 
-@callback
-def async_migrate_unique_id(hass: HomeAssistant):
-    """New unique_id format:
-    - zigbee 18 symb mac with leading `0x`, lowercase
-    - gateway, ble, mesh - 12 symb mac, lowercase
-    - mesh groups - 14 symb hex numb, lowercase
-    """
-    replaces = {}
+async def load_devices(hass: HomeAssistant, yaml_devices: dict):
+    # 1. Load devices settings from YAML
+    if yaml_devices:
+        for k, v in yaml_devices.items():
+            # AA:BB:CC:DD:EE:FF => aabbccddeeff
+            k = k.replace(':', '').lower()
+            XGateway.defaults[k] = v
 
-    dr: DeviceRegistry = hass.data["device_registry"]
-    er: EntityRegistry = hass.data['entity_registry']
+    # 2. Load unique_id from entity registry (backward support old format)
+    er: EntityRegistry = hass.data["entity_registry"]
     for entity in list(er.entities.values()):
         if entity.platform != DOMAIN:
             continue
-
         # split mac and attr in unique id
-        mac, attr = entity.unique_id.split("_", 1)
-
-        # save original mac
-        mac0 = mac
-
-        # remove unnecessary gateway entities
-        if attr in ("firmware lock", "pair"):
-            er.async_remove(entity.entity_id)
-            continue
-
-        # get real mac for gateway entities
-        if attr in ("alarm", "gateway"):
-            device = dr.async_get(entity.device_id)
-            for conn in device.connections:
-                _, mac = conn
-            mac = mac.replace(":", "")
-
-        if mac.startswith("0x"):
+        legacy_id = entity.unique_id.split("_", 1)[0]
+        if legacy_id.startswith("0x"):
             # add leading zeroes to zigbee mac
-            mac = f"0x{mac[2:]:>016s}"
-        elif len(mac) > 12 and attr == "light":
-            # change attr for mesh group
-            attr = "group"
-        elif len(mac) == 12:
+            mac = f"0x{legacy_id[2:]:>016s}"
+        elif len(legacy_id) == 12:
             # make mac lowercase (old Mesh devices)
-            mac = mac.lower()
-
-        if " " in attr:
-            # remove space from attr name (some attrs problem)
-            attr = attr.replace(" ", "_")
-
-        new_id = f"{mac}_{attr}"
-        # skip if nothing changed
-        if entity.unique_id == new_id:
+            mac = legacy_id.lower()
+        else:
             continue
-
-        # save replaces to fix device item
-        replaces[mac0] = mac
-
-        er.async_update_entity(entity.entity_id, new_unique_id=new_id)
-
-    for device in list(dr.devices.values()):
-        i = next((i for i in device.identifiers if i[0] == DOMAIN), None)
-        if not i:
+        if mac == legacy_id:
             continue
+        device = XGateway.defaults.setdefault(mac, {})
+        device.setdefault("unique_id", legacy_id)
 
-        # separate domain and mac
-        _, mac = i
+    # 3. Load devices data from .storage
+    store = Store(hass, 1, f"{DOMAIN}/devices.json")
+    devices = await store.async_load()
+    if devices:
+        for k, v in devices.items():
+            XGateway.defaults.setdefault(k, {}).update(v)
 
-        # skip if nothing changed
-        if mac not in replaces:
-            continue
+    # save devices data to .storage
+    async def stop(*args):
+        data = {
+            d.mac: {"decode_ts": d.decode_ts}
+            for d in XGateway.devices.values()
+            if d.decode_ts
+        }
+        await store.async_save(data)
 
-        # update device identifiers to new format
-        dr.async_update_device(device.id, new_identifiers={
-            (DOMAIN, replaces[mac])
-        })
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
 
 
 # new miio adds colors to logs

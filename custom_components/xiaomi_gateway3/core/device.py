@@ -20,7 +20,7 @@ from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
 from .converters.stats import STAT_GLOBALS
-from .utils import DOMAIN
+from .const import DOMAIN
 
 if TYPE_CHECKING:
     from .gateway import XGateway
@@ -36,6 +36,15 @@ RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")
 BATTERY_AVAILABLE = 3 * 60 * 60  # 3 hours
 POWER_AVAILABLE = 20 * 60  # 20 minutes
 POWER_POLL = 9 * 60  # 9 minutes
+
+# all legacy names for backward compatibility with 1st version
+LEGACY_ATTR_ID = {
+    "gas_density": "gas density",
+    "group": "light",
+    "outlet": "switch",
+    "plug": "switch",
+    "smoke_density": "smoke density",
+}
 
 
 class XDevice:
@@ -63,8 +72,12 @@ class XDevice:
             assert RE_NETWORK_MAC.match(mac)
         elif model == MESH_GROUP_MODEL:
             assert did.startswith("group.")
-        else:
-            assert isinstance(model, str if type == GATEWAY else int)
+        elif type == MESH:
+            assert isinstance(model, int)
+            assert did.isdecimal()
+            assert RE_NETWORK_MAC.match(mac), mac
+        elif type == GATEWAY:
+            assert isinstance(model, str)
             assert did.isdecimal()
             assert RE_NETWORK_MAC.match(mac), mac
 
@@ -97,6 +110,10 @@ class XDevice:
         self._available = value
         if self.entities:
             self.async_update_available()
+
+    @property
+    def unique_id(self) -> str:
+        return self.extra.get("unique_id", self.mac)
 
     @property
     def name(self) -> str:
@@ -145,11 +162,8 @@ class XDevice:
         self.model = value[:-3] if value[-3:-1] == ".v" else value
         self.info = converters.get_device_info(self.model, self.type)
 
-    def unique_id(self, attr: str):
-        # backward compatibility
-        if attr in ("plug", "outlet"):
-            attr = "switch"
-        return f"{self.mac}_{attr}"
+    def attr_unique_id(self, attr: str):
+        return f"{self.unique_id}_{LEGACY_ATTR_ID.get(attr, attr)}"
 
     def attr_name(self, attr: str):
         # this words always uppercase
@@ -198,9 +212,9 @@ class XDevice:
             # support set device name in config
             self.info.name = kwargs["name"]
 
-        if "entity_name" in kwargs:
-            # support change entity name in config
-            self.extra["entity_name"] = kwargs["entity_name"]
+        for k in ("entity_name", "unique_id"):
+            if k in kwargs:
+                self.extra[k] = kwargs[k]
 
         self.setup_converters(kwargs.get("entities"))
 
@@ -521,7 +535,7 @@ class XEntity(Entity):
         self._attr_icon = ICONS.get(attr)
         self._attr_name = device.attr_name(attr)
         self._attr_should_poll = conv.poll
-        self._attr_unique_id = device.unique_id(attr)
+        self._attr_unique_id = device.attr_unique_id(attr)
         self._attr_entity_category = ENTITY_CATEGORIES.get(attr)
         self.entity_id = device.entity_id(conv)
 
@@ -542,14 +556,14 @@ class XEntity(Entity):
             connections = {(CONNECTION_ZIGBEE, device.ieee)}
 
         if device.type != GATEWAY and gateway.device:
-            via_device = (DOMAIN, gateway.device.mac)
+            via_device = (DOMAIN, gateway.device.unique_id)
         else:
             via_device = None
 
         # https://developers.home-assistant.io/docs/device_registry_index/
         self._attr_device_info = DeviceInfo(
             connections=connections,
-            identifiers={(DOMAIN, device.mac)},
+            identifiers={(DOMAIN, device.unique_id)},
             manufacturer=device.info.manufacturer,
             model=device.info.model,
             name=device.info.name,
