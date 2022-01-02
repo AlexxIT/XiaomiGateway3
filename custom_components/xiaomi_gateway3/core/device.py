@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import re
+import time
 from datetime import timedelta
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
@@ -32,9 +33,20 @@ RE_ZIGBEE_MAC = re.compile(r"^0x[0-9a-f]{16}$")
 RE_NETWORK_MAC = re.compile(r"^[0-9a-f]{12}$")
 RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")
 
+BATTERY_AVAILABLE = 3 * 60 * 60  # 3 hours
+POWER_AVAILABLE = 20 * 60  # 20 minutes
+POWER_POLL = 9 * 60  # 9 minutes
+
 
 class XDevice:
     converters: List[Converter] = None
+
+    available_timeout: float = 0
+    poll_timeout: float = 0
+    decode_ts: float = 0
+    encode_ts: float = 0
+
+    _available: bool = None
 
     def __init__(self, type: str, model: Union[str, int, None], did: str,
                  mac: str, nwk: str = None):
@@ -73,9 +85,6 @@ class XDevice:
         # internal device storage from any useful data
         self.extra: Dict[str, Any] = {}
         self.lazy_setup = set()
-
-        # only gateway device available by default (maybe need to fix it)
-        self._available = type == GATEWAY
 
     @property
     def available(self):
@@ -178,13 +187,16 @@ class XDevice:
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
 
+        if "decode_ts" in kwargs:
+            self.decode_ts = kwargs["decode_ts"]
+
         if "model" in kwargs:
             # support change device model in config
             self.update_model(kwargs["model"])
 
-        if "device_name" in kwargs:
+        if "name" in kwargs:
             # support set device name in config
-            self.info.name = kwargs["device_name"]
+            self.info.name = kwargs["name"]
 
         if "entity_name" in kwargs:
             # support change entity name in config
@@ -204,6 +216,15 @@ class XDevice:
                 self.lazy_setup.add(conv.attr)
                 continue
             gateway.setups[domain](gateway, self, conv)
+
+        if any(True for c in self.converters if c.attr == "battery"):
+            self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
+        else:
+            self.available_timeout = self.info.ttl or POWER_AVAILABLE
+            self.poll_timeout = POWER_POLL
+
+        self._available = \
+            (time.time() - self.decode_ts) < self.available_timeout
 
     def setup_converters(self, entities: list = None):
         """If no entities - use only required converters. Otherwise search for
@@ -234,6 +255,9 @@ class XDevice:
         """Find converter by attr_name and decode value."""
         for conv in self.converters:
             if conv.attr == attr_name:
+                self.available = True
+                self.decode_ts = time.time()
+
                 payload = {}
                 conv.decode(self, payload, value)
                 return payload
@@ -255,6 +279,8 @@ class XDevice:
                 conv: Converter = LUMI_GLOBALS.get(prop)
                 if conv:
                     conv.decode(self, payload, v)
+                    if conv.attr == "online":
+                        return payload
 
             # piid or eiid is MIoT format
             elif "piid" in param:
@@ -263,6 +289,9 @@ class XDevice:
                 prop = f"{param['siid']}.e.{param['eiid']}"
             else:
                 raise RuntimeError
+
+            self.available = True
+            self.decode_ts = time.time()
 
             for conv in self.converters:
                 if conv.mi == prop:
@@ -278,6 +307,9 @@ class XDevice:
 
     def decode_zigbee(self, value: dict) -> Optional[dict]:
         """Decode value from Zigbee spec."""
+        self.available = True
+        self.decode_ts = time.time()
+
         payload = {}
         for conv in self.converters:
             if conv.zigbee == value["cluster"]:
@@ -291,6 +323,7 @@ class XDevice:
         @return: dict with `params` (lumi spec), `mi_spec` (miot spec),
             `commands` (zigbee spec)
         """
+        self.encode_ts = time.time()
         payload = {}
         for k, v in value.items():
             for conv in self.converters:
@@ -299,6 +332,7 @@ class XDevice:
         return payload
 
     def encode_read(self, attrs: set) -> dict:
+        self.encode_ts = time.time()
         payload = {}
         for conv in self.converters:
             if conv.attr in attrs:
@@ -341,6 +375,7 @@ class XDevice:
 DEVICE_CLASSES = {
     BLE: DEVICE_CLASS_TIMESTAMP,
     GATEWAY: DEVICE_CLASS_CONNECTIVITY,
+    MESH: DEVICE_CLASS_TIMESTAMP,
     ZIGBEE: DEVICE_CLASS_TIMESTAMP,
     "cloud_link": DEVICE_CLASS_CONNECTIVITY,
     "contact": DEVICE_CLASS_DOOR,
@@ -390,6 +425,7 @@ UNITS = {
 ICONS = {
     BLE: "mdi:bluetooth",
     GATEWAY: "mdi:router-wireless",
+    MESH: "mdi:bluetooth",
     ZIGBEE: "mdi:zigbee",
     "action": "mdi:bell",
     "alarm": "mdi:shield-home",
@@ -475,6 +511,7 @@ class XEntity(Entity):
         self.subscribed_attrs = device.subscribe_attrs(conv)
 
         # minimum support version: Hass v2021.6
+        self._attr_available = device.available
         self._attr_device_class = DEVICE_CLASSES.get(attr, attr)
         self._attr_entity_registry_enabled_default = conv.enabled != False
         self._attr_extra_state_attributes = {}
@@ -517,10 +554,6 @@ class XEntity(Entity):
             via_device=via_device,
             configuration_url=device.info.url
         )
-
-        # stats sensors always available
-        if attr not in (GATEWAY, ZIGBEE, BLE):
-            self._attr_available = device.available
 
         device.entities[attr] = self
 
@@ -568,11 +601,10 @@ class XEntity(Entity):
 
     @callback
     def async_update_available(self):
-        if self.attr in (GATEWAY, ZIGBEE, BLE):
-            return
         gw_available = any(gw.available for gw in self.device.gateways)
         self._attr_available = gw_available and (
-                self.device.available or self.customize.get('ignore_offline')
+                self.device.available or
+                self.customize.get('ignore_offline', False)
         )
 
     @callback

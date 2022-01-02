@@ -144,8 +144,8 @@ class ZigbeeStatsConverter(Converter):
 
             payload.update({
                 ZIGBEE: datetime.now(timezone.utc),
-                'ieee': value['eui64'],
-                'nwk': value['sourceAddress'],
+                # 'ieee': value['eui64'],
+                # 'nwk': value['sourceAddress'],
                 'msg_received': device.extra['msg_received'],
                 'msg_missed': device.extra['msg_missed'],
                 'linkquality': value['linkQuality'],

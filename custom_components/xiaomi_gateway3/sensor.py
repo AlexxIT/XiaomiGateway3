@@ -1,13 +1,13 @@
 import asyncio
 from asyncio import Task
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
-from .core.converters import Converter, ZIGBEE, BLE
+from .core.converters import Converter, STAT_GLOBALS
 from .core.device import XDevice, XEntity
 from .core.gateway import XGateway
 
@@ -18,8 +18,8 @@ async def async_setup_entry(hass, entry, add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
         if conv.attr == "action":
             cls = XiaomiAction
-        elif conv.attr in (ZIGBEE, BLE):
-            cls = XiaomiBaseSensor
+        elif conv.attr in STAT_GLOBALS:
+            cls = XiaomiStats
         else:
             cls = XiaomiSensor
         add_entities([cls(gateway, device, conv)])
@@ -60,6 +60,34 @@ class XiaomiSensor(XiaomiBaseSensor, RestoreEntity):
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
+
+
+class XiaomiStats(XiaomiBaseSensor):
+    @property
+    def available(self):
+        return True
+
+    @callback
+    def async_update_available(self):
+        super().async_update_available()
+
+        self._attr_extra_state_attributes["available"] = self._attr_available
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+
+        data = {"available": self._attr_available}
+        if self.device.decode_ts:
+            data[self.attr] = datetime.fromtimestamp(
+                self.device.decode_ts, timezone.utc
+            )
+        if self.device.nwk:
+            data["ieee"] = self.device.mac
+            data["nwk"] = self.device.nwk
+        else:
+            data["mac"] = self.device.mac
+
+        self.async_set_state(data)
 
 
 class XiaomiAction(XEntity):

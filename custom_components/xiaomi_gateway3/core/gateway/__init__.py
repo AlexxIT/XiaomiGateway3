@@ -111,8 +111,8 @@ class XGateway(GateGW3, GateE1):
     async def timer(self):
         while True:
             ts = time.time()
+            asyncio.create_task(self.check_available(ts))
             await self.dispatcher_send(SIGNAL_TIMER, ts=ts)
-            # asyncio.create_task(self.check_available(ts))
             await asyncio.sleep(30)
 
     async def mqtt_connect(self):
@@ -199,11 +199,22 @@ class XGateway(GateGW3, GateE1):
         finally:
             await sh.close()
 
-    # async def async_check_available(self, ts: float):
-    #     for device in self.devices.values():
-    #         if self not in device.gateways or ts - device.last_seen < 600:
-    #             continue
-    #         entity = device.entities[0]
-    #         if "sensor" in entity.platform.domain:
-    #             continue
-    #         await entity.device_read({entity.attr})
+    async def check_available(self, ts: float):
+        for device in self.devices.values():
+            if self not in device.gateways:
+                continue
+
+            if (device.poll_timeout and
+                    ts - device.decode_ts > device.poll_timeout and
+                    ts - device.encode_ts > device.poll_timeout
+            ):
+                for attr, entity in device.entities.items():
+                    self.debug_device(device, "poll state", attr)
+                    await entity.async_device_update()
+                    break
+
+            if (device.available and device.available_timeout and
+                    ts - device.decode_ts > device.available_timeout
+            ):
+                self.debug_device(device, "set device offline")
+                device.available = False

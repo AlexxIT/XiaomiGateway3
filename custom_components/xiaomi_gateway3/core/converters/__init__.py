@@ -5,6 +5,7 @@ from typing import List, Optional
 from .base import Converter, LUMI_GLOBALS
 from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
 from .devices import DEVICES
+from .stats import STAT_GLOBALS
 
 try:
     # loading external converters
@@ -15,6 +16,13 @@ except ModuleNotFoundError:
 except:
     logging.getLogger(__name__).exception("Can't load external converters")
 
+TTL = {
+    "s": 1,
+    "m": 60,
+    "h": 3600,
+    "d": 86400
+}
+
 
 @dataclass
 class XDeviceInfo:
@@ -23,6 +31,7 @@ class XDeviceInfo:
     name: str
     url: str
     spec: List[Converter]
+    ttl: float
 
 
 def is_mihome_zigbee(model: str) -> bool:
@@ -52,12 +61,17 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
         else:
             market = f"{type} ({model})"
 
+        ttl = desc.get("ttl")
+        if isinstance(ttl, str):
+            ttl = float(ttl[:-1]) * TTL[ttl[-1]]
+
         return XDeviceInfo(
             manufacturer=brand,
             model=market,
             name=f"{brand} {name}",
             url=url,
             spec=desc["spec"],
+            ttl=ttl
         )
     raise RuntimeError
 

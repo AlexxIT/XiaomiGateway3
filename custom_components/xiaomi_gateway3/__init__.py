@@ -69,6 +69,22 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
 
     hass.data[DOMAIN] = {}
 
+    store = Store(hass, 1, f"{DOMAIN}/devices.json")
+    devices = await store.async_load()
+    if devices:
+        for k, v in devices.items():
+            XGateway.defaults.setdefault(k, {}).update(v)
+
+    async def stop(*args):
+        data = {
+            d.mac: {"decode_ts": d.decode_ts}
+            for d in XGateway.devices.values()
+            if d.decode_ts
+        }
+        await store.async_save(data)
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
+
     return True
 
 

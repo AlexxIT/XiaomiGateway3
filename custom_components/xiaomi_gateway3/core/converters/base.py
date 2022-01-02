@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, TYPE_CHECKING
@@ -322,9 +323,12 @@ class OTAConv(Converter):
 class OnlineConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: dict):
         payload[self.attr] = value["status"] == "online"
-        payload["zigbee"] = \
-            datetime.now(timezone.utc) - timedelta(seconds=value["time"])
-        pass
+
+        dt = value["time"]
+        device.available = dt < device.available_timeout
+        device.decode_ts = time.time() - dt
+
+        payload["zigbee"] = datetime.now(timezone.utc) - timedelta(seconds=dt)
 
 
 ################################################################################
