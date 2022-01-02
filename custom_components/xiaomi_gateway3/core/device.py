@@ -301,6 +301,9 @@ class XDevice:
 
     def decode_miot(self, value: list):
         """Decode value from Mesh MIoT spec."""
+        if MESH in self.entities:
+            self.update(self.decode(MESH, value))
+
         for item in value:
             item["error_code"] = item.pop("code", 0)
         return self.decode_lumi(value)

@@ -187,11 +187,36 @@ class BLEStatsConv(Converter):
         })
 
 
+class MeshStatsConv(Converter):
+    childs = {"mac", "msg_received", "last_msg"}
+
+    def decode(self, device: 'XDevice', payload: dict, value: list):
+        if "msg_received" in device.extra:
+            device.extra["msg_received"] += 1
+        else:
+            device.extra["msg_received"] = 1
+
+        param = value[0]
+        if "piid" in param:
+            prop = f"{param['siid']}.p.{param['piid']}"
+        elif "eiid" in param:
+            prop = f"{param['siid']}.e.{param['eiid']}"
+        else:
+            raise NotImplementedError
+
+        payload.update({
+            MESH: datetime.now(timezone.utc),
+            "mac": device.mac,
+            "msg_received": device.extra["msg_received"],
+            "last_msg": prop
+        })
+
+
 GatewayStats = GatewayStatsConverter(GATEWAY, "binary_sensor")
 
 STAT_GLOBALS = {
     GATEWAY: GatewayStats,
     BLE: BLEStatsConv(BLE, "sensor"),
-    MESH: BLEStatsConv(MESH, "sensor"),
+    MESH: MeshStatsConv(MESH, "sensor"),
     ZIGBEE: ZigbeeStatsConverter(ZIGBEE, "sensor"),
 }
