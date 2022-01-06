@@ -855,6 +855,23 @@ DEVICES += [{
         MapConv("wireless_2", "switch", mi="10.p.1", map=INVERSE),
         MapConv("wireless_3", "switch", mi="11.p.1", map=INVERSE),
     ]
+}, {
+    "lumi.remote.b28ac1": ["Aqara", "Double Wall Button H1", "WRS-R02"],
+    "spec": [
+        Action,
+        ButtonMIConv("button_1", mi="3.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="3.e.2", value=2),  # double
+        ButtonMIConv("button_1", mi="3.e.3", value=16),  # long
+        ButtonMIConv("button_2", mi="4.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="4.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="4.e.3", value=16),  # long
+        BatteryConv("battery", "sensor", mi="6.p.2"),  # voltage
+        MapConv("battery_low", "binary_sensor", mi="6.p.1", map=BATTERY_LOW,
+                enabled=False),
+        MapConv("mode", "select", mi="8.p.1", map={
+            1: "single_click", 2: "multi_click"
+        }, enabled=False)
+    ]
 }]
 
 ################################################################################
