@@ -1067,6 +1067,13 @@ DEVICES += [{
         Converter("idle_time", "sensor", enabled=False),
     ],
 }, {
+    2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
+    "spec": [
+        MiBeacon, BLEMotion, BLELight, BLEIlluminance, BLEBattery,
+        Converter("idle_time", "sensor", enabled=False),
+    ],
+    "ttl": "34m",  # battery every 11 min
+}, {
     1983: ["Yeelight", "Button S1", "YLAI003"],
     "spec": [MiBeacon, BLEAction, BLEBattery],
     "ttl": "16m",  # battery every 5 min
@@ -1088,7 +1095,6 @@ DEVICES += [{
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
-    2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     "spec": [
         MiBeacon,
