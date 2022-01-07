@@ -68,6 +68,7 @@ DEVICES = [{
         ['0.12.85', 'load_power', 'power', 'sensor'],
         ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # or channel_0?
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
     ]
@@ -81,6 +82,8 @@ DEVICES = [{
         ['0.13.85', None, 'energy', 'sensor'],
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
+        ['4.11.85', 'channel_1_wireless', 'channel 2 wireless', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.5.85', None, 'button_both', None],
@@ -105,6 +108,7 @@ DEVICES = [{
     'lumi.ctrl_neutral1': ["Aqara", "Single Wall Switch", "QBKG04LM"],
     'lumi_spec': [
         ['4.1.85', 'neutral_0', 'switch', 'switch'],  # @vturekhanov
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
     ]
@@ -113,6 +117,7 @@ DEVICES = [{
     'lumi.switch.b1lacn02': ["Aqara", "Single Wall Switch D1", "QBKG21LM"],
     'lumi_spec': [
         ['4.1.85', 'channel_0', 'switch', 'switch'],  # or neutral_0?
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
         ['13.1.85', None, 'button', None],
         [None, None, 'action', 'sensor'],
     ]
@@ -122,6 +127,8 @@ DEVICES = [{
     'lumi_spec': [
         ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # @to4ko
         ['4.2.85', 'neutral_1', 'channel 2', 'switch'],  # @to4ko
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
+        ['4.11.85', 'channel_1_wireless', 'channel 2 wireless', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.5.85', None, 'button_both', None],
@@ -132,6 +139,8 @@ DEVICES = [{
     'lumi_spec': [
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
+        ['4.11.85', 'channel_1_wireless', 'channel 2 wireless', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.5.85', None, 'button_both', None],
@@ -144,6 +153,9 @@ DEVICES = [{
         ['4.1.85', 'neutral_0', 'channel 1', 'switch'],  # @to4ko
         ['4.2.85', 'neutral_1', 'channel 2', 'switch'],  # @to4ko
         ['4.3.85', 'neutral_2', 'channel 3', 'switch'],  # @to4ko
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
+        ['4.11.85', 'channel_1_wireless', 'channel 2 wireless', 'switch'],
+        ['4.12.85', 'channel_2_wireless', 'channel 3 wireless', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
@@ -161,6 +173,9 @@ DEVICES = [{
         ['4.1.85', 'channel_0', 'channel 1', 'switch'],
         ['4.2.85', 'channel_1', 'channel 2', 'switch'],
         ['4.3.85', 'channel_2', 'channel 3', 'switch'],
+        ['4.10.85', 'channel_0_wireless', 'channel 1 wireless', 'switch'],
+        ['4.11.85', 'channel_1_wireless', 'channel 2 wireless', 'switch'],
+        ['4.12.85', 'channel_2_wireless', 'channel 3 wireless', 'switch'],
         ['13.1.85', None, 'button_1', None],
         ['13.2.85', None, 'button_2', None],
         ['13.3.85', None, 'button_3', None],
