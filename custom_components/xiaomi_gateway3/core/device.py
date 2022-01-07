@@ -217,6 +217,11 @@ class XDevice:
                 continue
             gateway.setups[domain](gateway, self, conv)
 
+        if self.type == GATEWAY:
+            self._available = True
+            return
+
+        # TODO: change to better param
         if any(True for c in self.converters if c.attr == "battery"):
             self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
         else:

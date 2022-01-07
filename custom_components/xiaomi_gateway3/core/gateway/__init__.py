@@ -24,6 +24,7 @@ from .base import SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, SIGNAL_MQTT_DIS, \
 from .gate_e1 import GateE1
 from .gate_gw3 import GateGW3
 from .. import shell
+from ..converters import GATEWAY
 from ..mini_miio import AsyncMiIO
 from ..mini_mqtt import MiniMQTT, MQTTMessage
 
@@ -201,7 +202,7 @@ class XGateway(GateGW3, GateE1):
 
     async def check_available(self, ts: float):
         for device in list(self.devices.values()):
-            if self not in device.gateways:
+            if self not in device.gateways or device.type == GATEWAY:
                 continue
 
             if (device.poll_timeout and

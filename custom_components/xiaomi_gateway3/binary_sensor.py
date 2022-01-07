@@ -68,6 +68,10 @@ class XiaomiGateway(XiaomiBinaryBase):
         # sensor state=connected when whole gateway available
         self._attr_is_on = self.gw.available
 
+    @property
+    def available(self):
+        return True
+
 
 class XiaomiMotionSensor(XEntity, BinarySensorEntity):
     _default_delay = None
