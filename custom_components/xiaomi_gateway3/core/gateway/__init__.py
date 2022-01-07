@@ -120,7 +120,7 @@ class XGateway(GateGW3, GateE1):
 
         await self.mqtt.subscribe('#')
 
-        self.async_update_available(True)
+        self.update_available(True)
 
         await self.dispatcher_send(SIGNAL_MQTT_CON)
 
@@ -131,7 +131,7 @@ class XGateway(GateGW3, GateE1):
 
         self.timer_task.cancel()
 
-        self.async_update_available(False)
+        self.update_available(False)
 
         await self.dispatcher_send(SIGNAL_MQTT_DIS)
 
@@ -172,7 +172,7 @@ class XGateway(GateGW3, GateE1):
         finally:
             await sh.close()
 
-    def async_update_available(self, value: bool):
+    def update_available(self, value: bool):
         self.available = value
 
         for device in self.devices.values():
