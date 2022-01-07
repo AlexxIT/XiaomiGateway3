@@ -177,7 +177,7 @@ class XGateway(GateGW3, GateE1):
 
         for device in self.devices.values():
             if self in device.gateways:
-                device.async_update_available()
+                device.update_available()
 
     async def telnet_send(self, command: str):
         sh: shell.TelnetShell = await shell.connect(self.host)

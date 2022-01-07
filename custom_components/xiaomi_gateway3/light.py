@@ -6,8 +6,9 @@ from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
-from .core.converters import MESH_GROUP_MODEL, Converter
-from .core.device import XDevice, XEntity, ZIGBEE
+from .core.converters import ZIGBEE, MESH_GROUP_MODEL, Converter
+from .core.device import XDevice
+from .core.entity import XEntity
 from .core.gateway import XGateway
 
 CONF_DEFAULT_TRANSITION = 'default_transition'

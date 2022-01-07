@@ -13,7 +13,7 @@ from homeassistant.helpers.storage import Store
 
 from .core import logger, utils
 from .core.const import DOMAIN
-from .core.device import XEntity
+from .core.entity import XEntity
 from .core.gateway import XGateway
 from .core.utils import XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud

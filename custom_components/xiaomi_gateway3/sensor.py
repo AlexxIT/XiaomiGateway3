@@ -8,7 +8,8 @@ from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
 from .core.converters import Converter, STAT_GLOBALS
-from .core.device import XDevice, XEntity
+from .core.device import XDevice
+from .core.entity import XEntity
 from .core.gateway import XGateway
 
 SCAN_INTERVAL = timedelta(seconds=60)
