@@ -210,6 +210,8 @@ class XGateway(GateGW3, GateE1):
                     ts - device.encode_ts > device.poll_timeout
             ):
                 for attr, entity in device.entities.items():
+                    if not entity.hass:
+                        continue
                     self.debug_device(device, "poll state", attr)
                     await entity.async_device_update()
                     break
