@@ -128,20 +128,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 
-# async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
-#     if entry.version == 1:
-#         _LOGGER.debug("Migrate config and entities to new version")
-#
-#         options = dict(entry.options)
-#         if "debug" in options and "miio" in options["debug"]:
-#             options["debug"].pop("miio")
-#         if options.get("stats"):
-#             options["entities"] = "zigbee,ble"
-#         if "zha" in options and isinstance(options["zha"], str):
-#             options["zha"] = bool(options["zha"])
-#         hass.config_entries.async_update_entry(entry, options=options)
-#
-#     return True
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
+    return True
 
 
 async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
