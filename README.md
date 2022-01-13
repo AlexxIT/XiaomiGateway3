@@ -33,6 +33,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 - [FAQ](#faq)
 - [Requirements](#requirements)
 - [Supported Firmwares](#supported-firmwares)
+- [Regional Restrictions](#regional-restrictions)
 - [Supported Zigbee Devices](#supported-zigbee-devices)
 - [Supported BLE Devices](#supported-ble-devices)
 - [Supported Bluetooth Mesh Devices](#supported-bluetooth-mesh-devices)
@@ -137,6 +138,34 @@ If your Mi Home doesn't offer to you new firmware - you can [update using telnet
 Component can block fw updates with **Lock Firmware** switch. Mi Home app will continue to offer you update. But won't be able to install it. It should fail at 0%.
 
 [![Xiaomi Gateway 3 firmware update lock](https://img.youtube.com/vi/9BMoKq19yCI/mqdefault.jpg)](https://www.youtube.com/watch?v=9BMoKq19yCI)
+
+# Regional Restrictions
+
+Device | MiHome EU | MiHome CN | Vevs EU | Vevs CN
+---|---|---|---|---
+Gateway 3 (CN and EU) | supported | supported | supported | supported
+Zigbee old series | supported | supported | supported | supported
+Zigbee E1 series (CN and EU) | no        | supported | no        | supported
+Zigbee H1 and T1 series (CN and EU) | no | partially | no | some models
+Bluetooth BLE and Mesh | some models | supported | supported | supported
+
+**Xiaomi Mijia Smart Multi-Mode Gateway** has two models - `ZNDMWG03LM` (China) and `ZNDMWG02LM`/`YTC4044GL` (Euro). Both this models can be added to China or to Euro cloud servers.
+
+**PS.** This is the ONLY Xiaomi/Aqara gateway that has the same internal model for the China and Euro versions - `lumi.gateway.mgl03`. So the Hass component and the Xiaomi cloud servers see no difference between the models.
+
+Most **older Xiaomi/Aqara Zigbee devices** can also be added to China and to Euro cloud servers.
+
+New **Zigbee devices from E1 series** can be added ONLY to China cloud servers. They supported in official Mi Home application.
+
+New **Zigbee devices from H1 and T1 series** are not officially supported in Mi Home. But they can be added ONLY to China cloud servers. You can controll them from Hass (check supported list) but not from stock Mi Home application. Some of this model (mostly H1 switches and T1 relays) can be controlled from [Mi Home by Vevs](https://www.kapiba.ru/2017/11/mi-home.html).
+
+Some of **Bluetooth BLE and Mesh** can be added ONLY to China cloud. But with [Mi Home by Vevs](https://www.kapiba.ru/2017/11/mi-home.html) they can be added to any cloud.
+
+**PS.** You can't add **Zigbee devices E1/H1/T1** to Euro cloud even with **Mi Home by Vevs**.
+
+If you control your devices from Home Assistant - it makes absolutely no difference which cloud they are added to. Devices are controlled locally and without delay in any case.
+
+**PS.** Some Aqara devices are not supported at all in Mi Home in any version, e.g. **Aqara Door Lock N100 Zigbee version**.
 
 # Supported Zigbee Devices
 
