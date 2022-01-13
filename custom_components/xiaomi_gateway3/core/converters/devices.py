@@ -343,8 +343,8 @@ DEVICES += [{
     "lumi.sensor_motion.aq2": ["Aqara", "Motion Sensor", "RTCGQ11LM"],
     "spec": [
         BoolConv("motion", "binary_sensor", mi="3.1.85"),
-        # Converter("illuminance_lux", None, "0.3.85", "lux"),
-        Converter("illuminance", "sensor", mi="0.4.85"),
+        Converter("illuminance", "sensor", mi="0.3.85"),
+        # Converter("illuminance", "sensor", mi="0.4.85"),
         Battery, BatteryOrig
     ],
 }, {
