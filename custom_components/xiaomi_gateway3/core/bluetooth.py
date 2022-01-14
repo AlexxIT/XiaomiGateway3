@@ -34,6 +34,7 @@ DEVICES = [{
     # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
     2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
     2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
+    3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
 }, {
     # Mesh Light
     0: ["Xiaomi", "Mesh Group", "Mesh Group"],
@@ -66,6 +67,9 @@ DEVICES = [{
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     2007: ["Unknown", "Mesh Switch Controller", "lemesh.switch.sw0a01"],
+    3581: ["Linptech", "Mesh Triple Switch ", "linp.remote.k9b"],
+    5481: ["Linptech", "Mesh Double Switch ", "linp.remote.k9b11"],
+    5480: ["Linptech", "Mesh Single Switch ", "linp.remote.k9b1"],
     3150: ["XinGuang", "Mesh Switch", "wainft.switch.sw0a01"],
     'miot_spec': [
         [2, 1, 'switch', 'switch']
