@@ -41,7 +41,7 @@ class MIoTGateway(GatewayBase):
             item["did"] = device.did
         # MIoT properties changes should return in
         resp = await self.miio.send("set_properties", payload["mi_spec"])
-        return "result" in resp
+        return resp and "result" in resp
 
     async def miot_read(self, device: XDevice, payload: dict) -> Optional[dict]:
         assert "mi_spec" in payload, payload
@@ -49,6 +49,6 @@ class MIoTGateway(GatewayBase):
         for item in payload["mi_spec"]:
             item["did"] = device.did
         resp = await self.miio.send("get_properties", payload["mi_spec"])
-        if "result" not in resp:
+        if resp is None or "result" not in resp:
             return None
         return device.decode_miot(resp['result'])

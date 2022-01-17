@@ -233,7 +233,7 @@ class XEntity(Entity):
                 return
 
         if hasattr(self, "async_update"):
-            await self.async_device_update(warning=False)
+            await self.async_update()
 
     async def async_will_remove_from_hass(self) -> None:
         """Also run when rename entity_id"""

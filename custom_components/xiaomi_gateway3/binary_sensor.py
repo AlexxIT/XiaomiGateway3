@@ -68,6 +68,10 @@ class XiaomiGateway(XiaomiBinaryBase):
         # sensor state=connected when whole gateway available
         self._attr_is_on = self.gw.available
 
+    @property
+    def available(self):
+        return True
+
 
 class XiaomiMotionSensor(XEntity, BinarySensorEntity):
     _default_delay = None
@@ -84,6 +88,16 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
 
         self._attr_is_on = False
         self.async_write_ha_state()
+
+    async def async_will_remove_from_hass(self):
+        if self._clear_task:
+            self._clear_task.cancel()
+
+        if self._attr_is_on:
+            self._attr_is_on = False
+            self.async_write_ha_state()
+
+        await super().async_will_remove_from_hass()
 
     @callback
     def async_set_state(self, data: dict):
@@ -122,7 +136,7 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
 
             self.debug(f"Extend delay: {delay} seconds")
 
-            self._clear_task = self.hass.async_create_task(
+            self._clear_task = self.hass.loop.create_task(
                 self.async_clear_state(abs(delay))
             )
 

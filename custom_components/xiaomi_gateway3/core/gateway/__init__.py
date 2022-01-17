@@ -24,6 +24,7 @@ from .base import SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, SIGNAL_MQTT_DIS, \
 from .gate_e1 import GateE1
 from .gate_gw3 import GateGW3
 from .. import shell
+from ..converters import GATEWAY
 from ..mini_miio import AsyncMiIO
 from ..mini_mqtt import MiniMQTT, MQTTMessage
 
@@ -120,7 +121,7 @@ class XGateway(GateGW3, GateE1):
 
         await self.mqtt.subscribe('#')
 
-        self.async_update_available(True)
+        self.update_available(True)
 
         await self.dispatcher_send(SIGNAL_MQTT_CON)
 
@@ -131,7 +132,7 @@ class XGateway(GateGW3, GateE1):
 
         self.timer_task.cancel()
 
-        self.async_update_available(False)
+        self.update_available(False)
 
         await self.dispatcher_send(SIGNAL_MQTT_DIS)
 
@@ -172,7 +173,7 @@ class XGateway(GateGW3, GateE1):
         finally:
             await sh.close()
 
-    def async_update_available(self, value: bool):
+    def update_available(self, value: bool):
         self.available = value
 
         for device in self.devices.values():
@@ -201,7 +202,7 @@ class XGateway(GateGW3, GateE1):
 
     async def check_available(self, ts: float):
         for device in list(self.devices.values()):
-            if self not in device.gateways:
+            if self not in device.gateways or device.type == GATEWAY:
                 continue
 
             if (device.poll_timeout and
@@ -209,6 +210,8 @@ class XGateway(GateGW3, GateE1):
                     ts - device.encode_ts > device.poll_timeout
             ):
                 for attr, entity in device.entities.items():
+                    if not entity.hass:
+                        continue
                     self.debug_device(device, "poll state", attr)
                     await entity.async_device_update()
                     break

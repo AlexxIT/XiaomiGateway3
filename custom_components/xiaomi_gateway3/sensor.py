@@ -106,6 +106,16 @@ class XiaomiAction(XEntity):
         self._attr_state = ""
         self.async_write_ha_state()
 
+    async def async_will_remove_from_hass(self):
+        if self._clear_task:
+            self._clear_task.cancel()
+
+        if self._attr_state != "":
+            self._attr_state = ""
+            self.async_write_ha_state()
+
+        await super().async_will_remove_from_hass()
+
     @callback
     def async_set_state(self, data: dict):
         # fix 1.4.7_0115 heartbeat error (has button in heartbeat)
@@ -123,4 +133,4 @@ class XiaomiAction(XEntity):
             "entity_id": self.entity_id, "click_type": self._attr_state
         })
 
-        self._clear_task = self.hass.async_create_task(self.async_clear_state())
+        self._clear_task = self.hass.loop.create_task(self.async_clear_state())

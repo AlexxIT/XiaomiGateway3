@@ -217,6 +217,12 @@ class XDevice:
                 continue
             gateway.setups[domain](gateway, self, conv)
 
+        # TODO: change to better logic?
+        if self.type == GATEWAY or self.model == MESH_GROUP_MODEL:
+            self._available = True
+            return
+
+        # TODO: change to better logic?
         if any(True for c in self.converters if c.attr == "battery"):
             self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
         else:

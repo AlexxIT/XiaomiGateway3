@@ -126,10 +126,10 @@ class GatewayBase:
         if not device.model:
             return
 
-        if device.entities:
-            # don't setup if device already has setup entities
-            self.debug_device(device, "Join to gateway", device.model)
-            return
+        # if device.entities:
+        #     # don't setup if device already has setup entities
+        #     self.debug_device(device, "Join to gateway", device.model)
+        #     return
 
         device.setup_entitites(self, entities=self.entities)
         self.debug_device(
