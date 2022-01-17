@@ -150,6 +150,17 @@ class ShellGw3(TelnetShell):
 
         self.apatches = []
         self.mpatches = []
+    
+    async def flag(self):
+        await self.exec("touch /data/flag")
+    
+    async def unflag(self):
+        await self.exec("rm /data/flag")
+    
+    async def checkflag(self) -> bool:
+        if not await self.exec("ls /data/flag"):
+            return False
+        return True
 
     async def get_running_ps(self) -> str:
         return await self.exec("ps -ww | grep -v ' 0 SW'")
