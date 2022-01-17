@@ -41,6 +41,8 @@ async def connect(host: str, port=23) -> Union[TelnetShell, ShellGw3, ShellE1]:
 
         await shell.login()
         await shell.prepare()
+        await while not shell.checkflag():
+            asyncio.wait(1)
 
         return shell
 
