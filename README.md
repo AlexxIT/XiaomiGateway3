@@ -72,7 +72,7 @@ A. Beeps AFTER adding Zigbee devices:
 2. New device successfully added.
 3. Unsupported device model.
 
-Also, if you using hacked motion sensor - the getaway will periodically beeps. You can disable it in integration settings. 
+Also, if you using hacked motion sensor - the gateway will periodically beeps. You can disable it in integration settings. 
 
 **Q. Does the integration work without internet?**  
 A. Partially. The component connects to a hub on the local network. Zigbee devices work without internet. But adding new Zigbee devices to Mi Home requires Internet. Updating BLE device data may not work without Internet.
