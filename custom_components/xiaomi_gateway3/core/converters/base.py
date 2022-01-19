@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, TYPE_CHECKING
 
-from .const import BUTTON, BUTTON_BOTH, UNKNOWN
+from .const import *
 
 if TYPE_CHECKING:
     from ..device import XDevice
@@ -356,16 +356,12 @@ Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
 ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006", enabled=False)
 
 # switches and relays
-PlugN0 = BoolConv("plug", "switch", mi="4.1.85")
-# PlugC0 = BoolConv("plug", "switch", "4.1.85", "channel_0")
-# SwitchC0 = BoolConv("switch", "switch", "4.1.85", "channel_0")
-# SwitchN0 = BoolConv("switch", "switch", "4.1.85", "neutral_0")
-ChannelC1 = BoolConv("channel_1", "switch", mi="4.1.85")
-ChannelC2 = BoolConv("channel_2", "switch", mi="4.2.85")
-ChannelC3 = BoolConv("channel_3", "switch", mi="4.2.85")
-ChannelN1 = BoolConv("channel_1", "switch", mi="4.1.85")
-ChannelN2 = BoolConv("channel_2", "switch", mi="4.2.85")
-ChannelN3 = BoolConv("channel_3", "switch", mi="4.3.85")
+Outlet = BoolConv("outlet", "switch", mi="4.1.85")
+Plug = BoolConv("plug", "switch", mi="4.1.85")
+Switch = BoolConv("switch", "switch", mi="4.1.85")
+Channel1 = BoolConv("channel_1", "switch", mi="4.1.85")
+Channel2 = BoolConv("channel_2", "switch", mi="4.2.85")
+Channel3 = BoolConv("channel_3", "switch", mi="4.3.85")
 
 Action = Converter("action", "sensor")
 Button = ButtonConv("button", mi="13.1.85")
@@ -379,6 +375,20 @@ ButtonBoth = ButtonConv("button_both", mi="13.5.85")
 Button12 = ButtonConv("button_both_12", mi="13.5.85")
 Button13 = ButtonConv("button_both_13", mi="13.6.85")
 Button23 = ButtonConv("button_both_23", mi="13.7.85")
+
+PowerOffMemory = MapConv(
+    "power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY,
+    enabled=False
+)
+ChargeProtect = BoolConv(
+    "charge_protect", "switch", mi="8.0.2031", enabled=False
+)
+Led = BoolConv("led", "switch", mi="8.0.2032", enabled=False)
+
+Wireless = BoolConv("wireless", "switch", mi="4.10.85", enabled=False)
+Wireless1 = BoolConv("wireless_1", "switch", mi="4.10.85", enabled=False)
+Wireless2 = BoolConv("wireless_2", "switch", mi="4.11.85", enabled=False)
+Wireless3 = BoolConv("wireless_3", "switch", mi="4.12.85", enabled=False)
 
 # Light = BoolConv("light", "light", mi="4.1.85")
 # Brightness = BrightnessConv("brightness", mi="14.1.85", parent="light")

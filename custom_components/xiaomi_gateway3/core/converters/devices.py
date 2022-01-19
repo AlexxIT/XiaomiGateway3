@@ -66,7 +66,7 @@ Recommended attributes names:
 - outlet - for sockets with only female connector (wall installation)
 - switch - for relays and switches with buttons (wall installation, remotes)
 - led - control device led light
-- wireless_mode - change mode from wired to wireless (decoupled)
+- wireless - change mode from wired to wireless (decoupled)
 - power_on_state - default state when electricity is supplied
 - contact - for contact sensor
 - moisture - for water leak sensor
@@ -162,28 +162,23 @@ DEVICES = [{
 DEVICES += [{
     # don"t work: protect 8.0.2014, power 8.0.2015, plug_detection 8.0.2044
     "lumi.plug": ["Xiaomi", "Plug CN", "ZNCZ02LM"],  # tested
+    "lumi.plug.mitw01": ["Xiaomi", "Plug TW", "ZNCZ03LM"],
+    "lumi.plug.maus01": ["Xiaomi", "Plug US", "ZNCZ12LM"],
     "support": 5,  # @AlexxIT
     "spec": [
-        PlugN0, Power, Energy, ChipTemp,
-        MapConv("power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY,
-                enabled=False),
-        BoolConv("charge_protect", "switch", mi="8.0.2031", enabled=False),
-        BoolConv("led", "switch", mi="8.0.2032", enabled=False),
+        Plug, Power, Energy, ChipTemp,
+        PowerOffMemory, ChargeProtect, Led,
         # Converter("max_power", "sensor", mi="8.0.2042", enabled=False),
     ],
 }, {
-    "lumi.plug.mitw01": ["Xiaomi", "Plug TW", "ZNCZ03LM"],
-    "lumi.plug.maus01": ["Xiaomi", "Plug US", "ZNCZ12LM"],
-    "spec": [PlugN0, Power, Energy],
-}, {
     "lumi.plug.mmeu01": ["Xiaomi", "Plug EU", "ZNCZ04LM"],
-    "spec": [PlugN0, Power, Voltage, Energy],
+    "spec": [Plug, Power, Voltage, Energy],
 }, {
     "lumi.ctrl_86plug.aq1": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "lumi.ctrl_86plug": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "spec": [
-        BoolConv("outlet", "switch", mi="4.1.85"),
-        Power, Energy, ChipTemp
+        Outlet, Power, Energy, ChipTemp,
+        PowerOffMemory, ChargeProtect, Led, Wireless,
     ],
 }, {
     "lumi.ctrl_ln1.aq1": ["Aqara", "Single Wall Switch", "QBKG11LM"],
@@ -191,19 +186,13 @@ DEVICES += [{
     "lumi.switch.b1nacn02": [
         "Aqara", "Single Wall Switch D1 CN (with N)", "QBKG23LM"
     ],
-    "spec": [
-        BoolConv("switch", "switch", mi="4.1.85"),
-        Power, Energy, Action, Button,
-    ],
+    "spec": [Switch, Power, Energy, Action, Button, Wireless, Led],
 }, {
     "lumi.ctrl_neutral1": ["Aqara", "Single Wall Switch", "QBKG04LM"],
     "lumi.switch.b1lacn02": [
         "Aqara", "Single Wall Switch D1 CN (no N)", "QBKG21LM"
     ],
-    "spec": [
-        BoolConv("switch", "switch", mi="4.1.85"),
-        Action, Button,
-    ],
+    "spec": [Switch, Action, Button, Wireless, Led],
 }, {
     # dual channel on/off, power measurement
     "lumi.ctrl_ln2.aq1": ["Aqara", "Double Wall Switch", "QBKG12LM"],
@@ -212,33 +201,36 @@ DEVICES += [{
         "Aqara", "Double Wall Switch D1 CN (with N)", "QBKG24LM"
     ],
     "spec": [
-        ChannelC1, ChannelC2, Power, Energy,
+        Channel1, Channel2, Power, Energy,
         Action, Button1, Button2, ButtonBoth,
+        Wireless1, Wireless2, PowerOffMemory, Led,
     ],
 }, {
     "lumi.relay.c2acn01": ["Aqara", "Relay CN", "LLKZMK11LM"],  # tested
     "support": 4,  # @AlexxIT TODO: test load_s0 8.0.2034 load_s1 8.0.2035
     "spec": [
-        ChannelC1, ChannelC2, Current, Power, Voltage, Energy,
+        Channel1, Channel2, Current, Power, Voltage, Energy,
         Action, Button1, Button2, ButtonBoth, ChipTemp,
         BoolConv("interlock", "switch", mi="4.9.85", enabled=False),
     ],
 }, {
     "lumi.ctrl_neutral2": ["Aqara", "Double Wall Switch (no N)", "QBKG03LM"],
-    "spec": [ChannelN1, ChannelN2, Action, Button1, Button2, ButtonBoth]
-}, {
     "lumi.switch.b2lacn02": [
         "Aqara", "Double Wall Switch D1 CN (no N)", "QBKG22LM"
     ],
-    "spec": [ChannelC1, ChannelC2, Action, Button1, Button2, ButtonBoth]
+    "spec": [
+        Channel1, Channel2, Action, Button1, Button2, ButtonBoth,
+        Wireless1, Wireless2, Led,
+    ]
 }, {
     # triple channel on/off, no neutral wire
     "lumi.switch.l3acn3": [
         "Aqara", "Triple Wall Switch D1 CN (no N)", "QBKG25LM"
     ],
     "spec": [
-        ChannelN1, ChannelN2, ChannelN3,
+        Channel1, Channel2, Channel3,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
+        Wireless1, Wireless2, Wireless3, PowerOffMemory, Led,
     ],
 }, {
     # with neutral wire, thanks @Mantoui
@@ -246,8 +238,9 @@ DEVICES += [{
         "Aqara", "Triple Wall Switch D1 CN (with N)", "QBKG26LM"
     ],
     "spec": [
-        ChannelC1, ChannelC2, ChannelC3, Power, Voltage, Energy,
+        Channel1, Channel2, Channel3, Power, Voltage, Energy,
         Action, Button1, Button2, Button3, Button12, Button13, Button23,
+        Wireless1, Wireless2, Wireless3, PowerOffMemory, Led,
     ],
 }, {
     # we using lumi+zigbee covnerters for support heartbeats and transition
@@ -359,12 +352,12 @@ DEVICES += [{
     "lumi.vibration.aq1": ["Aqara", "Vibration Sensor", "DJT11LM"],
     "support": 3,  # @AlexxIT TODO: need some tests
     "spec": [
-        Action, Battery,
+        Action, Battery, BatteryLow, BatteryOrig,
         Converter("bed_activity", mi="0.1.85"),
         TiltAngleConv("tilt_angle", mi="0.2.85"),
         Converter("vibrate_intensity", mi="0.3.85"),
         VibrationConv("vibration", mi="13.1.85"),
-        Converter("vibration_level", mi="14.1.85"),
+        Converter("vibration_level", mi="14.1.85"),  # read/write from 1 to 30
     ],
 }, {
     # cube action, no retain
@@ -412,6 +405,9 @@ DEVICES += [{
         Converter("position", mi="1.1.85", parent="motor"),
         MapConv("run_state", mi="14.4.85", map=RUN_STATE),
         Converter("battery", "sensor", mi="8.0.2001"),
+        MapConv("power_mode", mi="14.5.85", map={
+            1: "adapter", 3: "battery", 4: "charging"
+        })
     ],
 }, {
     "lumi.lock.aq1": ["Aqara", "Door Lock S1", "ZNMS11LM"],
@@ -1279,7 +1275,7 @@ DEVICES += [{
         Converter("battery", "sensor", mi="3.p.1"),  # percentage 0-100
         Converter("supply", "sensor", mi="4.p.1"),  # percentage 0-100
         Converter("led", "switch", mi="9.p.1", enabled=False),  # bool
-        MapConv("mode", "select", mi="2.p.2", map={
+        MapConv("power_mode", "select", mi="2.p.2", map={
             0: "auto", 1: "battery", 2: "usb"
         }, enabled=False)
     ],
