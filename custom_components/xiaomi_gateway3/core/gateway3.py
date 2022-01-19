@@ -703,7 +703,7 @@ class GatewayEntry(GatewayNetwork):
                 # read Xiaomi devices DB
                 raw = await sh.read_file(shell.DB_ZIGBEE, as_base64=True)
                 if raw:
-                    raw = re.sub(br'}\s*{', b',', raw)
+                    raw = re.sub(br'}[\s\x00]*{', b',', raw)
                     xiaomi = json.loads(raw)
                 else:
                     self.debug("No zigbee database")
