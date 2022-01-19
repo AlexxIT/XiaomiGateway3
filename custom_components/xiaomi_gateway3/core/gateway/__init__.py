@@ -112,7 +112,7 @@ class XGateway(GateGW3, GateE1):
     async def timer(self):
         while True:
             ts = time.time()
-            asyncio.create_task(self.check_available(ts))
+            self.check_available(ts)
             await self.dispatcher_send(SIGNAL_TIMER, ts=ts)
             await asyncio.sleep(30)
 
@@ -200,7 +200,7 @@ class XGateway(GateGW3, GateE1):
         finally:
             await sh.close()
 
-    async def check_available(self, ts: float):
+    def check_available(self, ts: float):
         for device in list(self.devices.values()):
             if self not in device.gateways or device.type == GATEWAY:
                 continue
@@ -210,11 +210,10 @@ class XGateway(GateGW3, GateE1):
                     ts - device.encode_ts > device.poll_timeout
             ):
                 for attr, entity in device.entities.items():
-                    if not entity.hass:
-                        continue
-                    self.debug_device(device, "poll state", attr)
-                    await entity.async_device_update()
-                    break
+                    if entity.hass and hasattr(entity, "async_update"):
+                        self.debug_device(device, "poll state", attr)
+                        asyncio.create_task(entity.async_update())
+                        break
 
             if (device.available and device.available_timeout and
                     ts - device.decode_ts > device.available_timeout
