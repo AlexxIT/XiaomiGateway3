@@ -1078,6 +1078,12 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, BLEBattery],
     "ttl": "16m",  # battery every 5 min
 }, {
+    2443: ["Xiaomi", "Door/Window Sensor 2", "MCCGQ02HL"],
+    "spec": [
+        MiBeacon, BLEContact, BLELight, BLEBattery,
+    ],
+    "ttl": "3d",  # battery every 1 day
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1121,12 +1127,6 @@ DEVICES += [{
         Converter("smoke", "binary_sensor", enabled=None),
         Converter("water_leak", "binary_sensor", enabled=None),
     ],
-    2443: ["Xiaomi", "Door/Window Sensor 2", "MCCGQ02HL"],
-    "spec": [
-        MiBeacon, BLELight, BLEBattery,
-        Converter("contact", "binary_sensor"),
-    ],
-    "ttl": "3d",  # battery every 1 day
 }]
 
 ################################################################################
