@@ -174,7 +174,7 @@ The integration can work in two modes:
 **Mi Home (default)**
 
 - Support Xiaomi/Aqara Zigbee devices simultaneously in Mi Home and Hass
-- Support some Zigbee devices of other brands only in Hass
+- Support some Zigbee devices from other brands only in Hass
 - Support Xiaomi BLE devices simultaneously in Mi Home and Hass
 - Support Xiaomi Mesh devices simultaneously in Mi Home and Hass
 
@@ -216,47 +216,48 @@ Total devices: 2
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
 Aqara|Hub E1 CN|[ZHWG16LM](https://home.miot-spec.com/s/lumi.gateway.aqcn02)|command, data, gateway|3
-Xiaomi|Gateway 3|[ZNDMWG03LM/ZNDMWG02LM](https://home.miot-spec.com/s/lumi.gateway.mgl03)|alarm, command, data, cloud_link, led, gateway|4
+Xiaomi|Gateway 3|[ZNDMWG03LM ZNDMWG02LM](https://home.miot-spec.com/s/lumi.gateway.mgl03)|alarm, command, data, cloud_link, led, gateway|4
 
 ## Supported Xiaomi Zigbee
 
-Total devices: 81
+Total devices: 82
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
 Aqara|Air Quality Monitor CN|[VOCKQJK11LM](https://home.miot-spec.com/s/lumi.airmonitor.acn01)|temperature, humidity, tvoc, battery, battery_low, display_unit|
 Aqara|Bulb CN|[ZNLDP12LM](https://home.miot-spec.com/s/lumi.light.aqcn02)|light, power_on_state|
 Aqara|Button CN|[WXKG11LM](https://home.miot-spec.com/s/lumi.remote.b1acn01)|action, battery, battery_low, chip_temperature|
-Aqara|Cube EU|[MFKZQ01LM](https://home.miot-spec.com/s/lumi.sensor_cube.aqgl01)|action, battery|3
+Aqara|Cube EU|[MFKZQ01LM](https://home.miot-spec.com/s/lumi.sensor_cube.aqgl01)|action, battery|5
 Aqara|Curtain|[ZNCLDJ11LM](https://home.miot-spec.com/s/lumi.curtain)|motor|
 Aqara|Curtain B1 EU|[ZNCLDJ12LM](https://home.miot-spec.com/s/lumi.curtain.hagl04)|motor, battery|
-Aqara|Door Lock S1|[ZNMS11LM](https://home.miot-spec.com/s/lumi.lock.aq1)|action, battery, key_id, lock|
-Aqara|Door Lock S2 CN|[ZNMS12LM](https://home.miot-spec.com/s/lumi.lock.acn02)|action, battery, key_id, lock|
+Aqara|Door Lock S1|[ZNMS11LM](https://home.miot-spec.com/s/lumi.lock.aq1)|square, reverse, latch, battery, key_id|
+Aqara|Door Lock S2 CN|[ZNMS12LM](https://home.miot-spec.com/s/lumi.lock.acn02)|square, reverse, latch, battery, key_id|
 Aqara|Door Lock S2 Pro CN|[ZNMS13LM](https://home.miot-spec.com/s/lumi.lock.acn03)|lock, square, reverse, latch, battery, action|
 Aqara|Door/Window Sensor|[MCCGQ11LM](https://home.miot-spec.com/s/lumi.sensor_magnet.aq2)|contact, battery, battery_low, chip_temperature|
 Aqara|Door/Window Sensor E1 CN|[MCCGQ14LM](https://home.miot-spec.com/s/lumi.magnet.acn001)|contact, battery, battery_low|
 Aqara|Double Wall Button|[WXKG02LM](https://home.miot-spec.com/s/lumi.sensor_86sw2.es1)|action, battery, battery_low, chip_temperature|
-Aqara|Double Wall Button D1|[WXKG07LM](https://home.miot-spec.com/s/lumi.remote.b286acn02)|action, battery, battery_low, chip_temperature|
+Aqara|Double Wall Button D1 CN|[WXKG07LM](https://home.miot-spec.com/s/lumi.remote.b286acn02)|action, battery, battery_low, chip_temperature|
 Aqara|Double Wall Button E1 CN|[WXKG17LM](https://home.miot-spec.com/s/lumi.remote.acn004)|action, battery|
-Aqara|Double Wall Switch|[QBKG12LM](https://home.miot-spec.com/s/lumi.ctrl_ln2.aq1)|channel_1, channel_2, power, energy, action|
-Aqara|Double Wall Switch (no N)|[QBKG03LM](https://home.miot-spec.com/s/lumi.ctrl_neutral2)|channel_1, channel_2, action|
-Aqara|Double Wall Switch D1 CN (no N)|[QBKG22LM](https://home.miot-spec.com/s/lumi.switch.b2lacn02)|channel_1, channel_2, action|
-Aqara|Double Wall Switch D1 CN (with N)|[QBKG24LM](https://home.miot-spec.com/s/lumi.switch.b2nacn02)|channel_1, channel_2, power, energy, action|
+Aqara|Double Wall Button H1|[WRS-R02](https://home.miot-spec.com/s/lumi.remote.b28ac1)|action, battery, battery_low, mode|
+Aqara|Double Wall Switch|[QBKG12LM](https://home.miot-spec.com/s/lumi.ctrl_ln2.aq1)|channel_1, channel_2, power, energy, action, wireless_1, wireless_2, power_on_state, led|
+Aqara|Double Wall Switch (no N)|[QBKG03LM](https://home.miot-spec.com/s/lumi.ctrl_neutral2)|channel_1, channel_2, action, wireless_1, wireless_2, led|
+Aqara|Double Wall Switch D1 CN (no N)|[QBKG22LM](https://home.miot-spec.com/s/lumi.switch.b2lacn02)|channel_1, channel_2, action, wireless_1, wireless_2, led|
+Aqara|Double Wall Switch D1 CN (with N)|[QBKG24LM](https://home.miot-spec.com/s/lumi.switch.b2nacn02)|channel_1, channel_2, power, energy, action, wireless_1, wireless_2, power_on_state, led|
 Aqara|Double Wall Switch E1 (no N)|[QBKG39LM](https://home.miot-spec.com/s/lumi.switch.b2lc04)|channel_1, channel_2, action, wireless_1, wireless_2, led, power_on_state, mode|
-Aqara|Double Wall Switch E1 (with N)|[QBKG41LM](https://home.miot-spec.com/s/lumi.switch.b2nc01)|channel_1, channel_2, action, led, power_on_state, wireless_1, wireless_2|
+Aqara|Double Wall Switch E1 (with N)|[QBKG41LM](https://home.miot-spec.com/s/lumi.switch.b2nc01)|channel_1, channel_2, action, led, led_reverse, power_on_state, wireless_1, wireless_2|
 Aqara|Double Wall Switch H1 CN (no N)|[QBKG28LM](https://home.miot-spec.com/s/lumi.switch.l2acn1)|channel_1, channel_2, action, led, power_on_state, wireless_1, wireless_2|
-Aqara|Double Wall Switch H1 CN (with N)|[QBKG31LM](https://home.miot-spec.com/s/lumi.switch.n2acn1)|channel_1, channel_2, energy, power, action, led, power_on_state, wireless_1, wireless_2|
+Aqara|Double Wall Switch H1 CN (with N)|[QBKG31LM](https://home.miot-spec.com/s/lumi.switch.n2acn1)|channel_1, channel_2, energy, power, action, led, led_reverse, power_on_state, wireless_1, wireless_2|
 Aqara|Double Wall Switch H1 EU (no N)|[WS-EUK02](https://home.miot-spec.com/s/lumi.switch.l2aeu1)|channel_1, channel_2, action, led, power_on_state, wireless_1, wireless_2|
-Aqara|Double Wall Switch H1 EU (with N)|[WS-EUK04](https://home.miot-spec.com/s/lumi.switch.n2aeu1)|channel_1, channel_2, energy, power, action, led, power_on_state, wireless_1, wireless_2|
+Aqara|Double Wall Switch H1 EU (with N)|[WS-EUK04](https://home.miot-spec.com/s/lumi.switch.n2aeu1)|channel_1, channel_2, energy, power, action, led, led_reverse, power_on_state, wireless_1, wireless_2|
 Aqara|Double Wall Switch US (with N)|[WS-USC04](https://home.miot-spec.com/s/lumi.switch.b2naus01)|channel_1, channel_2, action, energy, power, led, power_on_state, wireless_1, wireless_2|
 Aqara|Motion Sensor|[RTCGQ11LM](https://home.miot-spec.com/s/lumi.sensor_motion.aq2)|motion, illuminance, battery|
-Aqara|Opple Four Button|[WXCJKG12LM](https://home.miot-spec.com/s/lumi.remote.b486opcn01)|action, battery, battery_low, chip_temperature|
+Aqara|Opple Four Button CN|[WXCJKG12LM](https://home.miot-spec.com/s/lumi.remote.b486opcn01)|mode, action, battery, battery_low, chip_temperature|
 Aqara|Opple MX480 CN|[XDD13LM](https://home.miot-spec.com/s/lumi.light.cwopcn03)|light|
 Aqara|Opple MX650 CN|[XDD12LM](https://home.miot-spec.com/s/lumi.light.cwopcn02)|light|
-Aqara|Opple Six Button|[WXCJKG13LM](https://home.miot-spec.com/s/lumi.remote.b686opcn01)|action, battery, battery_low, chip_temperature|
-Aqara|Opple Two Button|[WXCJKG11LM](https://home.miot-spec.com/s/lumi.remote.b286opcn01)|action, battery, battery_low, chip_temperature|
+Aqara|Opple Six Button CN|[WXCJKG13LM](https://home.miot-spec.com/s/lumi.remote.b686opcn01)|mode, action, battery, battery_low, chip_temperature|
+Aqara|Opple Two Button CN|[WXCJKG11LM](https://home.miot-spec.com/s/lumi.remote.b286opcn01)|mode, action, battery, battery_low, chip_temperature|
 Aqara|Plug EU|[SP-EUC01](https://home.miot-spec.com/s/lumi.plug.maeu01)|plug, energy, power, led, power_on_state|
-Aqara|Precision Motion Sensor EU|[RTCGQ13LM](https://home.miot-spec.com/s/lumi.motion.agl04)|motion, battery, sensitivity, blind_time, battery_low|
+Aqara|Precision Motion Sensor EU|[RTCGQ13LM](https://home.miot-spec.com/s/lumi.motion.agl04)|motion, battery, sensitivity, blind_time, battery_low, idle_time|
 Aqara|Relay CN|[LLKZMK11LM](https://home.miot-spec.com/s/lumi.relay.c2acn01)|channel_1, channel_2, current, power, voltage, energy, action, chip_temperature, interlock|4
 Aqara|Relay T1 CN (with N)|[DLKZMK11LM](https://home.miot-spec.com/s/lumi.switch.n0acn2)|switch, energy, power, led, power_on_state|
 Aqara|Relay T1 EU (no N)|[SSM-U02](https://home.miot-spec.com/s/lumi.switch.l0agl1)|switch, chip_temperature|
@@ -267,25 +268,25 @@ Aqara|Shake Button|[WXKG12LM](https://home.miot-spec.com/s/lumi.sensor_switch.aq
 Aqara|Single Wall Button CN|[WXKG03LM](https://home.miot-spec.com/s/lumi.remote.b186acn01)|action, battery, battery_low, chip_temperature|
 Aqara|Single Wall Button D1 CN|[WXKG06LM](https://home.miot-spec.com/s/lumi.remote.b186acn02)|action, battery, battery_low, chip_temperature|
 Aqara|Single Wall Button E1 CN|[WXKG16LM](https://home.miot-spec.com/s/lumi.remote.acn003)|action, battery|
-Aqara|Single Wall Switch|[QBKG04LM](https://home.miot-spec.com/s/lumi.ctrl_neutral1)|switch, action|
-Aqara|Single Wall Switch|[QBKG11LM](https://home.miot-spec.com/s/lumi.ctrl_ln1.aq1)|switch, power, energy, action|
-Aqara|Single Wall Switch D1 CN (no N)|[QBKG21LM](https://home.miot-spec.com/s/lumi.switch.b1lacn02)|switch, action|
-Aqara|Single Wall Switch D1 CN (with N)|[QBKG23LM](https://home.miot-spec.com/s/lumi.switch.b1nacn02)|switch, power, energy, action|
+Aqara|Single Wall Switch|[QBKG04LM](https://home.miot-spec.com/s/lumi.ctrl_neutral1)|switch, action, wireless, led|
+Aqara|Single Wall Switch|[QBKG11LM](https://home.miot-spec.com/s/lumi.ctrl_ln1.aq1)|switch, power, energy, action, wireless, led|
+Aqara|Single Wall Switch D1 CN (no N)|[QBKG21LM](https://home.miot-spec.com/s/lumi.switch.b1lacn02)|switch, action, wireless, led|
+Aqara|Single Wall Switch D1 CN (with N)|[QBKG23LM](https://home.miot-spec.com/s/lumi.switch.b1nacn02)|switch, power, energy, action, wireless, led|
 Aqara|Single Wall Switch E1 (no N)|[QBKG38LM](https://home.miot-spec.com/s/lumi.switch.b1lc04)|switch, action, led, power_on_state, wireless, mode|
-Aqara|Single Wall Switch E1 (with N)|[QBKG40LM](https://home.miot-spec.com/s/lumi.switch.b1nc01)|switch, action, led, power_on_state, wireless|
+Aqara|Single Wall Switch E1 (with N)|[QBKG40LM](https://home.miot-spec.com/s/lumi.switch.b1nc01)|switch, action, led, led_reverse, power_on_state, wireless|
 Aqara|Single Wall Switch H1 CN (no N)|[QBKG27LM](https://home.miot-spec.com/s/lumi.switch.l1acn1)|switch, action, led, power_on_state, wireless|
-Aqara|Single Wall Switch H1 CN (with N)|[QBKG30LM](https://home.miot-spec.com/s/lumi.switch.n1acn1)|switch, energy, power, action, led, power_on_state, wireless|
+Aqara|Single Wall Switch H1 CN (with N)|[QBKG30LM](https://home.miot-spec.com/s/lumi.switch.n1acn1)|switch, energy, power, action, led, led_reverse, power_on_state, wireless|
 Aqara|Single Wall Switch H1 EU (no N)|[WS-EUK01](https://home.miot-spec.com/s/lumi.switch.l1aeu1)|switch, action, led, power_on_state, wireless|
-Aqara|Single Wall Switch H1 EU (with N)|[WS-EUK03](https://home.miot-spec.com/s/lumi.switch.n1aeu1)|switch, energy, power, action, led, power_on_state, wireless|
+Aqara|Single Wall Switch H1 EU (with N)|[WS-EUK03](https://home.miot-spec.com/s/lumi.switch.n1aeu1)|switch, energy, power, action, led, led_reverse, power_on_state, wireless|
 Aqara|TH Sensor|[WSDCGQ11LM](https://home.miot-spec.com/s/lumi.weather)|temperature, humidity, battery, pressure|
 Aqara|TH Sensor|[WSDCGQ12LM](https://home.miot-spec.com/s/lumi.sensor_ht.agl02)|temperature, humidity, battery, pressure|
 Aqara|Thermostat S2 CN|[KTWKQ03ES](https://home.miot-spec.com/s/lumi.airrtc.tcpecn02)|climate|
-Aqara|Triple Wall Switch D1 CN (no N)|[QBKG25LM](https://home.miot-spec.com/s/lumi.switch.l3acn3)|channel_1, channel_2, channel_3, action|
-Aqara|Triple Wall Switch D1 CN (with N)|[QBKG26LM](https://home.miot-spec.com/s/lumi.switch.n3acn3)|channel_1, channel_2, channel_3, power, voltage, energy, action|
+Aqara|Triple Wall Switch D1 CN (no N)|[QBKG25LM](https://home.miot-spec.com/s/lumi.switch.l3acn3)|channel_1, channel_2, channel_3, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
+Aqara|Triple Wall Switch D1 CN (with N)|[QBKG26LM](https://home.miot-spec.com/s/lumi.switch.n3acn3)|channel_1, channel_2, channel_3, power, voltage, energy, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
 Aqara|Triple Wall Switch H1 CN (no N)|[QBKG29LM](https://home.miot-spec.com/s/lumi.switch.l3acn1)|channel_1, channel_2, channel_3, action, led, power_on_state, wireless_1, wireless_2, wireless_3|
 Aqara|Triple Wall Switch H1 CN (with N)|[QBKG32LM](https://home.miot-spec.com/s/lumi.switch.n3acn1)|channel_1, channel_2, channel_3, energy, power, action, led, led_reverse, power_on_state, wireless_1, wireless_2, wireless_3|
-Aqara|Vibration Sensor|[DJT11LM](https://home.miot-spec.com/s/lumi.vibration.aq1)|action, battery|3
-Aqara|Wall Outlet|[QBCZ11LM](https://home.miot-spec.com/s/lumi.ctrl_86plug.aq1)|outlet, power, energy, chip_temperature|
+Aqara|Vibration Sensor|[DJT11LM](https://home.miot-spec.com/s/lumi.vibration.aq1)|action, battery, battery_low|3
+Aqara|Wall Outlet|[QBCZ11LM](https://home.miot-spec.com/s/lumi.ctrl_86plug.aq1)|outlet, power, energy, chip_temperature, power_on_state, charge_protect, led, wireless|
 Aqara|Water Leak Sensor|[SJCGQ11LM](https://home.miot-spec.com/s/lumi.sensor_wleak.aq1)|moisture, battery|
 Honeywell|Gas Sensor|[JTQJ-BF-01LM/BW](https://home.miot-spec.com/s/lumi.sensor_natgas)|gas_density, gas, sensitivity|4
 Honeywell|Smoke Sensor|[JTYJ-GD-01LM/BW](https://home.miot-spec.com/s/lumi.sensor_smoke)|smoke_density, smoke, battery|
@@ -302,8 +303,8 @@ Xiaomi|Light Sensor EU|[GZCGQ01LM](https://home.miot-spec.com/s/lumi.sen_ill.mgl
 Xiaomi|Motion Sensor|[RTCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_motion)|motion, battery, battery_low, chip_temperature|
 Xiaomi|Plug CN|[ZNCZ02LM](https://home.miot-spec.com/s/lumi.plug)|plug, power, energy, chip_temperature, power_on_state, charge_protect, led|5
 Xiaomi|Plug EU|[ZNCZ04LM](https://home.miot-spec.com/s/lumi.plug.mmeu01)|plug, power, voltage, energy|
-Xiaomi|Plug TW|[ZNCZ03LM](https://home.miot-spec.com/s/lumi.plug.mitw01)|plug, power, energy|
-Xiaomi|Plug US|[ZNCZ12LM](https://home.miot-spec.com/s/lumi.plug.maus01)|plug, power, energy|
+Xiaomi|Plug TW|[ZNCZ03LM](https://home.miot-spec.com/s/lumi.plug.mitw01)|plug, power, energy, chip_temperature, power_on_state, charge_protect, led|5
+Xiaomi|Plug US|[ZNCZ12LM](https://home.miot-spec.com/s/lumi.plug.maus01)|plug, power, energy, chip_temperature, power_on_state, charge_protect, led|5
 Xiaomi|TH Sensor|[WSDCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_ht)|temperature, humidity, battery, battery_low, chip_temperature|
 
 ## Supported Other Zigbee
@@ -328,7 +329,7 @@ eWeLink|Zigbee OnOff Controller|[SA-003-Zigbee](https://www.zigbee2mqtt.io/suppo
 
 ## Supported Xiaomi BLE
 
-Total devices: 32
+Total devices: 33
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
@@ -336,12 +337,13 @@ Aqara|Door Lock D100|[ZNMS20LM](https://home.miot-spec.com/s/3051)|*|
 Aqara|Door Lock N100 (Bluetooth)|[ZNMS16LM](https://home.miot-spec.com/s/1694)|*|
 Aqara|Door Lock N200|[ZNMS17LM](https://home.miot-spec.com/s/1695)|*|
 Honeywell|Smoke Alarm|[JTYJ-GD-03MI](https://home.miot-spec.com/s/2455)|*|
+Loock|Door Lock Classic 2X Pro|[loock.lock.cc2xpro](https://home.miot-spec.com/s/3343)|*|
 Unknown|Lock M2|[ydhome.lock.m2silver](https://home.miot-spec.com/s/955)|*|
 Xiaomi|Alarm Clock|[CGD1](https://home.miot-spec.com/s/1398)|temperature, humidity, battery*|
 Xiaomi|Door Lock|[MJZNMS02LM](https://home.miot-spec.com/s/794)|*|
 Xiaomi|Door Lock|[MJZNMS03LM](https://home.miot-spec.com/s/1433)|*|
 Xiaomi|Door Lock|[XMZNMST02YD](https://home.miot-spec.com/s/2444)|*|
-Xiaomi|Door Sensor 2|[MCCGQ02HL](https://home.miot-spec.com/s/2443)|*|
+Xiaomi|Door/Window Sensor 2|[MCCGQ02HL](https://home.miot-spec.com/s/2443)|contact, light, battery|
 Xiaomi|Flower Care|[HHCCJCY01](https://home.miot-spec.com/s/152)|temperature, moisture, conductivity, illuminance, battery*|
 Xiaomi|Flower Pot|[HHCCPOT002](https://home.miot-spec.com/s/349)|moisture, conductivity, battery*|
 Xiaomi|Kettle|[YM-K1501](https://home.miot-spec.com/s/131)|power, temperature|
@@ -350,7 +352,7 @@ Xiaomi|Mosquito Repellent|[WX08ZM](https://home.miot-spec.com/s/1034)|*|
 Xiaomi|Motion Sensor 2|[RTCGQ02LM](https://home.miot-spec.com/s/2701)|motion, illuminance, battery, action, idle_time|
 Xiaomi|Night Light 2|[MJYD02YL-A](https://home.miot-spec.com/s/2038)|battery, light, motion, idle_time|
 Xiaomi|Qingping Door Sensor|[CGH1](https://home.miot-spec.com/s/982)|*|
-Xiaomi|Qingping Motion Sensor|[CGPR1](https://home.miot-spec.com/s/2691)|*|
+Xiaomi|Qingping Motion Sensor|[CGPR1](https://home.miot-spec.com/s/2691)|motion, light, illuminance, battery, idle_time|
 Xiaomi|Qingping TH Lite|[CGDK2](https://home.miot-spec.com/s/1647)|temperature, humidity, battery*|
 Xiaomi|Qingping TH Sensor|[CGG1](https://home.miot-spec.com/s/839)|temperature, humidity, battery*|
 Xiaomi|Safe Box|[BGX-5/X1-3001](https://home.miot-spec.com/s/2480)|*|
@@ -367,21 +369,22 @@ Yeelight|Button S1|[YLAI003](https://home.miot-spec.com/s/1983)|action, battery|
 
 ## Supported Xiaomi Mesh
 
-Total devices: 28
+Total devices: 29
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
+LeMesh|Mesh Downlight|[lemesh.light.wy0c05](https://home.miot-spec.com/s/2351)|light|
+LeMesh|Mesh Light|[lemesh.light.wy0c08](https://home.miot-spec.com/s/3531)|light|
+LeMesh|Mesh Light (RF ready)|[lemesh.light.wy0c02](https://home.miot-spec.com/s/1910)|light|
+LeMesh|Mesh Light (RF ready)|[lemesh.light.wy0c07](https://home.miot-spec.com/s/3164)|light|
 PTX|Mesh Double Wall Switch|[PTX-SK2M](https://home.miot-spec.com/s/2257)|channel_1, channel_2, led, wireless_1, wireless_2|
 PTX|Mesh Downlight|[090615.light.mlig01](https://home.miot-spec.com/s/3416)|light|
 PTX|Mesh Single Wall Switch|[PTX-SK1M](https://home.miot-spec.com/s/2258)|switch, led, wireless|
 PTX|Mesh Triple Wall Switch|[PTX-SK3M](https://home.miot-spec.com/s/3878)|channel_1, channel_2, channel_3, led, wireless_1, wireless_2, wireless_3|
 PTX|Mesh Triple Wall Switch|[PTX-TK3/M](https://home.miot-spec.com/s/2093)|channel_1, channel_2, channel_3, led, wireless_1, wireless_2, wireless_3|
-Unknown|Mesh Downlight|[lemesh.light.wy0c05](https://home.miot-spec.com/s/2351)|light|
-Unknown|Mesh Downlight (RF ready)|[lemesh.light.wy0c07](https://home.miot-spec.com/s/3164)|light|
 Unknown|Mesh Lightstrip (RF ready)|[crzm.light.wy0a01](https://home.miot-spec.com/s/2293)|light|
 Unknown|Mesh Switch Controller|[lemesh.switch.sw0a01](https://home.miot-spec.com/s/2007)|switch|
 Unknown|Mesh Wall Switch|[DHKG01ZM](https://home.miot-spec.com/s/1945)|switch, led|
-Unknown|ightctl Light|[lemesh.light.wy0c08](https://home.miot-spec.com/s/3531)|light|
 Xiaomi|Electrical Outlet|[ZNCZ01ZM](https://home.miot-spec.com/s/3083)|outlet, power, led, power_protect, power_value|
 Xiaomi|Mesh Bulb|[MJDP09YL](https://home.miot-spec.com/s/1771)|light, flex_switch, power_on_state|4
 Xiaomi|Mesh Double Wall Switch|[DHKG02ZM](https://home.miot-spec.com/s/1946)|channel_1, channel_2, led, wireless_1, wireless_2|
@@ -390,7 +393,7 @@ Xiaomi|Mesh Downlight|[MJTS01YL/MJTS003](https://home.miot-spec.com/s/1772)|ligh
 Xiaomi|Mesh Group|[yeelink.light.mb1grp](https://home.miot-spec.com/s/1054)|group|4
 Xiaomi|Mesh Single Wall Switch|[ZNKG01HL](https://home.miot-spec.com/s/2715)|switch, humidity, temperature|
 Xiaomi|Mesh Triple Wall Switch|[ZNKG03HL/ISA-KG03HL](https://home.miot-spec.com/s/2717)|channel_1, channel_2, channel_3, humidity, temperature, wireless_1, wireless_2, wireless_3, baby_mode|
-Xiaomi|Mosquito Repeller 2|[WX10ZM](https://home.miot-spec.com/s/4160)|switch, battery, supply, led, mode|
+Xiaomi|Mosquito Repeller 2|[WX10ZM](https://home.miot-spec.com/s/4160)|switch, battery, supply, led, power_mode|
 XinGuang|Mesh Switch|[wainft.switch.sw0a01](https://home.miot-spec.com/s/3150)|switch|
 XinGuang|Smart Light|[LIBMDA09X](https://home.miot-spec.com/s/2584)|light|
 Yeelight|Mesh Bulb E14|[YLDP09YL](https://home.miot-spec.com/s/995)|light, flex_switch, power_on_state|4

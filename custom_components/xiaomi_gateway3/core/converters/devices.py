@@ -95,7 +95,7 @@ from .zigbee import *
 ################################################################################
 
 DEVICES = [{
-    "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM/ZNDMWG02LM"],
+    "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM ZNDMWG02LM"],
     "support": 4,  # @AlexxIT TODO: cloud link
     "spec": [
         # write pair=60 => report discovered_mac => report 8.0.2166? =>
