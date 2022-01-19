@@ -1096,6 +1096,7 @@ DEVICES += [{
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
+    3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
     "spec": [
         MiBeacon,
         # sensors:
