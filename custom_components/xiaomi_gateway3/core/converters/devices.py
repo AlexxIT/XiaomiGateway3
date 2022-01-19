@@ -1091,7 +1091,6 @@ DEVICES += [{
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
     2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
-    2443: ["Xiaomi", "Door Sensor 2", "MCCGQ02HL"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
@@ -1122,6 +1121,12 @@ DEVICES += [{
         Converter("smoke", "binary_sensor", enabled=None),
         Converter("water_leak", "binary_sensor", enabled=None),
     ],
+    2443: ["Xiaomi", "Door/Window Sensor 2", "MCCGQ02HL"],
+    "spec": [
+        MiBeacon, BLELight, BLEBattery,
+        Converter("contact", "binary_sensor"),
+    ],
+    "ttl": "3d",  # battery every 1 day
 }]
 
 ################################################################################
