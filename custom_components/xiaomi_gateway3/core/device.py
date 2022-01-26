@@ -245,12 +245,15 @@ class XDevice:
 
         self.converters = self.info.spec.copy()
 
-        for attr in entities:
-            if attr in LUMI_GLOBALS:
-                self.converters.append(LUMI_GLOBALS[attr])
+        stat: Converter = STAT_GLOBALS[self.type]
 
-            if attr == self.type and attr in STAT_GLOBALS:
-                self.converters.append(STAT_GLOBALS[attr])
+        for attr in entities:
+            if attr == self.type:
+                self.converters.append(stat)
+
+            if attr in stat.childs:
+                conv = Converter(attr, "sensor")
+                self.converters.append(conv)
 
             for conv in self.info.spec:
                 if conv.childs and attr in conv.childs:
