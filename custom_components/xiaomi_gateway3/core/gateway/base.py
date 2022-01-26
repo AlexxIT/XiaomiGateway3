@@ -57,10 +57,8 @@ class GatewayBase:
         return self.options.get('zha', False)
 
     @property
-    def entities(self) -> Optional[list]:
-        if self.options.get('entities'):
-            return RE_ENTITIES.findall(self.options['entities'])
-        return None
+    def stats_enable(self):
+        return self.options.get('stats', False)
 
     @property
     def device(self) -> Optional[XDevice]:
@@ -131,7 +129,7 @@ class GatewayBase:
         #     self.debug_device(device, "Join to gateway", device.model)
         #     return
 
-        device.setup_entitites(self, entities=self.entities)
+        device.setup_entitites(self, stats=self.stats_enable)
         self.debug_device(
             device, f"setup {device.info.model}:",
             ", ".join(device.entities.keys())

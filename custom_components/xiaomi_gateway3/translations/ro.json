@@ -48,7 +48,7 @@
           "token": "Token",
           "telnet_cmd": "Comanda de deschidere Telnet",
           "ble": "Dispozitive BLE suportate",
-          "entities": "Additional entities",
+          "stats": "Date despre performanta dispozitivelor Zigbee si BLE",
           "debug": "Debug",
           "buzzer": "Dezactiveaza buzzer [ADV]",
           "memory": "Use storage in memory [ADV]",

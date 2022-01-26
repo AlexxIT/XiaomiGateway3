@@ -50,7 +50,7 @@
           "token": "Token",
           "telnet_cmd": "Open Telnet command",
           "ble": "Support Bluetooth devices",
-          "entities": "Additional entities",
+          "stats": "Add statistic sensors",
           "debug": "Debug logs",
           "buzzer": "Disable buzzer [ADV]",
           "memory": "Use storage in memory [ADV]",

@@ -242,7 +242,7 @@ class OptionsFlowHandler(OptionsFlow):
         token = self.entry.options["token"]
         telnet_cmd = self.entry.options.get("telnet_cmd", "")
         ble = self.entry.options.get("ble", True)
-        entities = self.entry.options.get("entities", "")
+        stats = self.entry.options.get("stats", False)
         debug = self.entry.options.get("debug", [])
         buzzer = self.entry.options.get("buzzer", False)
         memory = self.entry.options.get("memory", False)
@@ -258,7 +258,7 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Required("token", default=token): str,
                 vol.Optional("telnet_cmd", default=telnet_cmd): str,
                 vol.Required("ble", default=ble): bool,
-                vol.Optional("entities", default=entities): str,
+                vol.Optional("stats", default=stats): bool,
                 vol.Optional("debug", default=debug):
                     cv.multi_select(OPT_DEBUG),
                 vol.Optional("buzzer", default=buzzer): bool,

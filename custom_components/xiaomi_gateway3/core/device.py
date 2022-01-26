@@ -181,8 +181,12 @@ class XDevice:
         s += f", {self.nwk})" if self.nwk else ")"
         return s
 
-    def setup_entitites(self, gateway: 'GatewayBase', entities: list = None):
-        kwargs: Dict[str, Any] = {"entities": entities} if entities else {}
+    def setup_entitites(self, gateway: 'GatewayBase', stats: bool = False):
+        kwargs: Dict[str, Any] = {}
+
+        if stats:
+            kwargs["entities"] = list(STAT_GLOBALS.keys())
+
         for key in ("global", self.model, self.mac, self.did):
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
