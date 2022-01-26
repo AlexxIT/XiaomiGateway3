@@ -67,6 +67,7 @@ class ShellE1(TelnetShell):
     async def run_ftp(self):
         await self.exec("busybox tcpsvd -E 0.0.0.0 21 busybox ftpd -w &")
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     async def apply_patches(self, ps: str) -> int:
         # n = 0
         # if self.app_ps not in ps:

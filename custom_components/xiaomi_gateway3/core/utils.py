@@ -89,8 +89,9 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
         for k, v in devices.items():
             XGateway.defaults.setdefault(k, {}).update(v)
 
-    # save devices data to .storage
+    # noinspection PyUnusedLocal
     async def stop(*args):
+        # save devices data to .storage
         data = {
             d.mac: {"decode_ts": d.decode_ts}
             for d in XGateway.devices.values()

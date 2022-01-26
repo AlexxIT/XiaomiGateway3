@@ -243,6 +243,7 @@ def get_attr_type(attributes: dict, attr: str) -> (int, int):
     return attr, type
 
 
+# noinspection PyProtectedMember
 def get_type_len(type: int) -> int:
     t = DATA_TYPES[type][1]
     if hasattr(t, "_length"):

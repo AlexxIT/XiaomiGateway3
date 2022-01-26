@@ -128,6 +128,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 
+# noinspection PyUnusedLocal
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
