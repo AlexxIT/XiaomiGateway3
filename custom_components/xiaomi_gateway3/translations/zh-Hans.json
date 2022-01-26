@@ -50,11 +50,11 @@
 					"ble": "支持 BLE 设备",
 					"entities": "Additional entities",
 					"debug": "调试信息",
-					"buzzer": "关闭蜂鸣器 [ADV]",
-                    "memory": "Use storage in memory [ADV]",
-                    "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+					"buzzer": "关闭蜂鸣器 [DANGER]",
+                                        "memory": "Use storage in memory [DANGER]",
+                                        "zha": "Mode ZHA or zigbee2mqtt [DANGER]"
 				},
-				"description": "如果您不清楚了解带有 **ADV** 选项的作用，建议不要更改它们。"
+				"description": "如果您不清楚了解带有 **DANGER** 选项的作用，建议不要更改它们。"
 			}
 		}
 	},
