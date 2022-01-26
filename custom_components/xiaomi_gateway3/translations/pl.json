@@ -52,11 +52,11 @@
           "ble": "Wsparcie dla urządzeń BLE (Bluetoth Low Energy)",
           "entities": "Additional entities",
           "debug": "Debugowanie",
-          "buzzer": "Wyłącz głośnik w bramce [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "buzzer": "Wyłącz głośnik w bramce [DANGER]",
+          "memory": "Use storage in memory [DANGER]",
+          "zha": "Mode ZHA or zigbee2mqtt [DANGER]"
         },
-        "description": "Jeśli nie wiesz co robisz to NIGDY nie dotykaj ustawień **ADV**"
+        "description": "Jeśli nie wiesz co robisz to NIGDY nie dotykaj ustawień **DANGER**"
       }
     }
   },
