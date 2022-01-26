@@ -48,11 +48,11 @@
           "ble": "Підтримка BLE пристроїв",
           "stats": "Деталізація роботи Zigbee і BLE",
           "debug": "Відлагодження",
-          "buzzer": "Вимкнути спікер [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "buzzer": "[DANGER] Вимкнути спікер",
+          "memory": "[DANGER] Use storage in memory",
+          "zha": "[DANGER] Mode ZHA or zigbee2mqtt"
         },
-        "description": "Змінюйте **ADV** налаштування ТІЛЬКИ якщо знаєте, що ви робите"
+        "description": "Змінюйте **[DANGER]** налаштування ТІЛЬКИ якщо знаєте, що ви робите"
       }
     }
   },

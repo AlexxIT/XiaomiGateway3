@@ -52,11 +52,11 @@
           "ble": "Support Bluetooth devices",
           "stats": "Add statistic sensors",
           "debug": "Debug logs",
-          "buzzer": "Disable buzzer [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "buzzer": "[DANGER] Disable buzzer",
+          "memory": "[DANGER] Use storage in memory",
+          "zha": "[DANGER] Mode ZHA or zigbee2mqtt"
         },
-        "description": "Change **ADV** options ONLY if you know what you doing"
+        "description": "Change **[DANGER]** options ONLY if you know what you doing"
       }
     }
   },
