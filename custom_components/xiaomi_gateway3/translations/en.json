@@ -52,11 +52,11 @@
           "ble": "Support Bluetooth devices",
           "entities": "Additional entities",
           "debug": "Debug logs",
-          "buzzer": "Disable buzzer [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "buzzer": "Disable buzzer [DANGER]",
+          "memory": "Use storage in memory [DANGER]",
+          "zha": "Mode ZHA or zigbee2mqtt [DANGER]"
         },
-        "description": "Change **ADV** options ONLY if you know what you doing"
+        "description": "Change **DANGER** options ONLY if you know what you doing"
       }
     }
   },
