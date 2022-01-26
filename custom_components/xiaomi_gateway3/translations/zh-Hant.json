@@ -52,11 +52,11 @@
           "ble": "支援 BLE 設備",
           "entities": "Additional entities",
           "debug": "Debug",
-          "buzzer": "關閉蜂鳴器 [ADV]",
-          "memory": "使用記憶體空間 [ADV]",
-          "zha": "ZHA 或 zigbee2mqtt 模式 [ADV]"
+          "buzzer": "關閉蜂鳴器 [DANGER]",
+          "memory": "使用記憶體空間 [DANGER]",
+          "zha": "ZHA 或 zigbee2mqtt 模式 [DANGER]"
         },
-        "description": "僅於了解可能之風險後，才建議變更 **ADV** 選項"
+        "description": "僅於了解可能之風險後，才建議變更 **DANGER** 選項"
       }
     }
   },
