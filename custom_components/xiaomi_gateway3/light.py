@@ -138,12 +138,13 @@ class XiaomiMeshGroup(XiaomiMeshBase):
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
 
+        if not device.extra["childs"]:
+            device.available = False
+            return
+
         for did in device.extra["childs"]:
             child = gateway.devices[did]
             child.entities[self.attr] = self
-
-        if len(device.extra["childs"]) == 0:
-            device.available = False
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
