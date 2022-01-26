@@ -1080,6 +1080,10 @@ DEVICES += [{
     ],
     "ttl": "3d",  # battery every 1 day
 }, {
+    2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
+    "spec": [MiBeacon, BLEAction, BLESmoke, BLEBattery],
+    "ttl": "15m",  # battery every 4:30 min
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1094,7 +1098,6 @@ DEVICES += [{
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
     2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
-    2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
