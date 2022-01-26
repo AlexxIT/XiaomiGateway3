@@ -50,11 +50,11 @@
           "ble": "Dispozitive BLE suportate",
           "entities": "Additional entities",
           "debug": "Debug",
-          "buzzer": "Dezactiveaza buzzer [ADV]",
-          "memory": "Use storage in memory [ADV]",
-          "zha": "Mode ZHA or zigbee2mqtt [ADV]"
+          "buzzer": "Dezactiveaza buzzer [DANGER]",
+          "memory": "Use storage in memory [DANGER]",
+          "zha": "Mode ZHA or zigbee2mqtt [DANGER]"
         },
-        "description": "Nu schimba optiunile **ADV** DECAT daca stii ce fac!"
+        "description": "Nu schimba optiunile **DANGER** DECAT daca stii ce fac!"
       }
     }
   },
