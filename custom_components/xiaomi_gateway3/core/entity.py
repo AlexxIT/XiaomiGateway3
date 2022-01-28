@@ -207,7 +207,8 @@ class XEntity(Entity):
             configuration_url=device.info.url
         )
 
-        device.entities[attr] = self
+        # fix don't enabled by default entities
+        # device.entities[attr] = self
 
     @property
     def customize(self) -> dict:

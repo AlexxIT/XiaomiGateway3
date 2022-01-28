@@ -67,8 +67,9 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
     for entity in list(er.entities.values()):
         if entity.platform != DOMAIN:
             continue
+
         # split mac and attr in unique id
-        legacy_id = entity.unique_id.split("_", 1)[0]
+        legacy_id, attr = entity.unique_id.split("_", 1)
         if legacy_id.startswith("0x"):
             # add leading zeroes to zigbee mac
             mac = f"0x{legacy_id[2:]:>016s}"
@@ -76,11 +77,11 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
             # make mac lowercase (old Mesh devices)
             mac = legacy_id.lower()
         else:
-            continue
-        if mac == legacy_id:
-            continue
+            mac = legacy_id
+
         device = XGateway.defaults.setdefault(mac, {})
         device.setdefault("unique_id", legacy_id)
+        device.setdefault("restore_entities", []).append(attr)
 
     # 3. Load devices data from .storage
     store = Store(hass, 1, f"{DOMAIN}/devices.json")

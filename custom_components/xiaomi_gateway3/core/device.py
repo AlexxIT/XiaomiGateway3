@@ -182,10 +182,29 @@ class XDevice:
         return s
 
     def setup_entitites(self, gateway: 'GatewayBase', stats: bool = False):
+        """
+        xiaomi_gateway3:
+          devices:
+            0x001234567890:  # match device by IEEE
+              entities:
+                plug: light            # change entity domain (switch to light)
+                power:                 # disable default entity
+                zigbee: sensor         # adds stat entity only for this device
+                parent: sensor         # adds entity from attribute value
+                lqi: sensor            # adds entity from attribute value
+              model: lumi.plug.mitw01            # overwrite model
+              name: Kitchen Refrigerator         # overwrite device name
+              entity_name: kitchen_refrigerator  # overwrite entity name
+
+        System kwargs:
+          decode_ts - aka "last_seen" from device (stored in config folder)
+          unique_id - ID legacy format from 1st version
+          restore_entities - skip lazy status for exist entities
+        """
         kwargs: Dict[str, Any] = {}
 
         if stats:
-            kwargs["entities"] = list(STAT_GLOBALS.keys())
+            kwargs["entities"] = {self.type: "sensor"}
 
         for key in ("global", self.model, self.mac, self.did):
             if key in gateway.defaults:
@@ -206,17 +225,17 @@ class XDevice:
             if k in kwargs:
                 self.extra[k] = kwargs[k]
 
-        self.setup_converters(kwargs.get("entities"))
+        entities = kwargs.get("entities") or {}
+        restore_entities = kwargs.get("restore_entities") or []
 
-        # if self.lazy_setup:
-        #     return
+        self.setup_converters(entities)
 
         for conv in self.converters:
             # support change attribute domain in config
             domain = kwargs.get(conv.attr, conv.domain)
             if domain is None or conv.attr in self.entities:
                 continue
-            if conv.enabled is None:
+            if conv.enabled is None and conv.attr not in restore_entities:
                 self.lazy_setup.add(conv.attr)
                 continue
             gateway.setups[domain](gateway, self, conv)
@@ -236,32 +255,23 @@ class XDevice:
         self._available = \
             (time.time() - self.decode_ts) < self.available_timeout
 
-    def setup_converters(self, entities: list = None):
+    def setup_converters(self, entities: dict = None):
         """If no entities - use only required converters. Otherwise search for
         converters in:
-           - LUMI_GLOBALS list
            - STAT_GLOBALS list
            - converters childs list (always sensor)
         """
-        if not entities:
-            self.converters = self.info.spec
-            return
-
         self.converters = self.info.spec.copy()
 
-        stat: Converter = STAT_GLOBALS[self.type]
-
-        for attr in entities:
-            if attr == self.type:
-                self.converters.append(stat)
-
-            if attr in stat.childs:
-                conv = Converter(attr, "sensor")
-                self.converters.append(conv)
-
-            for conv in self.info.spec:
+        for attr, domain in entities.items():
+            if not isinstance(domain, str):
+                continue
+            if attr in STAT_GLOBALS:
+                self.converters.append(STAT_GLOBALS[attr])
+                continue
+            for conv in self.converters:
                 if conv.childs and attr in conv.childs:
-                    conv = Converter(attr, "sensor")
+                    conv = Converter(attr, domain)
                     self.converters.append(conv)
 
     def decode(self, attr_name: str, value: Any) -> Optional[dict]:

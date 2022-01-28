@@ -215,7 +215,7 @@ class MeshStatsConv(Converter):
 GatewayStats = GatewayStatsConverter(GATEWAY, "binary_sensor")
 
 STAT_GLOBALS = {
-    GATEWAY: GatewayStats,
+    # GATEWAY: GatewayStats,
     BLE: BLEStatsConv(BLE, "sensor"),
     MESH: MeshStatsConv(MESH, "sensor"),
     ZIGBEE: ZigbeeStatsConverter(ZIGBEE, "sensor"),
