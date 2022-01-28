@@ -161,7 +161,15 @@ class MiBeaconConv(Converter):
 
         elif eid == 0x100A:  # 4106
             # TODO: lock timestamp
-            payload['battery'] = data[0]
+            value = data[0]
+            if device.model == 2691:
+                # this sensor sends some kind of counter once an hour instead of
+                # the battery, so filter out the false values
+                prev = device.extra.get('battery')
+                device.extra['battery'] = value
+                if prev != value:
+                    return
+            payload['battery'] = value
 
         elif eid == 0x100D and len(data) == 4:  # 4109
             payload.update({
