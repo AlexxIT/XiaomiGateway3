@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 
 import voluptuous as vol
@@ -6,7 +7,7 @@ from homeassistant.components.system_log import CONF_LOGGER
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.storage import Store
@@ -65,6 +66,8 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     hass.data[DOMAIN] = {}
 
     await utils.load_devices(hass, config.get(CONF_DEVICES))
+
+    _register_send_command(hass)
 
     return True
 
@@ -267,3 +270,18 @@ async def _setup_logger(hass: HomeAssistant):
         if _LOGGER.defaul_level == logging.NOTSET:
             info = await hass.helpers.system_info.async_get_system_info()
             _LOGGER.debug(f"SysInfo: {info}")
+
+
+def _register_send_command(hass: HomeAssistant):
+    async def send_command(call: ServiceCall):
+        host = call.data["host"]
+        gw = next(gw for gw in hass.data[DOMAIN].values() if gw.host == host)
+        command = call.data["command"]
+        if command == "miio":
+            raw = json.loads(call.data["data"])
+            resp = await gw.miio.send(raw['method'], raw.get('params'))
+            hass.components.persistent_notification.async_create(
+                str(resp), utils.TITLE
+            )
+
+    hass.services.async_register(DOMAIN, "send_command", send_command)

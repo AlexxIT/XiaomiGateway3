@@ -1,0 +1,17 @@
+send_command:
+  description: Send command to Gateway
+  fields:
+    host:
+      description: Gateway IP address
+      example: 192.168.1.123
+      selector:
+        text:
+    command:
+      description: Command
+      example: reboot
+      selector:
+        text:
+    data:
+      description: Data
+      selector:
+        text:
