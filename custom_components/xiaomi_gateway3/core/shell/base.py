@@ -13,6 +13,8 @@ class TelnetShell:
     ver = None
 
     async def close(self):
+        if not self.writer:
+            return
         self.writer.close()
         await self.writer.wait_closed()
 
