@@ -229,6 +229,8 @@ class XDevice:
         restore_entities = kwargs.get("restore_entities") or []
 
         self.setup_converters(entities)
+        # update available before create entities
+        self.setup_available()
 
         for conv in self.converters:
             # support change attribute domain in config
@@ -239,21 +241,6 @@ class XDevice:
                 self.lazy_setup.add(conv.attr)
                 continue
             gateway.setups[domain](gateway, self, conv)
-
-        # TODO: change to better logic?
-        if self.type == GATEWAY or self.model == MESH_GROUP_MODEL:
-            self._available = True
-            return
-
-        # TODO: change to better logic?
-        if any(True for c in self.converters if c.attr == "battery"):
-            self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
-        else:
-            self.available_timeout = self.info.ttl or POWER_AVAILABLE
-            self.poll_timeout = POWER_POLL
-
-        self._available = \
-            (time.time() - self.decode_ts) < self.available_timeout
 
     def setup_converters(self, entities: dict = None):
         """If no entities - use only required converters. Otherwise search for
@@ -273,6 +260,22 @@ class XDevice:
                 if conv.childs and attr in conv.childs:
                     conv = Converter(attr, domain)
                     self.converters.append(conv)
+
+    def setup_available(self):
+        # TODO: change to better logic?
+        if self.type == GATEWAY or self.model == MESH_GROUP_MODEL:
+            self.available = True
+            return
+
+        # TODO: change to better logic?
+        if any(True for c in self.converters if c.attr == "battery"):
+            self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
+        else:
+            self.available_timeout = self.info.ttl or POWER_AVAILABLE
+            self.poll_timeout = POWER_POLL
+
+        self.available = \
+            (time.time() - self.decode_ts) < self.available_timeout
 
     def decode(self, attr_name: str, value: Any) -> Optional[dict]:
         """Find converter by attr_name and decode value."""
