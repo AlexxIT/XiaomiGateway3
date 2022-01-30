@@ -12,7 +12,11 @@ from .core.gateway import XGateway
 
 async def async_setup_entry(hass, config_entry, add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        add_entities([XiaomiSwitch(gateway, device, conv)])
+        if conv.attr in device.entities:
+            entity = device.entities[conv.attr]
+        else:
+            entity = XiaomiSwitch(gateway, device, conv)
+        add_entities([entity])
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup(__name__, setup)

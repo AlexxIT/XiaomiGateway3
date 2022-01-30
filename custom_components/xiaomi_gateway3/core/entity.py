@@ -208,7 +208,7 @@ class XEntity(Entity):
         )
 
         # fix don't enabled by default entities
-        # device.entities[attr] = self
+        device.entities[attr] = self
 
     @property
     def customize(self) -> dict:
@@ -224,7 +224,7 @@ class XEntity(Entity):
         # self.platform._async_add_entity => self.add_to_platform_finish
         #   => self.async_internal_added_to_hass => self.async_added_to_hass
         #   => self.async_write_ha_state
-        self.device.entities[self.attr] = self  # fix rename entity_id
+        # self.device.entities[self.attr] = self  # fix rename entity_id
 
         self.render_attributes_template()
 
@@ -240,7 +240,7 @@ class XEntity(Entity):
     async def async_will_remove_from_hass(self) -> None:
         """Also run when rename entity_id"""
         # self.device.setup_attrs.remove(self.attr)
-        self.device.entities.pop(self.attr)
+        # self.device.entities.pop(self.attr)
 
     @callback
     def async_set_state(self, data: dict):

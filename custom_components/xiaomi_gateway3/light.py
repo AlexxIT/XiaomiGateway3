@@ -16,14 +16,15 @@ CONF_DEFAULT_TRANSITION = 'default_transition'
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        if device.type == ZIGBEE:
-            cls = XiaomiZigbeeLight
+        if conv.attr in device.entities:
+            entity = device.entities[conv.attr]
+        elif device.type == ZIGBEE:
+            entity = XiaomiZigbeeLight(gateway, device, conv)
         elif device.model == MESH_GROUP_MODEL:
-            cls = XiaomiMeshGroup
+            entity = XiaomiMeshGroup(gateway, device, conv)
         else:
-            cls = XiaomiMeshLight
-
-        async_add_entities([cls(gateway, device, conv)])
+            entity = XiaomiMeshLight(gateway, device, conv)
+        async_add_entities([entity])
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup(__name__, setup)

@@ -233,7 +233,7 @@ class XDevice:
         for conv in self.converters:
             # support change attribute domain in config
             domain = kwargs.get(conv.attr, conv.domain)
-            if domain is None or conv.attr in self.entities:
+            if domain is None:
                 continue
             if conv.enabled is None and conv.attr not in restore_entities:
                 self.lazy_setup.add(conv.attr)

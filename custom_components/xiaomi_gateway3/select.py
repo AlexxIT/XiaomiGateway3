@@ -16,13 +16,15 @@ from .core.utils import TITLE
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        if conv.attr == "command":
-            cls = CommandSelect
+        if conv.attr in device.entities:
+            entity = device.entities[conv.attr]
+        elif conv.attr == "command":
+            entity = CommandSelect(gateway, device, conv)
         elif conv.attr == "data":
-            cls = DataSelect
+            entity = DataSelect(gateway, device, conv)
         else:
-            cls = XiaomiSelect
-        async_add_entities([cls(gateway, device, conv)])
+            entity = XiaomiSelect(gateway, device, conv)
+        async_add_entities([entity])
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
     gw.add_setup(__name__, setup)
