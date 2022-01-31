@@ -126,7 +126,7 @@ class ShellE1(TelnetShell):
         await self.check_mosquitto_pub()
         await self.exec("killall app_monitor.sh")
         await self.exec(
-            "killall miio_client mZ3GatewayHost_MQTT ser2net socat zigbee_gw; pkill -f log/z3"
+            "killall miio_client mZ3GatewayHost_MQTT ser2net socat; pkill -f log/z3"
         )
 
         if not self.apatches:
