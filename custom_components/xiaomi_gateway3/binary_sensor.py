@@ -75,6 +75,7 @@ class XiaomiGateway(XiaomiBinaryBase):
 
 
 class XiaomiMotionSensor(XEntity, BinarySensorEntity):
+    _attr_is_on = False
     _default_delay = None
     _last_on = 0
     _last_off = 0
