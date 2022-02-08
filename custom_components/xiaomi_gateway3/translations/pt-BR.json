@@ -1,0 +1,78 @@
+{
+    "config": {
+      "error": {
+        "no_servers": "Selecione pelo menos um servidor",
+        "cant_login": "Não consigo fazer login, verifique o nome de usuário e a senha",
+        "cant_connect": "Não é possível conectar ao gateway",
+        "wrong_model": "Modelo de gateway não compatível",
+        "wrong_token": "Token Mi Home errado",
+        "wrong_telnet": "Comando telnet aberto errado"
+      },
+      "step": {
+        "user": {
+          "title": "Selecionar ação",
+          "data": {
+            "action": "Ação"
+          }
+        },
+        "cloud": {
+          "title": "Adicionar conta Mi Cloud",
+          "description": "Selecione apenas os servidores em que você possui dispositivos",
+          "data": {
+            "username": "E-mail / ID da conta Mi",
+            "password": "Senha",
+            "servers": "Servidores"
+          }
+        },
+        "token": {
+          "description": "Você pode obter o token Mi Home automaticamente com [integração na nuvem](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) ou [manualmente](https://github.com/Maxmudjon/ com.xiaomi-miio/blob/master/docs/obtain_token.md). Leia sobre **comando telnet aberto** em [documentação](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+          "data": {
+            "host": "Host",
+            "token": "Token",
+            "telnet_cmd": "Abra o comando Telnet"
+          }
+        }
+      }
+    },
+    "options": {
+      "step": {
+        "cloud": {
+          "title": "Informações de dispositivos MiCloud",
+          "data": {
+            "did": "Dispositivo"
+          },
+          "description": "{device_info}"
+        },
+        "user": {
+          "title": "Configuração do Gateway",
+          "data": {
+            "host": "Host",
+            "token": "Token",
+            "telnet_cmd": "Abra o comando Telnet",
+            "ble": "Suporta dispositivos Bluetooth",
+            "stats": "Adicionar sensores estatísticos",
+            "debug": "Debug",
+            "buzzer": "Desativar campainha [ADV]",
+            "memory": "Usar armazenamento na memória [ADV]",
+            "zha": "Modo ZHA ou zigbee2mqtt [ADV]"
+          },
+          "description": "Altere as opções **ADV** SOMENTE se você souber o que está fazendo"
+        }
+      }
+    },
+    "device_automation": {
+      "trigger_type": {
+        "button": "Pressione o botão",
+        "button_1": "1º botão pressionado",
+        "button_2": "2º botão pressionado",
+        "button_3": "3º botão pressionado",
+        "button_4": "4º botão pressionado",
+        "button_5": "5º botão pressionado",
+        "button_6": "6º botão pressionado",
+        "button_both": "Ambos os botões pressionados",
+        "button_both_12": "1º e 2º botão pressionado",
+        "button_both_13": "1º e 3º botão pressionado",
+        "button_both_23": "2º e 3º botão pressionado"
+      }
+    }
+  }
