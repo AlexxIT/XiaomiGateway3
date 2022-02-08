@@ -29,7 +29,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         self.e1_init()
         self.silabs_init()
         self.lumi_init()
-        # self.z3_init()
+        self.z3_init()
 
         ps = await sh.get_running_ps()
 
@@ -43,6 +43,8 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
 
         if self.available is None and self.did is None:
             await self.e1_read_device(sh)
+
+        sh.patch_miio_mqtt()
 
         await self.dispatcher_send(
             SIGNAL_PREPARE_GW, sh=sh
