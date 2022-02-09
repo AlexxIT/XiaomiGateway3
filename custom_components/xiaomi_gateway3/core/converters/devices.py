@@ -129,6 +129,7 @@ DEVICES = [{
     ],
 }, {
     "lumi.gateway.aqcn02": ["Aqara", "Hub E1 CN", "ZHWG16LM"],
+    "lumi.gateway.aqcn03": ["Aqara", "Hub E1 EU", "HE1-G01"],
     "support": 3,  # @AlexxIT
     "spec": [
         MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),
@@ -150,9 +151,6 @@ DEVICES = [{
 
         GatewayStats
     ],
-}, {
-    "lumi.gateway.aqcn03": ["Aqara", "Hub E1 EU", "HE1-G01"],
-    "support": 1,
 }]
 
 ################################################################################

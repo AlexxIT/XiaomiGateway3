@@ -336,7 +336,7 @@ Brand|Name|Model|Entities|S
 Aqara|Door Lock D100|[ZNMS20LM](https://home.miot-spec.com/s/3051)|*|
 Aqara|Door Lock N100 (Bluetooth)|[ZNMS16LM](https://home.miot-spec.com/s/1694)|*|
 Aqara|Door Lock N200|[ZNMS17LM](https://home.miot-spec.com/s/1695)|*|
-Honeywell|Smoke Alarm|[JTYJ-GD-03MI](https://home.miot-spec.com/s/2455)|*|
+Honeywell|Smoke Alarm|[JTYJ-GD-03MI](https://home.miot-spec.com/s/2455)|action, smoke, battery|
 Loock|Door Lock Classic 2X Pro|[loock.lock.cc2xpro](https://home.miot-spec.com/s/3343)|*|
 Unknown|Lock M2|[ydhome.lock.m2silver](https://home.miot-spec.com/s/955)|*|
 Xiaomi|Alarm Clock|[CGD1](https://home.miot-spec.com/s/1398)|temperature, humidity, battery*|

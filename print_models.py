@@ -16,7 +16,7 @@ for device in DEVICES:
         continue
 
     for k, v in device.items():
-        if not isinstance(v, list) or k in ("spec", "config"):
+        if not isinstance(v, list) or k in ("spec", "lumi.gateway.aqcn03"):
             continue
 
         brand, name, model = v if len(v) == 3 else v + [k]
