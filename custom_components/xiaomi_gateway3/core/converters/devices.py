@@ -557,7 +557,7 @@ DEVICES += [{
         ButtonMIConv("button", mi="2.e.1", value=1),  # single
         ButtonMIConv("button", mi="2.e.2", value=2),  # double
         ButtonMIConv("button", mi="2.e.3", value=16),  # long
-        Converter("battery", "sensor", mi="3.p.2"),
+        BatteryConv("battery", "sensor", mi="3.p.2"),
     ],
 }, {
     "lumi.remote.acn004": ["Aqara", "Double Wall Button E1 CN", "WXKG17LM"],
@@ -570,7 +570,7 @@ DEVICES += [{
         ButtonMIConv("button_2", mi="7.e.2", value=2),  # double
         ButtonMIConv("button_2", mi="7.e.3", value=16),  # long
         ButtonMIConv("button_both", mi="8.e.1", value=4),  # single
-        Converter("battery", "sensor", mi="3.p.2"),
+        BatteryConv("battery", "sensor", mi="3.p.2"),
     ],
 }]
 
