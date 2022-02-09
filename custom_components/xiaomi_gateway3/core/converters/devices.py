@@ -1056,7 +1056,7 @@ DEVICES += [{
     # logs: https://github.com/AlexxIT/XiaomiGateway3/issues/180
     2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM"],  # 15,4119,4120
     "spec": [
-        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
+        MiBeacon, BLEMotion, BLELight, BLEBattery,
         Converter("action", "sensor", enabled=False),
         Converter("idle_time", "sensor", enabled=False),
     ],
