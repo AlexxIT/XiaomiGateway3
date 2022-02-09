@@ -107,10 +107,15 @@ STATE_CLASSES = {
     DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
 }
 
-# Config: An entity which allows changing the configuration of a device
-ENTITY_CATEGORY_CONFIG: Final = "config"
-# Diagnostic: An entity exposing some configuration parameter or diagnostics of a device
-ENTITY_CATEGORY_DIAGNOSTIC: Final = "diagnostic"
+try:
+    # backward compatibility
+    from homeassistant.helpers.entity import EntityCategory
+
+    ENTITY_CATEGORY_CONFIG = EntityCategory.CONFIG
+    ENTITY_CATEGORY_DIAGNOSTIC = EntityCategory.DIAGNOSTIC
+except:
+    ENTITY_CATEGORY_CONFIG = "config"
+    ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"
 
 ENTITY_CATEGORIES = {
     BLE: ENTITY_CATEGORY_DIAGNOSTIC,
