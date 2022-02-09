@@ -308,7 +308,7 @@ DEVICES += [{
 }, {
     # temperature, humidity and pressure sensor
     "lumi.weather": ["Aqara", "TH Sensor", "WSDCGQ11LM"],
-    "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor", "WSDCGQ12LM"],
+    "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor T1", "WSDCGQ12LM"],
     "spec": [
         Temperature, Humidity, Battery, BatteryOrig,
         MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01),
