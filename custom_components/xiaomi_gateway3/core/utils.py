@@ -30,7 +30,9 @@ from .xiaomi_cloud import MiCloud
 
 TITLE = "Xiaomi Gateway 3"
 
-SUPPORTED_MODELS = ('lumi.gateway.mgl03', 'lumi.gateway.aqcn02')
+SUPPORTED_MODELS = (
+    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03'
+)
 
 _LOGGER = logging.getLogger(__name__)
 
