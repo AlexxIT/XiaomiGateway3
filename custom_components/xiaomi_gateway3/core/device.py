@@ -25,6 +25,9 @@ POWER_POLL = 9 * 60  # 9 minutes
 
 # all legacy names for backward compatibility with 1st version
 LEGACY_ATTR_ID = {
+    "channel_1": "channel 1",
+    "channel_2": "channel 2",
+    "channel_3": "channel 3",
     "gas_density": "gas density",
     "group": "light",
     "outlet": "switch",
