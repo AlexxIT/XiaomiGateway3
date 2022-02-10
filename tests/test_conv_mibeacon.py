@@ -2,6 +2,7 @@ from custom_components.xiaomi_gateway3.core.device import XDevice, BLE
 
 DID = "blt.3.abc"
 MAC = "112233aabbcc"
+DID2 = "123456789"  # locks have nubm did
 
 
 def test_night_light():
@@ -39,3 +40,12 @@ def test_new_th():
     assert p == {'humidity': 47.7}
     p = device.decode("mibeacon", {'eid': 19457, 'edata': 'cdcca841'})
     assert p == {'temperature': 21.1}
+
+
+def test_lock():
+    device = XDevice(BLE, 1694, DID2, MAC)
+    assert device.info.name == "Aqara Door Lock N100 (Bluetooth)"
+    device.setup_converters()
+
+    p = device.decode("mibeacon", {'eid': 4106, 'edata': '3259f80362'})
+    assert p == {'battery': 50}
