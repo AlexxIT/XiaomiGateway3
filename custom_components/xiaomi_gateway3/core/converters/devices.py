@@ -1127,6 +1127,13 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, BLESmoke, BLEBattery],
     "ttl": "15m",  # battery every 4:30 min
 }, {
+    2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
+    "spec": [
+        MiBeacon, BLEWaterLeak, BLEBattery,
+        Converter("action", "sensor", enabled=False),
+    ],
+    "ttl": "725m"  # battery every 4 hour
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1139,7 +1146,6 @@ DEVICES += [{
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM"],
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
-    2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
