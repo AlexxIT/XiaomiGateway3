@@ -312,7 +312,6 @@ DEVICES += [{
 }, {
     # temperature, humidity and pressure sensor
     "lumi.weather": ["Aqara", "TH Sensor", "WSDCGQ11LM"],
-    "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor T1", "WSDCGQ12LM"],
     "spec": [
         Temperature, Humidity, Battery, BatteryOrig,
         MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01),
@@ -496,6 +495,16 @@ DEVICES += [{
         MapConv("contact", "binary_sensor", mi="2.p.1", map=INVERSE),
         BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
+                enabled=False),
+    ],
+}, {
+    "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor T1", "WSDCGQ12LM"],
+    "spec": [
+        Converter("temperature", "sensor", mi="2.p.1"),  # celsius
+        Converter("humidity", "sensor", mi="2.p.2"),  # percentage
+        Converter("pressure", "sensor", mi="2.p.3"),  # kilopascal
+        BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
+        MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW,
                 enabled=False),
     ],
 }, {
