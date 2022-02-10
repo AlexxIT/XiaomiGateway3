@@ -1281,6 +1281,15 @@ DEVICES += [{
         }, enabled=False)
     ],
 }, {
+    4736: ["Xiaomi", "Light Sensitive Night Light", "YEELINK-NL2"],
+    # "support": 3, #urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
+    "spec": [
+        Converter("switch", "light", mi="2.p.1"),  # bool
+        MapConv("light", "binary_sensor", mi="3.p.1", map={
+            0: False, 1: True
+      }) # uint8 0-Dark 1-Bright
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [],
 }]
