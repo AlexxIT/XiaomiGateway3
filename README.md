@@ -220,7 +220,7 @@ Aqara|Single Wall Switch H1 CN (with N)|[QBKG30LM](https://home.miot-spec.com/s/
 Aqara|Single Wall Switch H1 EU (no N)|[WS-EUK01](https://home.miot-spec.com/s/lumi.switch.l1aeu1)|switch, action, led, power_on_state, wireless|
 Aqara|Single Wall Switch H1 EU (with N)|[WS-EUK03](https://home.miot-spec.com/s/lumi.switch.n1aeu1)|switch, energy, power, action, led, led_reverse, power_on_state, wireless|
 Aqara|TH Sensor|[WSDCGQ11LM](https://home.miot-spec.com/s/lumi.weather)|temperature, humidity, battery, pressure|
-Aqara|TH Sensor|[WSDCGQ12LM](https://home.miot-spec.com/s/lumi.sensor_ht.agl02)|temperature, humidity, battery, pressure|
+Aqara|TH Sensor T1|[WSDCGQ12LM](https://home.miot-spec.com/s/lumi.sensor_ht.agl02)|temperature, humidity, battery, pressure|
 Aqara|Thermostat S2 CN|[KTWKQ03ES](https://home.miot-spec.com/s/lumi.airrtc.tcpecn02)|climate|
 Aqara|Triple Wall Switch D1 CN (no N)|[QBKG25LM](https://home.miot-spec.com/s/lumi.switch.l3acn3)|channel_1, channel_2, channel_3, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
 Aqara|Triple Wall Switch D1 CN (with N)|[QBKG26LM](https://home.miot-spec.com/s/lumi.switch.n3acn3)|channel_1, channel_2, channel_3, power, voltage, energy, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
@@ -250,7 +250,7 @@ Xiaomi|TH Sensor|[WSDCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_ht)|tempe
 
 ## Supported Other Zigbee
 
-Total devices: 13
+Total devices: 16
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
@@ -258,12 +258,15 @@ BlitzWolf|Plug|[BW-SHP13](https://www.zigbee2mqtt.io/supported-devices/#s=BW-SHP
 IKEA|Bulb E27 1000 lm|[LED1623G12](https://www.zigbee2mqtt.io/supported-devices/#s=LED1623G12)|light|3
 Ksentry Electronics|OnOff Controller|[KS-SM001](https://www.zigbee2mqtt.io/supported-devices/#s=KS-SM001)|switch|
 Lonsonho|Switch w/o neutral|[TS0011](https://www.zigbee2mqtt.io/supported-devices/#s=TS0011)|switch|5
+Neo|Power Plug|[NAS-WR01B](https://www.zigbee2mqtt.io/supported-devices/#s=NAS-WR01B)|plug, current, power, voltage, energy*, power_on_state|3
 Philips|Hue motion sensor|[9290012607](https://www.zigbee2mqtt.io/supported-devices/#s=9290012607)|occupancy, illuminance, temperature, battery, occupancy_timeout|4
 Sonoff|Button|[SNZB-01](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-01)|action, battery|5
 Sonoff|Door/Window Sensor|[SNZB-04](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-04)|contact, battery|5
 Sonoff|Mini|[ZBMINI](https://www.zigbee2mqtt.io/supported-devices/#s=ZBMINI)|switch|5
 Sonoff|Motion Sensor|[SNZB-03](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-03)|occupancy, battery|5
 Sonoff|TH Sensor|[SNZB-02](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-02)|temperature, humidity, battery|
+Tuya|Relay|[TS0001](https://www.zigbee2mqtt.io/supported-devices/#s=TS0001)|switch, power_on_state|4
+Tuya|Relay|[TS0002](https://www.zigbee2mqtt.io/supported-devices/#s=TS0002)|channel_1, channel_2, power_on_state, mode|3
 Unknown|Dimmer|[LXZ8-02A](https://www.zigbee2mqtt.io/supported-devices/#s=LXZ8-02A)|light|3
 UseeLink|Power Strip|[SM-SO306E](https://www.zigbee2mqtt.io/supported-devices/#s=SM-SO306E)|channel_1, channel_2, channel_3, channel_4, usb, power_on_state|5
 eWeLink|Zigbee OnOff Controller|[SA-003-Zigbee](https://www.zigbee2mqtt.io/supported-devices/#s=SA-003-Zigbee)|switch|5
@@ -290,7 +293,7 @@ Xiaomi|Flower Pot|[HHCCPOT002](https://home.miot-spec.com/s/349)|moisture, condu
 Xiaomi|Kettle|[YM-K1501](https://home.miot-spec.com/s/131)|power, temperature|
 Xiaomi|Magic Cube|[XMMF01JQD](https://home.miot-spec.com/s/1249)|action|
 Xiaomi|Mosquito Repellent|[WX08ZM](https://home.miot-spec.com/s/1034)|*|
-Xiaomi|Motion Sensor 2|[RTCGQ02LM](https://home.miot-spec.com/s/2701)|motion, illuminance, battery, action, idle_time|
+Xiaomi|Motion Sensor 2|[RTCGQ02LM](https://home.miot-spec.com/s/2701)|motion, light, battery, action, idle_time|
 Xiaomi|Night Light 2|[MJYD02YL-A](https://home.miot-spec.com/s/2038)|battery, light, motion, idle_time|
 Xiaomi|Qingping Door Sensor|[CGH1](https://home.miot-spec.com/s/982)|*|
 Xiaomi|Qingping Motion Sensor|[CGPR1](https://home.miot-spec.com/s/2691)|motion, light, illuminance, battery, idle_time|
@@ -310,7 +313,7 @@ Yeelight|Button S1|[YLAI003](https://home.miot-spec.com/s/1983)|action, battery|
 
 ## Supported Xiaomi Mesh
 
-Total devices: 29
+Total devices: 31
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
@@ -325,6 +328,7 @@ PTX|Mesh Triple Wall Switch|[PTX-SK3M](https://home.miot-spec.com/s/3878)|channe
 PTX|Mesh Triple Wall Switch|[PTX-TK3/M](https://home.miot-spec.com/s/2093)|channel_1, channel_2, channel_3, led, wireless_1, wireless_2, wireless_3|
 Unknown|Mesh Lightstrip (RF ready)|[crzm.light.wy0a01](https://home.miot-spec.com/s/2293)|light|
 Unknown|Mesh Switch Controller|[lemesh.switch.sw0a01](https://home.miot-spec.com/s/2007)|switch|
+Unknown|Mesh Switch Controller|[lemesh.switch.sw0a02](https://home.miot-spec.com/s/3169)|switch|
 Unknown|Mesh Wall Switch|[DHKG01ZM](https://home.miot-spec.com/s/1945)|switch, led|
 Xiaomi|Electrical Outlet|[ZNCZ01ZM](https://home.miot-spec.com/s/3083)|outlet, power, led, power_protect, power_value|
 Xiaomi|Mesh Bulb|[MJDP09YL](https://home.miot-spec.com/s/1771)|light, flex_switch, power_on_state|4
@@ -332,6 +336,7 @@ Xiaomi|Mesh Double Wall Switch|[DHKG02ZM](https://home.miot-spec.com/s/1946)|cha
 Xiaomi|Mesh Double Wall Switch|[ZNKG02HL](https://home.miot-spec.com/s/2716)|channel_1, channel_2, humidity, temperature|
 Xiaomi|Mesh Downlight|[MJTS01YL/MJTS003](https://home.miot-spec.com/s/1772)|light, flex_switch, power_on_state|4
 Xiaomi|Mesh Group|[yeelink.light.mb1grp](https://home.miot-spec.com/s/1054)|group|4
+Xiaomi|Mesh Night Light|[MJYD05YL](https://home.miot-spec.com/s/4736)|switch, light|
 Xiaomi|Mesh Single Wall Switch|[ZNKG01HL](https://home.miot-spec.com/s/2715)|switch, humidity, temperature|
 Xiaomi|Mesh Triple Wall Switch|[ZNKG03HL/ISA-KG03HL](https://home.miot-spec.com/s/2717)|channel_1, channel_2, channel_3, humidity, temperature, wireless_1, wireless_2, wireless_3, baby_mode|
 Xiaomi|Mosquito Repeller 2|[WX10ZM](https://home.miot-spec.com/s/4160)|switch, battery, supply, led, power_mode|
