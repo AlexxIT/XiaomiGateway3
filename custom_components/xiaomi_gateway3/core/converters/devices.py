@@ -894,6 +894,32 @@ DEVICES += [{
         ZTuyaPowerOn,
     ],
 }, {
+    # Neo Power Plug NAS-WR01B
+    "TS011F": ["Neo", "Power Plug", "NAS-WR01B"],
+    "support": 4,
+    "spec": [
+        ZOnOffConv("plug", "switch"),
+        ZCurrent, ZPower, ZVoltagePoll,
+        ZEnergyConv("energy", "sensor", multiply=0.01, enabled=None),  # not working now
+        ZTuyaPowerOn,
+    ],
+}, {
+    # tuya relay with neutral, 1 gang
+    "TS0001": ["Tuya", "Relay", "TS0001"],
+    "support": 4,
+    "spec": [
+        ZOnOffConv("switch", "switch", bind=True),
+        ZTuyaPowerOn,
+    ],
+}, {
+    # tuya relay with neutral, 2 gang
+    "TS0002": ["Tuya", "Relay", "TS0002"],
+    "support": 4,
+    "spec": [
+        ZOnOffConv("channel_1", "switch", ep=1, bind=True),
+        ZOnOffConv("channel_2", "switch", ep=2, bind=True),
+    ],
+}, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
