@@ -1240,6 +1240,7 @@ DEVICES += [{
     2007: ["Unknown", "Mesh Switch Controller", "lemesh.switch.sw0a01"],
     3150: ["XinGuang", "Mesh Switch", "wainft.switch.sw0a01"],
     3169: ["Unknown", "Mesh Switch Controller", "lemesh.switch.sw0a02"],
+    4252: ["Unknown", "Mesh Switch", "dwdz.switch.sw0a01"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
     ],
