@@ -288,3 +288,6 @@ def test_mi_curtain():
 
     p = device.encode({'motor': 'open'})
     assert p == {"mi_spec": [{'siid': 2, 'piid': 2, 'value': 2}]}
+
+    p = device.encode({"position": 60})
+    assert p == {'mi_spec': [{'siid': 2, 'piid': 4, 'value': 60}]}

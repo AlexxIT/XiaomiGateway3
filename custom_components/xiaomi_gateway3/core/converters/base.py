@@ -233,6 +233,15 @@ class ClimateTempConv(Converter):
         payload[self.attr] = value if value < 255 else 0
 
 
+# we need get pos with one property and set pos with another
+class CurtainPosConv(Converter):
+    def encode(self, device: "XDevice", payload: dict, value: Any):
+        conv = next(
+            c for c in device.converters if c.attr == "target_position"
+        )
+        conv.encode(device, payload, value)
+
+
 @dataclass
 class LockActionConv(Converter):
     map: dict = None
@@ -353,7 +362,9 @@ Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
 
-ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006", enabled=False)
+ChipTemp = Converter(
+    "chip_temperature", "sensor", mi="8.0.2006", enabled=False
+)
 
 # switches and relays
 Outlet = BoolConv("outlet", "switch", mi="4.1.85")

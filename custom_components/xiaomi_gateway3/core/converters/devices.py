@@ -540,7 +540,7 @@ DEVICES += [{
             0: "stop", 1: "close", 2: "open"
         }),
         Converter("target_position", mi="2.p.4"),
-        Converter("position", mi="2.p.5"),
+        CurtainPosConv("position", mi="2.p.5"),
         MapConv("run_state", mi="2.p.6", map=RUN_STATE),
         Converter("battery", "sensor", mi="3.p.4"),  # percent
         Converter("motor_reverse", "switch", mi="2.p.7", enabled=False),
