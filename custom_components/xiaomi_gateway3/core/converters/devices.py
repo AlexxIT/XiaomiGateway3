@@ -100,7 +100,8 @@ DEVICES = [{
     "spec": [
         # write pair=60 => report discovered_mac => report 8.0.2166? =>
         # write pair_command => report added_device => write pair=0
-        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False},
+                parent="data"),
         MapConv("alarm", "alarm_control_panel", mi="3.p.1", map=GATE_ALARM),
         BoolConv("alarm_trigger", mi="3.p.22", parent="alarm"),
 
@@ -132,7 +133,8 @@ DEVICES = [{
     "lumi.gateway.aqcn03": ["Aqara", "Hub E1 EU", "HE1-G01"],
     "support": 3,  # @AlexxIT
     "spec": [
-        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False},
+                parent="data"),
 
         Converter("discovered_mac", mi="8.0.2110", parent="data"),
         Converter("pair_command", mi="8.0.2111", parent="data"),
@@ -304,7 +306,9 @@ DEVICES += [{
 }, {
     # temperature and humidity sensor
     "lumi.sensor_ht": ["Xiaomi", "TH Sensor", "WSDCGQ01LM"],
-    "spec": [Temperature, Humidity, Battery, BatteryLow, BatteryOrig, ChipTemp],
+    "spec": [
+        Temperature, Humidity, Battery, BatteryLow, BatteryOrig, ChipTemp
+    ],
 }, {
     # temperature, humidity and pressure sensor
     "lumi.weather": ["Aqara", "TH Sensor", "WSDCGQ11LM"],
@@ -513,7 +517,9 @@ DEVICES += [{
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
-    "lumi.airmonitor.acn01": ["Aqara", "Air Quality Monitor CN", "VOCKQJK11LM"],
+    "lumi.airmonitor.acn01": [
+        "Aqara", "Air Quality Monitor CN", "VOCKQJK11LM"
+    ],
     # "support": 5,
     "spec": [
         Converter("temperature", "sensor", mi="3.p.1"),  # celsius
@@ -609,7 +615,9 @@ DEVICES += [{
                 enabled=False),
     ],
 }, {
-    "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1 (no N)", "QBKG38LM"],
+    "lumi.switch.b1lc04": [
+        "Aqara", "Single Wall Switch E1 (no N)", "QBKG38LM"
+    ],
     # "support": 5,
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
@@ -623,7 +631,9 @@ DEVICES += [{
         MapConv("mode", "select", mi="10.p.1", map=SWITCH_MODE, enabled=False)
     ],
 }, {
-    "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1 (no N)", "QBKG39LM"],
+    "lumi.switch.b2lc04": [
+        "Aqara", "Double Wall Switch E1 (no N)", "QBKG39LM"
+    ],
     # "support": 5,
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
@@ -896,11 +906,12 @@ DEVICES += [{
 }, {
     # Neo Power Plug NAS-WR01B
     "TS011F": ["Neo", "Power Plug", "NAS-WR01B"],
-    "support": 4,
+    "support": 3,
     "spec": [
         ZOnOffConv("plug", "switch"),
         ZCurrent, ZPower, ZVoltagePoll,
-        ZEnergyConv("energy", "sensor", multiply=0.01, enabled=None),  # not working now
+        # not working now
+        ZEnergyConv("energy", "sensor", multiply=0.01, enabled=None),
         ZTuyaPowerOn,
     ],
 }, {
@@ -914,10 +925,11 @@ DEVICES += [{
 }, {
     # tuya relay with neutral, 2 gang
     "TS0002": ["Tuya", "Relay", "TS0002"],
-    "support": 4,
+    "support": 3,  # @zvldz
     "spec": [
         ZOnOffConv("channel_1", "switch", ep=1, bind=True),
         ZOnOffConv("channel_2", "switch", ep=2, bind=True),
+        ZTuyaPowerOn, ZTuyaMode,
     ],
 }, {
     # very simple relays
@@ -971,10 +983,15 @@ DEVICES += [{
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
-        ZOccupancyConv("occupancy", "binary_sensor", ep=2, bind=True,
-                       report=True),
-        ZIlluminanceConv("illuminance", "sensor", ep=2, bind=True, report=True),
-        ZTemperatureConv("temperature", "sensor", ep=2, bind=True, report=True),
+        ZOccupancyConv(
+            "occupancy", "binary_sensor", ep=2, bind=True, report=True
+        ),
+        ZIlluminanceConv(
+            "illuminance", "sensor", ep=2, bind=True, report=True
+        ),
+        ZTemperatureConv(
+            "temperature", "sensor", ep=2, bind=True, report=True
+        ),
         ZBatteryConv("battery", "sensor", ep=2, bind=True, report=True),
         ZOccupancyTimeoutConv(
             "occupancy_timeout", "number", ep=2, enabled=False
@@ -1014,7 +1031,9 @@ DEVICES += [{
         ZBrightnessConv("brightness", parent="light"),
     ],
 }, {
-    "TRADFRI remote control": ["IKEA", "TRADFRI remote control", "E1524/E1810"],
+    "TRADFRI remote control": [
+        "IKEA", "TRADFRI remote control", "E1524/E1810"
+    ],
     "support": 1,
     "spec": [
         IKEARemoteConv1("action", "sensor", bind=True),

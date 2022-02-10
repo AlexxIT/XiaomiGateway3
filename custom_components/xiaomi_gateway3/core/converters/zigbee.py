@@ -81,7 +81,9 @@ class ZConverter(Converter):
         if self.report:
             args = REPORTING.get(f"{self.zigbee}:{self.zattr}") \
                 if isinstance(self.report, bool) else self.report
-            cmd = zdb_report(device.nwk, self.ep, self.zigbee, self.attr, *args)
+            cmd = zdb_report(
+                device.nwk, self.ep, self.zigbee, self.attr, *args
+            )
             payload.setdefault("commands", []).extend(cmd)
 
 
@@ -266,6 +268,15 @@ class ZTuyaPowerOnConv(ZConverter):
             device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30
         )
         payload.setdefault("commands", []).extend(cmd)
+
+
+# Thanks to:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/910271ae8fccb19305752d3f67381b4765853018/converters/fromZigbee.js#L4537
+# https://github.com/Koenkk/zigbee-herdsman/blob/068bbe7636f588394f69f82bc25c8b68a4feada7/src/zcl/definition/cluster.ts#L4284
+class ZTuyaModeConv(ZTuyaPowerOnConv):
+    zigbee = 0xE001
+    zattr = 0xD030
+    map = {0: "toggle", 1: "state", 2: "momentary"}
 
 
 class ZAqaraCubeMain(Converter):
@@ -469,3 +480,4 @@ ZBrightness = ZBrightnessConv("brightness", parent="light")
 ZColorTemp = ZColorTempConv("color_temp", parent="light")
 
 ZTuyaPowerOn = ZTuyaPowerOnConv("power_on_state", "select", enabled=False)
+ZTuyaMode = ZTuyaModeConv("mode", "select", enabled=False)
