@@ -1,7 +1,8 @@
-from typing import Dict, Optional
+import json
+import re
+from typing import Dict, List, Optional
 
 from .base import GatewayBase, SIGNAL_MQTT_PUB
-from .. import utils
 from ..device import XDevice
 from ..mini_mqtt import MQTTMessage
 
@@ -13,7 +14,7 @@ class MIoTGateway(GatewayBase):
 
     async def miot_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == 'log/miio':
-            for data in utils.decode_miio_json(
+            for data in decode_miio_json(
                     msg.payload, b'properties_changed'
             ):
                 await self.miot_process_data(data["params"])
@@ -43,7 +44,8 @@ class MIoTGateway(GatewayBase):
         resp = await self.miio.send("set_properties", payload["mi_spec"])
         return resp and "result" in resp
 
-    async def miot_read(self, device: XDevice, payload: dict) -> Optional[dict]:
+    async def miot_read(self, device: XDevice, payload: dict) \
+            -> Optional[dict]:
         assert "mi_spec" in payload, payload
         self.debug_device(device, "read", payload, tag="MIOT")
         for item in payload["mi_spec"]:
@@ -52,3 +54,25 @@ class MIoTGateway(GatewayBase):
         if resp is None or "result" not in resp:
             return None
         return device.decode_miot(resp['result'])
+
+
+# new miio adds colors to logs
+RE_JSON1 = re.compile(b'msg:(.+) length:([0-9]+) bytes')
+RE_JSON2 = re.compile(b'{.+}')
+EMPTY_RESPONSE = []
+
+
+def decode_miio_json(raw: bytes, search: bytes) -> List[dict]:
+    """There can be multiple concatenated json on one line. And sometimes the
+    length does not match the message."""
+    if search not in raw:
+        return EMPTY_RESPONSE
+    m = RE_JSON1.search(raw)
+    if m:
+        length = int(m[2])
+        raw = m[1][:length]
+    else:
+        m = RE_JSON2.search(raw)
+        raw = m[0]
+    items = raw.replace(b'}{', b'}\n{').split(b'\n')
+    return [json.loads(raw) for raw in items if search in raw]

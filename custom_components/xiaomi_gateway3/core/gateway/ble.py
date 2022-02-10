@@ -1,5 +1,5 @@
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB
-from .. import shell, utils
+from .. import shell
 from ..device import XDevice, BLE
 from ..mini_mqtt import MQTTMessage
 
@@ -21,7 +21,7 @@ class BLEGateway(GatewayBase):
             rows = sh.db.read_table('gateway_authed_table')
             for row in rows:
                 # BLE key is mac
-                mac = utils.reverse_mac(row[1])
+                mac = reverse_mac(row[1])
                 device = self.devices.get(mac)
                 if not device:
                     device = XDevice(BLE, row[2], row[4], mac)
@@ -113,3 +113,7 @@ class BLEGateway(GatewayBase):
         payload = device.decode("mibeacon", payload)
         device.update(payload)
         self.debug_device(device, "recv", payload, "BLEF")
+
+
+def reverse_mac(s: str):
+    return f"{s[10:]}{s[8:10]}{s[6:8]}{s[4:6]}{s[2:4]}{s[:2]}"

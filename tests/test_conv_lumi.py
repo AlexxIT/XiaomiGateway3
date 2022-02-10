@@ -14,7 +14,7 @@ def test_empty_model():
 def test_plug_heartbeat():
     device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
     assert device.info.name == 'Xiaomi Plug CN'
-    device.setup_converters(["energy"])
+    device.setup_converters()
     params = [
         {"res_name": "4.1.85", "value": 1},
         {"res_name": "8.0.2006", "value": 39},
@@ -79,7 +79,7 @@ def test_sensor_motion():
 
 def test_opple_buttons():
     device = XDevice(ZIGBEE, 'lumi.remote.b686opcn01', ZDID, ZMAC, ZNWK)
-    assert device.info.name == 'Aqara Opple Six Button'
+    assert device.info.name == 'Aqara Opple Six Button CN'
     device.setup_converters()
 
     p = device.decode_lumi([{"res_name": "13.1.85", "value": 1}])

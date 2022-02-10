@@ -251,6 +251,10 @@ class XDevice:
            - STAT_GLOBALS list
            - converters childs list (always sensor)
         """
+        if entities is None:
+            self.converters = self.info.spec
+            return
+
         self.converters = self.info.spec.copy()
 
         for attr, domain in entities.items():

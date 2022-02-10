@@ -55,7 +55,7 @@ def test_zigbee_stats():
     stats.now = lambda: datetime(2021, 12, 31, 23, 59)
 
     device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
-    device.setup_converters([ZIGBEE])
+    device.setup_converters({ZIGBEE: "sensor"})
 
     p = device.decode(ZIGBEE, {
         'sourceAddress': '0x9B43', 'eui64': '0x00158D0000AABBCC',
@@ -64,8 +64,10 @@ def test_zigbee_stats():
         'APSPlayload': '0x1071000000', 'rssi': -61, 'linkQuality': 156
     })
     assert p == {
-        'zigbee': '2021-12-31T23:59:00', 'ieee': '0x00158D0000AABBCC',
-        'nwk': '0x9B43', 'msg_received': 1, 'msg_missed': 0, 'linkquality': 156,
+        'zigbee': p['zigbee'],
+        # 'ieee': '0x00158D0000AABBCC', 'nwk': '0x9B43',
+        'msg_received': 1, 'msg_missed': 0,
+        'linkquality': 156,
         'rssi': -61, 'last_msg': 'Time'
     }
 
@@ -76,8 +78,10 @@ def test_zigbee_stats():
         'APSPlayload': '0x1075000000', 'rssi': -61, 'linkQuality': 156
     })
     assert p == {
-        'zigbee': '2021-12-31T23:59:00', 'ieee': '0x00158D0000AABBCC',
-        'nwk': '0x9B43', 'msg_received': 2, 'msg_missed': 1, 'linkquality': 156,
+        'zigbee': p['zigbee'],
+        # 'ieee': '0x00158D0000AABBCC', 'nwk': '0x9B43',
+        'msg_received': 2, 'msg_missed': 1,
+        'linkquality': 156,
         'rssi': -61, 'last_msg': 'Time'
     }
 
@@ -85,9 +89,7 @@ def test_zigbee_stats():
         'eui64': '', 'nwk': '0x9B43', 'ago': 60, 'type': 'device',
         'parent': '0xABCD'
     })
-    assert p == {
-        'zigbee': '2021-12-31T23:58:00', 'type': 'device', 'parent': '0xABCD'
-    }
+    assert p == {'parent': '0xABCD'}
 
     p = device.decode(ZIGBEE, {'parent': '0xABCD'})
     assert p == {'parent': '0xABCD'}

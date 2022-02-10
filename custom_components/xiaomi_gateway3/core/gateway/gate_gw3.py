@@ -1,4 +1,5 @@
 import asyncio
+import json
 import time
 from typing import Optional
 
@@ -6,10 +7,10 @@ from .base import SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB, SIGNAL_TIMER
 from .ble import BLEGateway
 from .lumi import LumiGateway
 from .mesh import MeshGateway
-from .miot import MIoTGateway
+from .miot import MIoTGateway, decode_miio_json
 from .silabs import SilabsGateway
 from .z3 import Z3Gateway
-from .. import shell, utils
+from .. import shell
 from ..device import XDevice, GATEWAY
 from ..mini_mqtt import MQTTMessage
 
@@ -102,13 +103,13 @@ class GateGW3(
 
     async def gw3_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == 'log/miio':
-            payload = utils.decode_miio_offline(msg.payload)
+            payload = decode_miio_offline(msg.payload)
             if payload:
                 payload = self.device.decode("cloud_link", payload["params"])
                 self.device.update(payload)
                 return
 
-            payload = utils.decode_miio_json(msg.payload, b'event.gw.heartbeat')
+            payload = decode_miio_json(msg.payload, b'event.gw.heartbeat')
             if payload:
                 payload = payload[0]['params'][0]
                 payload = self.device.decode(GATEWAY, payload)
@@ -182,3 +183,10 @@ class GateGW3(
             return None
         finally:
             await sh.close()
+
+
+def decode_miio_offline(raw: bytes) -> Optional[dict]:
+    if b"_internal.record_offline" not in raw:
+        return None
+    _, raw = raw.split(b":, ", 1)
+    return json.loads(raw)

@@ -42,6 +42,6 @@ def test_console():
     ))
 
     assert payload == {
-        'eui64': '0x00158D0000000002', 'nwk': '0x131e', 'ago': 335,
+        # 'eui64': '0x00158D0000000002', 'nwk': '0x131e', 'ago': 335,
         'type': 'router', 'parent': '0x1f0c'
     }

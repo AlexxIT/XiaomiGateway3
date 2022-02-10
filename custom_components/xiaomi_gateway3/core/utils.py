@@ -105,35 +105,6 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
 
 
-# new miio adds colors to logs
-RE_JSON1 = re.compile(b'msg:(.+) length:([0-9]+) bytes')
-RE_JSON2 = re.compile(b'{.+}')
-EMPTY_RESPONSE = []
-
-
-def decode_miio_json(raw: bytes, search: bytes) -> List[dict]:
-    """There can be multiple concatenated json on one line. And sometimes the
-    length does not match the message."""
-    if search not in raw:
-        return EMPTY_RESPONSE
-    m = RE_JSON1.search(raw)
-    if m:
-        length = int(m[2])
-        raw = m[1][:length]
-    else:
-        m = RE_JSON2.search(raw)
-        raw = m[0]
-    items = raw.replace(b'}{', b'}\n{').split(b'\n')
-    return [json.loads(raw) for raw in items if search in raw]
-
-
-def decode_miio_offline(raw: bytes) -> Optional[dict]:
-    if b"_internal.record_offline" not in raw:
-        return None
-    _, raw = raw.split(b":, ", 1)
-    return json.loads(raw)
-
-
 def migrate_options(data):
     data = dict(data)
     options = {k: data.pop(k) for k in ('ble', 'zha') if k in data}
@@ -227,10 +198,6 @@ async def get_bindkey(cloud: MiCloud, did: str):
     if bindkey.endswith('FFFFFFFF'):
         return "Not needed"
     return bindkey
-
-
-def reverse_mac(s: str):
-    return f"{s[10:]}{s[8:10]}{s[6:8]}{s[4:6]}{s[2:4]}{s[:2]}"
 
 
 NCP_URL = "https://master.dl.sourceforge.net/project/mgl03/zigbee/%s?viasf=1"
