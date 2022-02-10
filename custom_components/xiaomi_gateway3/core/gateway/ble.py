@@ -50,7 +50,7 @@ class BLEGateway(GatewayBase):
 
     async def ble_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == 'log/miio':
-            for data in utils.decode_miio_json(
+            for data in decode_miio_json(
                     msg.payload, b'_async.ble_event'
             ):
                 await self.ble_process_event(data["params"])
