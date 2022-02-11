@@ -80,6 +80,7 @@ E1_COMMANDS = {
     "ota": "Zigbee OTA",
     "config": "Zigbee Config",
     "remove": "Zigbee Remove",
+    "parentscan": "Zigbee Table Update",
     "reboot": "Gateway Reboot",
     "ftp": "Gateway Enable FTP",
     "dump": "Gateway Dump Data",
