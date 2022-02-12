@@ -144,9 +144,10 @@ ENTITY_CATEGORIES = {
     "occupancy_timeout": ENTITY_CATEGORY_CONFIG,
     "power_on_state": ENTITY_CATEGORY_CONFIG,
     "sensitivity": ENTITY_CATEGORY_CONFIG,
-    "smart": ENTITY_CATEGORY_CONFIG,
-    "smart_1": ENTITY_CATEGORY_CONFIG,
-    "smart_2": ENTITY_CATEGORY_CONFIG,
+    "wireless": ENTITY_CATEGORY_CONFIG,
+    "wireless_1": ENTITY_CATEGORY_CONFIG,
+    "wireless_2": ENTITY_CATEGORY_CONFIG,
+    "wireless_3": ENTITY_CATEGORY_CONFIG,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)
