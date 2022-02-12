@@ -24,7 +24,8 @@ CONF_OCCUPANCY_TIMEOUT = "occupancy_timeout"
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
         if conv.attr in device.entities:
-            entity = device.entities[conv.attr]
+            entity: XEntity = device.entities[conv.attr]
+            entity.gw = gateway
         elif conv.attr == "motion":
             entity = XiaomiMotionSensor(gateway, device, conv)
         elif conv.attr == GATEWAY:

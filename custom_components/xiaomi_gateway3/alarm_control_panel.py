@@ -14,7 +14,8 @@ from .core.gateway import XGateway
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
         if conv.attr in device.entities:
-            entity = device.entities[conv.attr]
+            entity: XEntity = device.entities[conv.attr]
+            entity.gw = gateway
         else:
             entity = XiaomiAlarm(gateway, device, conv)
         async_add_entities([entity])

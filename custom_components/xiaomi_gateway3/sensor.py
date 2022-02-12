@@ -18,7 +18,8 @@ SCAN_INTERVAL = timedelta(seconds=60)
 async def async_setup_entry(hass, entry, add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
         if conv.attr in device.entities:
-            entity = device.entities[conv.attr]
+            entity: XEntity = device.entities[conv.attr]
+            entity.gw = gateway
         elif conv.attr == "action":
             entity = XiaomiAction(gateway, device, conv)
         elif conv.attr in STAT_GLOBALS:

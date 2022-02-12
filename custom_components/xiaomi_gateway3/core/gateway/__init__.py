@@ -106,7 +106,7 @@ class XGateway(GateGW3, GateE1):
             finally:
                 await self.mqtt.disconnect()
                 await self.mqtt.close()
-            await self.mqtt_disconnect()
+                await self.mqtt_disconnect()
 
         self.debug("Stop main thread")
 
