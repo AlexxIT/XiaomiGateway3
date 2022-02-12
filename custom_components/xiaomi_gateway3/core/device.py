@@ -213,7 +213,7 @@ class XDevice:
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
 
-        if "decode_ts" in kwargs:
+        if "decode_ts" in kwargs and self.decode_ts == 0:
             self.decode_ts = kwargs["decode_ts"]
 
         if "model" in kwargs:
