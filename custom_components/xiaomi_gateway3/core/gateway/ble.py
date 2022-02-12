@@ -63,16 +63,24 @@ class BLEGateway(GatewayBase):
         # {'dev': {'did': 'blt.3.xxx', 'mac': 'AA:BB:CC:DD:EE:FF', 'pdid': 2038},
         # 'evt': [{'eid': 15, 'edata': '010000'}],
         # 'frmCnt': 36, 'gwts': 1636208932}
-        mac = data['dev']['mac'].replace(':', '').lower() \
-            if 'mac' in data['dev'] \
-            else data['dev']['did']
 
-        device = self.devices.get(mac)
-        if not device:
-            # some devices doesn't send mac, only number did
-            # https://github.com/AlexxIT/XiaomiGateway3/issues/24
-            device = XDevice(BLE, data['dev']['pdid'], data['dev']['did'], mac)
-            self.add_device(mac, device)
+        # some devices doesn't send mac, only number did
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/24
+        if 'mac' in data['dev']:
+            mac = data['dev']['mac'].replace(':', '').lower()
+            device = self.devices.get(mac)
+            if not device:
+                device = XDevice(
+                    BLE, data['dev']['pdid'], data['dev']['did'], mac
+                )
+                self.add_device(mac, device)
+        else:
+            device = next((
+                d for d in self.devices.values() if d.did == data['dev']['did']
+            ), None)
+            if not device:
+                self.debug(f"Unregistered BLEE device {data}")
+                return
 
         if device.extra.get('seq') == data['frmCnt']:
             return
@@ -96,12 +104,11 @@ class BLEGateway(GatewayBase):
         # {'did':'blt.3.xxx','eid':4104,'edata':'0b','pdid':152,'seq':3}
 
         device = next((
-            device for device in self.devices.values()
-            if device.did == payload['did']
+            d for d in self.devices.values() if d.did == payload['did']
         ), None)
 
         if not device:
-            self.debug(f"Unregistered BLE device {payload}")
+            self.debug(f"Unregistered BLEF device {payload}")
             return
 
         if device.extra.get('seq') == payload['seq']:
