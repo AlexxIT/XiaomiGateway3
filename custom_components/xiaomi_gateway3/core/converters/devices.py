@@ -1355,5 +1355,7 @@ DEVICES += [{
     ],
 }, {
     "default": "mesh",  # default Mesh device
-    "spec": [],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
+    ],
 }]
