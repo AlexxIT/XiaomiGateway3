@@ -486,7 +486,7 @@ DEVICES += [{
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
         # new gw firmwares has a bug - don't bind power cluster
-        ZBatteryVoltConv("battery", bind=True, report=True),
+        # ZBatteryVoltConv("battery", bind=True, report=True),
     ],
 }, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
@@ -897,8 +897,10 @@ DEVICES += [{
     "support": 5,  # @AlexxIT
     "spec": [
         ZOnOffConv("plug", "switch"),
-        ZCurrent, ZPower, ZVoltagePoll,  # once per 60 seconds
-        ZEnergyConv("energy", "sensor", multiply=0.01),  # once per 5 minutes
+        ZVoltageConv("voltage", "sensor", poll=True),  # once per 60 seconds
+        ZCurrentConv("current", "sensor"),
+        ZPowerConv("power", "sensor"),
+        ZEnergyConv("energy", "sensor"),  # once per 5 minutes
         ZTuyaPowerOn,
     ],
 }, {
@@ -918,10 +920,12 @@ DEVICES += [{
     "support": 3,
     "spec": [
         ZOnOffConv("plug", "switch"),
-        ZCurrent, ZPower, ZVoltagePoll,
-        # not working now
-        ZEnergyConv("energy", "sensor", multiply=0.01, enabled=None),
+        ZVoltageConv("voltage", "sensor", bind=True, report="5s 1h 5"),
+        ZCurrentConv("current", "sensor", bind=True, report="5s 1h 50"),
+        ZPowerConv("power", "sensor", bind=True, report="5s 1h 10"),
+        ZEnergyConv("energy", "sensor", bind=True, report="5s 1h 1"),
         ZTuyaPowerOn,
+        ZTuyaModeConv("led", "select", enabled=False)
     ],
 }, {
     # tuya relay with neutral, 1 gang
@@ -955,7 +959,7 @@ DEVICES += [{
 }, {
     "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "spec": [
-        ZOnOffConv("switch", "switch", ep=11, bind=True, report=True),
+        ZOnOffConv("switch", "switch", ep=11, bind=True, report="0s 1h 0"),
     ]
 }, {
     "WB01": ["Sonoff", "Button", "SNZB-01"],
@@ -976,9 +980,9 @@ DEVICES += [{
     "spec": [
         # temperature, humidity and battery binds by default
         # report config for battery_voltage also by default
-        ZTemperatureConv("temperature", "sensor", report=True),
-        ZHumidityConv("humidity", "sensor", report=True),
-        ZBatteryConv("battery", "sensor", report=True),
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 100"),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
+        ZBatteryConv("battery", "sensor", report="1h 12h 0"),
     ],
 }, {
     # wrong zigbee model, some devices have model TH01 (ewelink bug)
@@ -993,15 +997,15 @@ DEVICES += [{
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
         ZOccupancyConv(
-            "occupancy", "binary_sensor", ep=2, bind=True, report=True
+            "occupancy", "binary_sensor", ep=2, bind=True, report="0s 1h 0"
         ),
         ZIlluminanceConv(
-            "illuminance", "sensor", ep=2, bind=True, report=True
+            "illuminance", "sensor", ep=2, bind=True, report="10s 1h 5"
         ),
         ZTemperatureConv(
-            "temperature", "sensor", ep=2, bind=True, report=True
+            "temperature", "sensor", ep=2, bind=True, report="10s 1h 100"
         ),
-        ZBatteryConv("battery", "sensor", ep=2, bind=True, report=True),
+        ZBatteryConv("battery", "sensor", ep=2, bind=True, report="1h 12h 0"),
         ZOccupancyTimeoutConv(
             "occupancy_timeout", "number", ep=2, enabled=False
         ),

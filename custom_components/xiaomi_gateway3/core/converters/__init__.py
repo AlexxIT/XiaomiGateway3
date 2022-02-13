@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from .base import Converter, LUMI_GLOBALS
+from .base import Converter, LUMI_GLOBALS, parse_time
 from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
 from .devices import DEVICES
 from .stats import STAT_GLOBALS
@@ -15,13 +15,6 @@ except ModuleNotFoundError:
     pass
 except:
     logging.getLogger(__name__).exception("Can't load external converters")
-
-TTL = {
-    "s": 1,
-    "m": 60,
-    "h": 3600,
-    "d": 86400
-}
 
 
 @dataclass
@@ -63,7 +56,7 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
 
         ttl = desc.get("ttl")
         if isinstance(ttl, str):
-            ttl = float(ttl[:-1]) * TTL[ttl[-1]]
+            ttl = parse_time(ttl)
 
         return XDeviceInfo(
             manufacturer=brand,
