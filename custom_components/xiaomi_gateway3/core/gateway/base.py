@@ -129,6 +129,10 @@ class GatewayBase:
         #     self.debug_device(device, "Join to gateway", device.model)
         #     return
 
+        # don't setup device from second gateway
+        if len(device.gateways) > 1:
+            return
+
         device.setup_entitites(self, stats=self.stats_enable)
         self.debug_device(
             device, f"setup {device.info.model}:",
