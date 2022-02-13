@@ -353,6 +353,9 @@ def zdo_unbind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
 
 
 # zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2] [reportableChange:-1]
+# minReportTime Minimum number of seconds between reports
+# maxReportTime Maximum number of seconds between reports
+# reportableChange Amount of change to trigger a report
 def zdb_report(
         nwk: str, ep: int, cluster: str, attr: str, mint: int, maxt: int,
         change: int, type: int = None
