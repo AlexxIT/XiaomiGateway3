@@ -194,6 +194,9 @@ class ZIASZoneConv(ZConverter):
         if isinstance(value, list) and len(value) == 4:
             payload[self.attr] = value[0] == 1
 
+    def read(self, device: "XDevice", payload: dict):
+        pass
+
 
 @dataclass
 class ZIlluminanceConv(ZMathConv):
