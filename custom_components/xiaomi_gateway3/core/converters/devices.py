@@ -1040,6 +1040,7 @@ DEVICES += [{
     "TRADFRI bulb E27 W opal 1000lm": [
         "IKEA", "Bulb E27 1000 lm", "LED1623G12"
     ],
+    "TRADFRI bulb E27 WW 806lm": ["IKEA", "Bulb E27 806 lm", "LED1836G9"],
     "support": 3,  # @AlexxIT TODO: tests, effect?
     "spec": [
         ZOnOffConv("light", "light"),
