@@ -390,9 +390,13 @@ All settings are **important** or you may have an unstable operation of the gate
 - **Fixed IP-address** for Gateway on your Router
 - Wi-Fi Router settings:
    - **Fixed channel** from 1 to 11
-   - Channel width: **20MHz**
-   - Authentication: WPA2
-   - Group key update interval: **1 hour** and more
+   - Channel width: **20MHz** (don't use 40MHz)
+   - Authentication: WPA2 (don't use WPA3)
+- MikroTik Router settings:
+   - Wireless > Security Profiles > Group Key Update: **01:00:00** (1 hour or more)
+- Keenetic Router settings: 
+   - Disable "[Airtime Fairness](https://help.keenetic.com/hc/en-us/articles/360009149400)" for 2.4GHz
+   - Disable "[256-QAM](https://help.keenetic.com/hc/en-us/articles/4402854785170)" for 2.4GHz
 
 With the following settings the operation of the gateway may be **unstable**: different subnets, closed ping to router, Wi-Fi channel 40MHz, WPA3.
 
@@ -620,13 +624,13 @@ After rebooting the device, all changes will be reset. The component will launch
 
 ### Can't connect to gateway
 
-- Check [Requirements](#requirements) readme section
+- Check [network config](#network-configuration) readme section
 - Check if the Gateway really has the IP-address you set in the configuration
 - Check if the Gateway really use the MiHome token you set in the configuration. When you add a hub to MiHome - its token changes. The integration only updates tokens when Hass starts. And only if there are no problems with connection to the cloud servers. If there are problems, the old (wrong) token value will be shown.
 
 ### Lost connection with Zigbee and Bluetooth devices
 
-- Check [Requirements](#requirements) readme section, gateway and Wi-Fi router settings must be fully matched to all items in the section
+- Check [network config](#network-configuration) readme section, gateway and Wi-Fi router settings must be fully matched to all items in the section
 - Turn on stat sesors (Configuration > Integrations > Gateway 3 > Configure > Add statisic sensors)
 - Check that the connection to the Gateway is not dropped for weeks (`_gateway` sensor value means connection uptime)
 - Check that the zigbee error rate is not increasing at a high rate (`zigbee_oe` attribute in `_gateway` sensor, normal rate: 1-2 errors per hour)
