@@ -321,7 +321,7 @@ def zcl_write(
 
     type_len = get_type_len(type)
     # data always string hex: {FFFF}
-    data = data.to_bytes(type_len, "big").hex()
+    data = data.to_bytes(type_len, "little").hex()
 
     pre = [
         {"commandcli": f"zcl mfg-code {mfg}"}
@@ -366,7 +366,8 @@ def zdb_report(
     if isinstance(attr, str):
         attr, type = get_attr_type(cluster.attributes, attr)
 
-    change = int(change).to_bytes(2, "big").hex()
+    type_len = get_type_len(type)
+    change = change.to_bytes(type_len, "little").hex()
     return [{
         "commandcli": f"zcl global send-me-a-report {cid} {attr} {type} {mint} {maxt} {{{change}}}"
     }, {

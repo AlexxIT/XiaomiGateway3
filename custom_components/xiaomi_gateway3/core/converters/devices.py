@@ -920,12 +920,12 @@ DEVICES += [{
     "support": 3,
     "spec": [
         ZOnOffConv("plug", "switch"),
-        ZVoltageConv("voltage", "sensor", bind=True, report="5s 1h 5"),
-        ZCurrentConv("current", "sensor", bind=True, report="5s 1h 50",
-                     multiply=0.001),
-        ZPowerConv("power", "sensor", bind=True, report="5s 1h 10"),
-        ZEnergyConv("energy", "sensor", bind=True, report="5s 1h 1",
-                    multiply=0.01),
+        # default gateway software binds electrical_measurement and
+        # smartenergy_metering clusters, no need to repeat it
+        ZVoltageConv("voltage", "sensor", report="5s 1h 1"),
+        ZCurrentConv("current", "sensor", report="5s 1h 1", multiply=0.001),
+        ZPowerConv("power", "sensor", report="5s 1h 1"),
+        ZEnergyConv("energy", "sensor", report="5s 1h 1", multiply=0.01),
         ZTuyaPowerOn,
         ZTuyaModeConv("led", "select", enabled=False)
     ],
