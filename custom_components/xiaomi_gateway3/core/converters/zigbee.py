@@ -86,8 +86,9 @@ class ZBoolConv(ZConverter):
             payload[self.attr] = bool(value[self.zattr])
 
 
+@dataclass
 class ZMathConv(ZConverter):
-    multiply = 1
+    multiply: float = 1
 
     def decode(self, device: 'XDevice', payload: dict, value: dict):
         if value["endpoint"] == self.ep and self.zattr in value:
@@ -147,7 +148,6 @@ class ZVoltageConv(ZElectricalConv):
 
 class ZCurrentConv(ZElectricalConv):
     zattr = "rms_current"
-    multiply = 0.001
 
 
 class ZPowerConv(ZElectricalConv):
@@ -157,13 +157,6 @@ class ZPowerConv(ZElectricalConv):
 class ZEnergyConv(ZMathConv):
     zigbee = "smartenergy_metering"
     zattr = "current_summ_delivered"
-    multiply = 0.01
-
-
-class ZIlluminanceConv(ZMathConv):
-    zigbee = "illuminance"
-    zattr = "measured_value"
-    multiply = 0.01
 
 
 class ZOccupancyConv(ZBoolConv):
@@ -202,16 +195,25 @@ class ZIASZoneConv(ZConverter):
             payload[self.attr] = value[0] == 1
 
 
+@dataclass
+class ZIlluminanceConv(ZMathConv):
+    zigbee = "illuminance"
+    zattr = "measured_value"
+    multiply: float = 0.01
+
+
+@dataclass
 class ZTemperatureConv(ZMathConv):
     zigbee = "temperature"
     zattr = "measured_value"
-    multiply = 0.01
+    multiply: float = 0.01
 
 
+@dataclass
 class ZHumidityConv(ZMathConv):
     zigbee = "humidity"
     zattr = "measured_value"
-    multiply = 0.01
+    multiply: float = 0.01
 
 
 class ZBatteryConv(ZConverter):
