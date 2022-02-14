@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..device import XDevice
 
 
-def parse_time(value: str) -> int:
+def parse_time(value: str) -> float:
     """Conver string time to float time (seconds).
     @type value: 15s or 30m or 24h or 1d
     """

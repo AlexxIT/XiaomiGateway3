@@ -68,11 +68,11 @@ class ZConverter(Converter):
 
         if self.report:
             mint, maxt, change = self.report.split(" ")
-            mint = parse_time(mint)
-            maxt = parse_time(maxt)
+            mint = int(parse_time(mint))
+            maxt = int(parse_time(maxt))
             change = int(change)
             cmd = zdb_report(
-                device.nwk, self.ep, self.zigbee, self.attr,
+                device.nwk, self.ep, self.zigbee, self.zattr,
                 mint, maxt, change,
             )
             payload.setdefault("commands", []).extend(cmd)
@@ -86,9 +86,8 @@ class ZBoolConv(ZConverter):
             payload[self.attr] = bool(value[self.zattr])
 
 
-@dataclass
 class ZMathConv(ZConverter):
-    multiply: float = 1
+    multiply = 1
 
     def decode(self, device: 'XDevice', payload: dict, value: dict):
         if value["endpoint"] == self.ep and self.zattr in value:
