@@ -917,7 +917,7 @@ DEVICES += [{
 }, {
     # Neo Power Plug NAS-WR01B
     "TS011F": ["Neo", "Power Plug", "NAS-WR01B"],
-    "support": 3,
+    "support": 5,
     "spec": [
         ZOnOffConv("plug", "switch"),
         # default gateway software binds electrical_measurement and
@@ -926,8 +926,10 @@ DEVICES += [{
         ZCurrentConv("current", "sensor", report="5s 1h 1", multiply=0.001),
         ZPowerConv("power", "sensor", report="5s 1h 1"),
         ZEnergyConv("energy", "sensor", report="5s 1h 1", multiply=0.01),
-        ZTuyaPowerOn,
-        ZTuyaModeConv("led", "select", enabled=False)
+        ZTuyaPowerOnConv("power_on_state", "select", enabled=False),
+        ZTuyaLEDModeConv("led", "select", enabled=False),
+        ZTuyaChildModeConv("child_mode", "switch", enabled=False),
+        ZTuyaModeConv("mode", "select", enabled=False)
     ],
 }, {
     # tuya relay with neutral, 1 gang

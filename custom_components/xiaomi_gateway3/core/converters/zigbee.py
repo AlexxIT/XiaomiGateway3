@@ -85,6 +85,27 @@ class ZBoolConv(ZConverter):
         if value["endpoint"] == self.ep and self.zattr in value:
             payload[self.attr] = bool(value[self.zattr])
 
+    def encode(self, device: "XDevice", payload: dict, value: bool):
+        cmd = zcl_write(
+            device.nwk, self.ep, self.zigbee, self.zattr, int(value), type=0x10
+        )
+        payload.setdefault("commands", []).extend(cmd)
+
+
+class ZMapConv(ZConverter):
+    map = {}
+
+    def decode(self, device: 'XDevice', payload: dict, value: dict):
+        if self.zattr in value:
+            payload[self.attr] = self.map.get(value[self.zattr])
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        v = next(k for k, v in self.map.items() if v == value)
+        cmd = zcl_write(
+            device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30
+        )
+        payload.setdefault("commands", []).extend(cmd)
+
 
 @dataclass
 class ZMathConv(ZConverter):
@@ -250,30 +271,30 @@ class ZBatteryConv(ZConverter):
 # Specific defices converters
 ################################################################################
 
+class ZTuyaChildModeConv(ZBoolConv):
+    zigbee = "on_off"
+    zattr = 0x8000
+
+
+class ZTuyaLEDModeConv(ZMapConv):
+    zigbee = "on_off"
+    zattr = 0x8001
+    map = {0: "off", 1: "off/on", 2: "on/off", 3: "on"}
+
+
 # Thanks to:
 # https://github.com/Koenkk/zigbee-herdsman/blob/master/src/zcl/definition/cluster.ts
 # moesStartUpOnOff: {ID: 0x8002, type: DataType.enum8},
-class ZTuyaPowerOnConv(ZConverter):
+class ZTuyaPowerOnConv(ZMapConv):
     zigbee = "on_off"
     zattr = 0x8002
     map = {0: "off", 1: "on", 2: "previous"}
-
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
-        if self.zattr in value:
-            payload[self.attr] = self.map.get(value[self.zattr])
-
-    def encode(self, device: "XDevice", payload: dict, value: str):
-        v = next(k for k, v in self.map.items() if v == value)
-        cmd = zcl_write(
-            device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30
-        )
-        payload.setdefault("commands", []).extend(cmd)
 
 
 # Thanks to:
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/910271ae8fccb19305752d3f67381b4765853018/converters/fromZigbee.js#L4537
 # https://github.com/Koenkk/zigbee-herdsman/blob/068bbe7636f588394f69f82bc25c8b68a4feada7/src/zcl/definition/cluster.ts#L4284
-class ZTuyaModeConv(ZTuyaPowerOnConv):
+class ZTuyaModeConv(ZMapConv):
     zigbee = 0xE001
     zattr = 0xD030
     map = {0: "toggle", 1: "state", 2: "momentary"}

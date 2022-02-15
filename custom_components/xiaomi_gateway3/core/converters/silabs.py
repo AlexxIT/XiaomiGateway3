@@ -282,14 +282,20 @@ def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
 
 
 # zcl global read [cluster:2] [attributeId:2]
-def zcl_read(nwk: str, ep: int, cluster: str, *attrs) -> list:
+def zcl_read(nwk: str, ep: int, cluster: Union[str, int], *attrs) -> list:
     """Generate Silabs Z3 read attribute command. Support multiple attrs."""
-    # convert string to object
-    cluster = get_cluster(cluster)
-    cid = cluster.cluster_id
+    if isinstance(cluster, str):
+        cluster = get_cluster(cluster)
+        cid = cluster.cluster_id
 
-    # convert List[str] to List[int]
-    attrs = [get_attr(cluster.attributes, attr) for attr in attrs]
+        # convert List[str] to List[int]
+        attrs = [get_attr(cluster.attributes, attr) for attr in attrs]
+    else:
+        cid = cluster
+
+    assert isinstance(cid, int)
+    for attr in attrs:
+        assert isinstance(attr, int)
 
     if len(attrs) > 1:
         raw = "".join([int(a).to_bytes(2, "little").hex() for a in attrs])
