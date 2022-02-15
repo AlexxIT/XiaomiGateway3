@@ -220,7 +220,7 @@ Aqara|Single Wall Switch H1 CN (with N)|[QBKG30LM](https://home.miot-spec.com/s/
 Aqara|Single Wall Switch H1 EU (no N)|[WS-EUK01](https://home.miot-spec.com/s/lumi.switch.l1aeu1)|switch, action, led, power_on_state, wireless|
 Aqara|Single Wall Switch H1 EU (with N)|[WS-EUK03](https://home.miot-spec.com/s/lumi.switch.n1aeu1)|switch, energy, power, action, led, led_reverse, power_on_state, wireless|
 Aqara|TH Sensor|[WSDCGQ11LM](https://home.miot-spec.com/s/lumi.weather)|temperature, humidity, battery, pressure|
-Aqara|TH Sensor T1|[WSDCGQ12LM](https://home.miot-spec.com/s/lumi.sensor_ht.agl02)|temperature, humidity, battery, pressure|
+Aqara|TH Sensor T1|[WSDCGQ12LM](https://home.miot-spec.com/s/lumi.sensor_ht.agl02)|temperature, humidity, pressure, battery, battery_low|
 Aqara|Thermostat S2 CN|[KTWKQ03ES](https://home.miot-spec.com/s/lumi.airrtc.tcpecn02)|climate|
 Aqara|Triple Wall Switch D1 CN (no N)|[QBKG25LM](https://home.miot-spec.com/s/lumi.switch.l3acn3)|channel_1, channel_2, channel_3, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
 Aqara|Triple Wall Switch D1 CN (with N)|[QBKG26LM](https://home.miot-spec.com/s/lumi.switch.n3acn3)|channel_1, channel_2, channel_3, power, voltage, energy, action, wireless_1, wireless_2, wireless_3, power_on_state, led|
@@ -250,15 +250,16 @@ Xiaomi|TH Sensor|[WSDCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_ht)|tempe
 
 ## Supported Other Zigbee
 
-Total devices: 16
+Total devices: 17
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
-BlitzWolf|Plug|[BW-SHP13](https://www.zigbee2mqtt.io/supported-devices/#s=BW-SHP13)|plug, current, power, voltage, energy, power_on_state|5
+BlitzWolf|Plug|[BW-SHP13](https://www.zigbee2mqtt.io/supported-devices/#s=BW-SHP13)|plug, voltage, current, power, energy, power_on_state|5
 IKEA|Bulb E27 1000 lm|[LED1623G12](https://www.zigbee2mqtt.io/supported-devices/#s=LED1623G12)|light|3
+IKEA|Bulb E27 806 lm|[LED1836G9](https://www.zigbee2mqtt.io/supported-devices/#s=LED1836G9)|light|3
 Ksentry Electronics|OnOff Controller|[KS-SM001](https://www.zigbee2mqtt.io/supported-devices/#s=KS-SM001)|switch|
 Lonsonho|Switch w/o neutral|[TS0011](https://www.zigbee2mqtt.io/supported-devices/#s=TS0011)|switch|5
-Neo|Power Plug|[NAS-WR01B](https://www.zigbee2mqtt.io/supported-devices/#s=NAS-WR01B)|plug, current, power, voltage, energy*, power_on_state|3
+Neo|Power Plug|[NAS-WR01B](https://www.zigbee2mqtt.io/supported-devices/#s=NAS-WR01B)|plug, voltage, current, power, energy, power_on_state, led, child_mode, mode|5
 Philips|Hue motion sensor|[9290012607](https://www.zigbee2mqtt.io/supported-devices/#s=9290012607)|occupancy, illuminance, temperature, battery, occupancy_timeout|4
 Sonoff|Button|[SNZB-01](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-01)|action, battery|5
 Sonoff|Door/Window Sensor|[SNZB-04](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-04)|contact, battery|5
@@ -306,14 +307,14 @@ Xiaomi|TH Sensor|[XMWSDJ04MMC](https://home.miot-spec.com/s/4611)|temperature, h
 Xiaomi|TH Sensor 2|[LYWSD03MMC](https://home.miot-spec.com/s/1371)|temperature, humidity, battery*|
 Xiaomi|Toothbrush T500|[MES601](https://home.miot-spec.com/s/1161)|*|
 Xiaomi|Viomi Kettle|[V-SK152](https://home.miot-spec.com/s/1116)|power, temperature|
-Xiaomi|Water Leak Sensor|[SJWS01LM](https://home.miot-spec.com/s/2147)|*|
+Xiaomi|Water Leak Sensor|[SJWS01LM](https://home.miot-spec.com/s/2147)|water_leak, battery, action|
 Xiaomi|ZenMeasure Clock|[MHO-C303](https://home.miot-spec.com/s/1747)|temperature, humidity, battery*|
 Xiaomi|ZenMeasure TH|[MHO-C401](https://home.miot-spec.com/s/903)|temperature, humidity, battery*|
 Yeelight|Button S1|[YLAI003](https://home.miot-spec.com/s/1983)|action, battery|
 
 ## Supported Xiaomi Mesh
 
-Total devices: 31
+Total devices: 32
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
@@ -327,6 +328,7 @@ PTX|Mesh Single Wall Switch|[PTX-SK1M](https://home.miot-spec.com/s/2258)|switch
 PTX|Mesh Triple Wall Switch|[PTX-SK3M](https://home.miot-spec.com/s/3878)|channel_1, channel_2, channel_3, led, wireless_1, wireless_2, wireless_3|
 PTX|Mesh Triple Wall Switch|[PTX-TK3/M](https://home.miot-spec.com/s/2093)|channel_1, channel_2, channel_3, led, wireless_1, wireless_2, wireless_3|
 Unknown|Mesh Lightstrip (RF ready)|[crzm.light.wy0a01](https://home.miot-spec.com/s/2293)|light|
+Unknown|Mesh Switch|[dwdz.switch.sw0a01](https://home.miot-spec.com/s/4252)|switch|
 Unknown|Mesh Switch Controller|[lemesh.switch.sw0a01](https://home.miot-spec.com/s/2007)|switch|
 Unknown|Mesh Switch Controller|[lemesh.switch.sw0a02](https://home.miot-spec.com/s/3169)|switch|
 Unknown|Mesh Wall Switch|[DHKG01ZM](https://home.miot-spec.com/s/1945)|switch, led|
