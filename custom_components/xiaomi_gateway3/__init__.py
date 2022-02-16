@@ -275,7 +275,10 @@ async def _setup_logger(hass: HomeAssistant):
 def _register_send_command(hass: HomeAssistant):
     async def send_command(call: ServiceCall):
         host = call.data["host"]
-        gw = next(gw for gw in hass.data[DOMAIN].values() if gw.host == host)
+        gw = next(
+            gw for gw in hass.data[DOMAIN].values()
+            if isinstance(gw, XGateway) and gw.host == host
+        )
         command = call.data["command"]
         if command == "miio":
             raw = json.loads(call.data["data"])
