@@ -347,6 +347,16 @@ class OnlineConv(Converter):
         payload["zigbee"] = datetime.now(timezone.utc) - timedelta(seconds=dt)
 
 
+class RemoveDIDConv(Converter):
+    def decode(self, device: "XDevice", payload: dict, value: Any):
+        # two formats:
+        # "res_name":"8.0.2082","value":{"did":"lumi.1234567890"}"
+        # "res_name":"8.0.2082","value":"lumi.1234567890"
+        if isinstance(value, dict):
+            value = value["did"]
+        super().decode(device, payload, value)
+
+
 ################################################################################
 # Final converter classes
 ################################################################################

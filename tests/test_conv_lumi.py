@@ -1,4 +1,4 @@
-from custom_components.xiaomi_gateway3.core.converters import ZIGBEE
+from custom_components.xiaomi_gateway3.core.converters import ZIGBEE, GATEWAY
 from custom_components.xiaomi_gateway3.core.device import XDevice
 
 ZDID = "lumi.112233aabbcc"
@@ -291,3 +291,19 @@ def test_mi_curtain():
 
     p = device.encode({"position": 60})
     assert p == {'mi_spec': [{'siid': 2, 'piid': 4, 'value': 60}]}
+
+
+def test_gateway():
+    device = XDevice(GATEWAY, 'lumi.gateway.mgl03', "123456", "aabbccddeeff")
+    assert device.info.name == 'Xiaomi Gateway 3'
+    device.setup_converters()
+
+    p = device.decode_lumi([{
+        "res_name": "8.0.2082", "value": "lumi.1234567890"
+    }])
+    assert p == {"remove_did": "lumi.1234567890"}
+
+    p = device.decode_lumi([{
+        "res_name": "8.0.2082", "value": {"did": "lumi.1234567890"}
+    }])
+    assert p == {"remove_did": "lumi.1234567890"}
