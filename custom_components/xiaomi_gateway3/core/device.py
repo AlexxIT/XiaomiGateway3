@@ -301,7 +301,8 @@ class XDevice:
         payload = {}
 
         for param in value:
-            if param.get("error_code", 0) != 0:
+            # Lumi spec has `error_code`, MIoT spec has `code`
+            if param.get("error_code", 0) != 0 or param.get("code", 0) != 0:
                 continue
 
             v = param["value"] if "value" in param else param["arguments"]
@@ -337,8 +338,6 @@ class XDevice:
         if MESH in self.entities:
             self.update(self.decode(MESH, value))
 
-        for item in value:
-            item["error_code"] = item.pop("code", 0)
         return self.decode_lumi(value)
 
     def decode_zigbee(self, value: dict) -> Optional[dict]:

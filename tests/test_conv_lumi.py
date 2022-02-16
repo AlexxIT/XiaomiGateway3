@@ -307,3 +307,19 @@ def test_gateway():
         "res_name": "8.0.2082", "value": {"did": "lumi.1234567890"}
     }])
     assert p == {"remove_did": "lumi.1234567890"}
+
+
+def test_error():
+    device = XDevice(ZIGBEE, 'lumi.motion.agl04', ZDID, ZMAC, ZNWK)
+    assert device.info.name == 'Aqara Precision Motion Sensor EU'
+    device.setup_converters()
+
+    p = device.decode_lumi([{"siid": 10, "piid": 1, "code": -5020}])
+    assert p == {}
+
+    device = XDevice(ZIGBEE, 'lumi.sensor_magnet.aq2', ZDID, ZMAC, ZNWK)
+    assert device.info.name == 'Aqara Door/Window Sensor'
+    device.setup_converters()
+
+    p = device.decode_lumi([{"res_name":"8.0.2102","error_code":-5020}])
+    assert p == {}
