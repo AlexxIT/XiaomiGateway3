@@ -29,7 +29,7 @@ class TelnetShell:
     async def read_file(self, filename: str, as_base64=False):
         command = f"cat {filename}|base64" if as_base64 else f"cat {filename}"
         try:
-            raw = await self.exec(command, as_bytes=True)
+            raw = await self.exec(command, as_bytes=True, timeout=60)
             # b"cat: can't open ..."
             return base64.b64decode(raw) if as_base64 else raw
         except:
