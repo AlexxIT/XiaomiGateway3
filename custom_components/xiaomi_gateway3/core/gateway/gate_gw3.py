@@ -139,50 +139,60 @@ class GateGW3(
         self.debug(f"Gateway time offset: {self.time_offset}")
 
     async def gw3_update_serial_stats(self):
-        sh: shell.ShellGw3 = await shell.connect(self.host)
-        if not sh:
-            return
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             serial = await sh.read_file('/proc/tty/driver/serial')
             payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
             self.device.update(payload)
+
+        except Exception as e:
+            self.warning("Can't update gateway stats", e)
+
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
     async def gw3_memory_sync(self):
-        sh: shell.ShellGw3 = await shell.connect(self.host)
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             await sh.memory_sync()
         except Exception as e:
-            self.debug(f"Can't memory sync", e)
+            self.error(f"Can't memory sync", e)
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
     async def gw3_send_lock(self, enable: bool) -> bool:
         self.debug(f"Set firmware lock to {enable}")
 
-        sh: shell.ShellGw3 = await shell.connect(self.host)
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             await sh.lock_firmware(enable)
             locked = await sh.check_firmware_lock()
             return enable == locked
 
         except Exception as e:
-            self.debug(f"Can't set firmware lock", e)
+            self.error(f"Can't set firmware lock", e)
             return False
 
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
     async def gw3_read_lock(self) -> Optional[bool]:
-        sh: shell.ShellGw3 = await shell.connect(self.host)
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             return await sh.check_firmware_lock()
         except Exception as e:
-            self.debug(f"Can't get firmware lock", e)
+            self.error(f"Can't get firmware lock", e)
             return None
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
 
 def decode_miio_offline(raw: bytes) -> Optional[dict]:

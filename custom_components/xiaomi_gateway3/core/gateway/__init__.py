@@ -88,7 +88,8 @@ class XGateway(GateGW3, GateE1):
         """Main thread loop."""
         while True:
             # if not telnet - enable it
-            if not await self.check_port(23) and not await self.enable_telnet():
+            if not await self.check_port(23) and \
+                    not await self.enable_telnet():
                 await asyncio.sleep(30)
                 continue
 
@@ -154,9 +155,9 @@ class XGateway(GateGW3, GateE1):
         """Launching the required utilities on the gw, if they are not already
         running.
         """
-        sh: shell.TelnetShell = await shell.connect(self.host)
+        sh = None
         try:
-            # should fail if no connection
+            sh = await shell.connect(self.host)
             await sh.get_version()
 
             self.debug(f"Prepare gateway {sh.model} with firmware {sh.ver}")
@@ -168,11 +169,12 @@ class XGateway(GateGW3, GateE1):
                 raise NotImplementedError
 
         except Exception as e:
-            self.debug(f"Can't prepare gateway", e)
+            self.error(f"Can't prepare gateway", e)
             return False
 
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
     def update_available(self, value: bool):
         self.available = value
@@ -182,8 +184,9 @@ class XGateway(GateGW3, GateE1):
                 device.update_available()
 
     async def telnet_send(self, command: str):
-        sh: shell.TelnetShell = await shell.connect(self.host)
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             if command == "ftp":
                 await sh.run_ftp()
             elif command == "dump":
@@ -198,8 +201,10 @@ class XGateway(GateGW3, GateE1):
 
         except Exception as e:
             self.error(f"Can't run telnet command: {command}", exc_info=e)
+
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
 
     def check_available(self, ts: float):
         for device in list(self.devices.values()):

@@ -13,41 +13,33 @@ async def connect(host: str, port=23) -> Union[TelnetShell, ShellGw3, ShellE1]:
 
     Example of usage:
 
-        sh: shell.TelnetShell = await shell.connect(host)
+        sh = None
         try:
-            # should fail if no connection
-            await sh.get_version()
+            sh = await shell.connect(host)
             return True
         except Exception as e:
             return False
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
     """
-    reader = writer = None
+    coro = asyncio.open_connection(host, port, limit=1_000_000)
+    reader, writer = await asyncio.wait_for(coro, 5)
 
-    try:
-        coro = asyncio.open_connection(host, port, limit=1_000_000)
-        reader, writer = await asyncio.wait_for(coro, 5)
+    coro = reader.readuntil(b"login: ")
+    resp: bytes = await asyncio.wait_for(coro, 3)
 
-        coro = reader.readuntil(b"login: ")
-        resp: bytes = await asyncio.wait_for(coro, 3)
+    if b"rlxlinux" in resp:
+        shell = ShellGw3(reader, writer)
+    elif b"Aqara-Hub-E1" in resp:
+        shell = ShellE1(reader, writer)
+    else:
+        raise NotImplementedError
 
-        if b"rlxlinux" in resp:
-            shell = ShellGw3(reader, writer)
-        elif b"Aqara-Hub-E1" in resp:
-            shell = ShellE1(reader, writer)
-        else:
-            raise NotImplementedError
+    await shell.login()
+    await shell.prepare()
 
-        await shell.login()
-        await shell.prepare()
-
-        return shell
-
-    except:
-        pass
-
-    return TelnetShell(reader, writer)
+    return shell
 
 
 NTP_DELTA = 2208988800  # 1970-01-01 00:00:00

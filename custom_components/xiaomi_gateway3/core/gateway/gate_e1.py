@@ -67,10 +67,9 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         self.e1_ts = ts + 300  # 5 min
 
     async def e1_update_stats(self):
-        sh: shell.ShellE1 = await shell.connect(self.host)
-        if not sh:
-            return
+        sh = None
         try:
+            sh = await shell.connect(self.host)
             serial = await sh.read_file("/proc/tty/driver/ms_uart | grep -v ^0 | sort -r")
             free_mem = await sh.read_file("/proc/meminfo | grep MemFree: | awk '{print $2}'")
             load_avg = await sh.read_file("/proc/loadavg | sed 's/ /|/g'")
@@ -84,5 +83,10 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
                 "rssi": int(rssi) + 100
             })
             self.device.update(payload)
+
+        except Exception as e:
+            self.warning("Can't update gateway stats", e)
+
         finally:
-            await sh.close()
+            if sh:
+                await sh.close()
