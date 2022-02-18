@@ -243,7 +243,7 @@ class XDevice:
             if conv.enabled is None and conv.attr not in restore_entities:
                 self.lazy_setup.add(conv.attr)
                 continue
-            gateway.setups[domain](gateway, self, conv)
+            gateway.setup_entity(domain, self, conv)
 
     def setup_converters(self, entities: dict = None):
         """If no entities - use only required converters. Otherwise search for
