@@ -85,7 +85,6 @@ Support levels:
 Nice project with MIoT spec description: https://home.miot-spec.com/
 """
 from .base import *
-from .const import *
 from .mibeacon import *
 from .stats import *
 from .zigbee import *
@@ -929,7 +928,7 @@ DEVICES += [{
         ZTuyaPowerOnConv("power_on_state", "select", enabled=False),
         ZTuyaLEDModeConv("led", "select", enabled=False),
         ZTuyaChildModeConv("child_mode", "switch", enabled=False),
-        ZTuyaModeConv("mode", "select", enabled=False)
+        ZTuyaPlugModeConv("mode", "select", enabled=False)
     ],
 }, {
     # tuya relay with neutral, 1 gang
@@ -946,7 +945,19 @@ DEVICES += [{
     "spec": [
         ZOnOffConv("channel_1", "switch", ep=1, bind=True),
         ZOnOffConv("channel_2", "switch", ep=2, bind=True),
-        ZTuyaPowerOn, ZTuyaMode,
+        ZTuyaPowerOn,
+        ZTuyaPlugModeConv("mode", "select", enabled=False),
+    ],
+}, {
+    "TS004F": ["Tuya", "Wireless Four Button", "RSH-Zigbee-SC04"],
+    "spec": [
+        ZTuyaButtonConfig("action", "sensor"),
+        ZTuyaButtonConv("button_1", ep=1, bind=True),
+        ZTuyaButtonConv("button_2", ep=2, bind=True),
+        ZTuyaButtonConv("button_3", ep=3, bind=True),
+        ZTuyaButtonConv("button_4", ep=4, bind=True),
+        ZBatteryConv("battery", "sensor", bind=True),
+        ZTuyaButtonModeConv("mode", "select", enabled=False),
     ],
 }, {
     # very simple relays

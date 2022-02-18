@@ -6,7 +6,8 @@ from zigpy.zcl import Cluster
 from zigpy.zcl.foundation import Command, ZCLHeader, Attribute, \
     ReadAttributeRecord, DATA_TYPES
 from zigpy.zdo import ZDO
-from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
+from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, \
+    NodeDescriptor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,7 +62,9 @@ def decode(data: dict):
                     "command": str(hdr.command_id),
                     "status": str(args[0]),
                 }
-            elif hdr.command_id in (ZDOCmd.Node_Desc_req, ZDOCmd.Active_EP_req):
+            elif hdr.command_id in (
+                    ZDOCmd.Node_Desc_req, ZDOCmd.Active_EP_req
+            ):
                 return {"command": str(hdr.command_id)}
             elif hdr.command_id == ZDOCmd.Simple_Desc_req:
                 return {
@@ -143,6 +146,8 @@ def decode(data: dict):
                     elif isinstance(value, list) and \
                             not isinstance(value, EUI64):
                         payload[name] = [v.value for v in value]
+                    elif isinstance(value, int):
+                        payload[name] = int(value)
                     else:
                         payload[name] = value
 
@@ -161,6 +166,8 @@ def decode(data: dict):
                             payload[name] = "0x" + value.hex()
                         elif isinstance(value, list):
                             payload[name] = [v.value for v in value]
+                        elif isinstance(value, int):
+                            payload[name] = int(value)
                         else:
                             payload[name] = value
                     else:
@@ -198,8 +205,8 @@ def decode(data: dict):
                 payload["value"] = args
 
         elif hdr.frame_control.is_cluster:
-            if isinstance(args, bytes) and args:
-                args = "0x" + args.hex()
+            # if isinstance(args, bytes) and args:
+            #     args = "0x" + args.hex()
 
             payload["command_id"] = hdr.command_id
             if hdr.command_id < len(cluster.commands):

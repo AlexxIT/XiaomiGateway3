@@ -1,4 +1,5 @@
 from custom_components.xiaomi_gateway3.core.converters import silabs, ZIGBEE
+from custom_components.xiaomi_gateway3.core.converters.zigbee import ZConverter
 from custom_components.xiaomi_gateway3.core.device import XDevice
 
 ZDID = "lumi.112233aabbcc"
@@ -43,6 +44,44 @@ def test_aqara_cube():
     assert p == {'action': 'flip90', 'from_side': 3, 'to_side': 1}
 
 
+def test_tuya_button():
+    device = XDevice(ZIGBEE, "TS004F", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    p = silabs.decode({
+        "clusterId": "0x0006", "sourceEndpoint": "0x03",
+        "APSPlayload": "0x010AFD02",
+    })
+    p = device.decode_zigbee(p)
+    assert p == {'button_3': 'hold', 'action': 'button_3_hold'}
+
+
+def test_config():
+    device = XDevice(ZIGBEE, "TS004F", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    gw = type("", (), {"ieee": "0xAABBCC"})
+
+    p = {}
+    for conv in device.converters:
+        if isinstance(conv, ZConverter):
+            conv.config(device, p, gw)
+
+    assert p['commands'] == [
+        {'commandcli': 'raw 6 {10000004000000010005000700feff}'},
+        {'commandcli': 'send 0x12ab 1 1'},
+        {'commandcli': 'zcl global read 57345 53265'},
+        {'commandcli': 'send 0x12ab 1 1'},
+        {'commandcli': 'zdo bind 0x12ab 1 1 6 {0000112233aabbcc} {0xAABBCC}'},
+        {'commandcli': 'zdo bind 0x12ab 2 1 6 {0000112233aabbcc} {0xAABBCC}'},
+        {'commandcli': 'zdo bind 0x12ab 3 1 6 {0000112233aabbcc} {0xAABBCC}'},
+        {'commandcli': 'zdo bind 0x12ab 4 1 6 {0000112233aabbcc} {0xAABBCC}'},
+        {'commandcli': 'zdo bind 0x12ab 1 1 1 {0000112233aabbcc} {0xAABBCC}'},
+        {'commandcli': 'zcl global write 6 32772 48 {01}'},
+        {'commandcli': 'send 0x12ab 1 1'}
+    ]
+
+
 def test_():
     device = XDevice(ZIGBEE, "MS01", ZDID, ZMAC, ZNWK)
     assert device.info.name == "Sonoff Motion Sensor"
@@ -75,3 +114,22 @@ def test_():
     })
     p = device.decode_zigbee(p)
     assert p == {'occupancy': True}
+
+
+def test_silabs_decode():
+    p = silabs.decode({
+        "clusterId": "0x0006", "sourceEndpoint": "0x01",
+        "APSPlayload": "0x08080A04803001"
+    })
+    assert p == {
+        'endpoint': 1, 'cluster': 'on_off',
+        'command': 'Command.Report_Attributes', 32772: 1
+    }
+
+    p = silabs.decode({
+        "clusterId": "0x0006", "sourceEndpoint": "0x03",
+        "APSPlayload": "0x010AFD02"
+    })
+    assert p == {
+        'endpoint': 3, 'cluster': 'on_off', 'command_id': 253, 'value': b'\x02'
+    }
