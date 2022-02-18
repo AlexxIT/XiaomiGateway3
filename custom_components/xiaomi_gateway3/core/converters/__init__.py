@@ -1,4 +1,5 @@
 import logging
+import re
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -69,13 +70,30 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
     raise RuntimeError
 
 
-def get_zigbee_buttons(model: str) -> Optional[list]:
+RE_INFO_MODEL = re.compile(r"^(zigbee|ble|mesh)(?: ([^ ]+))?(?: \((.+?)\))?$")
+
+
+def get_buttons(info_model: str) -> Optional[List[str]]:
+    """Gets a list of buttons using the device info model."""
+    m = RE_INFO_MODEL.search(info_model)
+    if not m:
+        return None
+
+    market = m[2]
+    model = m[3]
+
+    # Yeelight Button S1
+    if market == "YLAI003":
+        return ["button"]
+
     for device in DEVICES:
-        if model not in device:
-            continue
-        buttons = [
-            conv.attr for conv in device["required"]
-            if conv.attr.startswith("button")
-        ]
-        return sorted(set(buttons))
+        if model in device or any(
+                info[2] == market for info in device.values()
+                if isinstance(info, list) and len(info) == 3
+        ):
+            return sorted(set([
+                conv.attr for conv in device["spec"]
+                if conv.attr.startswith("button")
+            ]))
+
     return None
