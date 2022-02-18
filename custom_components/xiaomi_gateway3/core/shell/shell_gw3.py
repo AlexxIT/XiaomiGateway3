@@ -182,7 +182,9 @@ class ShellGw3(TelnetShell):
         if md5 in await self.exec("md5sum /data/" + filename):
             return True
         elif url:
-            await self.exec(WGET.format(url, filename))
+            # files from sourceforge.net can take up to 3 minutes to download
+            # for Chinese users
+            await self.exec(WGET.format(url, filename), timeout=300)
             return await self.check_bin(filename, md5)
         else:
             return False

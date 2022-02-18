@@ -18,11 +18,12 @@ class TelnetShell:
         self.writer.close()
         await self.writer.wait_closed()
 
-    async def exec(self, command: str, as_bytes=False) -> Union[str, bytes]:
+    async def exec(self, command: str, as_bytes=False, timeout=10) \
+            -> Union[str, bytes]:
         """Run command and return it result."""
         self.writer.write(command.encode() + b"\n")
         coro = self.reader.readuntil(b"# ")
-        raw = await asyncio.wait_for(coro, timeout=10)
+        raw = await asyncio.wait_for(coro, timeout=timeout)
         return raw[:-2] if as_bytes else raw[:-2].decode()
 
     async def read_file(self, filename: str, as_base64=False):
