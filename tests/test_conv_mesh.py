@@ -13,3 +13,15 @@ def test_mesh():
         {'did': '1234567890', 'siid': 2, 'piid': 3, 'value': 4000, 'code': 0}
     ])
     assert p == {'light': True, 'brightness': 255.0, 'color_temp': 250}
+
+
+def test_brightness():
+    device = XDevice(MESH, 3164, "123", "112233aabbcc")
+    device.setup_converters()
+
+    p = device.encode({'light': True, 'brightness': 15.0, 'color_temp': 300})
+    assert p['mi_spec'] == [
+        {'siid': 2, 'piid': 1, 'value': True},
+        {'siid': 2, 'piid': 2, 'value': 6},
+        {'siid': 2, 'piid': 3, 'value': 3333}
+    ]

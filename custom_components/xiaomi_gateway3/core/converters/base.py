@@ -118,11 +118,12 @@ class MathConv(Converter):
 class BrightnessConv(Converter):
     max: float = 100.0
 
-    def decode(self, device: "XDevice", payload: dict, value: float):
+    def decode(self, device: "XDevice", payload: dict, value: int):
         payload[self.attr] = value / self.max * 255.0
 
     def encode(self, device: "XDevice", payload: dict, value: float):
-        super().encode(device, payload, value / 255.0 * self.max)
+        value = round(value / 255.0 * self.max)
+        super().encode(device, payload, int(value))
 
 
 @dataclass
