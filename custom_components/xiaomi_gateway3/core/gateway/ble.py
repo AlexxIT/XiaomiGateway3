@@ -38,6 +38,8 @@ class BLEGateway(GatewayBase):
         if ok:
             self.debug("Patch Bluetooth")
             sh.patch_bluetooth_mqtt()
+        else:
+            self.error("Can't patch Bluetooth utility")
 
         if not self.options.get('memory'):
             return
