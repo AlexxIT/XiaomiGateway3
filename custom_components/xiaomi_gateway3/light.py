@@ -84,9 +84,13 @@ class XiaomiZigbeeLight(XiaomiLight):
 
         if tr is not None:
             if kwargs:
+                # For the Aqara bulb, it is important that the brightness
+                # parameter comes before the color_temp parameter. Only this
+                # way transition will work. So we use `kwargs.pop` func to set
+                # the exact order of parameters.
                 for k in (ATTR_BRIGHTNESS, ATTR_COLOR_TEMP):
                     if k in kwargs:
-                        kwargs[k] = (kwargs[k], tr)
+                        kwargs[k] = (kwargs.pop(k), tr)
             else:
                 kwargs[ATTR_BRIGHTNESS] = (255, tr)
 
