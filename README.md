@@ -250,7 +250,7 @@ Xiaomi|TH Sensor|[WSDCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_ht)|tempe
 
 ## Supported Other Zigbee
 
-Total devices: 17
+Total devices: 18
 
 Brand|Name|Model|Entities|S
 ---|---|---|---|---
@@ -268,6 +268,7 @@ Sonoff|Motion Sensor|[SNZB-03](https://www.zigbee2mqtt.io/supported-devices/#s=S
 Sonoff|TH Sensor|[SNZB-02](https://www.zigbee2mqtt.io/supported-devices/#s=SNZB-02)|temperature, humidity, battery|
 Tuya|Relay|[TS0001](https://www.zigbee2mqtt.io/supported-devices/#s=TS0001)|switch, power_on_state|4
 Tuya|Relay|[TS0002](https://www.zigbee2mqtt.io/supported-devices/#s=TS0002)|channel_1, channel_2, power_on_state, mode|3
+Tuya|Wireless Four Button|[RSH-Zigbee-SC04](https://www.zigbee2mqtt.io/supported-devices/#s=RSH-Zigbee-SC04)|action, battery, mode|
 Unknown|Dimmer|[LXZ8-02A](https://www.zigbee2mqtt.io/supported-devices/#s=LXZ8-02A)|light|3
 UseeLink|Power Strip|[SM-SO306E](https://www.zigbee2mqtt.io/supported-devices/#s=SM-SO306E)|channel_1, channel_2, channel_3, channel_4, usb, power_on_state|5
 eWeLink|Zigbee OnOff Controller|[SA-003-Zigbee](https://www.zigbee2mqtt.io/supported-devices/#s=SA-003-Zigbee)|switch|5
