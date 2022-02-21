@@ -1,3 +1,4 @@
+import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -207,10 +208,9 @@ class TiltAngleConv(Converter):
 
 
 class CloudLinkConv(Converter):
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        # zero means online
-        # {"offline_time":1634407495,"offline_reason":30,"offline_ip":123,"offline_port":80}
-        payload[self.attr] = value["offline_time"] == 0
+    def decode(self, device: "XDevice", payload: dict, value: str):
+        value = json.loads(value)
+        payload[self.attr] = bool(value["cloud_link"])
 
 
 class ClimateConv(Converter):

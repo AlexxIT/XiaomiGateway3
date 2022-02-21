@@ -1,10 +1,4 @@
-from custom_components.xiaomi_gateway3.core.gateway import miot, gate_gw3
-
-
-def test_record_offline():
-    raw = b'[20211012 03:33:58] [I] record_offline():, {"method":"_internal.record_offline","params":{"offline_time":0,"offline_reason":0,"offline_ip":0,"offline_port":0}}'
-    p = gate_gw3.decode_miio_offline(raw)
-    assert p["params"]["offline_time"] == 0
+from custom_components.xiaomi_gateway3.core.gateway import miot
 
 
 def test_gw_heartbeat():

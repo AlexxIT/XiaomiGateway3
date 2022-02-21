@@ -1,5 +1,4 @@
 import asyncio
-import json
 import time
 from typing import Optional
 
@@ -103,12 +102,6 @@ class GateGW3(
 
     async def gw3_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == 'log/miio':
-            payload = decode_miio_offline(msg.payload)
-            if payload:
-                payload = self.device.decode("cloud_link", payload["params"])
-                self.device.update(payload)
-                return
-
             payload = decode_miio_json(msg.payload, b'event.gw.heartbeat')
             if payload:
                 payload = payload[0]['params'][0]
@@ -193,10 +186,3 @@ class GateGW3(
         finally:
             if sh:
                 await sh.close()
-
-
-def decode_miio_offline(raw: bytes) -> Optional[dict]:
-    if b"_internal.record_offline" not in raw:
-        return None
-    _, raw = raw.split(b":, ", 1)
-    return json.loads(raw)

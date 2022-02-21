@@ -119,7 +119,9 @@ DEVICES = [{
         MapConv("command", "select", map=GW3_COMMANDS),
         Converter("data", "select"),
 
-        CloudLinkConv("cloud_link", "binary_sensor", enabled=False),
+        CloudLinkConv(
+            "cloud_link", "binary_sensor", mi="8.0.2155", enabled=False
+        ),
         BoolConv("led", "switch", mi="6.p.6", enabled=False),
 
         GatewayStats,
