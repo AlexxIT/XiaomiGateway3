@@ -377,7 +377,7 @@ class ShellGw3(TelnetShell):
 
         await self.exec(f"/tmp/app_monitor.sh {self.app_monitor_ps} &")
 
-        return len(self.mpatches) + len(self.apatches)
+        return len(self.mpatches + self.apatches)
 
     @property
     def app_monitor_ps(self):
