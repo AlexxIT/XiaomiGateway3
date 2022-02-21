@@ -121,6 +121,8 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         if sh.model:
             # 1.1. check token with telnet
             return None if await sh.get_token() == token else 'wrong_token'
+    except:
+        pass
     finally:
         if sh:
             await sh.close()
@@ -155,11 +157,11 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         sh = await shell.connect(host)
         if not sh.model:
             return 'wrong_telnet'
+    except:
+        return None
     finally:
         if sh:
             await sh.close()
-
-    return None
 
 
 async def get_lan_key(host: str, token: str):
