@@ -120,7 +120,10 @@ def decode(data: dict):
         except KeyError as e:
             return {"cluster_id": cluster_id, "error": f"Key error: {e}"}
 
-        payload = {"endpoint": int(data["sourceEndpoint"], 0)}
+        payload = {
+            "endpoint": int(data["sourceEndpoint"], 0),
+            "seq": hdr.tsn,
+        }
 
         if cluster.ep_attribute:
             payload["cluster"] = cluster.ep_attribute

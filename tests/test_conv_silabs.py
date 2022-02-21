@@ -48,12 +48,16 @@ def test_tuya_button():
     device = XDevice(ZIGBEE, "TS004F", ZDID, ZMAC, ZNWK)
     device.setup_converters()
 
-    p = silabs.decode({
+    p0 = silabs.decode({
         "clusterId": "0x0006", "sourceEndpoint": "0x03",
         "APSPlayload": "0x010AFD02",
     })
-    p = device.decode_zigbee(p)
+    p = device.decode_zigbee(p0)
     assert p == {'button_3': 'hold', 'action': 'button_3_hold'}
+
+    # test processing same sequence
+    p = device.decode_zigbee(p0)
+    assert p == {}
 
 
 def test_config():
@@ -122,7 +126,7 @@ def test_silabs_decode():
         "APSPlayload": "0x08080A04803001"
     })
     assert p == {
-        'endpoint': 1, 'cluster': 'on_off',
+        'endpoint': 1, 'seq': 8, 'cluster': 'on_off',
         'command': 'Command.Report_Attributes', 32772: 1
     }
 
@@ -131,5 +135,6 @@ def test_silabs_decode():
         "APSPlayload": "0x010AFD02"
     })
     assert p == {
-        'endpoint': 3, 'cluster': 'on_off', 'command_id': 253, 'value': b'\x02'
+        'endpoint': 3, 'seq': 10, 'cluster': 'on_off', 'command_id': 253,
+        'value': b'\x02'
     }

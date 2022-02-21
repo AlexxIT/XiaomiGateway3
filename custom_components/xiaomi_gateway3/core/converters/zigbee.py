@@ -327,8 +327,13 @@ class ZTuyaButtonConv(ZConverter):
     map = {0: SINGLE, 1: DOUBLE, 2: HOLD}
 
     def decode(self, device: 'XDevice', payload: dict, value: dict):
-        if value["endpoint"] != self.ep:
+        # TS004F sends click three times with same seq number
+        if device.extra.get("seq") == value["seq"] or \
+                value["endpoint"] != self.ep:
             return
+
+        device.extra["seq"] = value["seq"]
+
         try:
             payload[self.attr] = value = self.map.get(value["value"][0])
             payload["action"] = self.attr + "_" + value
