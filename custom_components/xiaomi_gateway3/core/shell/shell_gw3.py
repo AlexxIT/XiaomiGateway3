@@ -46,17 +46,17 @@ def sed(app: str, pattern: str, repl: str):
 
 # grep output to cloud and send it to MQTT, use awk because buffer
 PATCH_MIIO_MQTT = sed(
-    "miio", "^ +miio_client .+$",
+    "miio", "^ +miio_client -.+$",
     "pkill -f log/miio\nmiio_client -l 0 -o FILE_STORE -d $MIIO_PATH -n 128 | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)|ot_agent_recv_handler_one.+?app_url/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 )
 # use patched silabs_ncp_bt from sourceforge and send stderr to MQTT
 PATCH_BLETOOTH_MQTT = sed(
-    "miio", "^ +silabs_ncp_bt .+$",
+    "miio", "silabs_ncp_bt (\/|-)[^-].+$",
     "pkill -f log/ble\n/data/silabs_ncp_bt /dev/ttyS1 $RESTORE 2>&1 >/dev/null | mosquitto_pub -t log/ble -l &"
 )
 
 PATCH_ZIGBEE_PARENTS = sed(
-    "app", "^ +(Lumi_Z3GatewayHost_MQTT [^>]+).+$",
+    "app", "^ +(Lumi_Z3GatewayHost_MQTT -[^>]+).+$",
     "pkill -f log/z3\n\\1-l 0 | mosquitto_pub -t log/z3 -l &"
 )
 
@@ -65,7 +65,7 @@ PATCH_ZIGBEE_TCP1 = sed(
     "app", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net"
 )
 PATCH_ZIGBEE_TCP2 = sed(
-    "app", "^ +Lumi_Z3GatewayHost_MQTT .+$",
+    "app", "^ +Lumi_Z3GatewayHost_MQTT -.+$",
     "/data/ser2net -C '8888:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT XONXOFF'"
 )
 
@@ -89,7 +89,7 @@ fi; N=$N.
 # move zigbee DB to tmp (memory)
 PATCH_MEMORY_ZIGBEE1 = "[ -d /tmp/zigbee_gw ] || cp -R /data/zigbee_gw /tmp"
 PATCH_MEMORY_ZIGBEE2 = sed(
-    "app", "^ +zigbee_gw", "zigbee_gw -s /tmp/zigbee_gw/"
+    "app", "^ +zigbee_gw (-|>)", "zigbee_gw -s /tmp/zigbee_gw/ \\1"
 )
 # every 5 min sync zigbee DB if device list changed
 PATCH_MEMORY_ZIGBEE3 = sed(
@@ -358,10 +358,43 @@ class ShellGw3(TelnetShell):
 
         return len(self.mpatches)
 
+    async def update_app_monitor(self) -> int:
+        """Run default app_monitor if no patches. Or run patched app_monitor
+        with patches hash in process list.
+        """
+        await self.exec("killall app_monitor.sh")
+        await self.exec(
+            "killall Lumi_Z3GatewayHost_MQTT zigbee_gw miio_client silabs_ncp_bt ser2net socat; killall -9 basic_gw; pkill -f 'log/ble|log/miio|log/z3'"
+        )
+
+        if not self.mpatches and self.apatches:
+            await self.exec(f"app_monitor.sh &")
+            return 0
+
+        await self.exec("cp /bin/app_monitor.sh /tmp")
+        for patch in (self.mpatches + self.apatches):
+            await self.exec(re.sub('daemon_app.sh|daemon_miio.sh', 'app_monitor.sh', patch).replace('-o FILE_STORE', ''))
+
+        await self.exec(f"/tmp/app_monitor.sh {self.app_monitor_ps} &")
+
+        return len(self.mpatches) + len(self.apatches)
+
+    @property
+    def app_monitor_ps(self):
+        if self.apatches or self.mpatches:
+            return hashlib.md5('\n'.join(self.apatches + self.mpatches).encode()).hexdigest()
+        return '/bin/app_monitor.sh'
+
     async def apply_patches(self, ps: str) -> int:
         n = 0
-        if self.app_ps not in ps:
-            n += await self.update_daemon_app()
-        if self.miio_ps not in ps:
-            n += await self.update_daemon_miio()
+
+        if self.ver > "1.5.1_0032":
+            if self.app_monitor_ps not in ps:
+                n += await self.update_app_monitor()
+        else:
+            if self.app_ps not in ps:
+                n += await self.update_daemon_app()
+            if self.miio_ps not in ps:
+                n += await self.update_daemon_miio()
+
         return n
