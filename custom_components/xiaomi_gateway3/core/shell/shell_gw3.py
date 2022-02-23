@@ -31,6 +31,7 @@ MD5_BT = {
     '1.5.0_0026': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.0_0102': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.1_0032': '9290241cd9f1892d2ba84074f07391d4',
+    '1.5.4_0052': '9290241cd9f1892d2ba84074f07391d4', # temporary old version
 }
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 # MD5_GW3 = 'c81b91816d4b9ad9bb271a5567e36ce9'  # alpha
@@ -375,11 +376,15 @@ class ShellGw3(TelnetShell):
 
         await self.exec("cp /bin/app_monitor.sh /tmp")
         for patch in (self.mpatches + self.apatches):
-            await self.exec(re.sub('daemon_app.sh|daemon_miio.sh', 'app_monitor.sh', patch).replace('-o FILE_STORE', ''))
+            patch = re.sub('daemon_app.sh|daemon_miio.sh', 'app_monitor.sh', patch).replace('-o FILE_STORE', '')
+            patch = patch.replace('log/ble\\n', 'log/ble; ')
+            patch = patch.replace('\$RESTORE', '1').replace('-l \&', '-l \& #\\"')  # temporary !!! waiting for new patched binary
+            patch = patch.replace('^/data/silabs_ncp_bt', '/data/silabs_ncp_bt')    # temporary !!! waiting for new patched binary
+            await self.exec(patch)
 
         await self.exec(f"/tmp/app_monitor.sh {self.app_monitor_ps} &")
 
-        return len(self.mpatches + self.apatches)
+        return len(self.mpatches) + len(self.apatches)
 
     @property
     def app_monitor_ps(self):
