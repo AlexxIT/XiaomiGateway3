@@ -104,6 +104,8 @@ class XGateway(GateGW3, GateE1):
                 async for msg in self.mqtt:
                     # noinspection PyTypeChecker
                     asyncio.create_task(self.mqtt_message(msg))
+            except Exception as e:
+                self.debug(f"MQTT connection issue", exc_info=e)
             finally:
                 await self.mqtt.disconnect()
                 await self.mqtt.close()
