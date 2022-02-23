@@ -178,8 +178,10 @@ class ShellGw3(TelnetShell):
         return True
 
     async def check_bin(self, filename: str, md5: str, url=None) -> bool:
-        """Check binary md5 and download it if needed."""
-        if md5 in await self.exec("md5sum /data/" + filename):
+        """Check binary md5 and if it is executable and download it if needed.
+        """
+        cmd = f"[ -x /data/{filename} ] && md5sum /data/{filename}"
+        if md5 in await self.exec(cmd):
             return True
         elif url:
             # files from sourceforge.net can take up to 3 minutes to download

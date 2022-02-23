@@ -72,7 +72,11 @@ Component support original gateway firmware. You do not need to manually open, s
 
 Maintain firmware: `v1.5.0_0102`. You **should** use [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)
 
-If you have problems with other firmware, don't even ask to fix it. The component can work with these firmware versions, but they may have bugs: v1.4.7_0063, v1.4.7_0065, v1.4.7_0115, v1.4.7_0160, v1.5.0_0026, v1.5.1_0032.
+If you have problems with other firmware, don't even ask to fix it:
+
+- there may be minor problems with these firmwares: v1.4.7_0XXX, v1.5.0_0026, v1.5.1_0XXX
+- there can be major problems with these firmwares: v1.4.4_0XXX, v1.4.5_0XXX, v1.4.6_0XXX
+- these firmwares are not supported yet: v1.5.4_0XXX
 
 If your Mi Home doesn't offer to you new firmware - you can [update using telnet](https://github.com/zvldz/mgl03_fw/tree/main/firmware).
 
@@ -110,22 +114,24 @@ If you control your devices from Home Assistant - it makes absolutely no differe
 
 # Supported Devices
 
-The integration can work in two modes:
+Gateway Zigbee chip can work in three modes:
 
 **1. Mi Home (default)**
 
-- Support Xiaomi/Aqara Zigbee devices simultaneously in Mi Home and Hass
-- Support some Zigbee devices from other brands only in Hass
-- Support Xiaomi BLE devices simultaneously in Mi Home and Hass
-- Support Xiaomi Mesh devices simultaneously in Mi Home and Hass
-
+   - Support [Xiaomi/Aqara Zigbee devices](#supported-xiaomi-zigbee) simultaneously in Mi Home and Hass
+   - Support [some Zigbee devices](#supported-other-zigbee) from other brands only in Hass
+   
 **2. Zigbee Home Automation (ZHA)**
 
-- Support for Zigbee devices of hundreds of brands only in Hass
-- Support Xiaomi BLE devices simultaneously in Mi Home and Hass
-- Support Xiaomi Mesh devices simultaneously in Mi Home and Hass
+   - Support for [Zigbee devices of hundreds of brands](https://zigbee.blakadder.com/zha.html) only in Hass ([read more](#zigbee-home-automation-mode))
 
-Zigbee devices in ZHA mode doesn't controlled by this integration!
+**3. Zigbee2mqtt**
+
+   - Support for [Zigbee devices of hundreds of brands](https://www.zigbee2mqtt.io/supported-devices/) in MQTT ([read more](#zigbee2mqtt-mode))
+
+Zigbee devices in ZHA or z2m modes doesn't controlled by this integration!
+
+Xiaomi BLE and Mesh devices works simultaneously in Mi Home and Hass. No matter which zigbee mode is used.
 
 Other Zigbee, BLE and Mesh devices not from the list below also may work with limited support of functionality. 
 
@@ -372,7 +378,7 @@ Yeelight|Mesh Spotlight|[YLSD04YL](https://home.miot-spec.com/s/997)|light, flex
 
 [![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
 
-> Configuration > Integrations > Add Integration > **Xiaomi Gateway3 **
+> Configuration > Integrations > Add Integration > **Xiaomi Gateway3**
 
 If the integration is not in the list, you need to clear the browser cache.
 
@@ -403,13 +409,13 @@ All settings are **important** or you may have an unstable operation of the gate
 
 With the following settings the operation of the gateway may be **unstable**: different subnets, closed ping to router, Wi-Fi channel 40MHz, WPA3.
 
-# Zigbee and BLE performance table
+# Statistics table
 
 ![](zigbee_table.png)
 
 1. To enable stats sensors go to:
 
-   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Zigbee and BLE performance data
+   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Add statistic sensors
 
 2. Install [Flex Table](https://github.com/custom-cards/flex-table-card) from HACS
 
@@ -419,32 +425,186 @@ With the following settings the operation of the gateway may be **unstable**: di
    - [example 1](https://gist.github.com/AlexxIT/120f20eef4f39071e67f698207490db9)
    - [example 2](https://github.com/avbor/HomeAssistantConfig/blob/master/lovelace/views/vi_radio_quality_gw3.yaml)
 
-How it works:
+**Gateway binary sensor**
 
-- for each Zigbee and BLE device, a sensor will be created with the time of receiving the last message from this sensor
-- there will also be a lot of useful information in the sensor attributes
-- for the Gateway, the sensor state shows the uptime of the gateway connection, so you can check the stability of your Wi-Fi
-- the `uptime` in gateway sensor attributes means time after reboot gateway
-- the `msg_missed` may not always show correct data if you reboot the gate or device
-- dash in the `type` means that the device is not directly connected to the hub
-- the `parent` can be updated within a few hours
+- sensor shows connection to gateway, so you can check the stability of your Wi-Fi
+- **bluetooth_tx/_rx** - amount of bytes read and transmitted via BT serial port
+- **bluetooth_oe** - amount of errors when reading data via BT serial port
+- **zigbee_tx/_rx/_oe** - same for zigbee serial port
+- **radio_tx_power** - zigbee chip power
+- **radio_channel** - zigbee chip channel
+- **free_mem** - gateway free memory in bytes
+- **load_avg** - gateway CPU `/proc/loadavg`
+- **rssi** - gateway Wi-Fi signal strength
+- **uptime** - gateway uptime after reboot
+
+**Zigbee sensor**
+
+- sensor shows time of receiving the last message from this device
+- **ieee** - zigbee device "long" address
+- **nwk** - zigbee device "short" address
+- **available** - device available state
+- **parent** - `0xABCD` if device connected to zigbee router or `-` if device connected to gateway or `?` for unknown parent 
+- **type** - zigbee `router` or end `device` or `?` for unknown type
+- **msg_received** - amount of messages received from the device
+- **msg_missed** - amount of unreceived messages from the device, calculated using the sequence number of messages
+- **linkquality** - zigbee signal quality, below 100 is very weak
+- **rssi** - zigbee signal quality, no recommendations
+- **last_msg** - type of last received message
+- **new_resets** - the number of device reboots since Hass reboot, supported in some Xiaomi/Aqara devices
+
+**BLE and Mesh sensor**
+
+- sensor shows time of receiving the last message from this device
+- **mac** - device MAC address
+- **available** - device available state
+- **msg_received** - amount of messages received from the device
+- **last_msg** - type of last received message
+
+# Gateway controls
+
+The old version of integration used two switches, pair and firmware_lock. If you still have them after the upgrade, remove them manually.
+
+The new version has two drop-down lists (select entities) - command and data.
+
+Available commands:
+
+- **Idle** - reset the command select to the default state
+- **Zigbee Pair** - start the process of adding a new zigbee device
+   - you can also start the process by pressing the physical button on the gateway three times
+   - you can also start the process from the Mi Home app
+- **Zigbee Bind** - configure the bindings of zigbee devices, only if they support it
+- **Zigbee OTA** - try to update the zigbee device if there is firmware for it
+- **Zigbee Config** - start the initial setup process for the device
+   - the battery devices must first be woken up manually
+- **Zigbee Remove** - start the zigbee device removal process
+- **Zigbee Table Update** - update the zigbee stats table manually
+- **Firmware Lock** - block the gateway firmware update ([read more](#supported-firmwares))
+- **Gateway Reboot** - reboot gateway
+- **Gateway Enable FTP** - enable FTP on gateway
+- **Gateway Dump Data** - save all gateway data in the Hass configuration folder
 
 # Advanced config
 
-Support custom occupancy timeout for motion sensor and invert state for door sensor (for DIY purposes).
+## Integration config
 
-Config through built-in [customizing](https://www.home-assistant.io/docs/configuration/customizing-devices/) UI or YAML.
+> Configuration > Integrations > Xiaomi Gateway 3 > CONFIGURE
 
-[![Xiaomi Gateway 3 occupancy timeout settings in Home Assistant](https://img.youtube.com/vi/2EeKnF2uvjo/mqdefault.jpg)](https://www.youtube.com/watch?v=2EeKnF2uvjo)
+- **Host** - gateway IP-address, should be fixed on your Wi-Fi router
+- **Token** - gateway Mi Home token, changed only when you add gateway to Mi Home app
+- **Open Telnet command** - read [supported firmwares](#supported-firmwares) section
+- **Support Bluetooth devices** - enable processing BLE and Mesh devices data from gateway
+- **Add statistic sensors** - [read more](#statistics-table)
+- **Debug logs** - enable different levels of logging
 
-It's important to add these lines to your `configuration.yaml`. Otherwise, changes to the UI will not be read when you restart Home Assistant.
+Don't enable DANGER settings if you don't know what you doing.
+
+**[DANGER] Disable buzzer**
+
+Mute the gateway when the user presses the button on the zigbee device. The same sound is made by the gateway for [Aqara Motion Sensor Hack for 5 sec](https://community.home-assistant.io/t/aqara-motion-sensor-hack-for-5-sec/147959). This is dangerous because you must remember that you will lose confirmation beep for all zigbee devices on the gateway.
+
+**[DANGER] Use storage in memory**
+
+Multi-Mode Gateway has an hardware problem with interruptions for zigbee and bluetooth serial data. You can lose zigbee or bluetooth data when writing to the gateway permanent memory. This setting reduces the amount of writing to the gateway's permanent memory. But if you restart the gateway at an bad moment - you may lose the newly added devices and have to add them again.
+
+**[DANGER] Mode ZHA or zigbee2mqtt**
+
+This setting switches the zigbee chip into ZHA or zigbee2mqtt support mode. When the setting is changed, a different version of firmware is flashed into the zigbee chip. All Zigbee devices stop working with Mi Home app.
+
+**Attention!** This mode is retained even when the integration is removed or when the gateway is rebooted or reset. When reinstalling integration, the mode may be displayed as off, although it may actually be on. If you are not sure what mode is on - turn the setting on, wait for it to turn on without errors, and then turn it off and wait for it to turn off without errors.
+
+## Devices config
+
+This options configured in the `configuration.yaml`. Section: `xiaomi_gateway3 > devices > IEEE or MAC`.
+
+As a device you can specify:
+
+- IEEE - should be 18 symbols with `0x` and leading zeroes (for zigbee devices)
+- MAC - should be 12 symbols (for BLE and Mesh devices)
+- model - string for zigbee devices and number for BLE and Mesh devices
+- type - gateway, zigbee, ble, mesh
+
+**Overwrite device model**
+
+This is useful if:
+
+- you have unsupported device with exact same functionality as supported device, example:
+   - for simple relay use model: `01MINIZB`
+   - for bulb with brightness use model: `TRADFRI bulb E27 W opal 1000lm`
+- you have Sonoff device with wrong firmware ([example](https://github.com/Koenkk/zigbee-herdsman-converters/issues/1449))
+- you have Tuya device with same model for many different devices
+- you want to use external converters only for one device
 
 ```yaml
-homeassistant:
-  customize: !include customize.yaml
+xiaomi_gateway3:
+  devices:
+    "0x00158d0001d82999":  # match device by IEEE or MAC
+      model: 01MINIZB
 ```
 
-To enable customizing UI, you need to enable **Advanced Mode** in your user profile.
+**Change switch to light**
+
+Depending on the model of the device, your entity may be called: `switch`, `plug`, `outlet`, `channel_1`, etc.
+
+```yaml
+xiaomi_gateway3:
+  devices:
+    "0x00158d0001d82999":  # match device by IEEE or MAC
+      entities:
+        channel_1: light   # change entity domain (switch to light)
+```
+
+**Create sensors from attributes**
+
+```yaml
+xiaomi_gateway3:
+  devices:
+    "lumi.sensor_motion.aq2":  # match device by model
+      entities:
+        zigbee: sensor         # adds stat entity only for this device
+        parent: sensor         # adds entity from attribute value
+        linkquality: sensor    # adds entity from attribute value
+```
+
+**Change device or entity name**
+
+Attention! You can change device name, entity name and entity_id safely from GUI. But if you want, you can change the device name and the entity_id part of the YAML.
+
+```yaml
+xiaomi_gateway3:
+  devices:
+    "0x00158d0001d82999":  # match device by IEEE or MAC
+      name: Kitchen Refrigerator         # overwrite device name
+      entity_name: kitchen_refrigerator  # overwrite entity_id part
+```
+
+**Additional attributes for entities**
+
+Useful if you want to:
+
+- put additional data in the [statistics table](#statistics-table)
+- collect entities data in scripts and automations
+
+Attention! Template is calculated only at the start of the Hass.
+
+```yaml
+xiaomi_gateway3:
+  attributes_template: |
+    {% if attr in ('zigbee', 'ble', 'mesh') %}{{{
+      "device_name": device.info.name,
+      "device_fw_ver": device.fw_ver,
+      "device_model": device.model,
+      "device_market_model": device.info.model,
+      "gateway_name": gateway.info.name,
+      "gateway_fw_ver": gateway.fw_ver
+    }}}{% elif attr == 'gateway' %}{{{
+      "device_fw_ver": device.fw_ver,
+    }}}{% endif %}
+```
+
+## Entities customize
+
+This options configured in the `configuration.yaml`. Section: `homeassistant > customize > entity_id`.
 
 **Occupancy timeout** for moving sensor.
 
@@ -455,38 +615,43 @@ To enable customizing UI, you need to enable **Advanced Mode** in your user prof
 - **fast back timer** starts with doubled value if the person moves immediately after the timer is off
 
 ```yaml
-# /config/customize.yaml
-binary_sensor.0x158d0003456789_motion:
-  occupancy_timeout: 180  # simple mode
-binary_sensor.0x158d0003456788_motion:
-  occupancy_timeout: -120  # fast back mode
-binary_sensor.0x158d0003456787_motion:
-  occupancy_timeout: [-120, 240, 300]  # progressive timer
-binary_sensor.0x158d0003456786_motion:
-  occupancy_timeout: 1  # for hacked 5 sec sensors
+homeassistant:
+  customize:
+    binary_sensor.0x158d0003456789_motion:
+      occupancy_timeout: 180  # simple mode
+    binary_sensor.0x158d0003456788_motion:
+      occupancy_timeout: -120  # fast back mode
+    binary_sensor.0x158d0003456787_motion:
+      occupancy_timeout: [-120, 240, 300]  # progressive timer
+    binary_sensor.0x158d0003456786_motion:
+      occupancy_timeout: 1  # for hacked 5 sec sensors
 ```
 
 **Invert state** for contact sensor.
 
 ```yaml
-# /config/customize.yaml
-binary_sensor.0x158d0003456789_contact:
-  invert_state: 1  # any non-empty value will reverse the logic
+homeassistant:
+  customize:
+    binary_sensor.0x158d0003456789_contact:
+      invert_state: 1  # any non-empty value will reverse the logic
 ```
 
 **Ignore offline** device status.
 
 ```yaml
-# /config/customize.yaml
-switch.0x158d0003456789_switch:
-  ignore_offline: 1  # any non-empty value
+homeassistant:
+  customize:
+    switch.0x158d0003456789_switch:
+      ignore_offline: 1  # any non-empty value
 ```
 
 **Zigbee bulb default transition**.
 
 ```yaml
-light.0x86bd7fffe000000_light:
-  default_transition: 5
+homeassistant:
+  customize:
+    light.0x86bd7fffe000000_light:
+      default_transition: 5
 ```
 
 # Zigbee Home Automation Mode

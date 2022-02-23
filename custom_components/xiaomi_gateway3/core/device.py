@@ -209,7 +209,7 @@ class XDevice:
         if stats:
             kwargs["entities"] = {self.type: "sensor"}
 
-        for key in ("global", self.model, self.mac, self.did):
+        for key in (self.type, self.model, self.mac, self.did):
             if key in gateway.defaults:
                 update(kwargs, gateway.defaults[key])
 
