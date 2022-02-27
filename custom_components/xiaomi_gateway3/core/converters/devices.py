@@ -1330,6 +1330,7 @@ DEVICES += [{
         Converter("switch", "switch", mi="2.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
     ]
 }, {
     2716: ["Xiaomi", "Mesh Double Wall Switch", "ZNKG02HL"],
@@ -1338,6 +1339,8 @@ DEVICES += [{
         Converter("channel_2", "switch", mi="3.p.1"),
         Converter("humidity", "sensor", mi="6.p.1"),
         Converter("temperature", "sensor", mi="6.p.7"),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
     ]
 }, {
     2717: ["Xiaomi", "Mesh Triple Wall Switch", "ZNKG03HL/ISA-KG03HL"],
