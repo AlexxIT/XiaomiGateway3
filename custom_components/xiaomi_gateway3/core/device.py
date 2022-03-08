@@ -3,6 +3,8 @@ import re
 import time
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
+from homeassistant.helpers.entity import EntityPlatformState
+
 from . import converters
 from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
     BLE, MESH, MESH_GROUP_MODEL
@@ -396,14 +398,14 @@ class XDevice:
             if entity.subscribed_attrs & attrs:
                 entity.async_set_state(value)
                 # noinspection PyProtectedMember
-                if entity._added:
+                if entity._platform_state == EntityPlatformState.ADDED:
                     entity.async_write_ha_state()
 
     def update_available(self):
         for entity in self.entities.values():
             entity.async_update_available()
             # noinspection PyProtectedMember
-            if entity._added:
+            if entity._platform_state == EntityPlatformState.ADDED:
                 entity.async_write_ha_state()
 
 
