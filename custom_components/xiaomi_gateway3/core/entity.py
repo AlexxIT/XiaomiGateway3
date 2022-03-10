@@ -153,8 +153,26 @@ ENTITY_CATEGORIES = {
 
 STATE_TIMEOUT = timedelta(minutes=10)
 
+try:
+    # new from Hass 2022.3.3
+    # noinspection PyUnresolvedReferences
+    from homeassistant.helpers.entity import EntityPlatformState
 
-class XEntity(Entity):
+
+    class XEntityBase(Entity):
+        @property
+        def added(self) -> bool:
+            return self._platform_state == EntityPlatformState.ADDED
+
+except ImportError:
+    class XEntityBase(Entity):
+        @property
+        def added(self) -> bool:
+            # noinspection PyUnresolvedReferences
+            return self._added
+
+
+class XEntity(XEntityBase):
     # duplicate here because typing problem
     _attr_extra_state_attributes: dict = None
 
