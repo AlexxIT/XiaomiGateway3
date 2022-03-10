@@ -1263,7 +1263,7 @@ DEVICES += [{
                         mink=3000, maxk=6400),
     ]
 }, {
-    1945: ["Unknown", "Mesh Wall Switch", "DHKG01ZM"],
+    1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         Converter("led", "switch", mi="10.p.1", enabled=False),
