@@ -1220,6 +1220,7 @@ DEVICES += [{
     997: ["Yeelight", "Mesh Spotlight", "YLSD04YL"],  # flex
     1771: ["Xiaomi", "Mesh Bulb", "MJDP09YL"],  # flex
     1772: ["Xiaomi", "Mesh Downlight", "MJTS01YL/MJTS003"],  # flex
+    3291: ["Yeelight", "Mesh Downlight M1", "YLSD001"],  # flex
     2076: ["Yeelight", "Mesh Downlight M2", "YLTS02YL/YLTS04YL"],  # flex
     2342: ["Yeelight", "Mesh Bulb M2", "YLDP25YL/YLDP26YL"],  # flex
     "support": 4,  # @AlexxIT TODO: power_on_state values
