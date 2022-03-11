@@ -209,8 +209,9 @@ class TiltAngleConv(Converter):
 
 class CloudLinkConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: str):
-        value = json.loads(value)
-        payload[self.attr] = bool(value["cloud_link"])
+        if isinstance(value, str):
+            value = json.loads(value)["cloud_link"]
+        payload[self.attr] = bool(value)
 
 
 class ClimateConv(Converter):
