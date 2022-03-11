@@ -398,14 +398,14 @@ DEVICES += [{
     "spec": [
         MapConv("motor", "cover", mi="14.2.85", map=MOTOR),
         Converter("position", mi="1.1.85", parent="motor"),
-        MapConv("run_state", mi="14.4.85", map=RUN_STATE),
+        MapConv("run_state", mi="14.4.85", map=RUN_STATE, parent="motor"),
     ],
 }, {
     "lumi.curtain.hagl04": ["Aqara", "Curtain B1 EU", "ZNCLDJ12LM"],
     "spec": [
         MapConv("motor", "cover", mi="14.2.85", map=MOTOR),
         Converter("position", mi="1.1.85", parent="motor"),
-        MapConv("run_state", mi="14.4.85", map=RUN_STATE),
+        MapConv("run_state", mi="14.4.85", map=RUN_STATE, parent="motor"),
         Converter("battery", "sensor", mi="8.0.2001"),
         MapConv("power_mode", mi="14.5.85", map={
             1: "adapter", 3: "battery", 4: "charging"
@@ -550,8 +550,8 @@ DEVICES += [{
             0: "stop", 1: "close", 2: "open"
         }),
         Converter("target_position", mi="2.p.4"),
-        CurtainPosConv("position", mi="2.p.5"),
-        MapConv("run_state", mi="2.p.6", map=RUN_STATE),
+        CurtainPosConv("position", mi="2.p.5", parent="motor"),
+        MapConv("run_state", mi="2.p.6", map=RUN_STATE, parent="motor"),
         Converter("battery", "sensor", mi="3.p.4"),  # percent
         Converter("motor_reverse", "switch", mi="2.p.7", enabled=False),
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
