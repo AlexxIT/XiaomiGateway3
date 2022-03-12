@@ -29,7 +29,7 @@ def test_plug_heartbeat():
     ]
     assert device.decode_lumi(params) == {
         'plug': True, 'power': 14.56, 'energy': 357.7, 'resets': 24,
-        'fw_ver': 90, 'chip_temperature': 39
+        'fw_ver': 90, 'chip_temperature': 39, 'new_resets': 0,
     }
 
 
@@ -60,7 +60,7 @@ def test_sensor_ht_heartbeat():
     assert p == {
         'battery': 51, "battery_voltage": 2955, 'resets': 11651,
         'temperature': 23.84, 'humidity': 45.09, 'parent': "-", 'fw_ver': 0,
-        'battery_original': 59
+        'battery_original': 59, 'new_resets': 0,
     }
 
 
@@ -321,5 +321,16 @@ def test_error():
     assert device.info.name == 'Aqara Door/Window Sensor'
     device.setup_converters()
 
-    p = device.decode_lumi([{"res_name":"8.0.2102","error_code":-5020}])
+    p = device.decode_lumi([{"res_name": "8.0.2102", "error_code": -5020}])
     assert p == {}
+
+
+def test_resets():
+    device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    params = [{"res_name": "8.0.2002", "value": 24}]
+    assert device.decode_lumi(params) == {'resets': 24, 'new_resets': 0}
+
+    params = [{"res_name": "8.0.2002", "value": 27}]
+    assert device.decode_lumi(params) == {'resets': 27, 'new_resets': 3}

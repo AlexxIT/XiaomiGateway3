@@ -91,11 +91,11 @@ def test_zigbee_stats():
     })
     assert p == {'parent': '0xABCD'}
 
-    p = device.decode(ZIGBEE, {'parent': '0xABCD'})
-    assert p == {'parent': '0xABCD'}
+    # p = device.decode(ZIGBEE, {'parent': '0xABCD'})
+    # assert p == {'parent': '0xABCD'}
 
-    p = device.decode(ZIGBEE, {'resets': 10})
-    assert p == {'new_resets': 0}
+    # p = device.decode(ZIGBEE, {'resets': 10})
+    # assert p == {'new_resets': 0}
 
-    p = device.decode(ZIGBEE, {'resets': 15})
-    assert p == {'new_resets': 5}
+    # p = device.decode(ZIGBEE, {'resets': 15})
+    # assert p == {'new_resets': 5}
