@@ -1062,6 +1062,15 @@ DEVICES += [{
         ZBrightnessConv("brightness", parent="light"),
     ],
 }, {
+    "TRADFRI bulb E14 WS opal 600lm": [
+        "IKEA", "Bulb E14 WS opal 600lm", "LED1738G7"
+    ],
+    "spec": [
+        ZOnOffConv("light", "light"),
+        ZXiaomiBrightnessConv("brightness", parent="light"),
+        ZXiaomiColorTempConv("color_temp", parent="light")
+    ],
+}, {
     "TRADFRI remote control": [
         "IKEA", "TRADFRI remote control", "E1524/E1810"
     ],
