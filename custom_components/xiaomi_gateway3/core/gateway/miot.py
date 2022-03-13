@@ -17,9 +17,14 @@ class MIoTGateway(GatewayBase):
             for data in decode_miio_json(
                     msg.payload, b'properties_changed'
             ):
-                await self.miot_process_data(data["params"])
+                await self.miot_process_properties(data["params"])
 
-    async def miot_process_data(self, data: list):
+            for data in decode_miio_json(
+                    msg.payload, b'event_occured'
+            ):
+                await self.miot_process_event(data["params"])
+
+    async def miot_process_properties(self, data: list):
         """Can receive multiple properties from multiple devices.
            data = [{'did':123,'siid':2,'piid':1,'value:True}]
         """
@@ -34,6 +39,14 @@ class MIoTGateway(GatewayBase):
             device = self.devices[did]
             payload = device.decode_miot(payload)
             device.update(payload)
+
+    async def miot_process_event(self, data: dict):
+        # {"did":"123","siid":8,"eiid":1,"tid":123,"ts":123,"arguments":[]}
+        device = self.devices.get(data["did"])
+        if not device:
+            return
+        payload = device.decode_miot([data])
+        device.update(payload)
 
     async def miot_send(self, device: XDevice, payload: dict) -> bool:
         assert "mi_spec" in payload, payload

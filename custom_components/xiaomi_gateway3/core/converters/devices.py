@@ -1301,6 +1301,9 @@ DEVICES += [{
         Converter("led", "switch", mi="10.p.1", enabled=False),
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="9.e.1", value=1),  # single
     ],
 }, {
     2257: ["PTX", "Mesh Double Wall Switch", "PTX-SK2M"],
