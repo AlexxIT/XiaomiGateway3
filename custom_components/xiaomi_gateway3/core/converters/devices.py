@@ -953,7 +953,7 @@ DEVICES += [{
 }, {
     # tuya relay with neutral, 3 gang
     "TS0003": ["Tuya", "Relay", "TS0003"],
-    "support": 3,  
+    "support": 3,
     "spec": [
         ZOnOffConv("channel_1", "switch", ep=1, bind=True),
         ZOnOffConv("channel_2", "switch", ep=2, bind=True),
@@ -964,7 +964,7 @@ DEVICES += [{
 }, {
     # tuya relay with neutral, 4 gang
     "TS0004": ["Tuya", "Relay", "TS0004"],
-    "support": 3, 
+    "support": 3,
     "spec": [
         ZOnOffConv("channel_1", "switch", ep=1, bind=True),
         ZOnOffConv("channel_2", "switch", ep=2, bind=True),
@@ -985,21 +985,13 @@ DEVICES += [{
         ZTuyaButtonModeConv("mode", "select", enabled=False),
     ],
 }, {
-    # very simple relays
-    "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
-    "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
-    "support": 5,  # @AlexxIT
-    "spec": [ZSwitch]
-}, {
     # very simple relays with binding
-    "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0011"],
-    "TS0011": ["Tuya", "Switch", "TS0011"],
+    "TS0011": ["Tuya", "Single Switch (no N)", "TS0011"],
     "support": 5,
     "spec": [ZOnOffConv("switch", "switch", bind=True)],
 }, {
     # very simple 2 gang relays with binding
-    "QS-Zigbee-S05-L": ["Lonsonho", "Switch w/o neutral", "TS0012"],
-    "TS0012": ["Tuya", "Switch", "TS0012"],
+    "TS0012": ["Tuya", "Double Switch", "TS0012"],
     "support": 5,
     "spec": [
         ZOnOffConv("channel_1", "light", ep=1, bind=True),
@@ -1007,6 +999,12 @@ DEVICES += [{
         ZTuyaPowerOn,
         ZTuyaPlugModeConv("mode", "select", enabled=False),
     ],
+}, {
+    # very simple relays
+    "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
+    "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
+    "support": 5,  # @AlexxIT
+    "spec": [ZSwitch]
 }, {
     "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "spec": [
