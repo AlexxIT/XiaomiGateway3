@@ -1373,8 +1373,8 @@ DEVICES += [{
     2715: ["Xiaomi", "Mesh Single Wall Switch", "ZNKG01HL"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
-        Converter("humidity", "sensor", mi="6.p.1"),
-        Converter("temperature", "sensor", mi="6.p.7"),
+        MathConv("humidity", "sensor", mi="6.p.1", round=2),
+        MathConv("temperature", "sensor", mi="6.p.7", round=2),
         BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
     ]
@@ -1383,8 +1383,8 @@ DEVICES += [{
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
-        Converter("humidity", "sensor", mi="6.p.1"),
-        Converter("temperature", "sensor", mi="6.p.7"),
+        MathConv("humidity", "sensor", mi="6.p.1", round=2),
+        MathConv("temperature", "sensor", mi="6.p.7", round=2),
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
@@ -1395,8 +1395,8 @@ DEVICES += [{
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
         Converter("channel_3", "switch", mi="4.p.1"),
-        Converter("humidity", "sensor", mi="6.p.1"),
-        Converter("temperature", "sensor", mi="6.p.7"),
+        MathConv("humidity", "sensor", mi="6.p.1", round=2),
+        MathConv("temperature", "sensor", mi="6.p.7", round=2),
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
         BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
