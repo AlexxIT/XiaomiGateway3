@@ -1290,6 +1290,23 @@ DEVICES += [{
       }) # uint8 0-Dark 1-Bright
     ],
 }, {
+    3129: ["Xiaomi", "Smart Curtain Motor", "HMCN02"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={
+            0: "stop", 1: "open", 2: "close"
+        }),
+        Converter("target_position", mi="2.p.2"),
+        CurtainPosConv("position", mi="2.p.6", parent="motor"),
+        MapConv("run_state", mi="2.p.3",parent="motor",map={
+             0: "stop", 1: "opening", 2: "closing"
+        }),
+        Converter("battery", "sensor", mi="5.p.1"),  # percent
+        Converter("motor_reverse", "switch", mi="2.p.5", enabled=False),
+        MapConv("battery_charging", "binary_sensor", mi="5.p.2", map={
+             1: True, 2: False ,3: False,
+        }, enabled=False),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [],
 }]
