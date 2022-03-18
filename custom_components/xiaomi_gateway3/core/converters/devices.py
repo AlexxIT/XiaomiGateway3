@@ -1305,6 +1305,7 @@ DEVICES += [{
         MapConv("battery_charging", "binary_sensor", mi="5.p.2", map={
              1: True, 2: False ,3: False,
         }, enabled=False),
+        BoolConv("light", "binary_sensor", mi="3.p.11")
     ],
 }, {
     "default": "mesh",  # default Mesh device
