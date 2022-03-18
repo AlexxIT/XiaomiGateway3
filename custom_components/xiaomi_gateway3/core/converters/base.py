@@ -106,7 +106,10 @@ class MathConv(Converter):
             if self.multiply:
                 value *= self.multiply
             if self.round is not None:
-                value = round(value, self.round)
+                if self.round == 0:
+                    value = round(value)
+                else:
+                    value = round(value, self.round)
             payload[self.attr] = value
 
     def encode(self, device: "XDevice", payload: dict, value: float):
