@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 
 import voluptuous as vol
 from homeassistant.components.system_log import CONF_LOGGER
@@ -279,12 +280,18 @@ def _register_send_command(hass: HomeAssistant):
             gw for gw in hass.data[DOMAIN].values()
             if isinstance(gw, XGateway) and gw.host == host
         )
-        command = call.data["command"]
-        if command == "miio":
+        cmd = call.data["command"].split(" ")
+        if cmd[0] == "miio":
             raw = json.loads(call.data["data"])
             resp = await gw.miio.send(raw['method'], raw.get('params'))
             hass.components.persistent_notification.async_create(
                 str(resp), utils.TITLE
             )
+        elif cmd[0] == "set_state":  # for debug purposes
+            device = gw.devices.get(cmd[1])
+            raw = json.loads(call.data["data"])
+            device.available = True
+            device.decode_ts = time.time()
+            device.update(raw)
 
     hass.services.async_register(DOMAIN, "send_command", send_command)
