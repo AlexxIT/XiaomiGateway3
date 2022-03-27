@@ -425,6 +425,7 @@ DEVICES += [{
         Converter("battery", "sensor", mi="8.0.2001"),
         LockActionConv("key_id", "sensor", mi="13.1.85"),
         # BoolConv("lock", "binary_sensor", mi="13.20.85")
+        Action,
     ],
 }, {
     # it's better to read only one property 13.26.85 and ignore others
