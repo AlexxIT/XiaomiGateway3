@@ -1423,7 +1423,7 @@ DEVICES += [{
         BoolConv("light", "binary_sensor", mi="3.p.1")  # uint8 0-Dark 1-Bright
     ],
 }, {
-    3129: ["Xiaomi", "Smart Curtain Motor", "HMCN02"],
+    3129: ["Xiaomi", "Smart Curtain Motor", "MJSGCLBL01LM"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={
             0: "stop", 1: "open", 2: "close"
