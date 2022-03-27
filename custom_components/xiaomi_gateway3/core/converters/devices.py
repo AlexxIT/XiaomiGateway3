@@ -1165,6 +1165,7 @@ DEVICES += [{
     275: ["Xiaomi", "Kettle", "YM-K1501"],  # international
     1116: ["Xiaomi", "Viomi Kettle", "V-SK152"],  # international
     "spec": [MiBeacon, BLEPower, BLETemperature],
+    "ttl": "12h",
 }, {
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD"],
     "spec": [MiBeacon, Action],
