@@ -198,7 +198,7 @@ class XEntity(XEntityBase):
         self.entity_id = device.entity_id(conv)
 
         if conv.domain == "sensor":  # binary_sensor moisture problem
-            self._attr_unit_of_measurement = UNITS.get(attr)
+            self._attr_native_unit_of_measurement = UNITS.get(attr)
 
             if attr in STATE_CLASSES:
                 self._attr_state_class = STATE_CLASSES[attr]
