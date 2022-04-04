@@ -32,18 +32,7 @@ async def async_setup_entry(hass, entry, add_entities):
     gw.add_setup(__name__, setup)
 
 
-# this class do nothing in Hass 2021.9 and more, and fix sensors in Hass 2021.7
-class Support20217:
-    @property
-    def _attr_native_value(self):
-        return self._attr_state
-
-    @_attr_native_value.setter
-    def _attr_native_value(self, value):
-        self._attr_state = value
-
-
-class XiaomiBaseSensor(XEntity, SensorEntity, Support20217):
+class XiaomiBaseSensor(XEntity, SensorEntity):
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
