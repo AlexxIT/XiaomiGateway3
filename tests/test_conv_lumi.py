@@ -104,7 +104,7 @@ def test_lock_s2():
     device.setup_converters()
 
     p = device.decode_lumi([{"res_name": "13.16.85", "value": 17}])
-    assert p == {'square': True, 'reverse': False, 'latch': True}
+    assert p == {'square': False, 'reverse': True, 'latch': False}
 
     p = device.decode_lumi([
         {"res_name": "13.1.85", "value": 65536},
@@ -124,7 +124,7 @@ def test_lock_s2_pro():
         {"res_name": "13.28.85", "value": 3}
     ])
     assert p == {
-        'lock': True, 'square': True, 'reverse': False, 'latch': True,
+        'lock': False, 'square': False, 'reverse': True, 'latch': False,
         'action': 'lock', 'lock_state': 'door_locked'
     }
 
@@ -134,7 +134,7 @@ def test_lock_s2_pro():
         {"res_name": "13.28.85", "value": 2}
     ])
     assert p == {
-        'lock': True, 'square': False, 'reverse': False, 'latch': False,
+        'lock': False, 'square': True, 'reverse': True, 'latch': True,
         'action': 'lock', 'lock_control': 'in_unlocked',
         'lock_state': 'door_without_lift'
     }
