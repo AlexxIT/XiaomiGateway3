@@ -46,7 +46,7 @@ class TelnetShell:
         # run shell with dummy option, so we can check if second Hass connected
         # shell will close automatically when disconnected from telnet
         raw = await self.exec("(ps|grep -v grep|grep -q 'sh +o') || sh +o")
-        return "BusyBox" in raw
+        return "set -o errexit" in raw
 
     async def get_version(self) -> str:
         raise NotImplementedError
