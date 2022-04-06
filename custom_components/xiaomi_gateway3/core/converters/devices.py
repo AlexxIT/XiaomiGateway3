@@ -1310,6 +1310,8 @@ DEVICES += [{
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         Converter("led", "switch", mi="10.p.1", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
     ],
 }, {
     2007: ["Unknown", "Mesh Switch Controller", "lemesh.switch.sw0a01"],
@@ -1379,6 +1381,8 @@ DEVICES += [{
         MathConv("temperature", "sensor", mi="6.p.7", round=2),
         BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="16.e.1", value=1),
     ]
 }, {
     2716: ["Xiaomi", "Mesh Double Wall Switch", "ZNKG02HL"],
@@ -1390,6 +1394,9 @@ DEVICES += [{
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="16.e.1", value=1),
+        ButtonMIConv("button_2", mi="18.e.1", value=1),
     ]
 }, {
     2717: ["Xiaomi", "Mesh Triple Wall Switch", "ZNKG03HL/ISA-KG03HL"],
@@ -1403,6 +1410,10 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
         BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
         Converter("baby_mode", "switch", mi="11.p.1", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="16.e.1", value=1),
+        ButtonMIConv("button_2", mi="17.e.1", value=1),
+        ButtonMIConv("button_3", mi="18.e.1", value=1),
     ],
 }, {
     4160: ["Xiaomi", "Mosquito Repeller 2", "WX10ZM"],
