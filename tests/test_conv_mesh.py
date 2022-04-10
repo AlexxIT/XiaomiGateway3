@@ -15,6 +15,16 @@ def test_mesh():
     assert p == {'light': True, 'brightness': 255.0, 'color_temp': 250}
 
 
+def test_event():
+    device = XDevice(MESH, 1946, "123", "112233aabbcc")
+    device.setup_converters()
+
+    p = device.decode_miot([
+        {"did": "1234567890", "siid": 8, "eiid": 1, "arguments": []}
+    ])
+    assert p == {'button_1': 1, 'action': 'button_1_single'}
+
+
 def test_brightness():
     device = XDevice(MESH, 3164, "123", "112233aabbcc")
     device.setup_converters()

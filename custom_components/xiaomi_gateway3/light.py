@@ -154,6 +154,8 @@ class XiaomiMeshGroup(XiaomiMeshBase):
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
+        if not self.device.extra["childs"]:
+            return
         for did in self.device.extra["childs"]:
             child = self.gw.devices[did]
             child.entities.pop(self.attr)

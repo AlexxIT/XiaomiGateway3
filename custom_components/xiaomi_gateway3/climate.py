@@ -31,6 +31,10 @@ class XiaomiClimate(XEntity, ClimateEntity):
     _attr_precision = PRECISION_WHOLE
     _attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
     _attr_temperature_unit = TEMP_CELSIUS
+    # support only KTWKQ03ES for now
+    _attr_max_temp = 30
+    _attr_min_temp = 17
+    _attr_target_temperature_step = 1
 
     @callback
     def async_set_state(self, data: dict):

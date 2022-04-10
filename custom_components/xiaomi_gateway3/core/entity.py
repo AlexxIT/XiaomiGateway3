@@ -11,9 +11,11 @@ from homeassistant.const import *
 from homeassistant.core import callback, State
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
     CONNECTION_ZIGBEE
-from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.template import Template
 
+from .backward import ENTITY_CATEGORY_CONFIG, ENTITY_CATEGORY_DIAGNOSTIC, \
+    XEntityBase
 from .const import DOMAIN
 from .converters import Converter, GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
 from .device import XDevice
@@ -79,14 +81,12 @@ ICONS = {
     MESH: "mdi:bluetooth",
     ZIGBEE: "mdi:zigbee",
     "action": "mdi:bell",
-    "alarm": "mdi:shield-home",
     "child_mode": "mdi:baby-carriage",
     "conductivity": "mdi:flower",
     "gas_density": "mdi:google-circles-communities",
     "group": "mdi:lightbulb-group",
     "idle_time": "mdi:timer",
     "led": "mdi:led-off",
-    "moisture": "mdi:water-percent",
     "outlet": "mdi:power-socket-us",
     "pair": "mdi:zigbee",
     "plug": "mdi:power-plug",
@@ -107,16 +107,6 @@ STATE_CLASS_TOTAL_INCREASING: Final = "total_increasing"
 STATE_CLASSES = {
     DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
 }
-
-try:
-    # backward compatibility
-    from homeassistant.helpers.entity import EntityCategory
-
-    ENTITY_CATEGORY_CONFIG = EntityCategory.CONFIG
-    ENTITY_CATEGORY_DIAGNOSTIC = EntityCategory.DIAGNOSTIC
-except:
-    ENTITY_CATEGORY_CONFIG = "config"
-    ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"
 
 ENTITY_CATEGORIES = {
     BLE: ENTITY_CATEGORY_DIAGNOSTIC,
@@ -154,7 +144,7 @@ ENTITY_CATEGORIES = {
 STATE_TIMEOUT = timedelta(minutes=10)
 
 
-class XEntity(Entity):
+class XEntity(XEntityBase):
     # duplicate here because typing problem
     _attr_extra_state_attributes: dict = None
 
@@ -182,7 +172,7 @@ class XEntity(Entity):
         self.entity_id = device.entity_id(conv)
 
         if conv.domain == "sensor":  # binary_sensor moisture problem
-            self._attr_unit_of_measurement = UNITS.get(attr)
+            self._attr_native_unit_of_measurement = UNITS.get(attr)
 
             if attr in STATE_CLASSES:
                 self._attr_state_class = STATE_CLASSES[attr]

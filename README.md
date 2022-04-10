@@ -531,6 +531,7 @@ This is useful if:
 - you have unsupported device with exact same functionality as supported device, example:
    - for simple relay use model: `01MINIZB`
    - for bulb with brightness use model: `TRADFRI bulb E27 W opal 1000lm`
+   - for bulb with color temp use model: `TRADFRI bulb E14 WS opal 600lm`
 - you have Sonoff device with wrong firmware ([example](https://github.com/Koenkk/zigbee-herdsman-converters/issues/1449))
 - you have Tuya device with same model for many different devices
 - you want to use external converters only for one device

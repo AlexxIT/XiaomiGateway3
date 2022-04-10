@@ -160,6 +160,11 @@ class XGateway(GateGW3, GateE1):
         sh = None
         try:
             sh = await shell.connect(self.host)
+
+            if not await sh.only_one():
+                self.debug("Connection from a second Hass detected")
+                return False
+
             await sh.get_version()
 
             self.debug(f"Prepare gateway {sh.model} with firmware {sh.ver}")

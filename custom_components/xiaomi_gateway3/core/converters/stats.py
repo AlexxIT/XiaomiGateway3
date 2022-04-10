@@ -162,10 +162,10 @@ class ZigbeeStatsConverter(Converter):
         if 'parent' in value:
             payload['parent'] = value['parent']
 
-        if 'resets' in value:
-            if 'resets0' not in device.extra:
-                device.extra['resets0'] = value['resets']
-            payload['new_resets'] = value['resets'] - device.extra['resets0']
+        # if 'resets' in value:
+        #     if 'resets0' not in device.extra:
+        #         device.extra['resets0'] = value['resets']
+        #     payload['new_resets'] = value['resets'] - device.extra['resets0']
 
 
 class BLEStatsConv(Converter):

@@ -46,3 +46,6 @@ def test_gateway():
         "value": "{\"cloud_link\":1,\"tz_updated\":\"GMT3\"}"
     }])
     assert p == {'cloud_link': True}
+
+    p = device.decode_lumi([{"res_name": "8.0.2155", "value": 1}])
+    assert p == {'cloud_link': True}

@@ -1,7 +1,7 @@
-from custom_components.xiaomi_gateway3.core.converters import GATEWAY, ZIGBEE, \
-    BLE
-from custom_components.xiaomi_gateway3.core.device import XDevice
 from custom_components.xiaomi_gateway3.core import converters
+from custom_components.xiaomi_gateway3.core.converters import GATEWAY, ZIGBEE, \
+    BLE, MESH
+from custom_components.xiaomi_gateway3.core.device import XDevice
 
 BDID = "blt.3.abc"
 GDID = "1234567890"
@@ -39,3 +39,7 @@ def test_buttons():
     device = XDevice(BLE, 1983, BDID, MAC)
     b = converters.get_buttons(device.info.model)
     assert b == ["button"]
+
+    device = XDevice(MESH, 1946, GDID, MAC)
+    b = converters.get_buttons(device.info.model)
+    assert b == ["button_1", "button_2"]
