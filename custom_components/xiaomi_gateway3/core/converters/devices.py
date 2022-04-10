@@ -1310,6 +1310,7 @@ DEVICES += [{
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         Converter("led", "switch", mi="10.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
         Converter("action", "sensor", enabled=False),
         ButtonMIConv("button_1", mi="8.e.1", value=1),  # single
     ],
