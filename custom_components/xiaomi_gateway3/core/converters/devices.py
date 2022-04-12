@@ -1442,6 +1442,20 @@ DEVICES += [{
         ButtonMIConv("button_3", mi="9.e.9", value=2),
     ]
 }, {
+    6267: ["Gosund", "Mesh double Wall Switch S5AM", "cuco.switch.s5amts"],
+    "spec": [
+        Converter("left_switch", "switch", mi="2.p.1"),
+        Converter("right_switch", "switch", mi="3.p.1"),
+        MapConv("wireless_1", "select", mi="6.p.1", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        MapConv("wireless_2", "select", mi="6.p.2", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        Converter("led", "switch", mi="8.p.1", enabled=False),  # bool
+        Converter("mode", "switch", mi="8.p.2", enabled=False),  # bool
+    ]
+}, {
     4160: ["Xiaomi", "Mosquito Repeller 2", "WX10ZM"],
     # "support": 5,  # @AlexxIT need some tests
     "spec": [
