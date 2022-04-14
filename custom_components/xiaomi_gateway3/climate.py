@@ -8,6 +8,12 @@ from .core.device import XDevice
 from .core.entity import XEntity
 from .core.gateway import XGateway
 
+ACTIONS = {
+    HVAC_MODE_OFF: CURRENT_HVAC_OFF,
+    HVAC_MODE_COOL: CURRENT_HVAC_COOL,
+    HVAC_MODE_HEAT: CURRENT_HVAC_HEAT
+}
+
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     def setup(gateway: XGateway, device: XDevice, conv: Converter):
@@ -41,6 +47,9 @@ class XiaomiClimate(XEntity, ClimateEntity):
         self._attr_current_temperature = data.get("current_temp")
         self._attr_fan_mode = data.get("fan_mode")
         self._attr_hvac_mode = data.get("hvac_mode")
+        # better support HomeKit
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/707#issuecomment-1099109552
+        self._attr_hvac_action = ACTIONS.get(self._attr_hvac_mode)
         # fix scenes with turned off climate
         # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
         self._attr_target_temperature = data.get("target_temp", 0)
