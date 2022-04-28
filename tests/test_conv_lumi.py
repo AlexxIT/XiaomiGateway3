@@ -1,5 +1,9 @@
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core.converters import ZIGBEE, GATEWAY
 from custom_components.xiaomi_gateway3.core.device import XDevice
+
+assert DOMAIN  # fix circular import
 
 ZDID = "lumi.112233aabbcc"
 ZMAC = "0x0000112233aabbcc"
@@ -334,3 +338,23 @@ def test_resets():
 
     params = [{"res_name": "8.0.2002", "value": 27}]
     assert device.decode_lumi(params) == {'resets': 27, 'new_resets': 3}
+
+
+def test_online():
+    device = XDevice(ZIGBEE, 'lumi.plug', ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    assert device.decode_ts == 0
+
+    params = [
+        {"res_name": "8.0.2102", "value": {"status": "online", "time": 60}}
+    ]
+    assert device.decode_lumi(params)
+    assert device.decode_ts > 0
+
+    old_ts = device.decode_ts
+    params = [
+        {"res_name": "8.0.2102", "value": {"status": "offline", "time": 1000}}
+    ]
+    assert device.decode_lumi(params) == {}
+    assert device.decode_ts == old_ts
