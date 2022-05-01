@@ -213,9 +213,10 @@ class ZIASZoneConv(ZConverter):
     zigbee = "ias_zone"
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        value = value.get("value")
-        if isinstance(value, list) and len(value) == 4:
-            payload[self.attr] = value[0] == 1
+        try:
+            payload[self.attr] = value["value"][0] == 1
+        except Exception:
+            pass
 
     def read(self, device: "XDevice", payload: dict):
         pass

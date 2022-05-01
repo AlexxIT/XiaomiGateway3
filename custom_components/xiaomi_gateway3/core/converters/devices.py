@@ -1417,6 +1417,45 @@ DEVICES += [{
         ButtonMIConv("button_3", mi="18.e.1", value=1),
     ],
 }, {
+    6266: ["Gosund", "Mesh Triple Wall Switch S6AM", "cuco.switch.s6amts"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        MapConv("wireless_1", "select", mi="6.p.1", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        MapConv("wireless_2", "select", mi="6.p.2", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        MapConv("wireless_3", "select", mi="6.p.3", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        Converter("led", "switch", mi="8.p.1", enabled=False),  # bool
+        Converter("mode", "switch", mi="8.p.2", enabled=False),  # bool
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="9.e.2", value=1),
+        ButtonMIConv("button_1", mi="9.e.3", value=2),
+        ButtonMIConv("button_2", mi="9.e.5", value=1),
+        ButtonMIConv("button_2", mi="9.e.6", value=2),
+        ButtonMIConv("button_3", mi="9.e.8", value=1),
+        ButtonMIConv("button_3", mi="9.e.9", value=2),
+    ]
+}, {
+    6267: ["Gosund", "Mesh double Wall Switch S5AM", "cuco.switch.s5amts"],
+    "spec": [
+        Converter("left_switch", "switch", mi="2.p.1"),
+        Converter("right_switch", "switch", mi="3.p.1"),
+        MapConv("wireless_1", "select", mi="6.p.1", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        MapConv("wireless_2", "select", mi="6.p.2", map={
+            0: "close", 1: "open-close", 2: "open-open"
+        }, enabled=False),
+        Converter("led", "switch", mi="8.p.1", enabled=False),  # bool
+        Converter("mode", "switch", mi="8.p.2", enabled=False),  # bool
+    ]
+}, {
     4160: ["Xiaomi", "Mosquito Repeller 2", "WX10ZM"],
     # "support": 5,  # @AlexxIT need some tests
     "spec": [

@@ -1,6 +1,10 @@
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core.converters import silabs, ZIGBEE
 from custom_components.xiaomi_gateway3.core.converters.zigbee import ZConverter
 from custom_components.xiaomi_gateway3.core.device import XDevice
+
+assert DOMAIN  # fix circular import
 
 ZDID = "lumi.112233aabbcc"
 ZMAC = "0x0000112233aabbcc"
@@ -127,7 +131,7 @@ def test_silabs_decode():
     })
     assert p == {
         'endpoint': 1, 'seq': 8, 'cluster': 'on_off',
-        'command': 'Command.Report_Attributes', 32772: 1
+        'command': 'Report_Attributes', 32772: 1
     }
 
     p = silabs.decode({
@@ -137,4 +141,16 @@ def test_silabs_decode():
     assert p == {
         'endpoint': 3, 'seq': 10, 'cluster': 'on_off', 'command_id': 253,
         'value': b'\x02'
+    }
+
+
+def test_ias_zone():
+    p = silabs.decode({
+        "clusterId": "0x0500", "sourceEndpoint": "0x01",
+        "APSPlayload": "0x096700210000000000"
+    })
+    p['value'] = list(p['value'])
+    assert p == {
+        'endpoint': 1, 'seq': 103, 'cluster': 'ias_zone', 'command_id': 0,
+        'command': 'enroll_response', 'value': [33, 0, 0, 0]
     }
