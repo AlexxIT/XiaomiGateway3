@@ -131,7 +131,7 @@ def test_silabs_decode():
     })
     assert p == {
         'endpoint': 1, 'seq': 8, 'cluster': 'on_off',
-        'command': 'Command.Report_Attributes', 32772: 1
+        'command': 'Report_Attributes', 32772: 1
     }
 
     p = silabs.decode({

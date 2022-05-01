@@ -1,7 +1,11 @@
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core import converters
 from custom_components.xiaomi_gateway3.core.converters import GATEWAY, ZIGBEE, \
     BLE, MESH
 from custom_components.xiaomi_gateway3.core.device import XDevice
+
+assert DOMAIN  # fix circular import
 
 BDID = "blt.3.abc"
 GDID = "1234567890"
