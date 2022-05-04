@@ -11,7 +11,7 @@ from .core.converters import Converter
 from .core.device import XDevice
 from .core.entity import XEntity
 from .core.gateway import XGateway
-from .core.utils import TITLE
+from .core.const import TITLE
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
