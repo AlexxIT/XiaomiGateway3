@@ -119,8 +119,9 @@ class XiaomiMeshBase(XiaomiLight):
         kwargs[self.attr] = True
         await self.device_send(kwargs)
 
-    async def async_turn_off(self):
-        await self.device_send({self.attr: False})
+    async def async_turn_off(self, **kwargs):
+        kwargs[self.attr] = False
+        await self.device_send(kwargs)
 
 
 # noinspection PyAbstractClass
