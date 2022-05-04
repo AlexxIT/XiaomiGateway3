@@ -18,7 +18,7 @@ Each converter has:
     Converter(<attribute name>, <hass domain>, <mi name>)
 
 - attribute - required, entity or attribute name in Hass
-- domain - optional, hass entity type (`sensor`, `switch`, `binary_sensor`, etc)
+- domain - optional, hass entity type (`sensor`, `switch`, `binary_sensor`...)
 - mi - optional, item name in Lumi spec (`8.0.2012`) or MIoT spec (`2.p.1`)
 - enabled - optional, default True:
    - True - entity will be enabled on first setup
@@ -41,9 +41,10 @@ Converter may have different types:
 For MIoT bool properties you should use `Converter`. For MIoT uint8 properties
 you should use `BoolConv`.
 
-By default, the entity is updated only if the decoded payload has its attribute.
-But one entity can process multiple attributes, example bulb: `light`,
-`brightness`, `color_temp`. In this case you should set `parent` attribute name:
+By default, the entity is updated only if the decoded payload has its
+attribute. But one entity can process multiple attributes, example bulb:
+`light`, `brightness`, `color_temp`. In this case you should set `parent`
+attribute name:
 
     BoolConv("light", "light", "4.1.85")
     BrightnessConv("brightness", mi="14.1.85", parent="light")
@@ -89,9 +90,9 @@ from .mibeacon import *
 from .stats import *
 from .zigbee import *
 
-################################################################################
+###############################################################################
 # Gateways
-################################################################################
+###############################################################################
 
 DEVICES = [{
     "lumi.gateway.mgl03": ["Xiaomi", "Gateway 3", "ZNDMWG03LM ZNDMWG02LM"],
@@ -156,9 +157,9 @@ DEVICES = [{
     ],
 }]
 
-################################################################################
+###############################################################################
 # Zigbee
-################################################################################
+###############################################################################
 
 DEVICES += [{
     # don"t work: protect 8.0.2014, power 8.0.2015, plug_detection 8.0.2044
@@ -889,9 +890,9 @@ DEVICES += [{
     ]
 }]
 
-################################################################################
+###############################################################################
 # 3rd party zigbee
-################################################################################
+###############################################################################
 
 DEVICES += [{
     # only one attribute with should_poll
@@ -1122,9 +1123,9 @@ DEVICES += [{
     ],
 }]
 
-################################################################################
+###############################################################################
 # BLE
-################################################################################
+###############################################################################
 
 # https://custom-components.github.io/ble_monitor/by_brand
 DEVICES += [{
@@ -1251,9 +1252,9 @@ DEVICES += [{
     ],
 }]
 
-################################################################################
+###############################################################################
 # Mesh
-################################################################################
+###############################################################################
 
 DEVICES += [{
     # brightness 1..65535, color_temp 2700..6500

@@ -1,7 +1,6 @@
 import asyncio
 import base64
 import hashlib
-import re
 
 from .base import TelnetShell
 
@@ -34,6 +33,8 @@ PATCH_ZIGBEE_PARENTS = sed(
 class ShellE1(TelnetShell):
     model = "e1"
 
+    apatches: list = None
+
     async def login(self):
         self.writer.write(b"root\n")
         await asyncio.sleep(.1)
@@ -65,7 +66,9 @@ class ShellE1(TelnetShell):
         self.ver = f"{raw1.rstrip()}_{raw2.rstrip()}"
 
     async def get_token(self) -> str:
-        raw = await self.exec("agetprop persist.app.miio_dtoken", as_bytes=True)
+        raw = await self.exec(
+            "agetprop persist.app.miio_dtoken", as_bytes=True
+        )
         return raw.rstrip().hex()
 
     async def get_did(self):
@@ -104,9 +107,11 @@ class ShellE1(TelnetShell):
             return False
 
     async def check_mosquitto_pub(self):
-        return await self.check_bin('mosquitto_pub', MD5_MOSQUITTO_PUB, 'bin/mosquitto_pub')
+        return await self.check_bin(
+            'mosquitto_pub', MD5_MOSQUITTO_PUB, 'bin/mosquitto_pub'
+        )
 
-    ############################################################################
+    ###########################################################################
 
     def patch_miio_mqtt(self):
         self.apatches.append(PATCH_MIIO_MQTT)
@@ -114,7 +119,7 @@ class ShellE1(TelnetShell):
     def patch_zigbee_parents(self):
         self.apatches.append(PATCH_ZIGBEE_PARENTS)
 
-    ############################################################################
+    ###########################################################################
 
     @property
     def app_ps(self):

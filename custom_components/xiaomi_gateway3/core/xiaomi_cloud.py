@@ -29,7 +29,6 @@ SOFTWARE.
 import asyncio
 import base64
 import hashlib
-import hmac
 import json
 import logging
 import os
@@ -159,7 +158,9 @@ class MiCloud:
                 'data': data
             }
             params['rc4_hash__'] = gen_signature(url, signed_nonce, params)
-            params = {k:encrypt_rc4(signed_nonce, v) for (k,v) in params.items()}
+            params = {
+                k: encrypt_rc4(signed_nonce, v) for (k, v) in params.items()
+            }
             params.update({
                 'signature': gen_signature(url, signed_nonce, params),
                 'ssecurity': self.auth['ssecurity'],
@@ -184,10 +185,11 @@ class MiCloud:
 
         except asyncio.TimeoutError:
             _LOGGER.error(f"Timeout while requesting MIoT api {url}")
-        except:
-            _LOGGER.exception(f"Can't request MIoT API {url}")
+        except Exception as e:
+            _LOGGER.error(f"Can't request MIoT API {url}", exc_info=e)
 
         return None
+
 
 class RC4:
     _idx = 0
@@ -230,6 +232,7 @@ class RC4:
         self.crypt(bytes(1024))
         return self
 
+
 def get_random_string(length: int):
     seq = string.ascii_uppercase + string.digits
     return ''.join((random.choice(seq) for _ in range(length)))
@@ -253,9 +256,9 @@ def gen_signature(url: str, signed_nonce: str, data: dict) -> str:
     """Request signature based on url, signed_nonce, nonce and data."""
     sign = '&'.join(
         (
-            ['POST', url]
-            + [f"{k}={v}" for k, v in data.items()]
-            + [signed_nonce]
+                ['POST', url]
+                + [f"{k}={v}" for k, v in data.items()]
+                + [signed_nonce]
         )
     )
     signature = hashlib.sha1(sign.encode()).digest()
@@ -269,4 +272,5 @@ def encrypt_rc4(pwd, data):
 
 
 def decrypt_rc4(pwd, data):
-    return RC4(base64.b64decode(pwd.encode())).init1024().crypt(base64.b64decode(data))
+    return RC4(base64.b64decode(pwd.encode())).init1024(). \
+        crypt(base64.b64decode(data))

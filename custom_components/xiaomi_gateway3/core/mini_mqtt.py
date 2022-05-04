@@ -179,7 +179,7 @@ class MiniMQTT:
             if resp and self.pub_buffer:
                 asyncio.create_task(self.empty_buffer())
             return resp
-        except:
+        except Exception:
             return False
 
     async def disconnect(self):
@@ -187,7 +187,7 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except:
+        except Exception:
             _LOGGER.debug("Can't disconnect from gateway")
 
     async def subscribe(self, topic: str):
@@ -196,7 +196,7 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except:
+        except Exception:
             _LOGGER.debug(f"Can't subscribe to {topic}")
 
     async def publish(self, topic: str, payload, retain=False):
@@ -213,7 +213,7 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except:
+        except Exception:
             _LOGGER.debug(f"Can't publish {payload} to {topic}")
 
     async def read(self) -> Optional[MQTTMessage]:
@@ -255,7 +255,7 @@ class MiniMQTT:
         try:
             self.writer.close()
             await asyncio.wait_for(self.writer.wait_closed(), self.timeout)
-        except:
+        except Exception:
             _LOGGER.debug("Can't close connection")
 
     async def empty_buffer(self):

@@ -139,7 +139,7 @@ class ZigbeeStatsConverter(Converter):
 
                 device.extra['last_seq1'] = new_seq1
                 device.extra['last_seq2'] = new_seq2
-            except:
+            except Exception:
                 pass
 
             payload.update({

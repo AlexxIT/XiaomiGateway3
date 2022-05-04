@@ -150,8 +150,10 @@ class XGateway(GateGW3, GateE1):
 
         try:
             await self.dispatcher_send(SIGNAL_MQTT_PUB, msg=msg)
-        except:
-            self.exception(f"Processing MQTT: {msg.topic} {msg.payload}")
+        except Exception as e:
+            self.error(
+                f"Processing MQTT: {msg.topic} {msg.payload}", exc_info=e
+            )
 
     async def prepare_gateway(self):
         """Launching the required utilities on the gw, if they are not already

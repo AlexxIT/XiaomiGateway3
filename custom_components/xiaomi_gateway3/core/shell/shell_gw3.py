@@ -267,7 +267,7 @@ class ShellGw3(TelnetShell):
     def mesh_device_table(self) -> str:
         return 'mesh_device_v3' if self.ver >= '1.4.7_0160' else 'mesh_device'
 
-    ############################################################################
+    ###########################################################################
 
     async def patch_miio_mqtt_fw146(self, ps: str):
         assert self.ver < "1.4.7_0000", self.ver
@@ -279,7 +279,7 @@ class ShellGw3(TelnetShell):
         await self.exec(MIIO2MQTT_FW146)
         await self.exec("daemon_miio.sh &")
 
-    ############################################################################
+    ###########################################################################
 
     def patch_miio_mqtt(self):
         self.mpatches.append(PATCH_MIIO_MQTT)
@@ -307,7 +307,7 @@ class ShellGw3(TelnetShell):
     def patch_zigbee_parents(self):
         self.apatches.append(PATCH_ZIGBEE_PARENTS)
 
-    ############################################################################
+    ###########################################################################
 
     @property
     def app_ps(self):

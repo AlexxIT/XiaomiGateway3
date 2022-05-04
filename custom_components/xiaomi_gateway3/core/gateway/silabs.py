@@ -195,5 +195,5 @@ def parse_version(value: str) -> int:
         if "_" in value:
             _, value = value.split("_")
         return int(value)
-    except:
+    except Exception:
         return 0

@@ -121,7 +121,7 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         if sh.model:
             # 1.1. check token with telnet
             return None if await sh.get_token() == token else 'wrong_token'
-    except:
+    except Exception:
         pass
     finally:
         if sh:
@@ -157,7 +157,7 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         sh = await shell.connect(host)
         if not sh.model:
             return 'wrong_telnet'
-    except:
+    except Exception:
         return None
     finally:
         if sh:
@@ -195,7 +195,7 @@ async def get_room_mapping(cloud: MiCloud, host: str, token: str):
             result += f"\n- {local_id}: {cloud_name}"
         return result
 
-    except:
+    except Exception:
         return "Can't get from cloud"
 
 
@@ -290,8 +290,8 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     try:
         sh = await shell.connect(host)
         assert await sh.run_zigbee_flash()
-    except:
-        _LOGGER.exception("Can't update zigbee firmware")
+    except Exception as e:
+        _LOGGER.error("Can't update zigbee firmware", exc_info=e)
         return False
     finally:
         if sh:

@@ -100,7 +100,8 @@ ICONS = {
 STATE_CLASS_MEASUREMENT: Final = "measurement"
 # The state represents a total amount, e.g. net energy consumption
 STATE_CLASS_TOTAL: Final = "total"
-# The state represents a monotonically increasing total, e.g. an amount of consumed gas
+# The state represents a monotonically increasing total, e.g. an amount of
+# consumed gas
 STATE_CLASS_TOTAL_INCREASING: Final = "total_increasing"
 
 # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
@@ -162,7 +163,7 @@ class XEntity(XEntityBase):
         # minimum support version: Hass v2021.6
         self._attr_available = device.available
         self._attr_device_class = DEVICE_CLASSES.get(attr, attr)
-        self._attr_entity_registry_enabled_default = conv.enabled != False
+        self._attr_entity_registry_enabled_default = conv.enabled is not False
         self._attr_extra_state_attributes = {}
         self._attr_icon = ICONS.get(attr)
         self._attr_name = device.attr_name(attr)
@@ -269,10 +270,10 @@ class XEntity(XEntityBase):
                 self._attr_extra_state_attributes.update(attrs)
         except AttributeError:
             pass
-        except:
-            _LOGGER.exception("Can't render attributes")
+        except Exception as e:
+            _LOGGER.error("Can't render attributes", exc_info=e)
 
-    ############################################################################
+    ###########################################################################
 
     async def device_send(self, value: dict):
         # GATEWAY support lumi_send in lumi spec and miot_send in miot spec

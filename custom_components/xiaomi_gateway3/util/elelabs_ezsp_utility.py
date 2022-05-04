@@ -17,6 +17,7 @@ import binascii
 import time
 
 
+# noinspection PyPep8Naming,PyMethodMayBeStatic
 class AshProtocolInterface:
     FLAG_BYTE = b'\x7E'
     RANDOMIZE_START = 0x42
@@ -147,6 +148,7 @@ class AshProtocolInterface:
         return 0, ezsp_response
 
 
+# noinspection PyRedundantParentheses,PyPep8Naming
 class EzspProtocolInterface:
     def __init__(self, serial, config, logger):
         self.logger = logger

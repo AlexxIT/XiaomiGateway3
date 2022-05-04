@@ -14,8 +14,9 @@ try:
     from xiaomi_gateway3 import DEVICES
 except ModuleNotFoundError:
     pass
-except:
-    logging.getLogger(__name__).exception("Can't load external converters")
+except Exception as e:
+    logger = logging.getLogger(__name__)
+    logger.error("Can't load external converters", exc_info=e)
 
 
 @dataclass

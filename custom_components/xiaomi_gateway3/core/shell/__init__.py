@@ -57,7 +57,7 @@ def ntp_time(host: str) -> float:
         integ = int.from_bytes(raw[-8:-4], 'big')
         fract = int.from_bytes(raw[-4:], 'big')
         return integ + float(fract) / 2 ** 32 - NTP_DELTA
-    except:
+    except Exception:
         return 0
     finally:
         sock.close()
