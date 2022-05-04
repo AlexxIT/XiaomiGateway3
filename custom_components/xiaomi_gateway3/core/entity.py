@@ -214,6 +214,16 @@ class XEntity(XEntityBase):
             return {}
         return self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
 
+    @property
+    def hass_state(self) -> str:
+        state = self.hass.states.get(self.entity_id).state \
+            if self.hass else "disabled"
+        if state == self.state:
+            return state
+        if self.state is None:
+            return f"{state}, none"
+        return f"{state}, {type(self.state).__name__}: {self.state}"
+
     def debug(self, msg: str, exc_info=None):
         self.gw.debug(f"{self.entity_id} | {msg}", exc_info=exc_info)
 

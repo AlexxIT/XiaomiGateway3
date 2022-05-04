@@ -88,6 +88,27 @@ class XDevice:
         self.extra: Dict[str, Any] = {}
         self.lazy_setup = set()
 
+    def as_dict(self, ts: float) -> dict:
+        resp = {
+            k: getattr(self, k) for k in (
+                "type", "model", "fw_ver", "available"
+            )
+        }
+        if self.decode_ts:
+            resp["decode_time"] = round(ts - self.decode_ts)
+        if self.encode_ts:
+            resp["encode_time"] = round(ts - self.encode_ts)
+
+        resp["entities"] = {
+            attr: entity.hass_state for attr, entity in self.entities.items()
+        }
+        resp["gateways"] = [gw.device.unique_id for gw in self.gateways]
+
+        if self.type in self.entities:
+            resp["stats"] = self.entities[self.type].extra_state_attributes
+
+        return resp
+
     @property
     def available(self):
         return self._available

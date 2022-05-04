@@ -36,14 +36,19 @@ class XiaomiBaseSensor(XEntity, SensorEntity):
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
-            self._attr_extra_state_attributes["native_value"] = \
-                self._attr_native_value = data[self.attr]
+            self._attr_native_value = data[self.attr]
         for k, v in data.items():
             if k in self.subscribed_attrs and k != self.attr:
                 self._attr_extra_state_attributes[k] = v
 
 
 class XiaomiSensor(XiaomiBaseSensor, RestoreEntity):
+    @callback
+    def async_set_state(self, data: dict):
+        if self.attr in data:
+            self._attr_extra_state_attributes["native_value"] = data[self.attr]
+        XiaomiBaseSensor.async_set_state(self, data)
+
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
         """Restore previous state."""
