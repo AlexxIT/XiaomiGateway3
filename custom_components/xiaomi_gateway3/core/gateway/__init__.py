@@ -87,31 +87,35 @@ class XGateway(GateGW3, GateE1):
 
         """Main thread loop."""
         while True:
-            # if not telnet - enable it
-            if not await self.check_port(23) and \
-                    not await self.enable_telnet():
-                await asyncio.sleep(30)
-                continue
-
-            # if not mqtt - enable it (handle Mi Home and ZHA mode)
-            if not await self.prepare_gateway() or \
-                    not await self.mqtt.connect(self.host):
-                await asyncio.sleep(60)
-                continue
-
-            await self.mqtt_connect()
             try:
-                async for msg in self.mqtt:
-                    # noinspection PyTypeChecker
-                    asyncio.create_task(self.mqtt_message(msg))
-            except Exception as e:
-                self.debug(f"MQTT connection issue", exc_info=e)
-            finally:
-                await self.mqtt.disconnect()
-                await self.mqtt.close()
-                await self.mqtt_disconnect()
+                # if not telnet - enable it
+                if not await self.check_port(23) and \
+                        not await self.enable_telnet():
+                    await asyncio.sleep(30)
+                    continue
 
-        self.debug("Stop main thread")
+                # if not mqtt - enable it (handle Mi Home and ZHA mode)
+                if not await self.prepare_gateway() or \
+                        not await self.mqtt.connect(self.host):
+                    await asyncio.sleep(60)
+                    continue
+
+                await self.mqtt_connect()
+                try:
+                    async for msg in self.mqtt:
+                        # noinspection PyTypeChecker
+                        asyncio.create_task(self.mqtt_message(msg))
+                except Exception as e:
+                    self.debug(f"MQTT connection issue", exc_info=e)
+                finally:
+                    await self.mqtt.disconnect()
+                    await self.mqtt.close()
+                    await self.mqtt_disconnect()
+
+            except Exception as e:
+                self.error("Main loop error", exc_info=e)
+
+        self.debug("Stop main loop")
 
     async def timer(self):
         while True:
