@@ -12,11 +12,11 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.storage import Store
 
+from . import system_health
 from .core import backward, logger, utils
 from .core.const import DOMAIN
 from .core.entity import XEntity
 from .core.gateway import XGateway
-from .core.utils import XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,7 +84,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.config_entries.async_update_entry(entry, data={},
                                                options=entry.data)
 
-    await _setup_logger(hass)
+    entries = hass.config_entries.async_entries(DOMAIN)
+    if any(e.options.get('debug') for e in entries):
+        await system_health.setup_debug(hass, _LOGGER)
 
     # add options handler
     if not entry.update_listeners:
@@ -241,35 +243,6 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
 #         registry.async_remove_device(hass_device.id)
 #
 #     hass.bus.async_listen('device_registry_updated', device_registry_updated)
-
-
-async def _setup_logger(hass: HomeAssistant):
-    if not hasattr(_LOGGER, 'defaul_level'):
-        # default level from Hass config
-        _LOGGER.defaul_level = _LOGGER.level
-
-    entries = hass.config_entries.async_entries(DOMAIN)
-    web_logs = any(e.options.get('debug') for e in entries)
-
-    # only if global logging don't set
-    if _LOGGER.defaul_level == logging.NOTSET:
-        # disable log to console
-        _LOGGER.propagate = web_logs is False
-        # set debug if any of integrations has debug
-        _LOGGER.setLevel(logging.DEBUG if web_logs else logging.NOTSET)
-
-    # if don't set handler yet
-    if web_logs:
-        # skip if already added
-        if any(isinstance(h, XiaomiGateway3Debug) for h in _LOGGER.handlers):
-            return
-
-        handler = XiaomiGateway3Debug(hass)
-        _LOGGER.addHandler(handler)
-
-        if _LOGGER.defaul_level == logging.NOTSET:
-            info = await hass.helpers.system_info.async_get_system_info()
-            _LOGGER.debug(f"SysInfo: {info}")
 
 
 def _register_send_command(hass: HomeAssistant):

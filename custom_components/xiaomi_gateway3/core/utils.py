@@ -2,15 +2,10 @@ import asyncio
 import json
 import logging
 import random
-import re
 import string
-import uuid
-from datetime import datetime
 from typing import Optional
 
 import requests
-from aiohttp import web
-from homeassistant.components.http import HomeAssistantView
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
@@ -27,8 +22,6 @@ from .ezsp import EzspUtils
 from .gateway import XGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
-
-TITLE = "Xiaomi Gateway 3"
 
 SUPPORTED_MODELS = (
     'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03'
@@ -347,59 +340,3 @@ async def run_zigbee_ota(
         return "Update started"
     else:
         return "No firmware"
-
-
-NOTIFY_TEXT = '<a href="%s?r=10" target="_blank">Open Log<a>'
-HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'
-        '<meta http-equiv="refresh" content="%s"></head>'
-        '<body><pre>%s</pre></body></html>')
-
-
-class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
-    name = "xiaomi_debug"
-    requires_auth = False
-
-    # https://waymoot.org/home/python_string/
-    text = []
-
-    def __init__(self, hass: HomeAssistant):
-        super().__init__()
-
-        # random url because without authorization!!!
-        self.url = f"/{uuid.uuid4()}"
-
-        hass.http.register_view(self)
-        hass.components.persistent_notification.async_create(
-            NOTIFY_TEXT % self.url, title=TITLE)
-
-    def handle(self, rec: logging.LogRecord) -> None:
-        dt = datetime.fromtimestamp(rec.created).strftime("%Y-%m-%d %H:%M:%S")
-        module = 'main' if rec.module == '__init__' else rec.module
-        self.text.append(f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}")
-
-    async def get(self, request: web.Request):
-        try:
-            if 'c' in request.query:
-                self.text.clear()
-
-            if 'q' in request.query or 't' in request.query:
-                lines = self.text
-
-                if 'q' in request.query:
-                    reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
-                    lines = [p for p in self.text if reg.search(p)]
-
-                if 't' in request.query:
-                    tail = int(request.query['t'])
-                    lines = lines[-tail:]
-
-                body = '\n'.join(lines)
-            else:
-                body = '\n'.join(self.text[:10000])
-
-            reload = request.query.get('r', '')
-            return web.Response(text=HTML % (reload, body),
-                                content_type="text/html")
-
-        except:
-            return web.Response(status=500)
