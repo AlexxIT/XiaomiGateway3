@@ -6,6 +6,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 
 from .core.const import DOMAIN
 from .core.converters import GATEWAY
+from .core.device import logger
 from .core.gateway import XGateway
 
 
@@ -45,13 +46,22 @@ async def async_get_config_entry_diagnostics(
 async def async_get_device_diagnostics(
         hass: HomeAssistant, entry: ConfigEntry, device: DeviceEntry
 ):
-    uid = next(i[1] for i in device.identifiers if i[0] == DOMAIN)
     info = await async_get_config_entry_diagnostics(hass, entry)
-    info["device"] = info.pop("devices")[uid]
-    info["device"]["unique_id"] = uid
+    try:
+        uid = next(i[1] for i in device.identifiers if i[0] == DOMAIN)
+        info["device"] = info.pop("devices")[uid]
+        info["device"]["unique_id"] = uid
 
-    if device.model.startswith(GATEWAY):
-        gw: XGateway = hass.data[DOMAIN][entry.entry_id]
-        info["data.tar.gz.b64"] = await gw.tar_data()
+        if device.model.startswith(GATEWAY):
+            gw: XGateway = hass.data[DOMAIN][entry.entry_id]
+            info["data.tar.gz.b64"] = await gw.tar_data()
+        else:
+            device = next(
+                d for d in XGateway.devices.values() if d.unique_id == uid
+            )
+            info["logger"] = logger(device)
+
+    except Exception as e:
+        info["error"] = f"{type(e).__name__}: {e}"
 
     return info
