@@ -13,7 +13,7 @@ from homeassistant.components import system_health
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant, callback
 
-from .core.const import DOMAIN
+from .core.const import DOMAIN, source_hash
 
 
 @callback
@@ -25,9 +25,7 @@ def async_register(
 
 async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
     integration = hass.data["integrations"][DOMAIN]
-    info = {
-        "version": str(integration.version),
-    }
+    info = {"version": f"{integration.version} ({source_hash()})"}
 
     if DebugView.url:
         info["debug"] = {
@@ -46,7 +44,7 @@ async def setup_debug(hass: HomeAssistant, logger: Logger):
 
     integration = hass.data["integrations"][DOMAIN]
     info = await hass.helpers.system_info.async_get_system_info()
-    info[DOMAIN + "_version"] = str(integration.version)
+    info[DOMAIN + "_version"] = f"{integration.version} ({source_hash()})"
     logger.debug(f"SysInfo: {info}")
 
 

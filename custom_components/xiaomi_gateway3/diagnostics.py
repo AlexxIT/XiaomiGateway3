@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .core.const import DOMAIN
+from .core.const import DOMAIN, source_hash
 from .core.converters import GATEWAY
 from .core.device import logger
 from .core.gateway import XGateway
@@ -37,6 +37,7 @@ async def async_get_config_entry_diagnostics(
         errors = f"{type(e).__name__}: {e}"
 
     return {
+        "version": source_hash(),
         "options": options,
         "errors": errors,
         "devices": devices,
