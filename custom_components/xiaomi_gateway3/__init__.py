@@ -8,13 +8,16 @@ from homeassistant.components.system_log import CONF_LOGGER
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import (
+    config_validation as cv, device_registry as dr, entity_registry as er
+)
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.device_registry import CONNECTION_ZIGBEE
 from homeassistant.helpers.storage import Store
 
 from . import system_health
 from .core import backward, logger, utils
-from .core.const import DOMAIN
+from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
 from .core.gateway import XGateway
 from .core.xiaomi_cloud import MiCloud
@@ -210,41 +213,6 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     return True
 
 
-# async def _handle_device_remove(hass: HomeAssistant):
-#     """Remove device from Hass and Mi Home if the device is renamed to
-#     `delete`.
-#     """
-#
-#     async def device_registry_updated(event: Event):
-#         if event.data['action'] != 'update':
-#             return
-#
-#         registry = hass.data['device_registry']
-#         hass_device = registry.async_get(event.data['device_id'])
-#
-#         # check empty identifiers
-#         if not hass_device or not hass_device.identifiers:
-#             return
-#
-#         # handle only our devices
-#         for hass_did in hass_device.identifiers:
-#             if hass_did[0] == DOMAIN and hass_device.name_by_user == 'delete':
-#                 break
-#         else:
-#             return
-#
-#         # remove from Mi Home
-#         # if multiple gateways - will try remove from all of them
-#         for gw in hass.data[DOMAIN].values():
-#             if isinstance(gw, XGateway):
-#                 await gw.remove_device(hass_did[1])
-#
-#         # remove from Hass
-#         registry.async_remove_device(hass_device.id)
-#
-#     hass.bus.async_listen('device_registry_updated', device_registry_updated)
-
-
 def _register_send_command(hass: HomeAssistant):
     async def send_command(call: ServiceCall):
         host = call.data["host"]
@@ -267,3 +235,23 @@ def _register_send_command(hass: HomeAssistant):
             device.update(raw)
 
     hass.services.async_register(DOMAIN, "send_command", send_command)
+
+
+async def async_remove_config_entry_device(
+        hass: HomeAssistant, entry: ConfigEntry, device: dr.DeviceEntry
+) -> bool:
+    """Supported from Hass v2022.3"""
+    dr.async_get(hass).async_remove_device(device.id)
+
+    try:
+        # check if device is zigbee
+        if any(c[0] == CONNECTION_ZIGBEE for c in device.connections):
+            unique_id = next(
+                i[1] for i in device.identifiers if i[0] == DOMAIN
+            )
+            await utils.remove_zigbee(unique_id)
+
+        return True
+    except Exception as e:
+        _LOGGER.error("Can't delete device", exc_info=e)
+        return False

@@ -20,6 +20,7 @@ from .const import DOMAIN
 from .device import XDevice
 from .ezsp import EzspUtils
 from .gateway import XGateway
+from .gateway.lumi import LumiGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
 
@@ -37,6 +38,17 @@ def remove_device(hass: HomeAssistant, mac: str):
     device = registry.async_get_device({(DOMAIN, mac)}, None)
     if device:
         registry.async_remove_device(device.id)
+
+
+async def remove_zigbee(unique_id: str):
+    device: XDevice = next(
+        d for d in XGateway.devices.values() if d.unique_id == unique_id
+    )
+    # delete device from all gateways
+    for gw in device.gateways:
+        payload = gw.device.encode({"remove_did": device.did})
+        if isinstance(gw, LumiGateway):
+            await gw.lumi_send(gw.device, payload)
 
 
 @callback
