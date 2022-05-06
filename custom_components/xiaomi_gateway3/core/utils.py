@@ -354,7 +354,7 @@ async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
 
 async def run_zigbee_ota(
         hass: HomeAssistant, gateway: "XGateway", device: "XDevice"
-):
+) -> Optional[bool]:
     url = await get_ota_link(hass, device)
     if url:
         gateway.debug_device(device, "update", url)
@@ -364,7 +364,7 @@ async def run_zigbee_ota(
         })
         if not resp or resp.get('result') != ['ok']:
             _LOGGER.error(f"Can't run update process: {resp}")
-            return "Can't run update"
-        return "Update started"
+            return None
+        return True
     else:
-        return "No firmware"
+        return False

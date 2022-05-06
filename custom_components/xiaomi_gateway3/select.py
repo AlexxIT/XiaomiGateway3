@@ -1,6 +1,3 @@
-import json
-
-from homeassistant.components import persistent_notification
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -11,7 +8,6 @@ from .core.converters import Converter
 from .core.device import XDevice
 from .core.entity import XEntity
 from .core.gateway import XGateway
-from .core.const import TITLE
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -60,194 +56,229 @@ class XiaomiSelect(XiaomiSelectBase, RestoreEntity):
         await self.device_read(self.subscribed_attrs)
 
 
-FIRMWARE_LOCK = {
-    False: "disabled",
-    True: "enabled"
-}
-
-
 # noinspection PyAbstractClass
-class CommandSelect(XiaomiSelectBase):
-    async def async_select_option(self, option: str):
-        self._attr_current_option = option
-        self.async_write_ha_state()
-
-        payload = self.device.encode({self.attr: option})
-        command = payload[self.attr]
-        if command == "idle":
-            await self.device_send({"pair": False})
-        elif command == "pair":
-            await self.device_send({"pair": True})
-        elif command == "lock":
-            lock = await self.gw.gw3_read_lock()
-            self.device.update({"data": command, "lock": lock})
-            return
-        elif command in ("reboot", "ftp", "dump"):
-            await self.gw.telnet_send(command)
-        elif command == "parentscan":
-            await self.gw.z3_run_parent_scan()
-
-        self.device.update({"data": command})
-
-
-# noinspection PyAbstractClass
-class DataSelect(XEntity, SelectEntity):
+class CommandSelect(XEntity, SelectEntity):
     _attr_current_option = None
-    _attr_options = None
-    command = None
-    kwargs = None
+    _attr_device_class = "command"
 
-    def set_current(self, value):
-        # force update dropdown in GUI
-        self._attr_current_option = None
-        self._attr_options = [value] if value else None
-        self.async_write_ha_state()
-
-        if not value:
-            return
-
-        self._attr_current_option = value
-        self.async_write_ha_state()
-
-    def set_devices(self, feature: str):
-        devices = [
-            f"{d.mac}: {d.name}"
-            for d in self.gw.filter_devices(feature)
-        ]
-        self._attr_current_option = None
-        self._attr_options = devices
-        self.async_write_ha_state()
-
-    def process_command(self, data: json):
-        self.command = data[self.attr]
-        if self.command == "pair":
-            self.set_current("Ready to join")
-
-        elif self.command == "remove":
-            self.set_devices("zigbee+ble")
-
-        elif self.command in ("config", "ota"):
-            self.set_devices("zigbee")
-
-        elif self.command == "bind":
-            self.kwargs = {}
-            self.set_devices("bind_from")
-
-        elif self.command == "lock":
-            self._attr_current_option = FIRMWARE_LOCK.get(data["lock"])
-            self._attr_options = list(FIRMWARE_LOCK.values())
-            self.async_write_ha_state()
-
-        elif self.command == "miio":
-            self.set_current("Use select_option service")
-
-        elif self.command == "idle":
-            self.set_current(None)
-
-        elif self.command in ("reboot", "ftp", "dump", "parentscan"):
-            # ping-pong
-            self.device.update({"command": None})
+    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+        super().__init__(gateway, device, conv)
+        if device.model == "lumi.gateway.mgl03":
+            self._attr_options = [
+                "pair", "bind", "ota", "config", "parentscan", "firmwarelock",
+                "reboot", "ftp"
+            ]
 
     @callback
     def async_set_state(self, data: dict):
-        if not self.hass:
-            return
-
         if self.attr in data:
-            self.process_command(data)
+            self._attr_current_option = data[self.attr]
 
-        elif "pair" in data:
-            if data["pair"]:
-                self.set_current("Ready to join")
-            else:
-                self.device.update({"command": None})
+    async def async_select_option(self, option: str) -> None:
+        # clear select.data
+        self.device.update({"data": None})
 
-        elif "discovered_mac" in data:
-            mac = data["discovered_mac"]
-            self.set_current(f"Discovered: 0x{mac:>016s}")
+        if option == "pair":
+            await self.device_send({"pair": True})
+        elif option in ("bind", "config", "ota"):
+            self.device.update({"command": option})
+        elif option == "firmwarelock":
+            lock = await self.gw.gw3_read_lock()
+            self.device.update({"command": option, "lock": lock})
+        elif option in ("ftp", "reboot"):
+            ok = await self.gw.telnet_send(option)
+            self.device.update({"command": option, "ok": ok})
+        elif option == "parentscan":
+            await self.gw.z3_run_parent_scan()
+            self.device.update({"command": option, "ok": True})
 
-        elif "pair_command" in data:
-            data = data["pair_command"]
-            if data["install_code"]:
-                self.set_current("Send network key (secure)")
-            else:
-                self.set_current("Send network key (legacy)")
 
-        elif "added_device" in data:
-            data = data["added_device"]
-            self.set_current(f"Paired: {data['mac']} ({data['model']})")
+OPT_ENABLED = "enabled"
+OPT_DISABLED = "disabled"
+OPT_UNKNOWN = "unknown"
+OPT_OK = "ok"
+OPT_ERROR = "error"
+OPT_JOIN = "permit_join"
+OPT_STOP_JOIN = "stop_join"
+OPT_CANCEL = "cancel"
+OPT_KEY_SECURE = "key_secure"
+OPT_KEY_LEGACY = "key_legacy"
+OPT_NO_FIRMWARE = "no_firmware"
+OPT_BIND = "bind"
+OPT_UNBIND = "unbind"
+OPT_NO_DEVICES = "no_devices"
+
+
+# noinspection PyAbstractClass,PyUnusedLocal
+class DataSelect(XEntity, SelectEntity):
+    _attr_current_option = None
+    _attr_device_class = "data"
+    _attr_options = None
+    step_id = None
+    kwargs = None
+
+    def set_options(self, option: str = None, options: list = None):
+        """Change current option with options list dynamically."""
+        # always change to None first time
+        self._attr_current_option = None
+
+        if option:
+            self._attr_options = options or [option]
+            # important to change current option with delay after options
+            self.hass.async_create_task(self.async_set_current(option))
+        else:
+            # better not leave options list empty
+            self._attr_options = options or []
+
+    async def async_set_current(self, option: str):
+        """Delayed update current option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+
+    def set_devices(self, feature: str):
+        """Set options list with devices list."""
+        devices = [
+            f"{d.mac}: {d.name}" for d in self.gw.filter_devices(feature)
+        ]
+        if devices:
+            self.set_options(None, devices)
+        else:
+            self.set_options(OPT_NO_DEVICES)
+
+    def set_end(self, option: str):
+        self.set_options(option)
+        self.device.update({"command": None})
+
+    ###########################################################################
+
+    @callback
+    def async_set_state(self, data: dict):
+        """Can process:
+        - command step, done by user from another select
+        - event step, done by receiving some data from gateway
+        """
+        if "command" in data:
+            self.step_id = data["command"]
+            func = getattr(self, f"step_command_{self.step_id}", None)
+        else:
+            self.step_id = next(k for k in self.subscribed_attrs if k in data)
+            data = data[self.step_id]
+            func = getattr(self, f"step_event_{self.step_id}", None)
+
+        if func:
+            func(data)
+
+    async def async_select_option(self, option: str) -> None:
+        """Can process user step, done by user from this select"""
+        coro = getattr(self, f"step_user_{self.step_id}")
+        if coro:
+            await coro(option)
+
+    ###########################################################################
+
+    def step_event_data(self, value: str):
+        # update select.data value from outside
+        self.set_options(value)
+
+    def step_event_pair(self, value: bool):
+        if value:
+            self.set_options(OPT_JOIN, [OPT_JOIN, OPT_CANCEL])
+            # change select.command
+            self.device.update({"command": "pair"})
+        else:
+            self.set_options(OPT_STOP_JOIN)
+            # clear select.command
             self.device.update({"command": None})
 
-        elif "remove_did" in data:
-            did = data['remove_did']
-            device = self.gw.devices.get(did)
-            utils.remove_device(self.hass, device.mac)
-            self.set_current(f"Removed: {did[5:]}")
-            self.device.update({"command": None})
+    async def step_user_pair(self, option: str):
+        assert option == OPT_CANCEL
+        await self.device_send({"pair": False})
 
-        elif "ota_progress" in data:
-            percent = data["ota_progress"]
-            self.set_current(f"Update progress: {percent}%")
+    def step_event_discovered_mac(self, value: str):
+        self.set_options(f"Discovered: 0x{value:>016s}")
 
-    async def async_select_option(self, option: str):
-        if self.command == "idle":
-            raise RuntimeWarning
+    def step_event_pair_command(self, value: dict):
+        secure = value["install_code"]
+        self.set_options(OPT_KEY_SECURE if secure else OPT_KEY_LEGACY)
 
-        elif self.command == "remove":
-            mac = option.split(":")[0]
-            if mac.startswith("0x"):
-                did = "lumi." + mac.lstrip("0x")
-                device = self.gw.devices.get(did)
-                if device.model:
-                    await self.device_send({"remove_did": did})
-                else:
-                    await self.gw.silabs_leave(device)
-            else:
-                device = self.gw.devices.get(mac)
-                utils.remove_device(self.hass, device.mac)
-            self.device.update({"command": None})
+    def step_event_added_device(self, value: dict):
+        self.set_end(f"Paired: {value['mac']} ({value['model']})")
 
-        elif self.command == "config":
-            did = "lumi." + option[:18].lstrip("0x")
-            device = self.gw.devices.get(did)
-            await self.gw.silabs_rejoin(device)
+    def step_event_remove_did(self, value: str):
+        device = self.gw.devices.get(value)
+        utils.remove_device(self.hass, device.mac)
+        self.set_end(f"Removed: {value[5:]}")
 
-        elif self.command == "ota":
-            did = "lumi." + option[:18].lstrip("0x")
-            device = self.gw.devices.get(did)
-            resp = await utils.run_zigbee_ota(self.hass, self.gw, device)
-            self.set_current(resp)
+    def step_event_ota_progress(self, value: int):
+        self.set_options(f"Update progress: {value}%")
 
-        elif self.command == "bind":
-            if "bind_from" not in self.kwargs:
-                did = "lumi." + option[:18].lstrip("0x")
-                self.kwargs["bind_from"] = self.gw.devices.get(did)
-                self.set_devices("bind_to")
+    def step_command_config(self, value: dict):
+        self.set_devices("zigbee")
 
-            elif "bind_to" not in self.kwargs:
-                did = "lumi." + option[:18].lstrip("0x")
-                self.kwargs["bind_to"] = self.gw.devices.get(did)
-                self._attr_options = ["bind", "unbind"]
-                self.async_write_ha_state()
+    async def step_user_config(self, option: str):
+        did = "lumi." + option[:18].lstrip("0x")
+        device = self.gw.devices.get(did)
+        await self.gw.silabs_rejoin(device)
 
-            else:
-                if option == "bind":
-                    await self.gw.silabs_bind(**self.kwargs)
-                    self.set_current("Bind command sent")
-                elif option == "unbind":
-                    await self.gw.silabs_unbind(**self.kwargs)
-                    self.set_current("Unbind command sent")
-                self.device.update({"command": None})
+    def step_command_ota(self, value: dict):
+        self.set_devices("zigbee")
 
-        elif self.command == "lock":
-            lock = next(k for k, v in FIRMWARE_LOCK.items() if v == option)
-            if await self.gw.gw3_send_lock(lock):
-                self.set_current("Lock enabled" if lock else "Lock disabled")
-            else:
-                self.set_current("Can't change lock")
-            self.device.update({"command": None})
+    async def step_user_ota(self, option: str):
+        did = "lumi." + option[:18].lstrip("0x")
+        device = self.gw.devices.get(did)
+        resp = await utils.run_zigbee_ota(self.hass, self.gw, device)
+        if resp is True:
+            resp = OPT_OK
+        elif resp is False:
+            resp = OPT_NO_FIRMWARE
+        else:
+            resp = OPT_ERROR
+        self.set_end(resp)
 
-        elif self.command == "miio":
-            raw = json.loads(option)
-            resp = await self.gw.miio.send(raw['method'], raw.get('params'))
-            persistent_notification.async_create(self.hass, str(resp), TITLE)
+    def step_command_bind(self, value: dict):
+        self.set_devices(self.step_id)
+        self.step_id = "bind_from"
+
+    async def step_user_bind_from(self, option: str):
+        did = "lumi." + option[:18].lstrip("0x")
+        self.kwargs = {"bind_from": self.gw.devices.get(did)}
+        self.set_devices("bind_to")
+        self.step_id = "bind_to"
+
+    async def step_user_bind_to(self, option: str):
+        did = "lumi." + option[:18].lstrip("0x")
+        self.kwargs["bind_to"] = self.gw.devices.get(did)
+        self.set_options(None, [OPT_BIND, OPT_UNBIND])
+        self.step_id = "bind_type"
+
+    async def step_user_bind_type(self, option: str):
+        if option == OPT_BIND:
+            await self.gw.silabs_bind(**self.kwargs)
+        else:
+            await self.gw.silabs_unbind(**self.kwargs)
+        self.set_end(OPT_OK)
+
+    def step_command_firmwarelock(self, value: dict):
+        lock = value["lock"]
+        if lock is None:
+            self.set_options(
+                OPT_UNKNOWN, [OPT_UNKNOWN, OPT_ENABLED, OPT_DISABLED]
+            )
+        else:
+            self.set_options(
+                OPT_ENABLED if lock else OPT_DISABLED,
+                [OPT_ENABLED, OPT_DISABLED]
+            )
+
+    async def step_user_firmwarelock(self, option: str):
+        ok = await self.gw.gw3_send_lock(option == OPT_ENABLED)
+        self.set_end(OPT_OK if ok else OPT_ERROR)
+
+    def step_command_reboot(self, value: dict):
+        self.set_end(OPT_OK if value["ok"] else OPT_ERROR)
+
+    def step_command_ftp(self, value: dict):
+        self.step_command_reboot(value)
+
+    def step_command_parentscan(self, value: dict):
+        self.step_command_reboot(value)

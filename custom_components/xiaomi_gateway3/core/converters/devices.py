@@ -117,7 +117,7 @@ DEVICES = [{
         Converter("power_tx", mi="8.0.2012"),
         Converter("channel", mi="8.0.2024"),
 
-        MapConv("command", "select", map=GW3_COMMANDS),
+        Converter("command", "select", parent="data"),
         Converter("data", "select"),
 
         CloudLinkConv(
@@ -150,7 +150,7 @@ DEVICES = [{
         Converter("power_tx", mi="8.0.2012"),
         Converter("channel", mi="8.0.2024"),
 
-        MapConv("command", "select", map=E1_COMMANDS),
+        Converter("command", "select", parent="data"),
         Converter("data", "select"),
 
         GatewayStats
