@@ -11,11 +11,9 @@ from homeassistant.const import *
 from homeassistant.core import callback, State
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
     CONNECTION_ZIGBEE
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.helpers.template import Template
 
-from .backward import ENTITY_CATEGORY_CONFIG, ENTITY_CATEGORY_DIAGNOSTIC, \
-    XEntityBase
 from .const import DOMAIN
 from .converters import Converter, GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
 from .device import XDevice
@@ -145,10 +143,11 @@ ENTITY_CATEGORIES = {
 STATE_TIMEOUT = timedelta(minutes=10)
 
 
-class XEntity(XEntityBase):
+class XEntity(Entity):
     # duplicate here because typing problem
     _attr_extra_state_attributes: dict = None
 
+    added = False
     attributes_template: Template = None
 
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
@@ -231,12 +230,9 @@ class XEntity(XEntityBase):
         self.gw.debug(f"{self.entity_id} | {msg}", exc_info=exc_info)
 
     async def async_added_to_hass(self):
-        """Also run when rename entity_id"""
-        # self.platform._async_add_entity => self.add_to_platform_finish
-        #   => self.async_internal_added_to_hass => self.async_added_to_hass
-        #   => self.async_write_ha_state
-        # self.device.entities[self.attr] = self  # fix rename entity_id
+        self.added = True
 
+        # also run when rename entity_id
         self.render_attributes_template()
 
         if hasattr(self, "async_get_last_state"):
@@ -249,9 +245,8 @@ class XEntity(XEntityBase):
             await self.async_update()
 
     async def async_will_remove_from_hass(self) -> None:
-        """Also run when rename entity_id"""
-        # self.device.setup_attrs.remove(self.attr)
-        # self.device.entities.pop(self.attr)
+        # also run when rename entity_id
+        self.added = False
 
     @callback
     def async_set_state(self, data: dict):

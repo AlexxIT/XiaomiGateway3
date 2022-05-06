@@ -6,7 +6,9 @@ import time
 import voluptuous as vol
 from homeassistant.components.system_log import CONF_LOGGER
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
+from homeassistant.const import (
+    EVENT_HOMEASSISTANT_STOP, MAJOR_VERSION, MINOR_VERSION
+)
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import (
     aiohttp_client as ac, config_validation as cv, device_registry as dr
@@ -14,7 +16,7 @@ from homeassistant.helpers import (
 from homeassistant.helpers.storage import Store
 
 from . import system_health
-from .core import backward, logger, utils
+from .core import logger, utils
 from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
 from .core.gateway import XGateway
@@ -44,8 +46,8 @@ CONFIG_SCHEMA = vol.Schema({
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
-    if not backward.hass_version_supported:
-        _LOGGER.error("Support Hass version 2021.7 and more")
+    if (MAJOR_VERSION, MINOR_VERSION) < (2021, 12):
+        _LOGGER.error("Minimum supported Hass version 2021.12")
         return False
 
     config = hass_config.get(DOMAIN) or {}
