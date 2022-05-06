@@ -9,14 +9,16 @@ import requests
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
+from homeassistant.helpers import (
+    device_registry as dr, entity_registry as er
+)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 from homeassistant.requirements import async_process_requirements
 
 from . import shell
 from .const import DOMAIN
+from .converters import STAT_GLOBALS
 from .device import XDevice
 from .ezsp import EzspUtils
 from .gateway import XGateway
@@ -34,10 +36,24 @@ _LOGGER = logging.getLogger(__name__)
 @callback
 def remove_device(hass: HomeAssistant, mac: str):
     """Remove device by did from Hass"""
-    registry: DeviceRegistry = hass.data['device_registry']
+    registry = dr.async_get(hass)
     device = registry.async_get_device({(DOMAIN, mac)}, None)
     if device:
         registry.async_remove_device(device.id)
+
+
+@callback
+def remove_stats(hass: HomeAssistant, entry_id: str):
+    suffix = tuple(STAT_GLOBALS.keys())
+    registry = er.async_get(hass)
+    remove = [
+        entity.entity_id
+        for entity in list(registry.entities.values())
+        if (entity.config_entry_id == entry_id and
+            entity.unique_id.endswith(suffix))
+    ]
+    for entity_id in remove:
+        registry.async_remove(entity_id)
 
 
 async def remove_zigbee(unique_id: str):
@@ -55,7 +71,7 @@ async def remove_zigbee(unique_id: str):
 def update_device_info(hass: HomeAssistant, did: str, **kwargs):
     # lumi.1234567890 => 0x1234567890
     mac = '0x' + did[5:]
-    registry: DeviceRegistry = hass.data['device_registry']
+    registry = dr.async_get(hass)
     device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
     if device:
         registry.async_update_device(device.id, **kwargs)
@@ -70,8 +86,8 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
             XGateway.defaults[k] = v
 
     # 2. Load unique_id from entity registry (backward support old format)
-    er: EntityRegistry = hass.data["entity_registry"]
-    for entity in list(er.entities.values()):
+    registry = er.async_get(hass)
+    for entity in list(registry.entities.values()):
         if entity.platform != DOMAIN:
             continue
 

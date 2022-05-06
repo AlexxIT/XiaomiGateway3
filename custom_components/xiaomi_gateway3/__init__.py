@@ -9,10 +9,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import (
-    config_validation as cv, device_registry as dr, entity_registry as er
+    aiohttp_client as ac, config_validation as cv, device_registry as dr
 )
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.device_registry import CONNECTION_ZIGBEE
 from homeassistant.helpers.storage import Store
 
 from . import system_health
@@ -111,19 +109,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if entry.entry_id not in hass.data[DOMAIN]:
         return
 
-    # TODO: delete entities if they have been removed from options
     # remove all stats entities if disable stats
-    # if not entry.options.get('stats'):
-    #     suffix = ('_gateway', '_zigbee', '_ble')
-    #     registry: EntityRegistry = hass.data['entity_registry']
-    #     remove = [
-    #         entity.entity_id
-    #         for entity in list(registry.entities.values())
-    #         if (entity.config_entry_id == entry.entry_id and
-    #             entity.unique_id.endswith(suffix))
-    #     ]
-    #     for entity_id in remove:
-    #         registry.async_remove(entity_id)
+    if not entry.options.get('stats'):
+        utils.remove_stats(hass, entry.entry_id)
 
     gw: XGateway = hass.data[DOMAIN][entry.entry_id]
     await gw.stop()
@@ -159,7 +147,7 @@ async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     data: dict = config_entry.data.copy()
 
-    session = async_create_clientsession(hass)
+    session = ac.async_create_clientsession(hass)
     hass.data[DOMAIN]['cloud'] = cloud = MiCloud(session, data['servers'])
 
     if 'service_token' in data:
@@ -225,7 +213,7 @@ def _register_send_command(hass: HomeAssistant):
             raw = json.loads(call.data["data"])
             resp = await gw.miio.send(raw['method'], raw.get('params'))
             hass.components.persistent_notification.async_create(
-                str(resp), utils.TITLE
+                str(resp), TITLE
             )
         elif cmd[0] == "set_state":  # for debug purposes
             device = gw.devices.get(cmd[1])
@@ -245,7 +233,7 @@ async def async_remove_config_entry_device(
 
     try:
         # check if device is zigbee
-        if any(c[0] == CONNECTION_ZIGBEE for c in device.connections):
+        if any(c[0] == dr.CONNECTION_ZIGBEE for c in device.connections):
             unique_id = next(
                 i[1] for i in device.identifiers if i[0] == DOMAIN
             )
