@@ -5,6 +5,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from .core.const import DOMAIN
+from .core.converters import GATEWAY
 from .core.gateway import XGateway
 
 
@@ -48,4 +49,9 @@ async def async_get_device_diagnostics(
     info = await async_get_config_entry_diagnostics(hass, entry)
     info["device"] = info.pop("devices")[uid]
     info["device"]["unique_id"] = uid
+
+    if device.model.startswith(GATEWAY):
+        gw: XGateway = hass.data[DOMAIN][entry.entry_id]
+        info["data.tar.gz.b64"] = await gw.tar_data()
+
     return info
