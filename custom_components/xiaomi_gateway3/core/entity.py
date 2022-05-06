@@ -202,7 +202,6 @@ class XEntity(XEntityBase):
             name=device.info.name,
             sw_version=device.fw_ver,
             via_device=via_device,
-            configuration_url=device.info.url
         )
 
         # fix don't enabled by default entities
