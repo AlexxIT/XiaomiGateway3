@@ -134,19 +134,15 @@ def migrate_options(data):
 
 async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
-    sh = None
-
     # 1. try connect with telnet (custom firmware)?
     try:
-        sh = await shell.connect(host)
-        if sh.model:
-            # 1.1. check token with telnet
-            return None if await sh.get_token() == token else 'wrong_token'
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            if sh.model:
+                # 1.1. check token with telnet
+                return None if await sh.get_token() == token else 'wrong_token'
     except Exception:
         pass
-    finally:
-        if sh:
-            await sh.close()
 
     if not telnet_cmd:
         return 'cant_connect'
@@ -175,14 +171,12 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
     await asyncio.sleep(1)
 
     try:
-        sh = await shell.connect(host)
-        if not sh.model:
-            return 'wrong_telnet'
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            if not sh.model:
+                return 'wrong_telnet'
     except Exception:
         return None
-    finally:
-        if sh:
-            await sh.close()
 
 
 async def get_lan_key(host: str, token: str):
@@ -307,16 +301,13 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
 
-    sh = None
     try:
-        sh = await shell.connect(host)
-        assert await sh.run_zigbee_flash()
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            assert await sh.run_zigbee_flash()
     except Exception as e:
         _LOGGER.error("Can't update zigbee firmware", exc_info=e)
         return False
-    finally:
-        if sh:
-            await sh.close()
 
     await asyncio.sleep(.5)
 
