@@ -4,7 +4,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.const import *
 from homeassistant.core import callback, State
@@ -55,7 +55,6 @@ ICONS = {
     "switch": "mdi:light-switch",
     "tvoc": "mdi:cloud",
 }
-
 
 ENTITY_CATEGORIES = {
     BLE: EntityCategory.DIAGNOSTIC,
@@ -157,14 +156,15 @@ class XEntity(Entity):
     def hass_state(self):
         if self.hass:
             state = self.hass.states.get(self.entity_id)
-            state = state.state if state else "NO_STATE"
+            hass_state = state.state if state else "NO_STATE"
         else:
-            state = "DISABLED"
-        if state == self.state:
-            return state
+            hass_state = "DISABLED"
+        entity_state = getattr(self, "native_value", self.state)
+        if hass_state == entity_state:
+            return hass_state
         return {
-            "state": state,
-            "value": self.state
+            "state": hass_state,
+            "value": entity_state,
         }
 
     def debug(self, msg: str, exc_info=None):
