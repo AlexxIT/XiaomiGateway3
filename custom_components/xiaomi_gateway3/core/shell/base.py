@@ -32,7 +32,7 @@ class TelnetShell:
             raw = await self.exec(command, as_bytes=True, timeout=60)
             # b"cat: can't open ..."
             return base64.b64decode(raw) if as_base64 else raw
-        except:
+        except Exception:
             return None
 
     async def reboot(self):

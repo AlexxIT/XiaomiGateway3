@@ -2,33 +2,29 @@ import asyncio
 import json
 import logging
 import random
-import re
 import string
-import uuid
-from datetime import datetime
 from typing import Optional
 
 import requests
-from aiohttp import web
-from homeassistant.components.http import HomeAssistantView
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
+from homeassistant.helpers import (
+    device_registry as dr, entity_registry as er
+)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.storage import Store
 from homeassistant.requirements import async_process_requirements
 
 from . import shell
 from .const import DOMAIN
+from .converters import STAT_GLOBALS
 from .device import XDevice
 from .ezsp import EzspUtils
 from .gateway import XGateway
+from .gateway.lumi import LumiGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
-
-TITLE = "Xiaomi Gateway 3"
 
 SUPPORTED_MODELS = (
     'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03'
@@ -40,17 +36,42 @@ _LOGGER = logging.getLogger(__name__)
 @callback
 def remove_device(hass: HomeAssistant, mac: str):
     """Remove device by did from Hass"""
-    registry: DeviceRegistry = hass.data['device_registry']
+    registry = dr.async_get(hass)
     device = registry.async_get_device({(DOMAIN, mac)}, None)
     if device:
         registry.async_remove_device(device.id)
 
 
 @callback
+def remove_stats(hass: HomeAssistant, entry_id: str):
+    suffix = tuple(STAT_GLOBALS.keys())
+    registry = er.async_get(hass)
+    remove = [
+        entity.entity_id
+        for entity in list(registry.entities.values())
+        if (entity.config_entry_id == entry_id and
+            entity.unique_id.endswith(suffix))
+    ]
+    for entity_id in remove:
+        registry.async_remove(entity_id)
+
+
+async def remove_zigbee(unique_id: str):
+    device: XDevice = next(
+        d for d in XGateway.devices.values() if d.unique_id == unique_id
+    )
+    # delete device from all gateways
+    for gw in device.gateways:
+        payload = gw.device.encode({"remove_did": device.did})
+        if isinstance(gw, LumiGateway):
+            await gw.lumi_send(gw.device, payload)
+
+
+@callback
 def update_device_info(hass: HomeAssistant, did: str, **kwargs):
     # lumi.1234567890 => 0x1234567890
     mac = '0x' + did[5:]
-    registry: DeviceRegistry = hass.data['device_registry']
+    registry = dr.async_get(hass)
     device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
     if device:
         registry.async_update_device(device.id, **kwargs)
@@ -65,8 +86,8 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
             XGateway.defaults[k] = v
 
     # 2. Load unique_id from entity registry (backward support old format)
-    er: EntityRegistry = hass.data["entity_registry"]
-    for entity in list(er.entities.values()):
+    registry = er.async_get(hass)
+    for entity in list(registry.entities.values()):
         if entity.platform != DOMAIN:
             continue
 
@@ -113,19 +134,15 @@ def migrate_options(data):
 
 async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
         -> Optional[str]:
-    sh = None
-
     # 1. try connect with telnet (custom firmware)?
     try:
-        sh = await shell.connect(host)
-        if sh.model:
-            # 1.1. check token with telnet
-            return None if await sh.get_token() == token else 'wrong_token'
-    except:
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            if sh.model:
+                # 1.1. check token with telnet
+                return None if await sh.get_token() == token else 'wrong_token'
+    except Exception:
         pass
-    finally:
-        if sh:
-            await sh.close()
 
     if not telnet_cmd:
         return 'cant_connect'
@@ -154,14 +171,12 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
     await asyncio.sleep(1)
 
     try:
-        sh = await shell.connect(host)
-        if not sh.model:
-            return 'wrong_telnet'
-    except:
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            if not sh.model:
+                return 'wrong_telnet'
+    except Exception:
         return None
-    finally:
-        if sh:
-            await sh.close()
 
 
 async def get_lan_key(host: str, token: str):
@@ -195,7 +210,7 @@ async def get_room_mapping(cloud: MiCloud, host: str, token: str):
             result += f"\n- {local_id}: {cloud_name}"
         return result
 
-    except:
+    except Exception:
         return "Can't get from cloud"
 
 
@@ -286,16 +301,13 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
     await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
 
-    sh = None
     try:
-        sh = await shell.connect(host)
-        assert await sh.run_zigbee_flash()
-    except:
-        _LOGGER.exception("Can't update zigbee firmware")
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            assert await sh.run_zigbee_flash()
+    except Exception as e:
+        _LOGGER.error("Can't update zigbee firmware", exc_info=e)
         return False
-    finally:
-        if sh:
-            await sh.close()
 
     await asyncio.sleep(.5)
 
@@ -333,7 +345,7 @@ async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
 
 async def run_zigbee_ota(
         hass: HomeAssistant, gateway: "XGateway", device: "XDevice"
-):
+) -> Optional[bool]:
     url = await get_ota_link(hass, device)
     if url:
         gateway.debug_device(device, "update", url)
@@ -343,63 +355,7 @@ async def run_zigbee_ota(
         })
         if not resp or resp.get('result') != ['ok']:
             _LOGGER.error(f"Can't run update process: {resp}")
-            return "Can't run update"
-        return "Update started"
+            return None
+        return True
     else:
-        return "No firmware"
-
-
-NOTIFY_TEXT = '<a href="%s?r=10" target="_blank">Open Log<a>'
-HTML = (f'<!DOCTYPE html><html><head><title>{TITLE}</title>'
-        '<meta http-equiv="refresh" content="%s"></head>'
-        '<body><pre>%s</pre></body></html>')
-
-
-class XiaomiGateway3Debug(logging.Handler, HomeAssistantView):
-    name = "xiaomi_debug"
-    requires_auth = False
-
-    # https://waymoot.org/home/python_string/
-    text = []
-
-    def __init__(self, hass: HomeAssistant):
-        super().__init__()
-
-        # random url because without authorization!!!
-        self.url = f"/{uuid.uuid4()}"
-
-        hass.http.register_view(self)
-        hass.components.persistent_notification.async_create(
-            NOTIFY_TEXT % self.url, title=TITLE)
-
-    def handle(self, rec: logging.LogRecord) -> None:
-        dt = datetime.fromtimestamp(rec.created).strftime("%Y-%m-%d %H:%M:%S")
-        module = 'main' if rec.module == '__init__' else rec.module
-        self.text.append(f"{dt}  {rec.levelname:7}  {module:12}  {rec.msg}")
-
-    async def get(self, request: web.Request):
-        try:
-            if 'c' in request.query:
-                self.text.clear()
-
-            if 'q' in request.query or 't' in request.query:
-                lines = self.text
-
-                if 'q' in request.query:
-                    reg = re.compile(fr"({request.query['q']})", re.IGNORECASE)
-                    lines = [p for p in self.text if reg.search(p)]
-
-                if 't' in request.query:
-                    tail = int(request.query['t'])
-                    lines = lines[-tail:]
-
-                body = '\n'.join(lines)
-            else:
-                body = '\n'.join(self.text[:10000])
-
-            reload = request.query.get('r', '')
-            return web.Response(text=HTML % (reload, body),
-                                content_type="text/html")
-
-        except:
-            return web.Response(status=500)
+        return False

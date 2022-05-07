@@ -7,39 +7,43 @@ from .shell_e1 import ShellE1
 from .shell_gw3 import ShellGw3
 
 
-async def connect(host: str, port=23) -> Union[TelnetShell, ShellGw3, ShellE1]:
-    """Return TelnetShell class for specific gateway. Returns the object in any
-    case. To be able to execute the `close()` function.
+class Session:
+    """Support automatic closing session in case of trouble. Example of usage:
 
-    Example of usage:
-
-        sh = None
         try:
-            sh = await shell.connect(host)
-            return True
-        except Exception as e:
+            async with shell.Session(host) as session:
+                sh = await session.login()
+                return True
+        except Exception:
             return False
-        finally:
-            if sh:
-                await sh.close()
     """
-    coro = asyncio.open_connection(host, port, limit=1_000_000)
-    reader, writer = await asyncio.wait_for(coro, 5)
 
-    coro = reader.readuntil(b"login: ")
-    resp: bytes = await asyncio.wait_for(coro, 3)
+    def __init__(self, host: str, port=23):
+        self.coro = asyncio.open_connection(host, port, limit=1_000_000)
 
-    if b"rlxlinux" in resp:
-        shell = ShellGw3(reader, writer)
-    elif b"Aqara-Hub-E1" in resp:
-        shell = ShellE1(reader, writer)
-    else:
-        raise NotImplementedError
+    async def __aenter__(self):
+        self.reader, self.writer = await asyncio.wait_for(self.coro, 5)
+        return self
 
-    await shell.login()
-    await shell.prepare()
+    async def __aexit__(self, exc_type, exc, tb):
+        self.writer.close()
+        await self.writer.wait_closed()
 
-    return shell
+    async def login(self) -> Union[TelnetShell, ShellGw3, ShellE1]:
+        coro = self.reader.readuntil(b"login: ")
+        resp: bytes = await asyncio.wait_for(coro, 3)
+
+        if b"rlxlinux" in resp:
+            shell = ShellGw3(self.reader, self.writer)
+        elif b"Aqara-Hub-E1" in resp:
+            shell = ShellE1(self.reader, self.writer)
+        else:
+            raise Exception(f"Unknown response: {resp}")
+
+        await shell.login()
+        await shell.prepare()
+
+        return shell
 
 
 NTP_DELTA = 2208988800  # 1970-01-01 00:00:00
@@ -57,7 +61,7 @@ def ntp_time(host: str) -> float:
         integ = int.from_bytes(raw[-8:-4], 'big')
         fract = int.from_bytes(raw[-4:], 'big')
         return integ + float(fract) / 2 ** 32 - NTP_DELTA
-    except:
+    except Exception:
         return 0
     finally:
         sock.close()

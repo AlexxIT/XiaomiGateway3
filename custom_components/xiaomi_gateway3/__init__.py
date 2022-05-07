@@ -6,17 +6,20 @@ import time
 import voluptuous as vol
 from homeassistant.components.system_log import CONF_LOGGER
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
+from homeassistant.const import (
+    EVENT_HOMEASSISTANT_STOP, MAJOR_VERSION, MINOR_VERSION
+)
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers import (
+    aiohttp_client as ac, config_validation as cv, device_registry as dr
+)
 from homeassistant.helpers.storage import Store
 
-from .core import backward, logger, utils
-from .core.const import DOMAIN
+from . import system_health
+from .core import logger, utils
+from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
 from .core.gateway import XGateway
-from .core.utils import XiaomiGateway3Debug
 from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,8 +46,8 @@ CONFIG_SCHEMA = vol.Schema({
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
-    if not backward.hass_version_supported:
-        _LOGGER.error("Support Hass version 2021.7 and more")
+    if (MAJOR_VERSION, MINOR_VERSION) < (2021, 12):
+        _LOGGER.error("Minimum supported Hass version 2021.12")
         return False
 
     config = hass_config.get(DOMAIN) or {}
@@ -84,7 +87,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.config_entries.async_update_entry(entry, data={},
                                                options=entry.data)
 
-    await _setup_logger(hass)
+    entries = hass.config_entries.async_entries(DOMAIN)
+    if any(e.options.get('debug') for e in entries):
+        await system_health.setup_debug(hass, _LOGGER)
 
     # add options handler
     if not entry.update_listeners:
@@ -106,19 +111,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if entry.entry_id not in hass.data[DOMAIN]:
         return
 
-    # TODO: delete entities if they have been removed from options
     # remove all stats entities if disable stats
-    # if not entry.options.get('stats'):
-    #     suffix = ('_gateway', '_zigbee', '_ble')
-    #     registry: EntityRegistry = hass.data['entity_registry']
-    #     remove = [
-    #         entity.entity_id
-    #         for entity in list(registry.entities.values())
-    #         if (entity.config_entry_id == entry.entry_id and
-    #             entity.unique_id.endswith(suffix))
-    #     ]
-    #     for entity_id in remove:
-    #         registry.async_remove(entity_id)
+    if not entry.options.get('stats'):
+        utils.remove_stats(hass, entry.entry_id)
 
     gw: XGateway = hass.data[DOMAIN][entry.entry_id]
     await gw.stop()
@@ -154,7 +149,7 @@ async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     data: dict = config_entry.data.copy()
 
-    session = async_create_clientsession(hass)
+    session = ac.async_create_clientsession(hass)
     hass.data[DOMAIN]['cloud'] = cloud = MiCloud(session, data['servers'])
 
     if 'service_token' in data:
@@ -208,70 +203,6 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     return True
 
 
-# async def _handle_device_remove(hass: HomeAssistant):
-#     """Remove device from Hass and Mi Home if the device is renamed to
-#     `delete`.
-#     """
-#
-#     async def device_registry_updated(event: Event):
-#         if event.data['action'] != 'update':
-#             return
-#
-#         registry = hass.data['device_registry']
-#         hass_device = registry.async_get(event.data['device_id'])
-#
-#         # check empty identifiers
-#         if not hass_device or not hass_device.identifiers:
-#             return
-#
-#         # handle only our devices
-#         for hass_did in hass_device.identifiers:
-#             if hass_did[0] == DOMAIN and hass_device.name_by_user == 'delete':
-#                 break
-#         else:
-#             return
-#
-#         # remove from Mi Home
-#         # if multiple gateways - will try remove from all of them
-#         for gw in hass.data[DOMAIN].values():
-#             if isinstance(gw, XGateway):
-#                 await gw.remove_device(hass_did[1])
-#
-#         # remove from Hass
-#         registry.async_remove_device(hass_device.id)
-#
-#     hass.bus.async_listen('device_registry_updated', device_registry_updated)
-
-
-async def _setup_logger(hass: HomeAssistant):
-    if not hasattr(_LOGGER, 'defaul_level'):
-        # default level from Hass config
-        _LOGGER.defaul_level = _LOGGER.level
-
-    entries = hass.config_entries.async_entries(DOMAIN)
-    web_logs = any(e.options.get('debug') for e in entries)
-
-    # only if global logging don't set
-    if _LOGGER.defaul_level == logging.NOTSET:
-        # disable log to console
-        _LOGGER.propagate = web_logs is False
-        # set debug if any of integrations has debug
-        _LOGGER.setLevel(logging.DEBUG if web_logs else logging.NOTSET)
-
-    # if don't set handler yet
-    if web_logs:
-        # skip if already added
-        if any(isinstance(h, XiaomiGateway3Debug) for h in _LOGGER.handlers):
-            return
-
-        handler = XiaomiGateway3Debug(hass)
-        _LOGGER.addHandler(handler)
-
-        if _LOGGER.defaul_level == logging.NOTSET:
-            info = await hass.helpers.system_info.async_get_system_info()
-            _LOGGER.debug(f"SysInfo: {info}")
-
-
 def _register_send_command(hass: HomeAssistant):
     async def send_command(call: ServiceCall):
         host = call.data["host"]
@@ -284,7 +215,7 @@ def _register_send_command(hass: HomeAssistant):
             raw = json.loads(call.data["data"])
             resp = await gw.miio.send(raw['method'], raw.get('params'))
             hass.components.persistent_notification.async_create(
-                str(resp), utils.TITLE
+                str(resp), TITLE
             )
         elif cmd[0] == "set_state":  # for debug purposes
             device = gw.devices.get(cmd[1])
@@ -294,3 +225,23 @@ def _register_send_command(hass: HomeAssistant):
             device.update(raw)
 
     hass.services.async_register(DOMAIN, "send_command", send_command)
+
+
+async def async_remove_config_entry_device(
+        hass: HomeAssistant, entry: ConfigEntry, device: dr.DeviceEntry
+) -> bool:
+    """Supported from Hass v2022.3"""
+    dr.async_get(hass).async_remove_device(device.id)
+
+    try:
+        # check if device is zigbee
+        if any(c[0] == dr.CONNECTION_ZIGBEE for c in device.connections):
+            unique_id = next(
+                i[1] for i in device.identifiers if i[0] == DOMAIN
+            )
+            await utils.remove_zigbee(unique_id)
+
+        return True
+    except Exception as e:
+        _LOGGER.error("Can't delete device", exc_info=e)
+        return False

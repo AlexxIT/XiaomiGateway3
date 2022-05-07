@@ -67,26 +67,28 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         self.e1_ts = ts + 300  # 5 min
 
     async def e1_update_stats(self):
-        sh = None
         try:
-            sh = await shell.connect(self.host)
-            serial = await sh.read_file("/proc/tty/driver/ms_uart | grep -v ^0 | sort -r")
-            free_mem = await sh.read_file("/proc/meminfo | grep MemFree: | awk '{print $2}'")
-            load_avg = await sh.read_file("/proc/loadavg | sed 's/ /|/g'")
-            run_time = await sh.read_file("/proc/uptime | cut -f1 -d.")
-            rssi = await sh.read_file("/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d.")
-            payload = self.device.decode(GATEWAY, {
-                "serial": serial.decode(),
-                "free_mem": int(free_mem),
-                "load_avg": load_avg.decode(),
-                "run_time": int(run_time),
-                "rssi": int(rssi) + 100
-            })
-            self.device.update(payload)
+            async with shell.Session(self.host) as session:
+                sh = await session.login()
+                serial = await sh.read_file(
+                    "/proc/tty/driver/ms_uart | grep -v ^0 | sort -r"
+                )
+                free_mem = await sh.read_file(
+                    "/proc/meminfo | grep MemFree: | awk '{print $2}'"
+                )
+                load_avg = await sh.read_file("/proc/loadavg | sed 's/ /|/g'")
+                run_time = await sh.read_file("/proc/uptime | cut -f1 -d.")
+                rssi = await sh.read_file(
+                    "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
+                )
+                payload = self.device.decode(GATEWAY, {
+                    "serial": serial.decode(),
+                    "free_mem": int(free_mem),
+                    "load_avg": load_avg.decode(),
+                    "run_time": int(run_time),
+                    "rssi": int(rssi) + 100
+                })
+                self.device.update(payload)
 
         except Exception as e:
             self.warning("Can't update gateway stats", e)
-
-        finally:
-            if sh:
-                await sh.close()

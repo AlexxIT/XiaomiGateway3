@@ -108,7 +108,7 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
         if "battery" in data or not self.hass:
             return
 
-        assert data[self.attr] == True
+        assert data[self.attr] is True
 
         # don't trigger motion right after illumination
         ts = time.time()

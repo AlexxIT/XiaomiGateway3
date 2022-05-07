@@ -137,7 +137,7 @@ class MiBeaconConv(Converter):
             # Humidity percentage, ranging from 0-1000
             value = int.from_bytes(data, 'little') / 10.0
             if device.model in (903, 1371):
-                # two models has bug, they increase humidity on each data by 0.1
+                # two models has bug, they increase humidity on each msg by 0.1
                 value = int(value)
             payload['humidity'] = value
 
@@ -163,8 +163,8 @@ class MiBeaconConv(Converter):
             # TODO: lock timestamp
             value = data[0]
             if device.model == 2691:
-                # this sensor sends some kind of counter once an hour instead of
-                # the battery, so filter out the false values
+                # this sensor sends some kind of counter once an hour instead
+                # of the battery, so filter out the false values
                 prev = device.extra.get('battery')
                 device.extra['battery'] = value
                 if prev != value:
@@ -328,8 +328,8 @@ MiBeacon = MiBeaconConv('mibeacon')
 
 BLEAction = Converter("action", "sensor")
 BLEAction.childs = {
-    "action_id", "counter", "error", "key_id", "message", "method", "method_id",
-    "score", "state", "timestamp"
+    "action_id", "counter", "error", "key_id", "message", "method",
+    "method_id", "score", "state", "timestamp"
 }
 BLEBattery = Converter("battery", "sensor")
 BLEConductivity = Converter("conductivity", "sensor")

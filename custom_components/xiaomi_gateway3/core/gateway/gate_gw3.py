@@ -132,57 +132,40 @@ class GateGW3(
         self.debug(f"Gateway time offset: {self.time_offset}")
 
     async def gw3_update_serial_stats(self):
-        sh = None
         try:
-            sh = await shell.connect(self.host)
-            serial = await sh.read_file('/proc/tty/driver/serial')
-            payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
-            self.device.update(payload)
-
+            async with shell.Session(self.host) as session:
+                sh = await session.login()
+                serial = await sh.read_file('/proc/tty/driver/serial')
+                payload = self.device.decode(
+                    GATEWAY, {"serial": serial.decode()}
+                )
+                self.device.update(payload)
         except Exception as e:
             self.warning("Can't update gateway stats", e)
 
-        finally:
-            if sh:
-                await sh.close()
-
     async def gw3_memory_sync(self):
-        sh = None
         try:
-            sh = await shell.connect(self.host)
-            await sh.memory_sync()
+            async with shell.Session(self.host) as session:
+                sh = await session.login()
+                await sh.memory_sync()
         except Exception as e:
             self.error(f"Can't memory sync", e)
-        finally:
-            if sh:
-                await sh.close()
 
     async def gw3_send_lock(self, enable: bool) -> bool:
-        self.debug(f"Set firmware lock to {enable}")
-
-        sh = None
         try:
-            sh = await shell.connect(self.host)
-            await sh.lock_firmware(enable)
-            locked = await sh.check_firmware_lock()
-            return enable == locked
-
+            async with shell.Session(self.host) as session:
+                sh = await session.login()
+                await sh.lock_firmware(enable)
+                locked = await sh.check_firmware_lock()
+                return enable == locked
         except Exception as e:
             self.error(f"Can't set firmware lock", e)
             return False
 
-        finally:
-            if sh:
-                await sh.close()
-
     async def gw3_read_lock(self) -> Optional[bool]:
-        sh = None
         try:
-            sh = await shell.connect(self.host)
-            return await sh.check_firmware_lock()
+            async with shell.Session(self.host) as session:
+                sh = await session.login()
+                return await sh.check_firmware_lock()
         except Exception as e:
             self.error(f"Can't get firmware lock", e)
-            return None
-        finally:
-            if sh:
-                await sh.close()
