@@ -3,15 +3,14 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR, \
-    DEVICE_CLASS_CONNECTIVITY, DEVICE_CLASS_MOISTURE, DEVICE_CLASS_LOCK
-from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.const import *
 from homeassistant.core import callback, State
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
     CONNECTION_ZIGBEE
-from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.entity import DeviceInfo, Entity, EntityCategory
 from homeassistant.helpers.template import Template
 
 from .const import DOMAIN
@@ -24,53 +23,16 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 DEVICE_CLASSES = {
-    BLE: DEVICE_CLASS_TIMESTAMP,
-    GATEWAY: DEVICE_CLASS_CONNECTIVITY,
-    MESH: DEVICE_CLASS_TIMESTAMP,
-    ZIGBEE: DEVICE_CLASS_TIMESTAMP,
-    "cloud_link": DEVICE_CLASS_CONNECTIVITY,
-    "contact": DEVICE_CLASS_DOOR,
-    "latch": DEVICE_CLASS_LOCK,
-    "reverse": DEVICE_CLASS_LOCK,
-    "square": DEVICE_CLASS_LOCK,
-    "water_leak": DEVICE_CLASS_MOISTURE,
-}
-
-# support for older versions of the Home Assistant
-ELECTRIC_POTENTIAL_VOLT = "V"
-ELECTRIC_CURRENT_AMPERE = "A"
-
-UNITS = {
-    DEVICE_CLASS_BATTERY: PERCENTAGE,
-    DEVICE_CLASS_HUMIDITY: PERCENTAGE,
-    # zb light and motion and ble flower - lux
-    DEVICE_CLASS_ILLUMINANCE: LIGHT_LUX,
-    DEVICE_CLASS_POWER: POWER_WATT,
-    DEVICE_CLASS_VOLTAGE: ELECTRIC_POTENTIAL_VOLT,
-    DEVICE_CLASS_CURRENT: ELECTRIC_CURRENT_AMPERE,
-    DEVICE_CLASS_PRESSURE: PRESSURE_HPA,
-    DEVICE_CLASS_TEMPERATURE: TEMP_CELSIUS,
-    DEVICE_CLASS_ENERGY: ENERGY_KILO_WATT_HOUR,
-    "chip_temperature": TEMP_CELSIUS,
-    "conductivity": CONDUCTIVITY,
-    "gas_density": "% LEL",
-    "idle_time": TIME_SECONDS,
-    "linkquality": "lqi",
-    "max_power": POWER_WATT,
-    "moisture": PERCENTAGE,
-    "msg_received": "msg",
-    "msg_missed": "msg",
-    "new_resets": "rst",
-    "resets": "rst",
-    "rssi": SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    "smoke_density": "% obs/ft",
-    "supply": PERCENTAGE,
-    "tvoc": CONCENTRATION_PARTS_PER_BILLION,
-    # "link_quality": "lqi",
-    # "rssi": "dBm",
-    # "msg_received": "msg",
-    # "msg_missed": "msg",
-    # "unresponsive": "times"
+    BLE: SensorDeviceClass.TIMESTAMP,
+    GATEWAY: BinarySensorDeviceClass.CONNECTIVITY,
+    MESH: SensorDeviceClass.TIMESTAMP,
+    ZIGBEE: SensorDeviceClass.TIMESTAMP,
+    "cloud_link": BinarySensorDeviceClass.CONNECTIVITY,
+    "contact": BinarySensorDeviceClass.DOOR,
+    "latch": BinarySensorDeviceClass.LOCK,
+    "reverse": BinarySensorDeviceClass.LOCK,
+    "square": BinarySensorDeviceClass.LOCK,
+    "water_leak": BinarySensorDeviceClass.MOISTURE,
 }
 
 ICONS = {
@@ -94,50 +56,38 @@ ICONS = {
     "tvoc": "mdi:cloud",
 }
 
-# The state represents a measurement in present time
-STATE_CLASS_MEASUREMENT: Final = "measurement"
-# The state represents a total amount, e.g. net energy consumption
-STATE_CLASS_TOTAL: Final = "total"
-# The state represents a monotonically increasing total, e.g. an amount of
-# consumed gas
-STATE_CLASS_TOTAL_INCREASING: Final = "total_increasing"
-
-# https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
-STATE_CLASSES = {
-    DEVICE_CLASS_ENERGY: STATE_CLASS_TOTAL_INCREASING,
-}
 
 ENTITY_CATEGORIES = {
-    BLE: ENTITY_CATEGORY_DIAGNOSTIC,
-    GATEWAY: ENTITY_CATEGORY_DIAGNOSTIC,
-    MESH: ENTITY_CATEGORY_DIAGNOSTIC,
-    ZIGBEE: ENTITY_CATEGORY_DIAGNOSTIC,
-    "battery": ENTITY_CATEGORY_DIAGNOSTIC,
-    "battery_charging": ENTITY_CATEGORY_DIAGNOSTIC,
-    "battery_low": ENTITY_CATEGORY_DIAGNOSTIC,
-    "battery_percent": ENTITY_CATEGORY_DIAGNOSTIC,
-    "battery_voltage": ENTITY_CATEGORY_DIAGNOSTIC,
-    "blind_time": ENTITY_CATEGORY_CONFIG,
-    "charge_protect": ENTITY_CATEGORY_CONFIG,
-    "child_mode": ENTITY_CATEGORY_CONFIG,
-    "chip_temperature": ENTITY_CATEGORY_DIAGNOSTIC,
-    "cloud_link": ENTITY_CATEGORY_DIAGNOSTIC,
-    "display_unit": ENTITY_CATEGORY_CONFIG,
-    "fault": ENTITY_CATEGORY_DIAGNOSTIC,
-    "flex_switch": ENTITY_CATEGORY_CONFIG,
-    "led": ENTITY_CATEGORY_CONFIG,
-    "idle_time": ENTITY_CATEGORY_DIAGNOSTIC,
-    "max_power": ENTITY_CATEGORY_DIAGNOSTIC,
-    "mode": ENTITY_CATEGORY_CONFIG,
-    "motor_reverse": ENTITY_CATEGORY_CONFIG,
-    "motor_speed": ENTITY_CATEGORY_CONFIG,
-    "occupancy_timeout": ENTITY_CATEGORY_CONFIG,
-    "power_on_state": ENTITY_CATEGORY_CONFIG,
-    "sensitivity": ENTITY_CATEGORY_CONFIG,
-    "wireless": ENTITY_CATEGORY_CONFIG,
-    "wireless_1": ENTITY_CATEGORY_CONFIG,
-    "wireless_2": ENTITY_CATEGORY_CONFIG,
-    "wireless_3": ENTITY_CATEGORY_CONFIG,
+    BLE: EntityCategory.DIAGNOSTIC,
+    GATEWAY: EntityCategory.DIAGNOSTIC,
+    MESH: EntityCategory.DIAGNOSTIC,
+    ZIGBEE: EntityCategory.DIAGNOSTIC,
+    "battery": EntityCategory.DIAGNOSTIC,
+    "battery_charging": EntityCategory.DIAGNOSTIC,
+    "battery_low": EntityCategory.DIAGNOSTIC,
+    "battery_percent": EntityCategory.DIAGNOSTIC,
+    "battery_voltage": EntityCategory.DIAGNOSTIC,
+    "blind_time": EntityCategory.CONFIG,
+    "charge_protect": EntityCategory.CONFIG,
+    "child_mode": EntityCategory.CONFIG,
+    "chip_temperature": EntityCategory.DIAGNOSTIC,
+    "cloud_link": EntityCategory.DIAGNOSTIC,
+    "display_unit": EntityCategory.CONFIG,
+    "fault": EntityCategory.DIAGNOSTIC,
+    "flex_switch": EntityCategory.CONFIG,
+    "led": EntityCategory.CONFIG,
+    "idle_time": EntityCategory.DIAGNOSTIC,
+    "max_power": EntityCategory.DIAGNOSTIC,
+    "mode": EntityCategory.CONFIG,
+    "motor_reverse": EntityCategory.CONFIG,
+    "motor_speed": EntityCategory.CONFIG,
+    "occupancy_timeout": EntityCategory.CONFIG,
+    "power_on_state": EntityCategory.CONFIG,
+    "sensitivity": EntityCategory.CONFIG,
+    "wireless": EntityCategory.CONFIG,
+    "wireless_1": EntityCategory.CONFIG,
+    "wireless_2": EntityCategory.CONFIG,
+    "wireless_3": EntityCategory.CONFIG,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)
@@ -170,15 +120,6 @@ class XEntity(Entity):
         self._attr_unique_id = device.attr_unique_id(attr)
         self._attr_entity_category = ENTITY_CATEGORIES.get(attr)
         self.entity_id = device.entity_id(conv)
-
-        if conv.domain == "sensor":  # binary_sensor moisture problem
-            self._attr_native_unit_of_measurement = UNITS.get(attr)
-
-            if attr in STATE_CLASSES:
-                self._attr_state_class = STATE_CLASSES[attr]
-            elif attr in UNITS:
-                # by default all sensors with units is measurement sensors
-                self._attr_state_class = STATE_CLASS_MEASUREMENT
 
         if device.model == MESH_GROUP_MODEL:
             connections = None
