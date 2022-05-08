@@ -170,7 +170,7 @@ class DataSelect(XEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Can process user step, done by user from this select"""
-        coro = getattr(self, f"step_user_{self.step_id}")
+        coro = getattr(self, f"step_user_{self.step_id}", None)
         if coro:
             await coro(option)
 
@@ -186,7 +186,6 @@ class DataSelect(XEntity, SelectEntity):
             # change select.command
             self.device.update({"command": "pair"})
         else:
-            self.set_options(OPT_STOP_JOIN)
             # clear select.command
             self.device.update({"command": None})
 
@@ -199,10 +198,12 @@ class DataSelect(XEntity, SelectEntity):
 
     def step_event_pair_command(self, value: dict):
         secure = value["install_code"]
-        self.set_options(OPT_KEY_SECURE if secure else OPT_KEY_LEGACY)
+        option = OPT_KEY_SECURE if secure else OPT_KEY_LEGACY
+        self.set_options(option, self.options + [option])
 
     def step_event_added_device(self, value: dict):
-        self.set_end(f"Paired: {value['mac']} ({value['model']})")
+        option = f"Paired: {value['model']}"
+        self.set_options(option, self.options + [option])
 
     def step_event_remove_did(self, value: str):
         device = self.gw.devices.get(value)
