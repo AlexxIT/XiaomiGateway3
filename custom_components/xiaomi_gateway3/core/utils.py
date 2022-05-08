@@ -57,9 +57,12 @@ def remove_stats(hass: HomeAssistant, entry_id: str):
 
 
 async def remove_zigbee(unique_id: str):
-    device: XDevice = next(
-        d for d in XGateway.devices.values() if d.unique_id == unique_id
-    )
+    try:
+        device: XDevice = next(
+            d for d in XGateway.devices.values() if d.unique_id == unique_id
+        )
+    except StopIteration:
+        return
     # delete device from all gateways
     for gw in device.gateways:
         payload = gw.device.encode({"remove_did": device.did})
