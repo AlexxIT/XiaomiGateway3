@@ -33,6 +33,7 @@ MD5_BT = {
     '1.5.1_0032': '9290241cd9f1892d2ba84074f07391d4',
     '1.5.4_0052': '9290241cd9f1892d2ba84074f07391d4', # temporary old version
     '1.5.4_0084': '9290241cd9f1892d2ba84074f07391d4', # temporary old version
+    '1.5.4_0090': '9290241cd9f1892d2ba84074f07391d4', # temporary old version
 }
 MD5_BUSYBOX = '099137899ece96f311ac5ab554ea6fec'
 # MD5_GW3 = 'c81b91816d4b9ad9bb271a5567e36ce9'  # alpha
