@@ -76,13 +76,13 @@ class XiaomiBaseSensor(XEntity, SensorEntity):
     def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
         XEntity.__init__(self, gateway, device, conv)
 
-        if self.attr in STATE_CLASSES:
-            self._attr_state_class = STATE_CLASSES[self.attr]
-
-        elif self.attr in UNITS:
+        if self.attr in UNITS:
             # by default all sensors with units is measurement sensors
             self._attr_state_class = SensorStateClass.MEASUREMENT
             self._attr_native_unit_of_measurement = UNITS[self.attr]
+
+        if self.attr in STATE_CLASSES:
+            self._attr_state_class = STATE_CLASSES[self.attr]
 
     @callback
     def async_set_state(self, data: dict):
