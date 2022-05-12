@@ -141,7 +141,7 @@ class XiaomiStats(XiaomiBaseSensor):
 
 class XiaomiAction(XiaomiBaseSensor):
     _attr_native_value = ""
-    orig_attrs: dict = None
+    native_attrs: dict = None
     clear_task: Task = None
 
     async def clear_state(self):
@@ -152,7 +152,7 @@ class XiaomiAction(XiaomiBaseSensor):
 
     async def async_added_to_hass(self):
         await XEntity.async_added_to_hass(self)
-        self.orig_attrs = self._attr_extra_state_attributes
+        self.native_attrs = self._attr_extra_state_attributes
 
     async def async_will_remove_from_hass(self):
         if self.clear_task:
@@ -174,11 +174,14 @@ class XiaomiAction(XiaomiBaseSensor):
             self.clear_task.cancel()
 
         self._attr_native_value = data[self.attr]
-        self._attr_extra_state_attributes = {**self.orig_attrs, **data}
+        if self.native_attrs:
+            self._attr_extra_state_attributes = {**self.native_attrs, **data}
+        else:
+            self._attr_extra_state_attributes = data
 
         # repeat event from Aqara integration
         self.hass.bus.async_fire("xiaomi_aqara.click", {
-            "entity_id": self.entity_id, "click_type": self._attr_state
+            "entity_id": self.entity_id, "click_type": self.native_value
         })
 
         self.clear_task = self.hass.loop.create_task(self.clear_state())
