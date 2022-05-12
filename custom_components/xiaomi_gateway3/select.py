@@ -5,7 +5,7 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from . import DOMAIN
 from .core import utils
 from .core.converters import Converter
-from .core.device import XDevice
+from .core.device import XDevice, RE_DID
 from .core.entity import XEntity
 from .core.gateway import XGateway
 
@@ -206,8 +206,9 @@ class DataSelect(XEntity, SelectEntity):
         self.set_options(option, self.options + [option])
 
     def step_event_remove_did(self, value: str):
+        assert RE_DID.search(value)
         device = self.gw.devices.get(value)
-        utils.remove_device(self.hass, device.mac)
+        utils.remove_device(self.hass, device)
         self.set_end(f"Removed: {value[5:]}")
 
     def step_event_ota_progress(self, value: int):
