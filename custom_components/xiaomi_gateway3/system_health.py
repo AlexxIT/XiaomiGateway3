@@ -23,7 +23,7 @@ def async_register(
     register.async_register_info(system_health_info)
 
 
-async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
+async def system_health_info(hass: HomeAssistant):
     integration = hass.data["integrations"][DOMAIN]
     info = {"version": f"{integration.version} ({source_hash()})"}
 
