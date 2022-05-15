@@ -282,6 +282,8 @@ class LockActionConv(Converter):
             payload["action"] = "error"
             payload["error"] = self.attr
             payload[self.attr] = value
+        elif self.attr in ("error", "method"):
+            payload[self.attr] = self.map.get(value)
 
 
 @dataclass

@@ -425,6 +425,12 @@ DEVICES += [{
         # other sensors
         Converter("battery", "sensor", mi="8.0.2001"),
         LockActionConv("key_id", "sensor", mi="13.1.85"),
+        LockActionConv("method", mi="13.15.85", map={
+            1: "fingerprint", 2: "password"
+        }),
+        LockActionConv("error", mi="13.4.85", map={
+            1: "Wrong password", 2: "Wrong fingerprint"
+        }),
         # BoolConv("lock", "binary_sensor", mi="13.20.85")
         Action,
     ],
