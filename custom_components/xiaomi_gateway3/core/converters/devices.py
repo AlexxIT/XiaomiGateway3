@@ -888,6 +888,17 @@ DEVICES += [{
             1: "single_click", 2: "multi_click"
         }, enabled=False)
     ]
+}, {
+    "lumi.sensor_smoke.acn03": ["Aqara", "Smoke Sensor", "JY-GZ-01AQ"],
+    "spec": [
+        BoolConv("smoke", "binary_sensor", mi="2.p.1"),
+        BoolConv("problem", "binary_sensor", mi="2.p.2", enabled=False),
+        Converter("smoke_density", "sensor", mi="2.p.3"),
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
+                enabled=False),
+        Converter("battery_voltage", "sensor", mi="3.p.2", enabled=False),
+        BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+    ]
 }]
 
 ###############################################################################
