@@ -1019,6 +1019,15 @@ DEVICES += [{
         ZTuyaPlugModeConv("mode", "select", enabled=False),
     ],
 }, {
+    "RH3052": ["Tuya", "TH sensor", "TT001ZAV20"],
+    "support": 3,
+    "spec": [
+        ZTemperatureConv("temperature", "sensor"),
+        ZHumidityConv("humidity", "sensor"),
+        # value always 100%
+        # ZBatteryConv("battery", "sensor"),
+    ],
+}, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
