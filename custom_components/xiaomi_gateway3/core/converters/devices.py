@@ -1497,8 +1497,11 @@ DEVICES += [{
     4896: ["Xiaomi", "Mesh Power Strip 2", "XMZNCXB01QM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),  # bool
+        Converter("mode", "switch", mi="2.p.2"), # int8
         MathConv("temperature", "sensor", mi="2.p.3", round=2),  # float
-    ],
+        MathConv("power_consumption", "sensor", mi="3.p.1", round=2),  # float
+        MathConv("electric_power", "sensor", mi="3.p.2", round=2)  # float
+    ]
 }, {
     3129: ["Xiaomi", "Smart Curtain Motor", "MJSGCLBL01LM"],
     "spec": [
