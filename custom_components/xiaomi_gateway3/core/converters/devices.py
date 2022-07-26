@@ -1534,6 +1534,60 @@ DEVICES += [{
         Converter("channel_3", "switch", mi="4.p.1"),
     ],
 }, {
+    6379: ["Xiaomi", "Mesh Wall Switch (Neutral Wire)", "XMQBKG01LM"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        Converter("led", "switch", mi="7.p.1", enabled=False),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button", mi="6.e.1", value=1),
+        MapConv("device_fault", mi="2.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }), 
+        ],
+}, {
+    6380: ["Xiaomi", "Mesh Double Wall Switch (Neutral Wire)", "XMQBKG02LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("led", "switch", mi="5.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="6.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.1", value=1),
+        MapConv("device_fault_1", mi="2.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }),
+        MapConv("device_fault_2", mi="3.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }),
+    ],
+}, {
+    6381: ["Xiaomi", "Mesh Triple Wall Switch (Neutral Wire)", "XMQBKG03LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("led", "switch", mi="9.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="6.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.1", value=1),
+        ButtonMIConv("button_3", mi="8.e.1", value=1),
+        MapConv("device_fault_1", mi="2.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }),
+        MapConv("device_fault_2", mi="3.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }),
+        MapConv("device_fault_3", mi="4.p.3", map={
+            0: "nofaults", 1: "overtemperature", 2: "overload", 3: "overtemperature-overload"
+        }),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
