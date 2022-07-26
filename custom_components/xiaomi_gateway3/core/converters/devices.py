@@ -1511,6 +1511,19 @@ DEVICES += [{
         BoolConv("light", "binary_sensor", mi="3.p.11")
     ],
 }, {
+    3789: ["PTX", "Mesh Double Wall Switch", "090615.switch.meshk2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+    ],
+}, {
+    3788: ["PTX", "Mesh Triple Wall Switch", "090615.switch.meshk3"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
