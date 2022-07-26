@@ -1588,6 +1588,17 @@ DEVICES += [{
         }),
     ],
 }, {
+    5195: ["YKGC", "LS Smart Curtain Motor", "LSCL"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={
+            0: "stop", 1: "open", 2: "close"
+            }),
+        Converter("target_position", mi="2.p.6"),
+        CurtainPosConv("position", mi="2.p.2", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.5", enabled=False),
+        BoolConv("on", "switch", mi="2.p.9"),       
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
