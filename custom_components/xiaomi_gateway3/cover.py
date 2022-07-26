@@ -38,7 +38,7 @@ class XiaomiCover(XEntity, CoverEntity, RestoreEntity):
         if 'position' in data:
             self._attr_current_cover_position = data['position']
             # https://github.com/AlexxIT/XiaomiGateway3/issues/771
-            self._attr_is_closed = self._attr_current_cover_position <= 1
+            self._attr_is_closed = self._attr_current_cover_position <= 2
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
