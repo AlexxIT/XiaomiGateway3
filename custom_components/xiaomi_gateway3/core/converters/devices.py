@@ -1019,6 +1019,15 @@ DEVICES += [{
         ZTuyaPlugModeConv("mode", "select", enabled=False),
     ],
 }, {
+    "RH3052": ["Tuya", "TH sensor", "TT001ZAV20"],
+    "support": 3,
+    "spec": [
+        ZTemperatureConv("temperature", "sensor"),
+        ZHumidityConv("humidity", "sensor"),
+        # value always 100%
+        # ZBatteryConv("battery", "sensor"),
+    ],
+}, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
@@ -1497,10 +1506,13 @@ DEVICES += [{
     4896: ["Xiaomi", "Mesh Power Strip 2", "XMZNCXB01QM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),  # bool
-        Converter("mode", "switch", mi="2.p.2"), # int8
-        MathConv("chip_temperature", "sensor", mi="2.p.3", round=2),  # float
-        MathConv("power_consumption", "sensor", mi="3.p.1", round=2),  # float
-        MathConv("electric_power", "sensor", mi="3.p.2", round=2)  # float
+        Converter("mode", "switch", mi="2.p.2"),  # int8
+        MathConv("chip_temperature", "sensor", mi="2.p.3", round=2,
+                 enabled=False),  # float
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),  # float
+        MathConv("voltage", "sensor", mi="3.p.3"),  # float
+        MathConv("current", "sensor", mi="3.p.4"),  # float
     ]
 }, {
     3129: ["Xiaomi", "Smart Curtain Motor", "MJSGCLBL01LM"],
