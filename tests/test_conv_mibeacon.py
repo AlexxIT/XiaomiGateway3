@@ -1,4 +1,8 @@
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core.device import XDevice, BLE
+
+assert DOMAIN  # fix circular import
 
 DID = "blt.3.abc"
 MAC = "112233aabbcc"
@@ -47,5 +51,20 @@ def test_lock():
     assert device.info.name == "Aqara Door Lock N100 (Bluetooth)"
     device.setup_converters()
 
-    p = device.decode("mibeacon", {'eid': 4106, 'edata': '3259f80362'})
+    p = device.decode("mibeacon", {'eid': 4106, 'edata': '329aaecd62'})
     assert p == {'battery': 50}
+
+    p = device.decode("mibeacon", {"eid": 11, "edata": "a400000000b8aecd62"})
+    assert p
+
+    p = device.decode("mibeacon", {"eid": 7, "edata": "00c5aecd62"})
+    assert p
+
+    p = device.decode("mibeacon", {"eid": 7, "edata": "01cbaecd62"})
+    assert p
+
+    p = device.decode("mibeacon", {"eid": 11, "edata": "2002000180c4aecd62"})
+    assert p
+
+    p = device.decode("mibeacon", {"eid": 6, "edata": "ffffffff00"})
+    assert p

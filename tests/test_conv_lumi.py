@@ -114,7 +114,7 @@ def test_lock_s2():
         {"res_name": "13.1.85", "value": 65536},
         {"res_name": "13.15.85", "value": 1}
     ])
-    assert p == {'action': 'lock', 'key_id': 65536}
+    assert p == {'action': 'lock', 'key_id': 65536, 'method': 'fingerprint'}
 
 
 def test_lock_s2_pro():

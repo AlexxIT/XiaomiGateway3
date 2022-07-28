@@ -425,6 +425,12 @@ DEVICES += [{
         # other sensors
         Converter("battery", "sensor", mi="8.0.2001"),
         LockActionConv("key_id", "sensor", mi="13.1.85"),
+        LockActionConv("method", mi="13.15.85", map={
+            1: "fingerprint", 2: "password"
+        }),
+        LockActionConv("error", mi="13.4.85", map={
+            1: "Wrong password", 2: "Wrong fingerprint"
+        }),
         # BoolConv("lock", "binary_sensor", mi="13.20.85")
         Action,
     ],
@@ -888,6 +894,17 @@ DEVICES += [{
             1: "single_click", 2: "multi_click"
         }, enabled=False)
     ]
+}, {
+    "lumi.sensor_smoke.acn03": ["Aqara", "Smoke Sensor", "JY-GZ-01AQ"],
+    "spec": [
+        BoolConv("smoke", "binary_sensor", mi="2.p.1"),
+        BoolConv("problem", "binary_sensor", mi="2.p.2", enabled=False),
+        Converter("smoke_density", "sensor", mi="2.p.3"),
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
+                enabled=False),
+        Converter("battery_voltage", "sensor", mi="3.p.2", enabled=False),
+        BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+    ]
 }]
 
 ###############################################################################
@@ -1000,6 +1017,15 @@ DEVICES += [{
         ZOnOffConv("channel_2", "light", ep=2, bind=True),
         ZTuyaPowerOn,
         ZTuyaPlugModeConv("mode", "select", enabled=False),
+    ],
+}, {
+    "RH3052": ["Tuya", "TH sensor", "TT001ZAV20"],
+    "support": 3,
+    "spec": [
+        ZTemperatureConv("temperature", "sensor"),
+        ZHumidityConv("humidity", "sensor"),
+        # value always 100%
+        # ZBatteryConv("battery", "sensor"),
     ],
 }, {
     # very simple relays
@@ -1476,6 +1502,19 @@ DEVICES += [{
         BoolConv("light", "binary_sensor", mi="3.p.1")  # uint8 0-Dark 1-Bright
     ],
 }, {
+    # urn:miot-spec-v2:device:outlet:0000A002:qmi-psv3:1:0000C816小米智能插线板2 5位插孔
+    4896: ["Xiaomi", "Mesh Power Strip 2", "XMZNCXB01QM"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),  # bool
+        Converter("mode", "switch", mi="2.p.2"),  # int8
+        MathConv("chip_temperature", "sensor", mi="2.p.3", round=2,
+                 enabled=False),  # float
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=2),  # float
+        MathConv("voltage", "sensor", mi="3.p.3"),  # float
+        MathConv("current", "sensor", mi="3.p.4"),  # float
+    ]
+}, {
     3129: ["Xiaomi", "Smart Curtain Motor", "MJSGCLBL01LM"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={
@@ -1492,6 +1531,19 @@ DEVICES += [{
             1: True, 2: False, 3: False,
         }, enabled=False),
         BoolConv("light", "binary_sensor", mi="3.p.11")
+    ],
+}, {
+    3789: ["PTX", "Mesh Double Wall Switch", "090615.switch.meshk2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+    ],
+}, {
+    3788: ["PTX", "Mesh Triple Wall Switch", "090615.switch.meshk3"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
     ],
 }, {
     "default": "mesh",  # default Mesh device
