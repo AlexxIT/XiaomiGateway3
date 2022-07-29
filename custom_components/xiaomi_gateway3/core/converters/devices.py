@@ -344,6 +344,16 @@ DEVICES += [{
         Battery, BatteryOrig
     ],
 }, {
+    # motion sensor E1 with illuminance
+    "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
+    "spec": [
+        EventConv("motion", "binary_sensor", mi="2.e.1", value=True),
+        Converter("illuminance", "sensor", mi="2.p.1"),
+        BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
+                enabled=False)
+    ],
+}, {
     # water leak sensor
     "lumi.sensor_wleak.aq1": ["Aqara", "Water Leak Sensor", "SJCGQ11LM"],
     "spec": [
@@ -522,7 +532,7 @@ DEVICES += [{
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
     # "support": 5,  # @zvldz
     "spec": [
-        ConstConv("motion", "binary_sensor", mi="4.e.1", value=True),
+        EventConv("motion", "binary_sensor", mi="4.e.1", value=True),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
         MapConv("sensitivity", "select", mi="8.p.1", map={
             1: "low", 2: "medium", 3: "high"

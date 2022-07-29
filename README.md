@@ -198,6 +198,7 @@ Aqara|Double Wall Switch H1 EU (no N)|[WS-EUK02](https://home.miot-spec.com/s/lu
 Aqara|Double Wall Switch H1 EU (with N)|[WS-EUK04](https://home.miot-spec.com/s/lumi.switch.n2aeu1)|channel_1, channel_2, energy, power, action, led, led_reverse, power_on_state, wireless_1, wireless_2|
 Aqara|Double Wall Switch US (with N)|[WS-USC04](https://home.miot-spec.com/s/lumi.switch.b2naus01)|channel_1, channel_2, action, energy, power, led, power_on_state, wireless_1, wireless_2|
 Aqara|Motion Sensor|[RTCGQ11LM](https://home.miot-spec.com/s/lumi.sensor_motion.aq2)|motion, illuminance, battery|
+Aqara|Motion Sensor E1|[RTCGQ15LM](https://home.miot-spec.com/s/lumi.motion.acn001)|motion, illuminance, battery|
 Aqara|Opple Four Button CN|[WXCJKG12LM](https://home.miot-spec.com/s/lumi.remote.b486opcn01)|mode, action, battery, battery_low, chip_temperature|
 Aqara|Opple MX480 CN|[XDD13LM](https://home.miot-spec.com/s/lumi.light.cwopcn03)|light|
 Aqara|Opple MX650 CN|[XDD12LM](https://home.miot-spec.com/s/lumi.light.cwopcn02)|light|
