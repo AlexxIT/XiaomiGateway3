@@ -328,6 +328,12 @@ class GasSensitivityWriteConv(Converter):
         pass
 
 
+class MotionIlluminanceConv(Converter):
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload["motion"] = bool(value)
+        payload.update(**device.decode_lumi(value))
+
+
 class ParentConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: str):
         try:
