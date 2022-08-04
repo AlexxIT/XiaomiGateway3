@@ -74,6 +74,8 @@ class XDevice:
 
         # TODO: assert mac
         self.type = type
+        if type == ZIGBEE:
+            model = model[:-19] if model[-19:-14] == "lumi." else model  # Remove the IEEE suffix from model after the LOOCK door sensor paired
         self.model = model
         self.did = did
         self.mac = mac
