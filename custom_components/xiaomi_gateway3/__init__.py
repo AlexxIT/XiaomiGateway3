@@ -149,6 +149,14 @@ async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     data: dict = config_entry.data.copy()
 
+    # quick fix Hass 2022.8 - parallel integration loading
+    # so Gateway loads before the Cloud with default devices names
+    store = Store(hass, 1, f"{DOMAIN}/{data['username']}.json")
+    devices = await store.async_load()
+    if devices:
+        _LOGGER.debug(f"Loaded from cache {len(devices)} devices")
+        _update_devices(devices)
+
     session = ac.async_create_clientsession(hass)
     hass.data[DOMAIN]['cloud'] = cloud = MiCloud(session, data['servers'])
 
@@ -173,16 +181,11 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         else:
             _LOGGER.error("Can't login to MiCloud")
 
-    # load devices from or save to .storage
-    store = Store(hass, 1, f"{DOMAIN}/{data['username']}.json")
-    if devices is None:
-        _LOGGER.debug("Loading a list of devices from the .storage")
-        devices = await store.async_load()
-    else:
+    if devices is not None:
         _LOGGER.debug(f"Loaded from MiCloud {len(devices)} devices")
+        _update_devices(devices)
         await store.async_save(devices)
-
-    if devices is None:
+    else:
         _LOGGER.debug("No devices in .storage")
         return False
 
@@ -201,6 +204,16 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         XGateway.defaults[did].setdefault('name', device['name'])
 
     return True
+
+
+def _update_devices(devices: list):
+    for device in devices:
+        # key - mac for BLE, and did for others
+        did = device['did'] if device['pid'] not in '6' else \
+            device['mac'].replace(':', '').lower()
+        XGateway.defaults.setdefault(did, {})
+        # don't override name if exists
+        XGateway.defaults[did].setdefault('name', device['name'])
 
 
 def _register_send_command(hass: HomeAssistant):
