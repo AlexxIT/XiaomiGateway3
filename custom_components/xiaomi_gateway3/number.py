@@ -42,7 +42,7 @@ class XiaomiNumber(XEntity, NumberEntity):
     def async_restore_last_state(self, state: float, attrs: dict):
         self._attr_value = state
 
-    async def async_set_value(self, value: float):
+    async def async_set_native_value(self, value: float):
         await self.device_send({self.attr: value})
 
     async def async_update(self):
