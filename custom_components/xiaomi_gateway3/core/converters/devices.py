@@ -32,7 +32,6 @@ Converter may have different types:
 
 - Converter - default, don't change/convert value
 - BoolConv - converts int to bool on decode and bool to int on encode
-- ConstConv - set constant value on any input
 - MapConv - translate value using mapping: `{0: "disarmed", 1: "armed_home"}`
 - MathConv - support multiply, round value and min/max borders
 - BrightnessConv - converts `0..<max>` to `0..255`, support set `max` value
