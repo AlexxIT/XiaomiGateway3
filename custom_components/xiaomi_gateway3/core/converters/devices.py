@@ -1323,6 +1323,7 @@ DEVICES += [{
 }, {
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
+    4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
