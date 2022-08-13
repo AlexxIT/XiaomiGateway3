@@ -5,7 +5,9 @@ from homeassistant.components.homeassistant.triggers import \
     state as state_trigger
 from homeassistant.const import *
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers import (
+    device_registry as dr, entity_registry as er
+)
 
 from . import DOMAIN
 from .core import converters
@@ -20,7 +22,7 @@ TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
 
 
 async def async_attach_trigger(hass, config, action, automation_info):
-    entity_registry = await hass.helpers.entity_registry.async_get_registry()
+    entity_registry = er.async_get(hass)
 
     device_id = config[CONF_DEVICE_ID]
     entry = next((
@@ -49,8 +51,8 @@ async def async_attach_trigger(hass, config, action, automation_info):
 
 
 async def async_get_triggers(hass, device_id):
-    device_registry = await hass.helpers.device_registry.async_get_registry()
-    device: DeviceEntry = device_registry.async_get(device_id)
+    device_registry = dr.async_get(hass)
+    device: dr.DeviceEntry = device_registry.async_get(device_id)
     buttons = converters.get_buttons(device.model)
     if not buttons:
         return None
