@@ -1,4 +1,5 @@
 from homeassistant.components.number import NumberEntity
+from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
 from homeassistant.core import callback
 
 from . import DOMAIN
@@ -42,8 +43,13 @@ class XiaomiNumber(XEntity, NumberEntity):
     def async_restore_last_state(self, state: float, attrs: dict):
         self._attr_value = state
 
-    async def async_set_value(self, value: float):
-        await self.device_send({self.attr: value})
-
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
+
+    # backward compatibility fix
+    if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 8):
+        async def async_set_native_value(self, value: float) -> None:
+            await self.device_send({self.attr: value})
+    else:
+        async def async_set_value(self, value: float) -> None:
+            await self.device_send({self.attr: value})

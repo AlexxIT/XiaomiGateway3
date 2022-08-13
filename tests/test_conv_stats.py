@@ -1,8 +1,12 @@
 from datetime import datetime
 
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core.converters import stats, GATEWAY, \
     ZIGBEE
 from custom_components.xiaomi_gateway3.core.device import XDevice
+
+assert DOMAIN  # fix circular import
 
 DID = "123456789"
 MAC = "112233aabbcc"
@@ -81,6 +85,20 @@ def test_zigbee_stats():
         'zigbee': p['zigbee'],
         # 'ieee': '0x00158D0000AABBCC', 'nwk': '0x9B43',
         'msg_received': 2, 'msg_missed': 1,
+        'linkquality': 156,
+        'rssi': -61, 'last_msg': 'Time'
+    }
+
+    p = device.decode(ZIGBEE, {
+        'sourceAddress': '0x9B43', 'eui64': '0x00158D0000AABBCC',
+        'destinationEndpoint': '0x01', 'clusterId': '0x000A',
+        'profileId': '0x0104', 'sourceEndpoint': '0x01', 'APSCounter': '0x72',
+        'APSPlayload': '0x1074000000', 'rssi': -61, 'linkQuality': 156
+    })
+    assert p == {
+        'zigbee': p['zigbee'],
+        # 'ieee': '0x00158D0000AABBCC', 'nwk': '0x9B43',
+        'msg_received': 3, 'msg_missed': 1,
         'linkquality': 156,
         'rssi': -61, 'last_msg': 'Time'
     }
