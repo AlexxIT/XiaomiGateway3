@@ -1400,6 +1400,7 @@ DEVICES += [{
                  min=0, max=1638400, enabled=False),
     ],
 }, {
+    5937: ["Xiaomi", "Mesh Triple Wall Switch", "DHKG05"],
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M"],
     "spec": [
