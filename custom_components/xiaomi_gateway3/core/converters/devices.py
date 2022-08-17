@@ -1036,6 +1036,14 @@ DEVICES += [{
         # value always 100%
         # ZBatteryConv("battery", "sensor"),
     ],
+}, {    
+    "RH3040": ["Tuya", "Motion Sensor", "TYZPIR-02"],
+    "support": 5,
+    "ttl": 6 * 60 * 60,
+    "spec": [
+        ZIASZoneConv("occupancy", "binary_sensor"),
+        ZBatteryConv("battery", "sensor", report="1h 12h 0"),
+    ],
 }, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
