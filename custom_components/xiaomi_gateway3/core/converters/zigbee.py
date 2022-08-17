@@ -214,7 +214,7 @@ class ZIASZoneConv(ZConverter):
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
         try:
-            payload[self.attr] = value["value"][0] == 1
+            payload[self.attr] = (value["value"][0] & 1) > 0
         except Exception:
             pass
 
