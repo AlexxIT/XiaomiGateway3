@@ -191,6 +191,10 @@ class OptionsFlowHandler(OptionsFlow):
                     self.hass.data[DOMAIN]["cloud"],
                     device["localip"], device["token"],
                 )
+            elif device["model"] == "yeelink.light.bslamp2":
+                device_info += "\nLAN mode: " + await utils.enable_bslamp2_lan(
+                    device["localip"], device["token"]
+                )
 
         elif not self.hass.data[DOMAIN].get("devices"):
             device_info = "No devices in account"

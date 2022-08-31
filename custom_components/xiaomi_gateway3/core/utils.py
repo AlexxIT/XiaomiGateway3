@@ -226,6 +226,19 @@ async def get_bindkey(cloud: MiCloud, did: str):
     return bindkey
 
 
+async def enable_bslamp2_lan(host: str, token: str):
+    device = AsyncMiIO(host, token)
+    resp = await device.send("get_prop", ["lan_ctrl"])
+    if not resp:
+        return "Can't connect to lamp"
+    if resp.get("result") == ["1"]:
+        return "Already enabled"
+    resp = await device.send("set_ps", ["cfg_lan_ctrl", "1"])
+    if resp.get("result") == ["ok"]:
+        return "Enabled"
+    return "Can't enable LAN"
+
+
 NCP_URL = "https://master.dl.sourceforge.net/project/mgl03/zigbee/%s?viasf=1"
 
 
