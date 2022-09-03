@@ -1244,6 +1244,10 @@ DEVICES += [{
     ],
     "ttl": "725m"  # battery every 4 hour
 }, {
+    6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
+    "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
+    "ttl": "16m",  # battery every 5 min
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
