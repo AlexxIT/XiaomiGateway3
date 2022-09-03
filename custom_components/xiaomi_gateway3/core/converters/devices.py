@@ -1417,6 +1417,13 @@ DEVICES += [{
         BoolConv("wireless_3", "switch", mi="8.p.4", enabled=False),
     ],
 }, {
+    8255: ["ZNSN", "Mesh Wall Switch ML3", "zm3d"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+    ],
+}, {
     2715: ["Xiaomi", "Mesh Single Wall Switch", "ZNKG01HL"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
