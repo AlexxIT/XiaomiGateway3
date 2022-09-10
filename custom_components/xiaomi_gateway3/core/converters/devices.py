@@ -1256,6 +1256,12 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
     "ttl": "16m",  # battery every 5 min
 }, {
+    10987: ["Linptech", "Linptech Motion Sensor v2", "hs1bb"],
+    "spec": [
+        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
+        Converter("idle_time", "sensor", enabled=False),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
