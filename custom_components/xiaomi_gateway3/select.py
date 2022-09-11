@@ -72,6 +72,10 @@ class CommandSelect(XEntity, SelectEntity):
             self._attr_options = [
                 "pair", "bind", "ota", "config", "parentscan", "reboot", "ftp"
             ]
+        elif device.model.startswith("lumi.gateway.mcn001"):
+            self._attr_options = [
+                "pair", "bind", "ota", "config", "parentscan", "reboot", "ftp"
+            ]
 
     @callback
     def async_set_state(self, data: dict):

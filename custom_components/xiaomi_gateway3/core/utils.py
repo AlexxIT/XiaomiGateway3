@@ -27,7 +27,7 @@ from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
 
 SUPPORTED_MODELS = (
-    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03'
+    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03', 'lumi.gateway.mcn001'
 )
 
 _LOGGER = logging.getLogger(__name__)
