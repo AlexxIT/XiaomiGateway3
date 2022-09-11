@@ -22,6 +22,7 @@ from .base import SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, SIGNAL_MQTT_DIS, \
     SIGNAL_MQTT_PUB, SIGNAL_TIMER
 from .gate_e1 import GateE1
 from .gate_gw3 import GateGW3
+from .gate_hubv2 import GateHubV2
 from .. import shell
 from ..converters import GATEWAY
 from ..mini_miio import AsyncMiIO
@@ -30,7 +31,7 @@ from ..mini_mqtt import MiniMQTT, MQTTMessage
 _LOGGER = logging.getLogger(__name__)
 
 
-class XGateway(GateGW3, GateE1):
+class XGateway(GateGW3, GateE1, GateHubV2):
     main_task: asyncio.Task = None
     timer_task: asyncio.Task = None
 
@@ -177,6 +178,8 @@ class XGateway(GateGW3, GateE1):
                     return await self.gw3_prepare_gateway(sh)
                 elif isinstance(sh, shell.ShellE1):
                     return await self.e1_prepare_gateway(sh)
+                elif isinstance(sh, shell.ShellHubV2):
+                    return await self.hubv2_prepare_gateway(sh)
 
         except Exception as e:
             self.error(f"Can't prepare gateway", e)

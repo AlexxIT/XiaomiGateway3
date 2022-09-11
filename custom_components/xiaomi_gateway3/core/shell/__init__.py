@@ -5,6 +5,7 @@ from typing import Union
 from .base import TelnetShell
 from .shell_e1 import ShellE1
 from .shell_gw3 import ShellGw3
+from .shell_hubv2 import ShellHubV2
 
 
 class Session:
@@ -29,7 +30,7 @@ class Session:
         self.writer.close()
         await self.writer.wait_closed()
 
-    async def login(self) -> Union[TelnetShell, ShellGw3, ShellE1]:
+    async def login(self) -> Union[TelnetShell, ShellGw3, ShellE1, ShellHubV2]:
         coro = self.reader.readuntil(b"login: ")
         resp: bytes = await asyncio.wait_for(coro, 3)
 
@@ -37,6 +38,8 @@ class Session:
             shell = ShellGw3(self.reader, self.writer)
         elif b"Aqara-Hub-E1" in resp:
             shell = ShellE1(self.reader, self.writer)
+        elif b"Mijia_Hub_V2" in resp:
+            shell = ShellHubV2(self.reader, self.writer)
         else:
             raise Exception(f"Unknown response: {resp}")
 
