@@ -86,7 +86,7 @@ class GateHubV2(LumiGateway, SilabsGateway, Z3Gateway):
                     "free_mem": int(free_mem),
                     "load_avg": load_avg.decode(),
                     "run_time": int(run_time),
-                    "rssi": int(rssi) + 100
+                    "rssi": int(rssi) + 100 if len(rssi) >=1 else 0
                 })
                 self.device.update(payload)
 
