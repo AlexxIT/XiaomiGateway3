@@ -1037,7 +1037,7 @@ DEVICES += [{
         # value always 100%
         # ZBatteryConv("battery", "sensor"),
     ],
-}, {    
+}, {
     "RH3040": ["Tuya", "Motion Sensor", "TYZPIR-02"],
     "support": 5,
     "ttl": 6 * 60 * 60,
@@ -1253,6 +1253,16 @@ DEVICES += [{
     ],
     "ttl": "725m"  # battery every 4 hour
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/776
+    3685: ["Xiaomi", "Face Recognition Smart Door Lock X", "XMZNMS06LM"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("battery", "sensor"),
+        Converter("contact", "binary_sensor"),
+        Converter("lock", "binary_sensor"),
+    ],
+}, {
     6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
     "ttl": "16m",  # battery every 5 min
@@ -1431,7 +1441,7 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
         BoolConv("wireless_3", "switch", mi="8.p.4", enabled=False),
     ],
-[{
+}, {
     5937: ["Xiaomi", "Mesh Triple Wall Switch", "DHKG05"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
