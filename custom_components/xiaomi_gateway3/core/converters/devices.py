@@ -1420,7 +1420,6 @@ DEVICES += [{
                  min=0, max=1638400, enabled=False),
     ],
 }, {
-    5937: ["Xiaomi", "Mesh Triple Wall Switch", "DHKG05"],
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M"],
     "spec": [
@@ -1431,6 +1430,22 @@ DEVICES += [{
         BoolConv("wireless_1", "switch", mi="8.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="8.p.3", enabled=False),
         BoolConv("wireless_3", "switch", mi="8.p.4", enabled=False),
+    ],
+[{
+    5937: ["Xiaomi", "Mesh Triple Wall Switch", "DHKG05"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("led", "switch", mi="10.p.1", enabled=False),
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="5.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="6.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="7.e.1", value=1),  # single
+        Converter("anti_flick", "switch", mi="9.p.1"),
     ],
 }, {
     8255: ["ZNSN", "Mesh Wall Switch ML3", "zm3d"],
