@@ -163,7 +163,7 @@ class OptionsFlowHandler(OptionsFlow):
                 if device["did"] == did
             )
 
-            if device["pid"] != "6":
+            if device["pid"] != 6:
                 device_info = (
                     f"Name: {device['name']}\n"
                     f"Model: {device['model']}\n"
@@ -204,9 +204,9 @@ class OptionsFlowHandler(OptionsFlow):
         devices = {}
         for device in self.hass.data[DOMAIN].get("devices", []):
             # 0 - wifi, 6 - ble, 8 - wifi+ble
-            if device["pid"] in ("0", "8"):
+            if device["pid"] in (0, 8):
                 info = device["localip"]
-            elif device["pid"] == "6":
+            elif device["pid"] == 6:
                 info = "BLE"
             else:
                 continue

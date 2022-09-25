@@ -116,7 +116,9 @@ class MiCloud:
 
         total = []
         for server in self.servers:
-            resp = await self.request(server, '/home/device_list', payload)
+            resp = await self.request(
+                server, '/v2/home/device_list_page', payload
+            )
             if resp is None:
                 return None
             total += resp['list']
