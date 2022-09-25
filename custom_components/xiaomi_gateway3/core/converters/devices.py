@@ -1547,6 +1547,7 @@ DEVICES += [{
             0: "auto", 1: "battery", 2: "usb"
         }, enabled=False)
     ],
+    "ttl": "1440m"
 }, {
     # urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
     4736: ["Xiaomi", "Mesh Night Light", "MJYD05YL"],
