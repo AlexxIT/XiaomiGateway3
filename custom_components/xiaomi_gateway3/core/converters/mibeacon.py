@@ -348,6 +348,20 @@ class MiBeaconConv(Converter):
                 payload.update({'action': 'button_1_hold'})
             if value == 2:
                 payload.update({'action': 'button_2_hold'})
+          
+        elif eid == 0x4818:  # 18456
+            # Linptech motion sensor version 2
+            payload['idle_time'] = int.from_bytes(data, 'little')
+
+        elif eid == 0x4A08:  # 18952
+            # Linptech motion sensor version 2
+            value = struct.unpack('<f', data)[0]
+            payload.update({'motion': True, 'illuminance': value})
+
+        elif eid == 0x4C03:  # 19459
+            # Linptech motion sensor version 2
+            payload['battery'] = data[0]
+
 
 
 MiBeacon = MiBeaconConv('mibeacon')
