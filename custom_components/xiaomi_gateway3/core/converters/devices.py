@@ -586,6 +586,8 @@ DEVICES += [{
     ],
 }, {
     "lumi.remote.acn003": ["Aqara", "Single Wall Button E1 CN", "WXKG16LM"],
+    # https://github.com/niceboygithub/AqaraGateway/pull/118/files
+    "lumi.remote.acn007": ["Aqara", "Single Wall Button E1", "WXKG20LM"],
     "spec": [
         Action,
         ButtonMIConv("button", mi="2.e.1", value=1),  # single
