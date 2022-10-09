@@ -1275,6 +1275,17 @@ DEVICES += [{
         Converter("idle_time", "sensor", enabled=False),
     ],
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/657
+    2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("battery", "sensor"),
+        Converter("lock", "binary_sensor"),
+        Converter("opening", "binary_sensor"),
+    ],
+    "ttl": "6h"
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1288,7 +1299,6 @@ DEVICES += [{
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM"],
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
-    2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
