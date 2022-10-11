@@ -30,9 +30,9 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 A. No. The integration does not support Xiaomi Wi-Fi devices.
 
 **Q. Which Mi Home region is best to use?**  
-A. Most devices are supported in the China region. In European regions may not work new Zigbee devices E1/H1/T1-series and some Mesh devices. Read more about [regional restrictions](#regional-restrictions).
+A. Most devices are supported in the China region. In European regions the new Zigbee devices E1/H1/T1-series and some Mesh devices may not work. Read more about [regional restrictions](#regional-restrictions).
 
-**Q. What means multimode gateway beeps?**  
+**Q. What do multimode gateway beeps mean?**  
 A. Beeps AFTER adding Zigbee devices:
 1. No new devices found, the pair is stopped.
 2. New device successfully added.
