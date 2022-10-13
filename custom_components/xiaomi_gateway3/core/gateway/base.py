@@ -1,7 +1,8 @@
 import asyncio
+import random
 import re
 from logging import Logger
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Union
 
 from ..converters import Converter
 from ..device import XDevice
@@ -38,6 +39,7 @@ class GatewayBase:
     dispatcher: Dict[str, List[Callable]] = None
     setups: Dict[str, Callable] = None
     tasks: List[asyncio.Task] = None
+    miio_ack: Dict[int, asyncio.Future] = None
 
     mqtt: MiniMQTT = None
     miio: AsyncMiIO = None
@@ -150,3 +152,25 @@ class GatewayBase:
             device for device in self.devices.values()
             if self in device.gateways and device.has_support(feature)
         ]
+
+    async def miio_send(
+            self, method: str, params: Union[dict, list] = None,
+            timeout: int = 5
+    ):
+        fut = asyncio.get_event_loop().create_future()
+
+        cid = random.randint(0x80000000, 0xFFFFFFFF)
+        self.miio_ack[cid] = fut
+
+        await self.mqtt.publish("miio/command", {
+            "id": cid, "method": method, "params": params
+        })
+
+        try:
+            await asyncio.wait_for(self.miio_ack[cid], timeout)
+        except asyncio.TimeoutError:
+            return None
+        finally:
+            del self.miio_ack[cid]
+
+        return fut.result()

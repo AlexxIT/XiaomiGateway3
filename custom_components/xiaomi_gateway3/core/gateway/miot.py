@@ -23,6 +23,11 @@ class MIoTGateway(GatewayBase):
                     msg.payload, b'event_occured'
             ):
                 await self.miot_process_event(data["params"])
+        elif msg.topic == "miio/report":
+            if b'properties_changed' in msg.payload:
+                await self.miot_process_properties(msg.json["params"])
+            elif b'event_occured' in msg.payload:
+                await self.miot_process_event(msg.json["params"])
 
     async def miot_process_properties(self, data: list):
         """Can receive multiple properties from multiple devices.
@@ -54,7 +59,7 @@ class MIoTGateway(GatewayBase):
         for item in payload["mi_spec"]:
             item["did"] = device.did
         # MIoT properties changes should return in
-        resp = await self.miio.send("set_properties", payload["mi_spec"])
+        resp = await self.miio_send("set_properties", payload["mi_spec"])
         return resp and "result" in resp
 
     async def miot_read(self, device: XDevice, payload: dict) \
@@ -63,7 +68,7 @@ class MIoTGateway(GatewayBase):
         self.debug_device(device, "read", payload, tag="MIOT")
         for item in payload["mi_spec"]:
             item["did"] = device.did
-        resp = await self.miio.send("get_properties", payload["mi_spec"])
+        resp = await self.miio_send("get_properties", payload["mi_spec"])
         if resp is None or "result" not in resp:
             return None
         return device.decode_miot(resp['result'])

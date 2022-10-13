@@ -13,7 +13,7 @@ class BLEGateway(GatewayBase):
         self.dispatcher_connect(SIGNAL_PREPARE_GW, self.ble_prepare_gateway)
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.ble_mqtt_publish)
 
-    async def ble_read_devices(self, sh: shell.ShellGw3):
+    async def ble_read_devices(self, sh: shell.ShellMGW):
         try:
             # prevent read database two times
             db = await sh.read_db_bluetooth()
@@ -30,7 +30,7 @@ class BLEGateway(GatewayBase):
         except Exception:
             pass
 
-    async def ble_prepare_gateway(self, sh: shell.ShellGw3):
+    async def ble_prepare_gateway(self, sh: shell.ShellMGW):
         if self.available is None:
             await self.ble_read_devices(sh)
 
@@ -57,6 +57,10 @@ class BLEGateway(GatewayBase):
                     msg.payload, b'_async.ble_event'
             ):
                 await self.ble_process_event(data["params"])
+
+        elif msg.topic == "miio/report":
+            if b'_async.ble_event' in msg.payload:
+                await self.ble_process_event(msg.json["params"])
 
         elif msg.topic == 'log/ble':
             await self.ble_process_event_fix(msg.json)

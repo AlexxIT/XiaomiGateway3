@@ -16,7 +16,7 @@ from ..mini_mqtt import MQTTMessage
 MODEL = "lumi.gateway.mgl03"
 
 
-class GateGW3(
+class GateMGW(
     MIoTGateway, LumiGateway, MeshGateway, BLEGateway, SilabsGateway, Z3Gateway
 ):
     gw3_ts = 0
@@ -27,7 +27,7 @@ class GateGW3(
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.gw3_mqtt_publish)
         self.dispatcher_connect(SIGNAL_TIMER, self.gw3_timer)
 
-    async def gw3_read_device(self, sh: shell.ShellGw3):
+    async def gw3_read_device(self, sh: shell.ShellMGW):
         self.did = await sh.get_did()
         mac = await sh.get_wlan_mac()
         device = self.devices.get(self.did)
@@ -36,7 +36,7 @@ class GateGW3(
             device.extra = {"fw_ver": sh.ver}
         self.add_device(self.did, device)
 
-    async def gw3_prepare_gateway(self, sh: shell.ShellGw3):
+    async def gw3_prepare_gateway(self, sh: shell.ShellMGW):
         # run all inits from subclasses
         self.miot_init()  # GW3 and Mesh depends on MIoT
         self.gw3_init()
@@ -56,11 +56,11 @@ class GateGW3(
             # run NTPd for sync time
             await sh.run_ntpd()
 
+        msg = await sh.run_openmiio_agent()
+        self.debug("openmiio_agent: " + msg)
+
         if self.available is None and self.did is None:
             await self.gw3_read_device(sh)
-
-        # global patch from GW3, BLE and Mesh
-        sh.patch_miio_mqtt()
 
         if not self.zha_mode:
             # buzzer problem only in MiHome mode
