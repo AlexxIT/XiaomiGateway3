@@ -4,6 +4,8 @@ from asyncio import StreamReader, StreamWriter
 from dataclasses import dataclass
 from typing import Union
 
+from ..unqlite import SQLite
+
 
 @dataclass
 class TelnetShell:
@@ -48,6 +50,31 @@ class TelnetShell:
         raw = await self.exec("(ps|grep -v grep|grep -q 'sh +o') || sh +o")
         return "set -o errexit" in raw
 
+    async def run_ntpd(self):
+        await self.exec("ntpd -l")
+
+    async def check_bin(self, filename: str, md5: str, url: str) -> int:
+        """
+        Check binary md5 and download it if needed. We should use HTTP-link
+        because wget don't support HTTPS and curl removed in lastest fw. But
+        it's not a problem because we check md5.
+        """
+        filename = "/data/" + filename
+        cmd = f"[ -x {filename} ] && md5sum {filename}"
+
+        if md5 in await self.exec(cmd):
+            return 1
+
+        # download can take up to 3 minutes for Chinese users
+        await self.exec(
+            f"wget {url} -O {filename} && chmod +x {filename}", timeout=300
+        )
+
+        return 2 if md5 in await self.exec(cmd) else 0
+
+    async def get_running_ps(self) -> str:
+        raise NotImplementedError
+
     async def get_version(self) -> str:
         raise NotImplementedError
 
@@ -64,4 +91,52 @@ class TelnetShell:
         raise NotImplementedError
 
     def patch_zigbee_parents(self):
+        raise NotImplementedError
+
+
+class ShellOpenMiio(TelnetShell):
+    async def check_openmiio_agent(self) -> int:
+        raise NotImplementedError
+
+    async def run_openmiio_agent(self) -> str:
+        cmd = f"/data/openmiio_agent 1>/tmp/miio.out 2>/tmp/miio.err &"
+
+        ok = await self.check_openmiio_agent()
+        if ok == 1:
+            # run if not in ps
+            if "openmiio_agent" in await self.get_running_ps():
+                return "The latest version is already running"
+
+            await self.exec(cmd)
+            return "The latest version is launched"
+
+        if ok == 2:
+            if "openmiio_agent" in await self.get_running_ps():
+                await self.exec(f"killall openmiio_agent")
+
+            await self.exec(cmd)
+            return "The latest version is updated and launched"
+
+        return "ERROR: can't download latest version"
+
+
+class ShellMultimode(ShellOpenMiio):
+    db: SQLite = None
+
+    async def read_db_bluetooth(self) -> SQLite:
+        if not self.db:
+            raw = await self.read_file(self.mesh_db, as_base64=True)
+            self.db = SQLite(raw)
+        return self.db
+
+    @property
+    def mesh_db(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def mesh_group_table(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def mesh_device_table(self) -> str:
         raise NotImplementedError

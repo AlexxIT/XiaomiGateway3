@@ -11,7 +11,7 @@ class MeshGateway(GatewayBase):
             return
         self.dispatcher_connect(SIGNAL_PREPARE_GW, self.mesh_prepare_gateway)
 
-    async def mesh_read_devices(self, sh: shell.ShellGw3):
+    async def mesh_read_devices(self, sh: shell.ShellMultimode):
         try:
             # prevent read database two times
             db = await sh.read_db_bluetooth()
@@ -47,6 +47,6 @@ class MeshGateway(GatewayBase):
         except Exception as e:
             self.debug("Can't read mesh DB", exc_info=e)
 
-    async def mesh_prepare_gateway(self, sh: shell.ShellGw3):
+    async def mesh_prepare_gateway(self, sh: shell.ShellMGW):
         if self.available is None:
             await self.mesh_read_devices(sh)

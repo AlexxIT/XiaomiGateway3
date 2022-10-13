@@ -226,7 +226,7 @@ def _register_send_command(hass: HomeAssistant):
         cmd = call.data["command"].split(" ")
         if cmd[0] == "miio":
             raw = json.loads(call.data["data"])
-            resp = await gw.miio.send(raw['method'], raw.get('params'))
+            resp = await gw.miio_send(raw['method'], raw.get('params'))
             hass.components.persistent_notification.async_create(
                 str(resp), TITLE
             )

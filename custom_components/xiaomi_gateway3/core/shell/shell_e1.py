@@ -1,14 +1,12 @@
-import asyncio
 import base64
 import hashlib
 
-from .base import TelnetShell
-
-WGET = "(wget http://master.dl.sourceforge.net/project/aqcn02/{0}?viasf=1 -O /data/{1} && chmod +x /data/{1})"
+from .shell_arm import ShellARM
 
 TAR_DATA = "tar -czOC /data mha_master miio storage zigbee devices.txt gatewayInfoJson.info 2>/dev/null | base64"
 
-MD5_MOSQUITTO_PUB = '7c3883281750e00f717d35d6bdf2d913'
+URL_MOSQUITTO_PUB = "http://master.dl.sourceforge.net/project/aqcn02/bin/mosquitto_pub?viasf=1"
+MD5_MOSQUITTO_PUB = "7c3883281750e00f717d35d6bdf2d913"
 
 
 def sed(pattern: str, repl: str):
@@ -30,85 +28,23 @@ PATCH_ZIGBEE_PARENTS = sed(
 
 
 # noinspection PyAbstractClass
-class ShellE1(TelnetShell):
+class ShellE1(ShellARM):
     model = "e1"
 
     apatches: list = None
 
-    async def login(self):
-        self.writer.write(b"root\n")
-        await asyncio.sleep(.1)
-        self.writer.write(b"\n")  # empty password
-
-        coro = self.reader.readuntil(b"/ # ")
-        await asyncio.wait_for(coro, timeout=3)
-
     async def prepare(self):
-        # change bash end symbol to gw3 style
-        self.writer.write(b"export PS1='# '\n")
-        coro = self.reader.readuntil(b"\r\n# ")
-        await asyncio.wait_for(coro, timeout=3)
-
-        await self.exec("stty -echo")
+        await ShellARM.prepare(self)
 
         self.apatches = []
-
-    async def prevent_unpair(self):
-        await self.exec("killall mha_master")
 
     async def tar_data(self):
         raw = await self.exec(TAR_DATA, as_bytes=True)
         return base64.b64decode(raw)
 
-    async def get_version(self):
-        raw1 = await self.exec("agetprop ro.sys.mi_fw_ver")
-        raw2 = await self.exec("agetprop ro.sys.mi_build_num")
-        self.ver = f"{raw1.rstrip()}_{raw2.rstrip()}"
-
-    async def get_token(self) -> str:
-        raw = await self.exec(
-            "agetprop persist.app.miio_dtoken", as_bytes=True
-        )
-        return raw.rstrip().hex()
-
-    async def get_did(self):
-        raw = await self.exec("agetprop persist.sys.miio_did")
-        return raw.rstrip()
-
-    async def get_wlan_mac(self):
-        raw = await self.exec("agetprop persist.sys.miio_mac")
-        return raw.rstrip().replace(":", "").lower()
-
-    async def get_running_ps(self) -> str:
-        return await self.exec("ps")
-
-    async def run_public_mosquitto(self):
-        await self.exec("killall mosquitto")
-        await asyncio.sleep(.5)
-        # mosquitto bind to local IP and local interface, need to fix this
-        await self.exec(
-            "cp /bin/mosquitto /tmp; sed 's=127.0.0.1=0000.0.0.0=;s=^lo$= =' -i /tmp/mosquitto; /tmp/mosquitto -d"
-        )
-
-    async def run_ntpd(self):
-        await self.exec("ntpd -l")
-
-    async def run_ftp(self):
-        await self.exec("busybox tcpsvd -E 0.0.0.0 21 busybox ftpd -w &")
-
-    async def check_bin(self, filename: str, md5: str, url=None) -> bool:
-        """Check binary md5 and download it if needed."""
-        if md5 in await self.exec("md5sum /data/" + filename):
-            return True
-        elif url:
-            await self.exec(WGET.format(url, filename))
-            return await self.check_bin(filename, md5)
-        else:
-            return False
-
     async def check_mosquitto_pub(self):
         return await self.check_bin(
-            'mosquitto_pub', MD5_MOSQUITTO_PUB, 'bin/mosquitto_pub'
+            "mosquitto_pub", MD5_MOSQUITTO_PUB, URL_MOSQUITTO_PUB
         )
 
     ###########################################################################
@@ -124,8 +60,8 @@ class ShellE1(TelnetShell):
     @property
     def app_ps(self):
         if self.apatches:
-            return hashlib.md5('\n'.join(self.apatches).encode()).hexdigest()
-        return '/bin/app_monitor.sh'
+            return hashlib.md5("\n".join(self.apatches).encode()).hexdigest()
+        return "/bin/app_monitor.sh"
 
     async def update_app_monitor(self) -> int:
         await self.check_mosquitto_pub()

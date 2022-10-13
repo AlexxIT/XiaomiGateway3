@@ -381,7 +381,7 @@ async def run_zigbee_ota(
     url = await get_ota_link(hass, device)
     if url:
         gateway.debug_device(device, "update", url)
-        resp = await gateway.miio.send('miIO.subdev_ota', {
+        resp = await gateway.miio_send('miIO.subdev_ota', {
             'did': device.did,
             'subdev_url': url
         })
