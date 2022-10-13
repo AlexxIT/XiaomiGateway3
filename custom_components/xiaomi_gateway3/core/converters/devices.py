@@ -1286,6 +1286,11 @@ DEVICES += [{
     ],
     "ttl": "6h"
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/826
+    7184: ["Linptech", "Wireless Switch", "K11"],
+    "spec": [MiBeacon, BLEAction, Button, BLEBattery],
+    "ttl": "6h" # battery every 6 hours
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
