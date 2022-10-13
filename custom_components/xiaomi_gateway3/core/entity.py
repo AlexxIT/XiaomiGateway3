@@ -290,3 +290,9 @@ class XEntity(Entity):
             if data:
                 # support instant update state
                 self.async_set_state(data)
+
+    async def update_state(self):
+        if hasattr(self, "async_update"):
+            await self.async_update()
+        if self.added:
+            self.async_write_ha_state()

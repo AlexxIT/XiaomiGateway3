@@ -228,9 +228,9 @@ class XGateway(GateGW3, GateE1, GateHubV2):
                     ts - device.encode_ts > device.poll_timeout
             ):
                 for attr, entity in device.entities.items():
-                    if entity.hass and hasattr(entity, "async_update"):
+                    if entity.added and hasattr(entity, "async_update"):
                         self.debug_device(device, "poll state", attr)
-                        asyncio.create_task(entity.async_update())
+                        asyncio.create_task(entity.update_state())
                         break
 
             if (device.available and device.available_timeout and
