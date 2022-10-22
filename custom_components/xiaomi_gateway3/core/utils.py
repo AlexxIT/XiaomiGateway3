@@ -221,8 +221,8 @@ async def get_bindkey(cloud: MiCloud, did: str):
     bindkey = await cloud.get_bindkey(did)
     if bindkey is None:
         return "Can't get from cloud"
-    if bindkey.endswith('FFFFFFFF'):
-        return "Not needed"
+    # if bindkey.endswith('FFFFFFFF'):
+    #     return "Not needed"
     return bindkey
 
 
