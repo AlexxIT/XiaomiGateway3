@@ -239,6 +239,22 @@ async def enable_bslamp2_lan(host: str, token: str):
     return "Can't enable LAN"
 
 
+async def get_ble_remotes(host: str, token: str):
+    device = AsyncMiIO(host, token)
+    resp = await device.send("ble_dbg_tbl_dump", {"table": "evtRuleTbl"})
+    if not resp:
+        return "Can't connect to lamp"
+    if "result" not in resp:
+        return f"Wrong response"
+    return "\n".join([
+        f"{p['beaconkey']} ({format_mac(p['mac'])})" for p in resp["result"]
+    ])
+
+
+def format_mac(s: str) -> str:
+    return f"{s[10:]}:{s[8:10]}:{s[6:8]}:{s[4:6]}:{s[2:4]}:{s[:2]}".upper()
+
+
 NCP_URL = "https://master.dl.sourceforge.net/project/mgl03/zigbee/%s?viasf=1"
 
 
