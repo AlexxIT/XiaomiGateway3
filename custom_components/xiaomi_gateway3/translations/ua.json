@@ -4,7 +4,10 @@
       "no_servers": "Будь ласка, виберіть хоча б один сервер",
       "cant_login": "Помилка, перевірте ім'я користувача і пароль",
       "cant_connect": "Не вдається підключитися до шлюзу",
-      "wrong_model": "Модель шлюзу не підтримується"
+      "wrong_model": "Модель шлюзу не підтримується",
+      "wrong_token": "Wrong Mi Home token",
+      "wrong_telnet": "Wrong open telnet command",
+      "verify": "Click to verify url"
     },
     "step": {
       "user": {
@@ -15,7 +18,7 @@
       },
       "cloud": {
         "title": "Додати Mi Cloud аккаунт",
-        "description": "Вибирайте тільки ті сервери, на яких у вас є пристрої",
+        "description": "Вибирайте тільки ті сервери, на яких у вас є пристрої{verify}",
         "data": {
           "username": "Email / Mi Account ID",
           "password": "Пароль",

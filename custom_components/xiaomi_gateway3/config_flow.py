@@ -2,6 +2,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, OptionsFlow, ConfigEntry
 from homeassistant.core import callback
+from homeassistant.data_entry_flow import FlowHandler
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
@@ -27,6 +28,31 @@ OPT_DEBUG = {
     "mqtt": "MQTT logs",
     "zigbee": "Zigbee logs",
 }
+
+
+def form(
+        flow: FlowHandler, step_id: str, schema: dict, defaults: dict = None,
+        template: dict = None, error: str = None,
+):
+    """Suppport:
+     - overwrite schema defaults from dict (user_input or entry.options)
+     - set base error code (translations > config > error > code)
+     - set custom error via placeholders ("template": "{error}")
+    """
+    if defaults:
+        for key in schema:
+            if key.schema in defaults:
+                key.default = vol.default_factory(defaults[key.schema])
+
+    if template and "error" in template:
+        error = {"base": "template"}
+    elif error:
+        error = {"base": error}
+
+    return flow.async_show_form(
+        step_id=step_id, data_schema=vol.Schema(schema),
+        description_placeholders=template, errors=error,
+    )
 
 
 class FlowHandler(ConfigFlow, domain=DOMAIN):
@@ -67,34 +93,41 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             })
         )
 
-    async def async_step_cloud(self, user_input=None, error=None):
-        if user_input:
-            if not user_input["servers"]:
-                return await self.async_step_cloud(error="no_servers")
-
-            session = async_create_clientsession(self.hass)
-            cloud = MiCloud(session)
-            if await cloud.login(
-                    user_input["username"], user_input["password"]
-            ):
-                user_input.update(cloud.auth)
-                return self.async_create_entry(
-                    title=user_input["username"], data=user_input
-                )
-
-            else:
-                return await self.async_step_cloud(error="cant_login")
-
-        return self.async_show_form(
-            step_id="cloud",
-            data_schema=vol.Schema({
+    async def async_step_cloud(self, data=None):
+        kwargs = {
+            "step_id": "cloud",
+            "schema": {
                 vol.Required("username"): str,
                 vol.Required("password"): str,
                 vol.Required("servers", default=["cn"]):
                     cv.multi_select(SERVERS)
-            }),
-            errors={"base": error} if error else None
-        )
+            },
+            "defaults": data,
+            "template": {"verify": ""}
+        }
+
+        if data:
+            if data["servers"]:
+                session = async_create_clientsession(self.hass)
+                cloud = MiCloud(session)
+                if await cloud.login(
+                        data["username"], data["password"]
+                ):
+                    data.update(cloud.auth)
+                    return self.async_create_entry(
+                        title=data["username"], data=data
+                    )
+
+                elif cloud.verify:
+                    kwargs["error"] = "verify"
+                    kwargs["template"]["verify"] = \
+                        f"\n[Verify url]({cloud.verify})"
+                else:
+                    kwargs["error"] = "cant_login"
+            else:
+                kwargs["error"] = "no_servers"
+
+        return form(self, **kwargs)
 
     async def async_step_token(self, user_input=None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""

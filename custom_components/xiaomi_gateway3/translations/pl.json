@@ -6,7 +6,8 @@
       "cant_connect": "Nie można nawiązać połączenia z bramką",
       "wrong_model": "Niewspierany model bramki",
       "wrong_token": "Niepoprawny token Mi Home",
-      "wrong_telnet": "Nieprawidłowa komenda otwarcia protokołu telnet"
+      "wrong_telnet": "Nieprawidłowa komenda otwarcia protokołu telnet",
+      "verify": "Click to verify url"
     },
     "step": {
       "user": {
@@ -17,7 +18,7 @@
       },
       "cloud": {
         "title": "Dodaj konto Xiaomi Home",
-        "description": "Wybierz tylko te serwery na której masz urządzenia",
+        "description": "Wybierz tylko te serwery na której masz urządzenia{verify}",
         "data": {
           "username": "Email / ID konta Xiaomi",
           "password": "Hasło",

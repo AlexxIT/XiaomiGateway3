@@ -46,6 +46,7 @@ UA = "Android-7.1.1-1.0.0-ONEPLUS A3010-136-%s APP/xiaomi.smarthome APPV/62830"
 
 class MiCloud:
     auth = None
+    verify = None
 
     def __init__(self, session: ClientSession, servers: list = None):
         self.session = session
@@ -56,6 +57,7 @@ class MiCloud:
         try:
             payload = await self._login_step1()
             data = await self._login_step2(username, password, payload)
+            self.verify = data.get('notificationUrl')
             if not data['location']:
                 return False
 

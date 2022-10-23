@@ -6,7 +6,8 @@
       "cant_connect": "Не получается подключиться к шлюзу",
       "wrong_model": "Модель шлюза не поддерживается",
       "wrong_token": "Неверный Mi Home токен",
-      "wrong_telnet": "Неверная команда для открытия Telnet"
+      "wrong_telnet": "Неверная команда для открытия Telnet",
+      "verify": "Перейдите по verify url"
     },
     "step": {
       "user": {
@@ -17,7 +18,7 @@
       },
       "cloud": {
         "title": "Добавить Mi Cloud аккаунт",
-        "description": "Выбирайте только те серверы, на которых у вас есть устройства",
+        "description": "Выбирайте только те серверы, на которых у вас есть устройства{verify}",
         "data": {
           "username": "Email / Mi Account ID",
           "password": "Пароль",

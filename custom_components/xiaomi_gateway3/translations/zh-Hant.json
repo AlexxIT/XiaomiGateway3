@@ -6,7 +6,8 @@
       "cant_connect": "無法連線至網關",
       "wrong_model": "網關型號不支援",
       "wrong_token": "小米智能家庭權杖錯誤",
-      "wrong_telnet": "開啟 Telnet 指令錯誤"
+      "wrong_telnet": "開啟 Telnet 指令錯誤",
+      "verify": "Click to verify url"
     },
     "step": {
       "user": {
@@ -17,7 +18,7 @@
       },
       "cloud": {
         "title": "新增小米雲服務帳號",
-        "description": "僅選擇已榜定設備的伺服器",
+        "description": "僅選擇已榜定設備的伺服器{verify}",
         "data": {
           "username": "Email / 小米帳號 ID",
           "password": "密碼",

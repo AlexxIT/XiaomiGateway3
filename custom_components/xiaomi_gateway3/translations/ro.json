@@ -4,7 +4,10 @@
       "no_servers": "Te rog sa selectezi macar un server!",
       "cant_login": "Nu ma pot conecta. Mai verifica o data username-ul sau parola!",
       "cant_connect": "Nu ma pot conecta la gateway!",
-      "wrong_model": "Modelul tau de gateway nu este suportat!"
+      "wrong_model": "Modelul tau de gateway nu este suportat!",
+      "wrong_token": "Wrong Mi Home token",
+      "wrong_telnet": "Wrong open telnet command",
+      "verify": "Click to verify url"
     },
     "step": {
       "user": {
@@ -15,7 +18,7 @@
       },
       "cloud": {
         "title": "Adauga un cont Mi Cloud",
-        "description": "Selecteaza doar serverul unde ai dispozitivele",
+        "description": "Selecteaza doar serverul unde ai dispozitivele{verify}",
         "data": {
           "username": "Email / ID-ul contului Mi",
           "password": "Parola",

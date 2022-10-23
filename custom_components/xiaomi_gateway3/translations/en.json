@@ -6,7 +6,8 @@
       "cant_connect": "Can't connect to gateway",
       "wrong_model": "Unsupported gateway model",
       "wrong_token": "Wrong Mi Home token",
-      "wrong_telnet": "Wrong open telnet command"
+      "wrong_telnet": "Wrong open telnet command",
+      "verify": "Click to verify url"
     },
     "step": {
       "user": {
@@ -17,7 +18,7 @@
       },
       "cloud": {
         "title": "Add Mi Cloud Account",
-        "description": "Select only those servers where you have devices",
+        "description": "Select only those servers where you have devices{verify}",
         "data": {
           "username": "Email / Mi Account ID",
           "password": "Password",
