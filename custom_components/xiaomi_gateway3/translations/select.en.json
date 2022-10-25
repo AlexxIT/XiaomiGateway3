@@ -8,7 +8,8 @@
       "parentscan": "Zigbee parent scan",
       "firmwarelock": "Gateway firmware lock",
       "reboot": "Gateway reboot",
-      "ftp": "Gateway run FTP"
+      "ftp": "Gateway run FTP",
+      "flashzb": "Flash Zigbee chip"
     },
     "data": {
       "enabled": "Enabled",
@@ -24,7 +25,9 @@
       "no_firmware": "No firmware",
       "bind": "Bind",
       "unbind": "Unbind",
-      "no_devices": "No devices"
+      "no_devices": "No devices",
+      "original": "Original",
+      "custom": "Custom"
     }
   }
 }
