@@ -52,7 +52,7 @@ class ShellARM(ShellOpenMiio):
         )
 
     async def run_ftp(self):
-        await self.exec("busybox tcpsvd -E 0.0.0.0 21 busybox ftpd -w &")
+        await self.exec("tcpsvd -E 0.0.0.0 21 ftpd -w &")
 
     async def prevent_unpair(self):
         await self.exec("killall mha_master")
