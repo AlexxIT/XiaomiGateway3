@@ -21,13 +21,14 @@ from .const import DOMAIN
 from .converters import STAT_GLOBALS
 from .device import XDevice
 from .ezsp import EzspUtils
-from .gateway import XGateway
+from .gateway import XGateway, TELNET_CMD
 from .gateway.lumi import LumiGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
 
 SUPPORTED_MODELS = (
-    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03', 'lumi.gateway.mcn001'
+    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03',
+    'lumi.gateway.mcn001'
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -135,8 +136,9 @@ def migrate_options(data):
     return {'data': data, 'options': options}
 
 
-async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
-        -> Optional[str]:
+async def check_gateway(
+        host: str, token: str, telnet_cmd: str = None
+) -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
     try:
         async with shell.Session(host) as session:
@@ -146,9 +148,6 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
                 return None if await sh.get_token() == token else 'wrong_token'
     except Exception:
         pass
-
-    if not telnet_cmd:
-        return 'cant_connect'
 
     # 2. try connect with miio
     miio = AsyncMiIO(host, token)
@@ -166,7 +165,7 @@ async def check_gateway(host: str, token: str, telnet_cmd: Optional[str]) \
     if info['model'] not in SUPPORTED_MODELS:
         return 'wrong_model'
 
-    raw = json.loads(telnet_cmd)
+    raw = json.loads(telnet_cmd or TELNET_CMD)
     # fw 1.4.6_0043+ won't answer on cmd without cloud, don't check answer
     await miio.send(raw['method'], raw.get('params'))
 
