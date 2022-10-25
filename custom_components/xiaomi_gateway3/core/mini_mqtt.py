@@ -1,5 +1,5 @@
 """
-http://stanford-clark.com/MQTT/
+https://stanford-clark.com/MQTT/
 """
 import asyncio
 import json

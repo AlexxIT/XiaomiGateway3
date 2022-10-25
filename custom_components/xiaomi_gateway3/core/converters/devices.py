@@ -1578,11 +1578,11 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
         Converter("battery", "sensor", mi="4.p.1"),
         MapConv("battery_charging", "binary_sensor", mi="4.p.2", map={
-             1: True, 2: False ,3: False,
+            1: True, 2: False, 3: False,
         }, enabled=False),
     ],
     "ttl": "7d",
-},{
+}, {
     # urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
     4736: ["Xiaomi", "Mesh Night Light", "MJYD05YL"],
     "spec": [
