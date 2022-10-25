@@ -30,8 +30,8 @@ MD5_AGENT = "615401ee802dd76649169836b6733c65"
 
 def sed(app: str, pattern: str, repl: str):
     """sed with extended regex and edit file in-place"""
-    repl = repl.replace('$', '\$').replace('&', '\&').replace('=', '\='). \
-        replace('`', '\`').replace('"', '\\"').replace('\n', '\\n')
+    repl = repl.replace('$', r'\$').replace('&', r'\&').replace('=', r'\='). \
+        replace('`', r'\`').replace('"', '\\"').replace('\n', '\\n')
     return f'sed -r "s={pattern}={repl}=" -i /tmp/{app}'
 
 

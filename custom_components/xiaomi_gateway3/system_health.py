@@ -6,7 +6,6 @@ import uuid
 from collections import deque
 from datetime import datetime
 from logging import Logger
-from typing import Any
 
 from aiohttp import web
 from homeassistant.components import system_health
