@@ -49,7 +49,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                     data_schema=vol.Schema({
                         vol.Required("host", default=device["localip"]): str,
                         vol.Required("token", default=device["token"]): str,
-                        vol.Required("telnet_cmd"): str,
+                        vol.Optional("telnet_cmd"): str,
                     }),
                 )
 
@@ -112,7 +112,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required("host"): str,
                 vol.Required("token"): str,
-                vol.Required("telnet_cmd"): str,
+                vol.Optional("telnet_cmd"): str,
             }),
             errors={"base": error} if error else None
         )

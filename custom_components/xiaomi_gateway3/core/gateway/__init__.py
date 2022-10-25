@@ -30,6 +30,8 @@ from ..mini_mqtt import MiniMQTT, MQTTMessage
 
 _LOGGER = logging.getLogger(__name__)
 
+TELNET_CMD = '{"method":"set_ip_info","params":{"ssid":"\"\"","pswd":"1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"}}'
+
 
 class XGateway(GateMGW, GateE1, GateMGW2):
     main_task: asyncio.Task = None
@@ -53,7 +55,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
 
     @property
     def telnet_cmd(self):
-        return self.options.get('telnet_cmd')
+        return self.options.get('telnet_cmd') or TELNET_CMD
 
     def start(self):
         self.main_task = asyncio.create_task(self.run_forever())
