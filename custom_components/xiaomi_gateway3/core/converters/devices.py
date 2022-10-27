@@ -607,6 +607,9 @@ DEVICES += [{
         ButtonMIConv("button_2", mi="7.e.3", value=16),  # long
         ButtonMIConv("button_both", mi="8.e.1", value=4),  # single
         BatteryConv("battery", "sensor", mi="3.p.2"),
+        MapConv("mode", "select", mi="5.p.1", map={
+            1: "speed", 2: "multi"
+        }, enabled=False),
     ],
 }]
 
