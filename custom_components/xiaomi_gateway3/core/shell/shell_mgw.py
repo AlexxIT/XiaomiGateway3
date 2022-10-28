@@ -10,22 +10,16 @@ LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bi
 UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware/firmware_ota.bin"
 
 RUN_FTP = "/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &"
-# flash on another ports because running ZHA or z2m can breake process
-RUN_ZIGBEE_FLASH = "/data/ser2net -C '8115:raw:60:/dev/ttyS2:115200 8DATABITS NONE 1STOPBIT' -C '8038:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT'"
 
 # c create, z gzip, O stdout, C change DIR
 TAR_DATA = "tar -czO /data/miio/mible_local.db* /data/silicon_zigbee_host/*.txt /data/zigbee /data/zigbee_gw 2>/dev/null | base64"
 
-# original link http://pkg.musl.cc/socat/mipsel-linux-musln32/bin/socat
 # original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
 URL_BUSYBOX = "http://master.dl.sourceforge.net/project/mgl03/bin/busybox?viasf=1"
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
 
-URL_SER2NET = "http://master.dl.sourceforge.net/project/mgl03/bin/ser2net?viasf=1"
-MD5_SER2NET = "f27a481e54f94ea7613b461bda090b0f"
-
-URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/mips/openmiio_agent?viasf=1"
-MD5_AGENT = "615401ee802dd76649169836b6733c65"
+URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent?viasf=1"
+MD5_AGENT = "dd7e5ff40f03edcf71254da28a870cd0"
 
 
 def sed(app: str, pattern: str, repl: str):
@@ -34,20 +28,6 @@ def sed(app: str, pattern: str, repl: str):
         replace('`', r'\`').replace('"', '\\"').replace('\n', '\\n')
     return f'sed -r "s={pattern}={repl}=" -i /tmp/{app}'
 
-
-PATCH_ZIGBEE_PARENTS = sed(
-    "daemon_app.sh", "^ +(Lumi_Z3GatewayHost_MQTT [^>]+).+$",
-    "pkill -f log/z3\n\\1-l 0 | mosquitto_pub -t log/z3 -l &"
-)
-
-# replace default Z3 to ser2net
-PATCH_ZIGBEE_TCP1 = sed(
-    "daemon_app.sh", "grep Lumi_Z3GatewayHost_MQTT", "grep ser2net"
-)
-PATCH_ZIGBEE_TCP2 = sed(
-    "daemon_app.sh", "^ +Lumi_Z3GatewayHost_MQTT .+$",
-    "/data/ser2net -C '8888:raw:60:/dev/ttyS2:38400 8DATABITS NONE 1STOPBIT XONXOFF'"
-)
 
 # patch silabs_ncp_bt for storing data in tmp (memory)
 PATCH_MEMORY_BLUETOOTH1 = "[ -d /tmp/miio ] || (cp -R /data/miio /tmp && cp /bin/silabs_ncp_bt /tmp && sed -r 's=/data/=/tmp//=g' -i /tmp/silabs_ncp_bt)"
@@ -84,14 +64,6 @@ fi; N=$N.
 """
 )
 
-# just for statistics
-SAVE_SERIAL_STATS = "[ -f /tmp/serial ] || cp /proc/tty/driver/serial /tmp"
-
-# don't run bt utility in all cases
-# if [ ! -e /tmp/bt_dont_need_startup ]; then
-PATCH_DISABLE_BLUETOOTH = sed(
-    "daemon_miio.sh", "^ +if.+bt_dont_need_startup.+$", "if false; then"
-)
 # patch basic_gw file to not beeps with 5 sec Motion Sensors
 PATCH_DISABLE_BUZZER1 = "[ -f /tmp/basic_gw ] || (cp /bin/basic_gw /tmp && sed -r 's=dev_query=xxx_query=' -i /tmp/basic_gw)"
 # use patched binary instead of original
@@ -104,9 +76,6 @@ SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|
 DB_BLUETOOTH = "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
 # `sed...` - remove filename and adds "*.json" on its place
 DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
-
-# limited partial support on old firmwares
-MIIO2MQTT_FW146 = "miio_client -l 4 -d /data/miio | awk '/ot_agent_recv_handler_one.+(ble_event|properties_changed|heartbeat)/{print $0;fflush()}' | mosquitto_pub -t log/miio -l &"
 
 
 class ShellMGW(ShellMultimode):
@@ -132,31 +101,12 @@ class ShellMGW(ShellMultimode):
     async def get_running_ps(self) -> str:
         return await self.exec("ps -ww | grep -v ' 0 SW'")
 
-    async def run_public_mosquitto(self):
-        await self.exec("killall mosquitto")
-        await asyncio.sleep(.5)
-        await self.exec("mosquitto -d")
-        await asyncio.sleep(.5)
-        # fix CPU 90% full time bug
-        await self.exec("killall zigbee_gw")
-
     async def check_openmiio_agent(self) -> int:
         return await self.check_bin("openmiio_agent", MD5_AGENT, URL_AGENT)
 
     async def run_ftp(self):
         if await self.check_bin("busybox", MD5_BUSYBOX, URL_BUSYBOX):
             await self.exec(RUN_FTP)
-
-    async def run_zigbee_flash(self) -> bool:
-        if not await self.check_zigbee_tcp():
-            return False
-        await self.exec("killall daemon_app.sh")
-        await self.exec("killall Lumi_Z3GatewayHost_MQTT ser2net socat")
-        await self.exec(RUN_ZIGBEE_FLASH)
-        return True
-
-    async def check_zigbee_tcp(self):
-        return await self.check_bin("ser2net", MD5_SER2NET, URL_SER2NET)
 
     async def check_firmware_lock(self) -> bool:
         """Check if firmware update locked. And create empty file if needed."""
@@ -222,43 +172,13 @@ class ShellMGW(ShellMultimode):
 
     ###########################################################################
 
-    async def patch_miio_mqtt_fw146(self, ps: str):
-        assert self.ver < "1.4.7_0000", self.ver
-        if "-t log/miio" in ps:
-            return
-        await self.exec("killall daemon_miio.sh")
-        await self.exec("killall miio_client; pkill -f log/miio")
-        await asyncio.sleep(.5)
-        await self.exec(MIIO2MQTT_FW146)
-        await self.exec("daemon_miio.sh &")
-
-    ###########################################################################
-
-    # def patch_miio_mqtt(self):
-    #     self.mpatches.append(PATCH_MIIO_MQTT)
-
-    def patch_disable_buzzer(self):
-        self.miio_patches += [PATCH_DISABLE_BUZZER1, PATCH_DISABLE_BUZZER2]
-
     def patch_memory_zigbee(self):
         self.app_patches += [
             PATCH_MEMORY_ZIGBEE1, PATCH_MEMORY_ZIGBEE2, PATCH_MEMORY_ZIGBEE3
         ]
 
-    def patch_zigbee_tcp(self):
-        self.app_patches += [PATCH_ZIGBEE_TCP1, PATCH_ZIGBEE_TCP2]
-
-    # def patch_bluetooth_mqtt(self):
-    #     self.mpatches.append(PATCH_BLETOOTH_MQTT)
-
     def patch_memory_bluetooth(self):
         self.miio_patches += [PATCH_MEMORY_BLUETOOTH1, PATCH_MEMORY_BLUETOOTH2]
-
-    def patch_disable_bluetooth(self):
-        self.miio_patches.append(PATCH_DISABLE_BLUETOOTH)
-
-    def patch_zigbee_parents(self):
-        self.app_patches.append(PATCH_ZIGBEE_PARENTS)
 
     ###########################################################################
 
@@ -352,7 +272,6 @@ class ShellMGW(ShellMultimode):
             if self.miio_ps not in ps:
                 n += await self.update_daemon_miio()
         else:
-            await self.patch_miio_mqtt_fw146(ps)
             n = -1
 
         return n

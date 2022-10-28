@@ -5,7 +5,6 @@ import random
 import string
 from typing import Optional
 
-import requests
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
@@ -14,13 +13,11 @@ from homeassistant.helpers import (
 )
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
-from homeassistant.requirements import async_process_requirements
 
 from . import shell
 from .const import DOMAIN
 from .converters import STAT_GLOBALS
 from .device import XDevice
-from .ezsp import EzspUtils
 from .gateway import XGateway, TELNET_CMD
 from .gateway.lumi import LumiGateway
 from .mini_miio import AsyncMiIO
@@ -141,8 +138,7 @@ async def check_gateway(
 ) -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
     try:
-        async with shell.Session(host) as session:
-            sh = await session.login()
+        async with shell.Session(host) as sh:
             if sh.model:
                 # 1.1. check token with telnet
                 return None if await sh.get_token() == token else 'wrong_token'
@@ -173,8 +169,7 @@ async def check_gateway(
     await asyncio.sleep(1)
 
     try:
-        async with shell.Session(host) as session:
-            sh = await session.login()
+        async with shell.Session(host) as sh:
             if not sh.model:
                 return 'wrong_telnet'
     except Exception:
@@ -252,108 +247,6 @@ async def get_ble_remotes(host: str, token: str):
 
 def format_mac(s: str) -> str:
     return f"{s[10:]}:{s[8:10]}:{s[6:8]}:{s[4:6]}:{s[2:4]}:{s[:2]}".upper()
-
-
-NCP_URL = "https://master.dl.sourceforge.net/project/mgl03/zigbee/%s?viasf=1"
-
-
-def flash_zigbee_firmware(host: str, ports: list, fw_url: str, fw_ver: str,
-                          fw_port=0, force=False):
-    """
-    param host: gateway host
-    param ports: one or multiple ports with different speeds, first port
-        should be 115200
-    param fw_url: url to firmware file
-    param fw_ver: firmware version, checks before and after flash
-    param fw_port: optional, port with firmware speed if it is not 115200
-    param second_port: optional, second port if current firmware may have
-        different speed
-    param force: skip check firmware version before flash
-    return: True if NCP firmware version equal to fw_ver
-    """
-
-    # we can flash NCP only in boot mode on speed 115200
-    # but NCP can work on another speed, so we need to try both of them
-    # work with 115200 on port 8115, and with 38400 on port 8038
-    _LOGGER.debug(f"Try to update Zigbee NCP to version {fw_ver}")
-
-    if isinstance(ports, int):
-        ports = [ports]
-
-    utils = EzspUtils()
-
-    try:
-        # try to find right speed from the list
-        for port in ports:
-            utils.connect(host, port)
-            state = utils.state()
-            if state:
-                break
-            utils.close()
-        else:
-            raise RuntimeError
-
-        if state == "normal":
-            if fw_ver in utils.version and not force:
-                _LOGGER.debug("No need to flash")
-                return True
-            _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
-            utils.launch_boot()
-            state = utils.state()
-
-        _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
-
-        # should be in boot
-        if state != "boot":
-            return False
-
-        r = requests.get(fw_url)
-        assert r.status_code == 200, r.status_code
-
-        assert utils.flash_and_close(r.content)
-
-        utils.connect(host, ports[0])
-        utils.reboot_and_close()
-
-        utils.connect(host, fw_port or ports[0])
-        state = utils.state()
-        _LOGGER.debug(f"NCP state: {state}, version: {utils.version}")
-        return fw_ver in utils.version
-
-    except Exception as e:
-        _LOGGER.debug(f"NCP flash error", exc_info=e)
-        return False
-
-    finally:
-        utils.close()
-
-
-async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
-    """Update zigbee firmware for both ZHA and zigbee2mqtt modes"""
-    await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
-
-    try:
-        async with shell.Session(host) as session:
-            sh = await session.login()
-            assert await sh.run_zigbee_flash()
-    except Exception as e:
-        _LOGGER.error("Can't update zigbee firmware", exc_info=e)
-        return False
-
-    await asyncio.sleep(.5)
-
-    args = [
-        host, [8115, 8038], NCP_URL % 'mgl03_ncp_6_7_10_b38400_sw.gbl',
-        'v6.7.10', 8038
-    ] if custom else [
-        host, [8115, 8038], NCP_URL % 'ncp-uart-sw_mgl03_6_6_2_stock.gbl',
-        'v6.6.2', 8115
-    ]
-
-    for _ in range(3):
-        if await hass.async_add_executor_job(flash_zigbee_firmware, *args):
-            return True
-    return False
 
 
 async def get_ota_link(hass: HomeAssistant, device: "XDevice"):

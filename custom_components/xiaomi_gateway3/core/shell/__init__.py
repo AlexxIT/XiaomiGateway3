@@ -18,15 +18,23 @@ class Session:
         except Exception:
             return False
     """
+    reader: asyncio.StreamReader
+    writer: asyncio.StreamWriter
 
     def __init__(self, host: str, port=23):
         self.coro = asyncio.open_connection(host, port, limit=1_000_000)
 
     async def __aenter__(self):
-        self.reader, self.writer = await asyncio.wait_for(self.coro, 5)
-        return self
+        await self.connect()
+        return await self.login()
 
     async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
+
+    async def connect(self):
+        self.reader, self.writer = await asyncio.wait_for(self.coro, 5)
+
+    async def close(self):
         self.writer.close()
         await self.writer.wait_closed()
 

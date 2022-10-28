@@ -48,10 +48,6 @@ class GateMGW(
 
         ps = await sh.get_running_ps()
 
-        if "mosquitto -d" not in ps:
-            self.debug("Run public mosquitto")
-            await sh.run_public_mosquitto()
-
         if "ntpd" not in ps:
             # run NTPd for sync time
             await sh.run_ntpd()
@@ -62,32 +58,14 @@ class GateMGW(
         if self.available is None and self.did is None:
             await self.gw3_read_device(sh)
 
-        if not self.zha_mode:
-            # buzzer problem only in MiHome mode
-            if self.options.get('buzzer'):
-                self.debug("Disable Buzzer")
-                sh.patch_disable_buzzer()
-
-            if self.options.get('memory'):
-                self.debug("Init Zigbee in memory storage")
-                sh.patch_memory_zigbee()
-
-        elif await sh.check_zigbee_tcp():
-            self.debug("Init ZHA mode")
-            sh.patch_zigbee_tcp()
-
-        else:
-            self.error("Can't run ZHA mode")
-            return False
+        if not self.zha_mode and self.options.get('memory'):
+            self.debug("Init Zigbee in memory storage")
+            sh.patch_memory_zigbee()
 
         await self.dispatcher_send(SIGNAL_PREPARE_GW, sh=sh)
 
-        if sh.ver >= "1.4.7_0000":
-            n = await sh.apply_patches(ps)
-            self.debug(f"Applied {n} patches to daemons")
-        else:
-            await sh.patch_miio_mqtt_fw146(ps)
-            self.warning(f"Firmware {sh.ver} support is very limited!")
+        n = await sh.apply_patches(ps)
+        self.debug(f"Applied {n} patches to daemons")
 
         return True
 
@@ -133,8 +111,7 @@ class GateMGW(
 
     async def gw3_update_serial_stats(self):
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 serial = await sh.read_file('/proc/tty/driver/serial')
                 payload = self.device.decode(
                     GATEWAY, {"serial": serial.decode()}
@@ -145,16 +122,14 @@ class GateMGW(
 
     async def gw3_memory_sync(self):
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 await sh.memory_sync()
         except Exception as e:
             self.error(f"Can't memory sync", e)
 
     async def gw3_send_lock(self, enable: bool) -> bool:
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 await sh.lock_firmware(enable)
                 locked = await sh.check_firmware_lock()
                 return enable == locked
@@ -164,8 +139,7 @@ class GateMGW(
 
     async def gw3_read_lock(self) -> Optional[bool]:
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 return await sh.check_firmware_lock()
         except Exception as e:
             self.error(f"Can't get firmware lock", e)

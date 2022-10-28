@@ -3,7 +3,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
-from .core import utils
+from .core import utils, ezsp
 from .core.converters import Converter
 from .core.device import XDevice, RE_DID
 from .core.entity import XEntity
@@ -77,7 +77,7 @@ class CommandSelect(XEntity, SelectEntity):
         if device.model == "lumi.gateway.mgl03":
             self._attr_options = [
                 CMD_PAIR, CMD_BIND, CMD_OTA, CMD_CONFIG, CMD_PARENTSCAN,
-                CMD_FWLOCK, CMD_FLASHZB, CMD_REBOOT, CMD_FTP,
+                CMD_FLASHZB, CMD_FWLOCK, CMD_REBOOT, CMD_FTP,
             ]
         else:
             self._attr_options = [
@@ -298,7 +298,7 @@ class DataSelect(XEntity, SelectEntity):
         self.set_options(None, [OPT_ORIGINAL, OPT_CUSTOM])
 
     async def step_user_flashzb(self, option: str):
-        ok = await utils.update_zigbee_firmware(
+        ok = await ezsp.update_zigbee_firmware(
             self.hass, self.gw.host, option == OPT_CUSTOM
         )
         self.set_end(OPT_OK if ok else OPT_ERROR)

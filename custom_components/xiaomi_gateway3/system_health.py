@@ -46,6 +46,8 @@ async def setup_debug(hass: HomeAssistant, logger: Logger):
     info[DOMAIN + "_version"] = f"{integration.version} ({source_hash()})"
     logger.debug(f"SysInfo: {info}")
 
+    integration.manifest["issue_tracker"] = view.url
+
 
 class DebugView(logging.Handler, HomeAssistantView):
     """Class generate web page with component debug logs."""

@@ -159,7 +159,7 @@ class GatewayBase:
     ):
         fut = asyncio.get_event_loop().create_future()
 
-        cid = random.randint(0x80000000, 0xFFFFFFFF)
+        cid = random.randint(1_000_000_000, 2_147_483_647)
         self.miio_ack[cid] = fut
 
         await self.mqtt.publish("miio/command", {
