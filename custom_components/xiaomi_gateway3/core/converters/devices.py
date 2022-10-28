@@ -1051,6 +1051,11 @@ DEVICES += [{
         ZBatteryConv("battery", "sensor", report="1h 12h 0"),
     ],
 }, {
+    "TS0202": ["Tuya", "Motion Sensor", "IH012-RT01"],
+    "spec": [
+        ZIASZoneConv("occupancy", "binary_sensor"),
+    ],
+}, {
     # very simple relays
     "01MINIZB": ["Sonoff", "Mini", "ZBMINI"],
     "SA-003-Zigbee": ["eWeLink", "Zigbee OnOff Controller", "SA-003-Zigbee"],
