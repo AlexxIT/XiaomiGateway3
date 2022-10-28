@@ -19,6 +19,7 @@ from . import system_health
 from .core import logger, utils
 from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
+from .core.ezsp import update_zigbee_firmware
 from .core.gateway import XGateway
 from .core.xiaomi_cloud import MiCloud
 

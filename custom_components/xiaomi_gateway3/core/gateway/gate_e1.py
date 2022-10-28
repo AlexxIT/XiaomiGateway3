@@ -31,27 +31,10 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         self.lumi_init()
         self.z3_init()
 
-        ps = await sh.get_running_ps()
-
-        if "/tmp/mosquitto -d" not in ps:
-            self.debug("Run public mosquitto")
-            await sh.run_public_mosquitto()
-
-        # if "ntpd" not in ps:
-        #     # run NTPd for sync time
-        #     await sh.run_ntpd()
-
         if self.available is None and self.did is None:
             await self.e1_read_device(sh)
 
-        sh.patch_miio_mqtt()
-
-        await self.dispatcher_send(
-            SIGNAL_PREPARE_GW, sh=sh
-        )
-
-        n = await sh.apply_patches(ps)
-        self.debug(f"Applied {n} patches to daemons")
+        await self.dispatcher_send(SIGNAL_PREPARE_GW, sh=sh)
 
         return True
 
@@ -68,8 +51,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
 
     async def e1_update_stats(self):
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 serial = await sh.read_file(
                     "/proc/tty/driver/ms_uart | grep -v ^0 | sort -r"
                 )

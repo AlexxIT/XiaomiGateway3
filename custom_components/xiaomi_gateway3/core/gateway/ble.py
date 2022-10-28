@@ -34,22 +34,9 @@ class BLEGateway(GatewayBase):
         if self.available is None:
             await self.ble_read_devices(sh)
 
-        ok = await sh.check_bt()
-        if ok:
-            self.debug("Patch Bluetooth")
-            sh.patch_bluetooth_mqtt()
-        else:
-            self.error("Can't patch Bluetooth utility")
-
-        if not self.options.get('memory'):
-            return
-
-        if ok:
+        if self.options.get('memory'):
             self.debug("Init Bluetooth in memory storage")
             sh.patch_memory_bluetooth()
-        else:
-            self.debug("Disable Bluetooth")
-            sh.patch_disable_bluetooth()
 
     async def ble_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == 'log/miio':

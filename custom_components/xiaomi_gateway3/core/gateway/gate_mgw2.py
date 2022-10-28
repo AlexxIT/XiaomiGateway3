@@ -24,12 +24,6 @@ class GateMGW2(
         self.mesh_init()
         self.ble_init()
 
-        ps = await sh.get_running_ps()
-
-        if "/tmp/mosquitto -d" not in ps:
-            self.debug("Run public mosquitto")
-            await sh.run_public_mosquitto()
-
         msg = await sh.run_openmiio_agent()
         self.debug("openmiio_agent: " + msg)
 

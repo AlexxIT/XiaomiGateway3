@@ -123,8 +123,7 @@ class SilabsGateway(GatewayBase):
 
     async def silabs_prevent_unpair(self):
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 await sh.prevent_unpair()
         except Exception as e:
             self.error("Can't prevent unpair", e)

@@ -6,6 +6,12 @@ from typing import Union
 
 from ..unqlite import SQLite
 
+ERROR = 0
+OK = 1
+DOWNLOAD = 2
+
+RUN_OPENMIIO = "/data/openmiio_agent miio mqtt cache z3 --zigbee.tcp=8888 > /var/log/openmiio.log 2>&1 &"
+
 
 @dataclass
 class TelnetShell:
@@ -63,14 +69,14 @@ class TelnetShell:
         cmd = f"[ -x {filename} ] && md5sum {filename}"
 
         if md5 in await self.exec(cmd):
-            return 1
+            return OK
 
         # download can take up to 3 minutes for Chinese users
         await self.exec(
             f"wget {url} -O {filename} && chmod +x {filename}", timeout=300
         )
 
-        return 2 if md5 in await self.exec(cmd) else 0
+        return DOWNLOAD if md5 in await self.exec(cmd) else ERROR
 
     async def get_running_ps(self) -> str:
         raise NotImplementedError
@@ -90,36 +96,34 @@ class TelnetShell:
     async def tar_data(self):
         raise NotImplementedError
 
-    def patch_zigbee_parents(self):
-        raise NotImplementedError
 
-
+# noinspection PyAbstractClass
 class ShellOpenMiio(TelnetShell):
     async def check_openmiio_agent(self) -> int:
+        # different binaries for different arch
         raise NotImplementedError
 
     async def run_openmiio_agent(self) -> str:
-        cmd = f"/data/openmiio_agent 1>/tmp/miio.out 2>/tmp/miio.err &"
-
         ok = await self.check_openmiio_agent()
-        if ok == 1:
+        if ok == OK:
             # run if not in ps
             if "openmiio_agent" in await self.get_running_ps():
                 return "The latest version is already running"
 
-            await self.exec(cmd)
+            await self.exec(RUN_OPENMIIO)
             return "The latest version is launched"
 
-        if ok == 2:
+        if ok == DOWNLOAD:
             if "openmiio_agent" in await self.get_running_ps():
                 await self.exec(f"killall openmiio_agent")
 
-            await self.exec(cmd)
+            await self.exec(RUN_OPENMIIO)
             return "The latest version is updated and launched"
 
         return "ERROR: can't download latest version"
 
 
+# noinspection PyAbstractClass
 class ShellMultimode(ShellOpenMiio):
     db: SQLite = None
 

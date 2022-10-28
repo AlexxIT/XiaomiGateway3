@@ -26,8 +26,6 @@ class Z3Gateway(GatewayBase):
 
     async def z3_prepare_gateway(self, sh: shell.TelnetShell):
         assert self.ieee, "Z3Gateway depends on SilabsGateway"
-        self.debug("Init Zigbee parents")
-        sh.patch_zigbee_parents()
 
     async def z3_mqtt_connect(self):
         # delay first scan

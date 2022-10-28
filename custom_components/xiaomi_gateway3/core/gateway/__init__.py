@@ -30,7 +30,7 @@ from ..mini_mqtt import MiniMQTT, MQTTMessage
 
 _LOGGER = logging.getLogger(__name__)
 
-TELNET_CMD = '{"method":"set_ip_info","params":{"ssid":"\"\"","pswd":"1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"}}'
+TELNET_CMD = r'{"method":"set_ip_info","params":{"ssid":"\"\"","pswd":"1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"}}'
 
 
 class XGateway(GateMGW, GateE1, GateMGW2):
@@ -171,9 +171,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
         running.
         """
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
-
+            async with shell.Session(self.host) as sh:
                 if not await sh.only_one():
                     self.debug("Connection from a second Hass detected")
                     return False
@@ -201,8 +199,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
 
     async def telnet_send(self, command: str):
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 if command == "ftp":
                     await sh.run_ftp()
                 elif command == "tardata":
@@ -219,8 +216,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
 
     async def tar_data(self) -> str:
         try:
-            async with shell.Session(self.host) as session:
-                sh = await session.login()
+            async with shell.Session(self.host) as sh:
                 return await sh.tar_data()
         except Exception as e:
             return f"{type(e).__name__} {e}"

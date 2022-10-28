@@ -9,7 +9,7 @@
       "firmwarelock": "Gateway firmware lock",
       "reboot": "Gateway reboot",
       "ftp": "Gateway run FTP",
-      "flashzb": "Flash Zigbee chip"
+      "flashzb": "Zigbee flash EZSP"
     },
     "data": {
       "enabled": "Enabled",

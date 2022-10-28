@@ -228,13 +228,6 @@ class OptionsFlowHandler(OptionsFlow):
             new_mode = user_input["zha"]
             if new_mode != old_mode:
                 host = user_input["host"]
-
-                # change zigbee firmware if needed
-                if not await utils.update_zigbee_firmware(
-                        self.hass, host, new_mode
-                ):
-                    raise Exception("Can't update zigbee firmware")
-
                 if new_mode is True:
                     self.hass.components.persistent_notification.async_create(
                         ZHA_NOTIFICATION.format(host), TITLE
@@ -248,7 +241,7 @@ class OptionsFlowHandler(OptionsFlow):
         ble = self.entry.options.get("ble", True)
         stats = self.entry.options.get("stats", False)
         debug = self.entry.options.get("debug", [])
-        buzzer = self.entry.options.get("buzzer", False)
+        # buzzer = self.entry.options.get("buzzer", False)
         memory = self.entry.options.get("memory", False)
         zha = self.entry.options.get("zha", False)
 
@@ -265,7 +258,7 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Optional("stats", default=stats): bool,
                 vol.Optional("debug", default=debug):
                     cv.multi_select(OPT_DEBUG),
-                vol.Optional("buzzer", default=buzzer): bool,
+                # vol.Optional("buzzer", default=buzzer): bool,
                 vol.Optional("memory", default=memory): bool,
                 vol.Optional("zha", default=zha): bool,
             }),
