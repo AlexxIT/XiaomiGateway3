@@ -101,6 +101,13 @@ def decode(data: dict):
                     "failures": args[3],
                     "energy": args[4],
                 }
+            elif hdr.command_id == ZDOCmd.NWK_addr_rsp:
+                return {
+                    "command": cmd,
+                    "status": args[0],
+                    "ieee": args[1],
+                    "nwk": args[2],
+                }
             else:
                 raise NotImplemented
 

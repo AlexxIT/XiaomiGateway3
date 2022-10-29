@@ -1,4 +1,5 @@
 from homeassistant.components.sensor import DOMAIN
+from zigpy.types import EUI64
 
 from custom_components.xiaomi_gateway3.core.converters import silabs, ZIGBEE
 from custom_components.xiaomi_gateway3.core.converters.zigbee import ZConverter
@@ -153,4 +154,15 @@ def test_ias_zone():
     assert p == {
         'endpoint': 1, 'seq': 103, 'cluster': 'ias_zone', 'command_id': 0,
         'command': 'enroll_response', 'value': [33, 0, 0, 0]
+    }
+
+
+def test_misc():
+    p = silabs.decode({
+        "clusterId": "0x8000", "sourceEndpoint": "0x00",
+        "APSPlayload": "0x02005D6A9303008D15002723"
+    })
+    assert p == {
+        'command': 'NWK_addr_rsp', 'status': 0, 'nwk': 0x2327,
+        'ieee': EUI64.convert("00:15:8d:00:03:93:6a:5d"),
     }
