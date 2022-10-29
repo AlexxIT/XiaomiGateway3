@@ -47,7 +47,3 @@ class GateMGW2(
         if msg.topic.endswith('/heartbeat'):
             payload = self.device.decode(GATEWAY, msg.json)
             self.device.update(payload)
-
-    async def ble_prepare_gateway(self, sh: shell.ShellMGW):
-        if self.available is None:
-            await self.ble_read_devices(sh)

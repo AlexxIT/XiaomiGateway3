@@ -34,7 +34,7 @@ class BLEGateway(GatewayBase):
         if self.available is None:
             await self.ble_read_devices(sh)
 
-        if self.options.get('memory'):
+        if self.options.get('memory') and sh.model == "mgw":
             self.debug("Init Bluetooth in memory storage")
             sh.patch_memory_bluetooth()
 
