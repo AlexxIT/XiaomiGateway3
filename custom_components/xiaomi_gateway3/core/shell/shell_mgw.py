@@ -19,7 +19,7 @@ URL_BUSYBOX = "http://master.dl.sourceforge.net/project/mgl03/bin/busybox?viasf=
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
 
 URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent?viasf=1"
-MD5_AGENT = "dd7e5ff40f03edcf71254da28a870cd0"
+MD5_AGENT = "1defd8048bff54a726a5a187f729a1bd"
 
 
 def sed(app: str, pattern: str, repl: str):

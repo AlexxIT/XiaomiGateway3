@@ -3,7 +3,7 @@ import asyncio
 from .base import ShellOpenMiio
 
 URL_AGENT = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent?viasf=1"
-MD5_AGENT = "3fea39f9610cbf8a37ffb53ba4fa0689"
+MD5_AGENT = "56f591a3307a7e5b7489a88b7de98efd"
 
 
 # noinspection PyAbstractClass
