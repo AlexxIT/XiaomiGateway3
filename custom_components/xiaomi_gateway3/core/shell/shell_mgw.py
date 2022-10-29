@@ -261,6 +261,10 @@ class ShellMGW(ShellMultimode):
         return len(self.app_patches)
 
     async def apply_patches(self, ps: str) -> int:
+        # stop old version
+        if "log/miio" in ps:
+            await self.exec("pkill -f log/miio")
+
         n = 0
 
         if self.ver >= "1.5.4_0036":

@@ -6,7 +6,7 @@ from .base import SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB, SIGNAL_TIMER
 from .ble import BLEGateway
 from .lumi import LumiGateway
 from .mesh import MeshGateway
-from .miot import MIoTGateway, decode_miio_json
+from .miot import MIoTGateway
 from .silabs import SilabsGateway
 from .z3 import Z3Gateway
 from .. import shell
@@ -78,15 +78,14 @@ class GateMGW(
     #     self.device.update({GATEWAY: False})
 
     async def gw3_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == 'log/miio':
-            payload = decode_miio_json(msg.payload, b'event.gw.heartbeat')
-            if payload:
-                payload = payload[0]['params'][0]
-                payload = self.device.decode(GATEWAY, payload)
-                self.device.update(payload)
+        if msg.topic == "miio/report" and \
+                b'"event.gw.heartbeat"' in msg.payload:
+            payload = msg.json['params'][0]
+            payload = self.device.decode(GATEWAY, payload)
+            self.device.update(payload)
 
-                # time offset may changed right after gw.heartbeat
-                await self.gw3_update_time_offset()
+            # time offset may changed right after gw.heartbeat
+            await self.gw3_update_time_offset()
 
         elif msg.topic.endswith('/heartbeat'):
             payload = self.device.decode(GATEWAY, msg.json)

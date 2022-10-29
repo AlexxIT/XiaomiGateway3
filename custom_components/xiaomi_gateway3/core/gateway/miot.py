@@ -1,6 +1,4 @@
-import json
-import re
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from .base import GatewayBase, SIGNAL_MQTT_PUB
 from ..device import XDevice
@@ -13,20 +11,10 @@ class MIoTGateway(GatewayBase):
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.miot_mqtt_publish)
 
     async def miot_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == 'log/miio':
-            for data in decode_miio_json(
-                    msg.payload, b'properties_changed'
-            ):
-                await self.miot_process_properties(data["params"])
-
-            for data in decode_miio_json(
-                    msg.payload, b'event_occured'
-            ):
-                await self.miot_process_event(data["params"])
-        elif msg.topic == "miio/report":
-            if b'properties_changed' in msg.payload:
+        if msg.topic == "miio/report":
+            if b'"properties_changed"' in msg.payload:
                 await self.miot_process_properties(msg.json["params"])
-            elif b'event_occured' in msg.payload:
+            elif b'"event_occured"' in msg.payload:
                 await self.miot_process_event(msg.json["params"])
 
     async def miot_process_properties(self, data: list):
@@ -72,25 +60,3 @@ class MIoTGateway(GatewayBase):
         if resp is None or "result" not in resp:
             return None
         return device.decode_miot(resp['result'])
-
-
-# new miio adds colors to logs
-RE_JSON1 = re.compile(b'msg:(.+) length:([0-9]+) bytes')
-RE_JSON2 = re.compile(b'{.+}')
-EMPTY_RESPONSE = []
-
-
-def decode_miio_json(raw: bytes, search: bytes) -> List[dict]:
-    """There can be multiple concatenated json on one line. And sometimes the
-    length does not match the message."""
-    if search not in raw:
-        return EMPTY_RESPONSE
-    m = RE_JSON1.search(raw)
-    if m:
-        length = int(m[2])
-        raw = m[1][:length]
-    else:
-        m = RE_JSON2.search(raw)
-        raw = m[0]
-    items = raw.replace(b'}{', b'}\n{').split(b'\n')
-    return [json.loads(raw) for raw in items if search in raw]
