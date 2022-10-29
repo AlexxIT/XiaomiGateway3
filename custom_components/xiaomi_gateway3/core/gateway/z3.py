@@ -57,7 +57,7 @@ class Z3Gateway(GatewayBase):
 
     async def z3_process_log(self, payload: str):
         if payload.startswith("CLI command executed"):
-            cmd = payload[22:-1]
+            cmd = payload[22:]
             if cmd == "debugprint all_on" or self.z3_buffer is None:
                 # reset all buffers
                 self.z3_buffer = {}
