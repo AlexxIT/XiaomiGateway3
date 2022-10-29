@@ -316,7 +316,7 @@ def test_mi_curtain():
 
 def test_gateway():
     device = XDevice(GATEWAY, 'lumi.gateway.mgl03', "123456", "aabbccddeeff")
-    assert device.info.name == 'Xiaomi Gateway 3'
+    assert device.info.name == 'Xiaomi Multimode Gateway'
     device.setup_converters()
 
     p = device.decode_lumi([{

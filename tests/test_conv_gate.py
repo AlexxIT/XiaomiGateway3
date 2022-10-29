@@ -7,7 +7,7 @@ MAC = "112233aabbcc"
 
 def test_gateway():
     device = XDevice(GATEWAY, "lumi.gateway.mgl03", DID, MAC)
-    assert device.info.name == "Xiaomi Gateway 3"
+    assert device.info.name == "Xiaomi Multimode Gateway"
     device.setup_converters()
 
     p = device.decode_lumi([{"res_name": "8.0.2109", "value": 60}])
