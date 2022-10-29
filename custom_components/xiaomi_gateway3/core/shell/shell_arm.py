@@ -2,7 +2,7 @@ import asyncio
 
 from .base import ShellOpenMiio
 
-URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/aqcn02/openmiio_agent/openmiio_agent?viasf=1"
+URL_AGENT = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent?viasf=1"
 MD5_AGENT = "3fea39f9610cbf8a37ffb53ba4fa0689"
 
 

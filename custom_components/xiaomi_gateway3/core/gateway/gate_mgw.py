@@ -47,7 +47,6 @@ class GateMGW(
         self.z3_init()
 
         ps = await sh.get_running_ps()
-
         if "ntpd" not in ps:
             # run NTPd for sync time
             await sh.run_ntpd()

@@ -31,6 +31,9 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         self.lumi_init()
         self.z3_init()
 
+        msg = await sh.run_openmiio_agent()
+        self.debug("openmiio_agent: " + msg)
+
         if self.available is None and self.did is None:
             await self.e1_read_device(sh)
 

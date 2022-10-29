@@ -79,7 +79,7 @@ class TelnetShell:
         return DOWNLOAD if md5 in await self.exec(cmd) else ERROR
 
     async def get_running_ps(self) -> str:
-        raise NotImplementedError
+        return await self.exec("ps")
 
     async def get_version(self) -> str:
         raise NotImplementedError
