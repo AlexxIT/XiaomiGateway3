@@ -1711,6 +1711,21 @@ DEVICES += [{
         BoolConv("on", "switch", mi="2.p.9"),
     ],
 }, {
+    10356: ["ZQ", "Presence Sensor Lite", "lite"],
+    "spec": [
+        MapConv("occupancy-status", "sensor", mi="2.p.1", map={
+            0: "NoOne", 1: "EnterIn", 2: "SmallMove",
+            3: "MicroMove", 4: "Approaching", 5: "MoveAway"
+        }),
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        Converter("no-one-determine-time", "sensor", mi="2.p.2"), 
+        Converter("has-someone-duration", "sensor", mi="2.p.3"), 
+        Converter("no-one-duration", "sensor", mi="2.p.4"), 
+        Converter("illuminance", "sensor", mi="2.p.5"), 
+        Converter("distance", "sensor", mi="2.p.6"), 
+        BoolConv("led", "switch", mi="3.p.1", enabled=False),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
