@@ -1716,6 +1716,7 @@ DEVICES += [{
         MapConv("occupancy_status", "sensor", mi="2.p.1", map={
             0: "NoOne", 1: "EnterIn", 2: "SmallMove", 3: "MicroMove", 4: "Approaching", 5: "MoveAway"
         }),
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
         MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
         MathConv("has_someone_duration", "sensor", mi="2.p.3", min=0, max=255),
         MathConv("no_one_duration", "sensor", mi="2.p.4", min=0, max=255),
