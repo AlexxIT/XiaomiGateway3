@@ -1035,6 +1035,7 @@ DEVICES += [{
     ],
 }, {
     "RH3052": ["Tuya", "TH sensor", "TT001ZAV20"],
+    "TS0201": ["Tuya", "TH sensor", "IH-K009"],
     "support": 3,
     "spec": [
         ZTemperatureConv("temperature", "sensor"),
