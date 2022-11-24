@@ -1600,6 +1600,22 @@ DEVICES += [{
     ],
     "ttl": "7d",
 }, {
+    10441: ["Linptech", "Linptech Presence Sensor", "hb01"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
+        Converter("has_someone_duration", "sensor", mi="2.p.3"),
+        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
+        Converter("illuminance", "sensor", mi="2.p.5"),
+        MapConv("approach_aloof", "sensor", mi="3.p.1", map={
+            0: "Stop", 1: "Approach", 2: "Aloof"
+        }),
+        MathConv("shielding_distance", "number", mi="3.p.2", min=0, max=255),
+        MathConv("distance", "sensor", mi="3.p.3"),
+        MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
+        Converter("led", "switch", mi="4.p.1"),
+    ],
+},{
     # urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
     4736: ["Xiaomi", "Mesh Night Light", "MJYD05YL"],
     "spec": [
