@@ -1611,7 +1611,7 @@ DEVICES += [{
             0: "Stop", 1: "Approach", 2: "Aloof"
         }),
         MathConv("shielding_distance", "number", mi="3.p.2", min=0, max=255),
-        MathConv("distance", "sensor", mi="3.p.3"),
+        MathConv("body_distance", "sensor", mi="3.p.3"),
         MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
         Converter("led", "switch", mi="4.p.1"),
     ],
