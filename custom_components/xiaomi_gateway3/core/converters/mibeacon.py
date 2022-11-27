@@ -341,22 +341,33 @@ class MiBeaconConv(Converter):
                     payload.update({'action': 'hold'})
                 if value == 15:
                     payload.update({'action': 'double'})
+            # wireless button Xiaomi Wireless Switch Bluetooth Version
+            elif device.model == 9095:
+                payload.update({'action': 'single'})
 
         elif eid == 0x4E0D:  # 19981
-            # wireless button XMWXKG01YL
             value = int.from_bytes(data, 'little')
-            if value == 1:
-                payload.update({'action': 'button_1_double'})
-            if value == 2:
-                payload.update({'action': 'button_2_double'})
+            # wireless button XMWXKG01YL
+            if device.model == 6473:
+                if value == 1:
+                    payload.update({'action': 'button_1_double'})
+                if value == 2:
+                    payload.update({'action': 'button_2_double'})\
+            # wireless button Xiaomi Wireless Switch Bluetooth Version
+            elif device.model == 9095:
+                payload.update({'action': 'double'})
 
         elif eid == 0x4E0E:  # 19982
-            # wireless button XMWXKG01YL
             value = int.from_bytes(data, 'little')
-            if value == 1:
-                payload.update({'action': 'button_1_hold'})
-            if value == 2:
-                payload.update({'action': 'button_2_hold'})
+            # wireless button XMWXKG01YL
+            if device.model == 6473:
+                if value == 1:
+                    payload.update({'action': 'button_1_hold'})
+                if value == 2:
+                    payload.update({'action': 'button_2_hold'})
+            # wireless button Xiaomi Wireless Switch Bluetooth Version
+            elif device.model == 9095:
+                payload.update({'action': 'hold'})
 
         elif eid == 0x4818:  # 18456
             # Linptech motion sensor version 2
