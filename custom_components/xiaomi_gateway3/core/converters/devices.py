@@ -1301,11 +1301,11 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/issues/826
     7184: ["Linptech", "Wireless Switch", "K11"],
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
-    "ttl": "6h" # battery every 6 hours
+    "ttl": "6h"  # battery every 6 hours
 }, {
     9095: ["Xiaomi", "Xiaomi Wireless Switch Bluetooth Version", "XMWXKG01LM"],
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
-    "ttl": "6h" # battery every 6 hours
+    "ttl": "6h"  # battery every 6 hours
 }, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
@@ -1604,22 +1604,6 @@ DEVICES += [{
     ],
     "ttl": "7d",
 }, {
-    10441: ["Linptech", "Linptech Presence Sensor", "hb01"],
-    "spec": [
-        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
-        MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
-        Converter("has_someone_duration", "sensor", mi="2.p.3"),
-        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
-        Converter("illuminance", "sensor", mi="2.p.5"),
-        MapConv("approach_aloof", "sensor", mi="3.p.1", map={
-            0: "Stop", 1: "Approach", 2: "Aloof"
-        }),
-        MathConv("shielding_distance", "number", mi="3.p.2", min=0, max=255),
-        MathConv("distance", "sensor", mi="3.p.3"),
-        MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
-        Converter("led", "switch", mi="4.p.1"),
-    ],
-},{
     # urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
     4736: ["Xiaomi", "Mesh Night Light", "MJYD05YL"],
     "spec": [
@@ -1744,18 +1728,39 @@ DEVICES += [{
 }, {
     10356: ["ZiQing", "IZQ Presence Sensor Lite", "IZQ-24"],
     "spec": [
-        MapConv("occupancy_status", "sensor", mi="2.p.1", map={
-            0: "NoOne", 1: "EnterIn", 2: "SmallMove", 3: "MicroMove", 4: "Approaching", 5: "MoveAway"
-        }),
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
         MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
-        MathConv("has_someone_duration", "sensor", mi="2.p.3", min=0, max=255),
-        MathConv("no_one_duration", "sensor", mi="2.p.4", min=0, max=255),
-        MathConv("illuminance", "sensor", mi="2.p.5", min=0, max=65535),
-        MathConv("distance", "sensor", mi="2.p.6", min=0, max=1000),
-        Converter("pir", "switch", mi="3.p.3", enabled=True),
-        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8),
+        MathConv("has_someone_duration", "sensor", mi="2.p.3"),
+        MathConv("idle_time", "sensor", mi="2.p.4"),
+        MathConv("illuminance", "sensor", mi="2.p.5"),
+        MathConv("distance", "sensor", mi="2.p.6"),
+
         Converter("led", "switch", mi="3.p.1", enabled=True),
+        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8),
+        Converter("pir", "switch", mi="3.p.3", enabled=True),
+
+        MapConv("occupancy_status", "sensor", mi="2.p.1", map={
+            0: "NoOne", 1: "EnterIn", 2: "SmallMove", 3: "MicroMove", 4: "Approaching",
+            5: "MoveAway"
+        }),
+    ],
+}, {
+    10441: ["Linptech", "Linptech Presence Sensor", "hb01"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
+        Converter("has_someone_duration", "sensor", mi="2.p.3"),
+        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
+        Converter("illuminance", "sensor", mi="2.p.5"),
+
+        MapConv("approach_aloof", "sensor", mi="3.p.1", map={
+            0: "Stop", 1: "Approach", 2: "Aloof"
+        }),
+        MathConv("shielding_distance", "number", mi="3.p.2", min=0, max=255),
+        MathConv("body_distance", "sensor", mi="3.p.3"),
+        MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
+
+        Converter("led", "switch", mi="4.p.1"),
     ],
 }, {
     "default": "mesh",  # default Mesh device
