@@ -328,7 +328,12 @@ class XDevice:
             if param.get("error_code", 0) != 0 or param.get("code", 0) != 0:
                 continue
 
-            v = param["value"] if "value" in param else param["arguments"]
+            if "value" in param:
+                v = param["value"]
+            else:
+                v = param["arguments"]
+                if "siid" not in v[0]:
+                    v[0]['siid'] = param['siid']
 
             # res_name is Lumi format
             if "res_name" in param:
