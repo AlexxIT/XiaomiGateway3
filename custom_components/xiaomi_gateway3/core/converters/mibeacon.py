@@ -65,6 +65,72 @@ BLE_LOCK_ERROR = {
     0xC0DE1004: "Mechanical failure",
 }
 
+BLE_SPEC_LOCK_ACTION = {
+    0b0000: None,
+    0b0001: "Lock",
+    0b0010: "Unlock",
+    0b0011: "Lifted Up The Door Handle From Outside To Lock",
+    0b0100: "Locked From Inside",
+    0b0101: "Released Lock From Inside",
+    0b0110: "Enabled Child Lock",
+    0b0111: "Disabled Child Lock",
+    0b1000: "Enable The Away From Home Mode",
+    0b1001: "Disable The Away From Home Mode"
+}
+
+BLE_SPEC_LOCK_METHOD = {
+    0b0000: None,
+    0b0001: "Mobile Phone",
+    0b0010: "Finger Print",
+    0b0011: "PassWord",
+    0b0100: "NFC",
+    0b0101: "Face",
+    0b0110: "Finger Vein",
+    0b0111: "Palm Print",
+    0b1000: "Lock Key",
+    0b1001: "One Time Password",
+    0b1010: "Periodic Password",
+    0b1011: "HomeKit",
+    0b1100: "Coerce",
+    0b1101: "Two Step Verification",
+    0b1110: "Turntable",
+    0b1111: "Manual",
+    0b10000: "Auto"
+}
+BLE_SPEC_LOCK_ERROR = {
+    1: "Frequent Unlocking Failed By Multiple Methods",
+    2: "Frequent Unlocking Failed By Password",
+    3: "Frequent Unlocking Failed By Fingerprint",
+    4: "Frequent Unlocking Failed By NFC",
+    5: "Frequent Unlocking Failed By Face",
+    6: "Frequent Unlocking Failed By Palmprint",
+    7: "Frequent Unlocking Failed By Finger Vein",
+    8: "Frequent Unlocking Failed By Key",
+    9: "Door Lock Was Damaged",
+    10: "Locked Unsuccessfully",
+    11: "Unlock From Inside After Leaving Home",
+    12: "Door Lock Was Reset",
+    13: "Foreign Object Detected In The Keyhole",
+    14: "Key Was Not Removed",
+    15: "Door Lock Fingerprint Sensor Error",
+    16: "Door Lock Mechanical Failure",
+    17: "Door Lock Main Part Failure",
+    18: "The Lithium Battery Temperature Is Too High",
+    19: "Door Lock Batteries Are Low",
+    20: "Door Lock Batteries Are Nearly Depleted",
+    21: "Door Lock Camera Batteries Are Low",
+    22: "Door Lock Camera Batteries Are Nearly Depleted",
+    23: "Leaving The Door Open Timed Out",
+    24: "Door Was Ajar",
+    25: "Door Was Opened Forcefully"
+}
+
+BLE_SPEC_LOCK_POSITION = {
+    1: "Indoor",
+    2: "OutDoor",
+    3: "Not Tell The Inside Or Outside Of The Door"
+}
+
 KETTLE = {0: "idle", 1: "heat", 2: "cool_down", 3: "warm_up"}
 
 ACTIONS = {
@@ -381,6 +447,56 @@ class MiBeaconConv(Converter):
         elif eid == 0x4C03:  # 19459
             # Linptech motion sensor version 2
             payload['battery'] = data[0]
+            
+        elif eid == 0x5003:  # 20483
+            # xiaomi face recogenize lock battery
+            payload['battery'] = data[0]
+        elif eid == 0x4A14:   #18964
+            # xiaomi face recogenize lock action
+            action_id = data[6]
+            method_id = data[7]
+            key_id = int.from_bytes(data[0:1], 'little')
+            position_id = data[8]
+
+            timestamp = int.from_bytes(data[2:6], 'little')
+            timestamp = datetime.fromtimestamp(timestamp).isoformat()
+            
+            #1 lock,2 unlock
+            if action_id == 1:
+                payload['contact'] = False
+                payload['lock'] = False
+                action = 'lock'
+            elif action_id == 2:
+                payload['contact'] = True
+                payload['lock'] = True
+                action = 'unlock'
+
+            if action_id not in BLE_SPEC_LOCK_ACTION or method_id not in BLE_SPEC_LOCK_METHOD or position_id not in BLE_SPEC_LOCK_POSITION:
+                return
+
+            payload.update({
+                'action': action,
+                'action_id': action_id,
+                'method_id': method_id,
+                'posotion_id': position_id,
+                'message': BLE_SPEC_LOCK_ACTION[action_id],
+                'method': BLE_SPEC_LOCK_METHOD[method_id],
+                'position': BLE_SPEC_LOCK_POSITION[position_id],
+                'key_id': key_id,
+                'timestamp': timestamp
+            })
+        elif eid == 0x5606: #22022
+            # xiaomi face recogenize lock doorbell
+            timestamp = int.from_bytes(data[0:4], 'little')
+            timestamp = datetime.fromtimestamp(timestamp).isoformat()
+
+            payload['doorbell'] = timestamp
+        elif eid == 0x4A07:
+            # xiaomi face recogenize lock abnormal-condition
+            error_id = data[5]
+            if error_id not in BLE_SPEC_LOCK_ERROR:
+                return
+            payload['error'] = BLE_SPEC_LOCK_ERROR[error_id]
 
 
 
