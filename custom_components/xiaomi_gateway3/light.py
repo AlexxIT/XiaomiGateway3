@@ -10,6 +10,7 @@ from .core.converters import ZIGBEE, MESH_GROUP_MODEL, Converter
 from .core.device import XDevice
 from .core.entity import XEntity
 from .core.gateway import XGateway
+from .core.converters.const import LIGHT_EFFECT_LIST
 
 CONF_DEFAULT_TRANSITION = 'default_transition'
 
@@ -51,6 +52,9 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
                     self._attr_min_mireds = int(1000000 / conv.maxk)
                     self._attr_max_mireds = int(1000000 / conv.mink)
+            elif conv.attr == ATTR_EFFECT:
+                self._attr_supported_features |= SUPPORT_EFFECT
+                self._attr_effect_list = list(LIGHT_EFFECT_LIST.keys())
 
     @callback
     def async_set_state(self, data: dict):
@@ -61,12 +65,15 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
             self._attr_color_temp = data[ATTR_COLOR_TEMP]
+        if ATTR_EFFECT in data:
+            self._attr_mode = data[ATTR_EFFECT]
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
         self._attr_is_on = state == STATE_ON
         self._attr_brightness = attrs.get(ATTR_BRIGHTNESS)
         self._attr_color_temp = attrs.get(ATTR_COLOR_TEMP)
+        self._attr_mode = attrs.get(ATTR_EFFECT)
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)

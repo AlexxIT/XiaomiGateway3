@@ -63,3 +63,18 @@ POWEROFF_MEMORY = {0: "off", 1: "previous"}
 BATTERY_LOW = {1: False, 2: True}
 SWITCH_MODE = {1: "250 ms", 2: "500 ms", 3: "750 ms", 4: "1 sec"}
 INVERSE = {0: True, 1: False}
+
+LIGHT_EFFECT_LIST = {
+    "自定义": 0,
+    "日光": 4,
+    "月光": 5,
+    "温馨": 7,
+    "影院": 8,
+    "阅读": 9,
+    "电脑": 10,
+    "会客": 11,
+    "娱乐": 12,
+    "唤醒": 13,
+    "黄昏": 14,
+    "助眠": 15
+}

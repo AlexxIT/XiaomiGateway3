@@ -1335,6 +1335,14 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
     ]
 }, {
+    7136: ["LeMesh", "Mesh Light V2", "lemesh.light.wy0c09"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        LightModeConv("effect", mi="2.p.5", parent="light"),
+    ]
+}, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),

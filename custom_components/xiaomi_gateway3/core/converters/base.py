@@ -148,6 +148,14 @@ class ColorTempKelvin(Converter):
             value = self.maxk
         super().encode(device, payload, value)
 
+@dataclass
+class LightModeConv(Converter):
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        payload[self.attr] = list(LIGHT_EFFECT_LIST.keys())[list(LIGHT_EFFECT_LIST.values()).index(value)]
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        super().encode(device, payload, LIGHT_EFFECT_LIST[value])
 
 @dataclass
 class BatteryConv(Converter):
