@@ -171,7 +171,7 @@ DEVICES += [{
     ],
 }, {
     "lumi.plug.mmeu01": ["Xiaomi", "Plug EU", "ZNCZ04LM"],
-    "spec": [Plug, Power, Voltage, Energy],
+    "spec": [Plug, Power, Voltage, Energy, ChipTemp],
 }, {
     "lumi.ctrl_86plug.aq1": ["Aqara", "Wall Outlet", "QBCZ11LM"],
     "lumi.ctrl_86plug": ["Aqara", "Wall Outlet", "QBCZ11LM"],
