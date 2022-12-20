@@ -864,6 +864,21 @@ DEVICES += [{
         Converter("battery_voltage", "sensor", mi="3.p.2", enabled=False),
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
     ]
+}, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/865
+    "lumi.sensor_gas.acn02": ["Aqara", "Gas Sensor", "JT-BZ-01AQ/A"],
+    "spec": [
+        MapConv("status", "sensor", mi="2.p.1", map={
+            0: "Normal Monitoring", 1: "Alarm", 2: "Fault", 3: "Warm Up",
+            4: "End Of Life"
+        }),
+        BoolConv("fault", "binary_sensor", mi="2.p.2"),
+        Converter("gas_density", "sensor", mi="2.p.3"),  # percentage
+        MapConv("sensitivity", "select", mi="5.p.1", map={
+            1: "LEL15", 2: "LEL10"
+        }, enabled=False),
+        Converter("remain_days", "sensor", mi="9.p.1"),
+    ],
 }]
 
 ########################################################################################
