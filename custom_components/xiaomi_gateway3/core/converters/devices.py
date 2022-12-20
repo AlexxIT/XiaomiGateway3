@@ -1207,6 +1207,16 @@ DEVICES += [{
         Converter("lock", "binary_sensor"),
     ],
 }, {
+    6017: ["Xiaomi", "Face Recognition Smart Door Lock", "XMZNMS09LM"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("battery", "sensor"),
+        Converter("doorbell","sensor"),
+        Converter("contact", "binary_sensor"),
+        Converter("lock", "binary_sensor"),
+    ],
+},{
     6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
     "ttl": "16m",  # battery every 5 min
