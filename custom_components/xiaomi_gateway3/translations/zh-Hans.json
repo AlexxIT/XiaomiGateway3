@@ -5,9 +5,9 @@
       "cant_login": "无法登录，请检查用户名和密码",
       "cant_connect": "无法连接到网络",
       "wrong_model": "网关型号不支持",
-      "wrong_token": "Wrong Mi Home token",
+      "wrong_token": "错误的网关Token",
       "wrong_telnet": "Wrong open telnet command",
-      "verify": "Click to verify url"
+      "verify": "点击链接去验证"
     },
     "step": {
       "user": {
@@ -18,7 +18,7 @@
       },
       "cloud": {
         "title": "添加小米云账号",
-        "description": "选择设备所属的服务器{verify}",
+        "description": "选择设备所属的服务器 {verify}",
         "data": {
           "username": "邮箱/小米 ID",
           "password": "密码",
@@ -26,12 +26,11 @@
         }
       },
       "token": {
-        "description": "需要[获取](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md)米家 token。\n注意：若网关固件版本高于 **1.4.6_0043** ，需要先[焊接](https://github.com/AlexxIT/XiaomiGateway3/wiki)才能支持。",
+        "description": "可以通过 [添加小米云账号](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自动或 [手动](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 获取网关Token。请阅读 [已支持的网关固件版本](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 及 [打开 Telnet 命令](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)。",
         "data": {
-          "host": "主机",
+          "host": "网关IP",
           "token": "Token",
-          "ble": "支持 BLE 设备",
-          "zha": "Zigbee Home Automation 模式"
+          "telnet_cmd": "打开 Telnet 命令"
         }
       }
     }
