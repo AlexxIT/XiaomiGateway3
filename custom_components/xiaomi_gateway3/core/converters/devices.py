@@ -1346,6 +1346,7 @@ DEVICES += [{
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
     3531: ["LeMesh", "Mesh Light", "lemesh.light.wy0c08"],
+    7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
