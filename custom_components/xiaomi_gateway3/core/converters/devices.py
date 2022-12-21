@@ -1397,6 +1397,7 @@ DEVICES += [{
         Converter("outlet", "switch", mi="2.p.1"),
         MathConv("power", "sensor", mi="3.p.1", multiply=0.01),
         Converter("led", "switch", mi="4.p.1", enabled=False),
+        BoolConv("enable-upload-power", "switch", mi="6.p.1"),  # The power status will only be reported every time this switch is turned on
         Converter("power_protect", "switch", mi="7.p.1", enabled=False),
         MathConv("power_value", "number", mi="7.p.2", multiply=0.01,
                  min=0, max=1638400, enabled=False),
