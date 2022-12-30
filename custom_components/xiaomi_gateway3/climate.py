@@ -36,7 +36,7 @@ class XiaomiClimate(XEntity, ClimateEntity):
     _attr_hvac_modes = [HVAC_MODE_OFF, HVAC_MODE_COOL, HVAC_MODE_HEAT]
     _attr_precision = PRECISION_WHOLE
     _attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
-    _attr_temperature_unit = TEMP_CELSIUS
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
     _attr_min_temp = 17
