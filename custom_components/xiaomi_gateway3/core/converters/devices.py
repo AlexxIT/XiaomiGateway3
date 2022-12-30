@@ -1666,7 +1666,7 @@ DEVICES += [{
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
         MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
         MathConv("has_someone_duration", "sensor", mi="2.p.3"),
-        MathConv("idle_time", "sensor", mi="2.p.4"),
+        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60), 
         MathConv("illuminance", "sensor", mi="2.p.5"),
         MathConv("distance", "sensor", mi="2.p.6"),
 
