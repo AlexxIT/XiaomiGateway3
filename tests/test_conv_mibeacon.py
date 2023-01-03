@@ -68,3 +68,18 @@ def test_lock():
 
     p = device.decode("mibeacon", {"eid": 6, "edata": "ffffffff00"})
     assert p
+
+
+def test_9095():
+    device = XDevice(BLE, 9095, DID2, MAC)
+    assert device.info.name == "Xiaomi Wireless Button"
+    device.setup_converters()
+
+    p = device.decode("mibeacon", {"eid": 19980, "edata": ""})
+    assert p == {"action": "single"}
+
+    p = device.decode("mibeacon", {"eid": 19981, "edata": ""})
+    assert p == {"action": "double"}
+
+    p = device.decode("mibeacon", {"eid": 19982, "edata": ""})
+    assert p == {"action": "hold"}
