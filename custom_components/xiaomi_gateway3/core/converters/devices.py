@@ -1254,11 +1254,11 @@ DEVICES += [{
     "ttl": "6h"
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/826
-    7184: ["Linptech", "Wireless Switch", "K11"],
+    7184: ["Linptech", "Wireless Button", "K11"],
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
     "ttl": "6h"  # battery every 6 hours
 }, {
-    9095: ["Xiaomi", "Xiaomi Wireless Switch Bluetooth Version", "XMWXKG01LM"],
+    9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
     "ttl": "6h"  # battery every 6 hours
 }, {
