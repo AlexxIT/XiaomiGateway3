@@ -73,13 +73,12 @@ class GateMGW2(
                 rssi = await sh.read_file(
                     "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
                 )
-                if not rssi: rssi = 0
                 payload = self.device.decode(GATEWAY, {
                     "serial": serial.decode(),
                     "free_mem": int(free_mem),
                     "load_avg": load_avg.decode(),
                     "run_time": int(run_time),
-                    "rssi": int(rssi) + 100 if len(rssi) >=1 else 0
+                    "rssi": int(rssi) + 100 if rssi else 0
                 })
                 self.device.update(payload)
 
