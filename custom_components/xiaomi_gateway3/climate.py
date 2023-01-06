@@ -1,5 +1,6 @@
 from homeassistant.components.climate import *
 from homeassistant.components.climate.const import *
+from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import callback
 
 from . import DOMAIN
