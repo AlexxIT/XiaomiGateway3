@@ -469,6 +469,25 @@ DEVICES += [{
         ClimateTempConv("target_temp", mi="14.9.85"),
     ],
 }, {
+    "lumi.airrtc.agl001": ["Aqara", "Thermostat E1", "SRTS-A01"],
+    "spec": [
+        BoolConv("climate", "climate", mi="4.21.85"),
+        # 0: Manual module 1: Smart schedule mode 2: Antifreeze mode 3: Installation mode
+        MapConv("mode", mi="14.51.85", parent="climate", map={0: "heat", 2: "auto"}),
+        MathConv("current_temp", mi="0.1.85", multiply=0.01, parent="climate"),
+        MathConv("target_temp", mi="1.8.85", multiply=0.01, parent="climate"),
+        MathConv("antifreeze_temp", "number", mi="1.10.85", multiply=0.01, min=500,
+                 max=15000),
+        BoolConv("window_detection", "switch", mi="4.24.85", enabled=False),
+        BoolConv("valve_calibration", "switch", mi="4.22.85", enabled=False),
+        BoolConv("valve_notification", "switch", mi="4.25.85", enabled=False),
+        BoolConv("child_lock", "switch", mi="4.26.85", enabled=False),
+        MapConv("find_device", "switch", mi="8.0.2096", map={2: True, 1: False},
+                enabled=False),
+        Converter("battery", "sensor", mi="8.0.2001"),
+        ChipTemp,
+    ],
+}, {
     "lumi.airrtc.vrfegl01": ["Xiaomi", "VRF Air Conditioning EU"],
     "support": 1,
     "spec": [
