@@ -252,6 +252,13 @@ DEVICES += [{
                 enabled=False),
     ],
 }, {
+    "lumi.light.acn003": ["Aqara", "L1-350 Ceiling Light", "ZNXDD01LM"],
+    "spec": [
+        BoolConv("light", "light", mi="2.p.1"),
+        ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
+        ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
+    ],
+}, {
     # light with brightness
     "ikea.light.led1623g12": ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
     "ikea.light.led1650r5": ["IKEA", "Bulb GU10 400 lm", "LED1650R5"],
