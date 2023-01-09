@@ -131,7 +131,8 @@ DEVICES = [{
 }, {
     "lumi.gateway.aqcn02": ["Aqara", "Hub E1 CN", "ZHWG16LM"],
     "lumi.gateway.aqcn03": ["Aqara", "Hub E1 EU", "HE1-G01"],
-    "lumi.gateway.mcn001": ["Xiaomi", "Multimode Gateway 2", "DMWG03LM"],
+    "lumi.gateway.mcn001": ["Xiaomi", "Multimode Gateway 2 CN", "DMWG03LM"],
+    "lumi.gateway.mgl001": ["Xiaomi", "Multimode Gateway 2 EU", "ZNDMWG04LM"],
     "support": 3,  # @AlexxIT
     "spec": [
         MapConv("pair", mi="8.0.2109", map={60: True, 0: False}, parent="data"),

@@ -25,7 +25,7 @@ from .xiaomi_cloud import MiCloud
 
 SUPPORTED_MODELS = (
     'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03',
-    'lumi.gateway.mcn001'
+    'lumi.gateway.mcn001', 'lumi.gateway.mgl001'
 )
 
 _LOGGER = logging.getLogger(__name__)
