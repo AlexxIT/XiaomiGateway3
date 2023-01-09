@@ -52,7 +52,6 @@ ICONS = {
     "plug": "mdi:power-plug",
     "smoke_density": "mdi:google-circles-communities",
     "supply": "mdi:gauge",
-    "switch": "mdi:light-switch",
     "tvoc": "mdi:cloud",
 }
 
