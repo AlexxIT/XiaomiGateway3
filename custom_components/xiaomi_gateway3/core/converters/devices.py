@@ -1164,7 +1164,7 @@ DEVICES += [{
         MiBeacon, BLETemperature, BLEMoisture, BLEConductivity, BLEIlluminance,
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
-    "ttl": "1m",  # new data every 10 seconds
+    "ttl": "60m"  # TODO: check right value
 }, {
     349: ["Xiaomi", "Flower Pot", "HHCCPOT002"],
     "spec": [
@@ -1216,11 +1216,11 @@ DEVICES += [{
         MiBeacon, BLEMotion, BLELight, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
     ],
-    "ttl": "34m",  # battery every 11 min
+    "ttl": "60m",  # battery every 11 min
 }, {
     1983: ["Yeelight", "Button S1", "YLAI003"],
     "spec": [MiBeacon, BLEAction, BLEBattery],
-    "ttl": "16m",  # battery every 5 min
+    "ttl": "60m",  # battery every 5 min
 }, {
     2443: ["Xiaomi", "Door/Window Sensor 2", "MCCGQ02HL"],
     "spec": [
@@ -1230,14 +1230,14 @@ DEVICES += [{
 }, {
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     "spec": [MiBeacon, BLEAction, BLESmoke, BLEBattery],
-    "ttl": "15m",  # battery every 4:30 min
+    "ttl": "60m",  # battery every 4:30 min
 }, {
     2147: ["Xiaomi", "Water Leak Sensor", "SJWS01LM"],
     "spec": [
         MiBeacon, BLEWaterLeak, BLEBattery,
         Converter("action", "sensor", enabled=False),
     ],
-    "ttl": "725m"  # battery every 4 hour
+    "ttl": "60m"  # battery every 4? hour
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/776
     3685: ["Xiaomi", "Face Recognition Smart Door Lock X", "XMZNMS06LM"],
@@ -1261,7 +1261,7 @@ DEVICES += [{
 }, {
     6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
-    "ttl": "16m",  # battery every 5 min
+    "ttl": "60m",  # battery every 5 min
 }, {
     10987: ["Linptech", "Linptech Motion Sensor v2", "hs1bb"],
     "spec": [
