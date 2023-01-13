@@ -85,7 +85,7 @@ class AqaraE1(XEntity, ClimateEntity):
     _attr_min_temp = 5
     _attr_target_temperature_step = 0.5
 
-    _enabled = False
+    _enabled = None
     _mode = None
 
     @callback
@@ -99,17 +99,16 @@ class AqaraE1(XEntity, ClimateEntity):
         if "target_temp" in data:
             self._attr_target_temperature = data["target_temp"]
 
-        if self._enabled:
-            self._attr_hvac_mode = self._mode or HVAC_MODE_OFF
-        else:
-            self._attr_hvac_mode = HVAC_MODE_OFF
+        if self._enabled is None or self._mode is None:
+            return
+
+        self._attr_hvac_mode = self._mode if self._enabled else HVAC_MODE_OFF
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
 
     async def async_set_temperature(self, **kwargs) -> None:
-        payload = {"target_temp": kwargs[ATTR_TEMPERATURE]}
-        await self.device_send({self.attr: payload})
+        await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         if hvac_mode in (HVAC_MODE_HEAT, HVAC_MODE_AUTO):
