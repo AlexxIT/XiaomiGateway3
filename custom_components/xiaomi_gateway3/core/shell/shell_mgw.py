@@ -3,7 +3,7 @@ import hashlib
 import re
 from typing import List
 
-from .base import ShellMultimode
+from .base import ShellMultimode, URL_MIPS, MD5_MIPS
 
 CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"
 LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bin && /data/busybox chattr +i /data/firmware/firmware_ota.bin"
@@ -17,9 +17,6 @@ TAR_DATA = "tar -czO /data/miio/mible_local.db* /data/silicon_zigbee_host/*.txt 
 # original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
 URL_BUSYBOX = "http://master.dl.sourceforge.net/project/mgl03/bin/busybox?viasf=1"
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
-
-URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/1.0.0/openmiio_agent?viasf=1"
-MD5_AGENT = "28677f3e1e32bb06b5867f73f934f968"
 
 
 def sed(app: str, pattern: str, repl: str):
@@ -102,7 +99,7 @@ class ShellMGW(ShellMultimode):
         return await self.exec("ps -ww | grep -v ' 0 SW'")
 
     async def check_openmiio_agent(self) -> int:
-        return await self.check_bin("openmiio_agent", MD5_AGENT, URL_AGENT)
+        return await self.check_bin("openmiio_agent", MD5_MIPS, URL_MIPS)
 
     async def run_ftp(self):
         if await self.check_bin("busybox", MD5_BUSYBOX, URL_BUSYBOX):

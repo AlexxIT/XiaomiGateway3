@@ -1,9 +1,6 @@
 import asyncio
 
-from .base import ShellOpenMiio
-
-URL_AGENT = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent?viasf=1"
-MD5_AGENT = "56f591a3307a7e5b7489a88b7de98efd"
+from .base import ShellOpenMiio, URL_ARM, MD5_ARM
 
 
 # noinspection PyAbstractClass
@@ -50,4 +47,4 @@ class ShellARM(ShellOpenMiio):
         await self.exec("killall mha_master")
 
     async def check_openmiio_agent(self) -> int:
-        return await self.check_bin("openmiio_agent", MD5_AGENT, URL_AGENT)
+        return await self.check_bin("openmiio_agent", MD5_ARM, URL_ARM)

@@ -162,7 +162,8 @@ class MiniMQTT:
     async def _connect(self, host: str):
         self.reader, self.writer = await asyncio.open_connection(host, 1883)
 
-        msg = RawMessage.connect()
+        # keepalive can't be 0 for mosquitto v2
+        msg = RawMessage.connect(60 * 60 * 18)
         self.writer.write(msg)
         await self.writer.drain()
 
