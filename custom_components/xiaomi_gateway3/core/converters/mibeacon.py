@@ -327,13 +327,27 @@ class MiBeaconConv(Converter):
             })
 
         elif eid == 0x0007:
-            # TODO: lock timestamp
-            if data[0] >= len(BLE_DOOR_ACTION):
+            action = data[0]
+            if action >= len(BLE_DOOR_ACTION):
                 return
+
+            timestamp = int.from_bytes(data[1:5], 'little')
+            timestamp = datetime.fromtimestamp(timestamp).isoformat()
+
+            if action == 0:
+                # 0 open, 1 closed
+                payload['contact'] = True
+            elif action == 1:
+                payload['contact'] = False
+            elif action == 3:
+                # 3 doorbell
+                payload['doorbell'] = timestamp
+
             payload.update({
                 'action': 'door',
-                'action_id': data[0],
-                'message': BLE_DOOR_ACTION[data[0]]
+                'action_id': action,
+                'message': BLE_DOOR_ACTION[action],
+                'timestamp': timestamp
             })
 
         elif eid == 0x0008:
