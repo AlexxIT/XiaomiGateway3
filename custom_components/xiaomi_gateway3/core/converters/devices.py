@@ -1289,6 +1289,16 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    3641: ["Xiaomi", "Door Lock 1S", "XMZNMS08LM"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("battery", "sensor"),
+        Converter("doorbell", "sensor"),
+        Converter("contact", "binary_sensor"),
+    ],
+    "ttl": "3d"  # battery every 1? day
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
