@@ -8,8 +8,10 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.const import *
 from homeassistant.core import callback, State
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, \
-    CONNECTION_ZIGBEE
+from homeassistant.helpers.device_registry import (
+    CONNECTION_NETWORK_MAC,
+    CONNECTION_ZIGBEE,
+)
 from homeassistant.helpers.entity import DeviceInfo, Entity, EntityCategory
 from homeassistant.helpers.template import Template
 
@@ -98,7 +100,7 @@ class XEntity(Entity):
     added = False
     attributes_template: Template = None
 
-    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         attr = conv.attr
 
         self.gw = gateway
@@ -202,18 +204,15 @@ class XEntity(Entity):
     def async_update_available(self):
         gw_available = any(gw.available for gw in self.device.gateways)
         self._attr_available = gw_available and (
-                self.device.available or
-                self.customize.get('ignore_offline', False)
+            self.device.available or self.customize.get("ignore_offline", False)
         )
 
     @callback
     def render_attributes_template(self):
         try:
-            attrs = self.attributes_template.async_render({
-                "attr": self.attr,
-                "device": self.device,
-                "gateway": self.gw.device
-            })
+            attrs = self.attributes_template.async_render(
+                {"attr": self.attr, "device": self.device, "gateway": self.gw.device}
+            )
             if isinstance(attrs, dict):
                 self._attr_extra_state_attributes.update(attrs)
         except AttributeError:
@@ -254,7 +253,7 @@ class XEntity(Entity):
 
             payload = self.device.encode_read(self.subscribed_attrs)
             for _ in range(10):
-                await asyncio.sleep(.5)
+                await asyncio.sleep(0.5)
                 data = await self.gw.miot_read(self.device, payload)
                 # check that all read attrs are equal to send attrs
                 if not data or any(data.get(k) != v for k, v in value.items()):

@@ -22,7 +22,7 @@ class MeshGateway(GatewayBase):
             rows = sh.db.read_table(sh.mesh_device_table)
             for row in rows:
                 did = row[0]
-                mac = row[1].replace(':', '').lower()
+                mac = row[1].replace(":", "").lower()
                 device = self.devices.get(did)
                 if not device:
                     device = XDevice(MESH, row[2], did, mac)
@@ -34,11 +34,11 @@ class MeshGateway(GatewayBase):
             # load Mesh groups
             rows = sh.db.read_table(sh.mesh_group_table)
             for row in rows:
-                did = 'group.' + row[0]
+                did = "group." + row[0]
                 device = self.devices.get(did)
                 if not device:
                     # don't know if 8 bytes enougth
-                    mac = int(row[0]).to_bytes(8, 'big').hex()
+                    mac = int(row[0]).to_bytes(8, "big").hex()
                     device = XDevice(MESH, MESH_GROUP_MODEL, did, mac)
                 # update childs of device
                 device.extra["childs"] = childs.get(row[1])

@@ -7,7 +7,7 @@ from .base import ShellOpenMiio, URL_ARM, MD5_ARM
 class ShellARM(ShellOpenMiio):
     async def login(self):
         self.writer.write(b"root\n")
-        await asyncio.sleep(.1)
+        await asyncio.sleep(0.1)
         self.writer.write(b"\n")  # empty password
 
         coro = self.reader.readuntil(b"/ # ")
@@ -27,9 +27,7 @@ class ShellARM(ShellOpenMiio):
         self.ver = f"{raw1.rstrip()}_{raw2.rstrip()}"
 
     async def get_token(self) -> str:
-        raw = await self.exec(
-            "agetprop persist.app.miio_dtoken", as_bytes=True
-        )
+        raw = await self.exec("agetprop persist.app.miio_dtoken", as_bytes=True)
         return raw.rstrip().hex()
 
     async def get_did(self):

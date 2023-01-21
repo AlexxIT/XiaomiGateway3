@@ -80,9 +80,7 @@ class TelnetShell:
         await self.exec("killall " + filename)
 
         # download can take up to 3 minutes for Chinese users
-        await self.exec(
-            f"wget {url} -O {filename} && chmod +x {filename}", timeout=300
-        )
+        await self.exec(f"wget {url} -O {filename} && chmod +x {filename}", timeout=300)
 
         return DOWNLOAD if md5 in await self.exec(cmd) else ERROR
 

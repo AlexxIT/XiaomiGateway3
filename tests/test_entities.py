@@ -1,5 +1,4 @@
 import asyncio
-import time
 
 from homeassistant.components.sensor import DOMAIN
 from homeassistant.core import HomeAssistant

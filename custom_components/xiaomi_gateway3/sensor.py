@@ -73,7 +73,7 @@ STATE_CLASSES = {
 
 
 class XiaomiBaseSensor(XEntity, SensorEntity):
-    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         XEntity.__init__(self, gateway, device, conv)
 
         if self.attr in UNITS:
@@ -145,7 +145,7 @@ class XiaomiAction(XiaomiBaseSensor):
     clear_task: Task = None
 
     async def clear_state(self):
-        await asyncio.sleep(.3)
+        await asyncio.sleep(0.3)
 
         self._attr_native_value = ""
         self.async_write_ha_state()
@@ -180,8 +180,9 @@ class XiaomiAction(XiaomiBaseSensor):
             self._attr_extra_state_attributes = data
 
         # repeat event from Aqara integration
-        self.hass.bus.async_fire("xiaomi_aqara.click", {
-            "entity_id": self.entity_id, "click_type": self.native_value
-        })
+        self.hass.bus.async_fire(
+            "xiaomi_aqara.click",
+            {"entity_id": self.entity_id, "click_type": self.native_value},
+        )
 
         self.clear_task = self.hass.loop.create_task(self.clear_state())

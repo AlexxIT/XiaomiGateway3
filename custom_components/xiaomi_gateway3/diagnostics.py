@@ -10,19 +10,15 @@ from .core.device import logger
 from .core.gateway import XGateway
 
 
-async def async_get_config_entry_diagnostics(
-        hass: HomeAssistant, entry: ConfigEntry
-):
+async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry):
     options = {
-        k: "***" if k in ("host", "token") else v
-        for k, v in entry.options.items()
+        k: "***" if k in ("host", "token") else v for k, v in entry.options.items()
     }
 
     try:
         ts = time.time()
         devices = {
-            device.unique_id: device.as_dict(ts)
-            for device in XGateway.devices.values()
+            device.unique_id: device.as_dict(ts) for device in XGateway.devices.values()
         }
     except Exception as e:
         devices = f"{type(e).__name__}: {e}"
@@ -45,7 +41,7 @@ async def async_get_config_entry_diagnostics(
 
 
 async def async_get_device_diagnostics(
-        hass: HomeAssistant, entry: ConfigEntry, device: DeviceEntry
+    hass: HomeAssistant, entry: ConfigEntry, device: DeviceEntry
 ):
     info = await async_get_config_entry_diagnostics(hass, entry)
     try:
@@ -57,9 +53,7 @@ async def async_get_device_diagnostics(
             gw: XGateway = hass.data[DOMAIN][entry.entry_id]
             info["data.tar.gz.b64"] = await gw.tar_data()
         else:
-            device = next(
-                d for d in XGateway.devices.values() if d.unique_id == uid
-            )
+            device = next(d for d in XGateway.devices.values() if d.unique_id == uid)
             info["logger"] = logger(device)
 
     except Exception as e:

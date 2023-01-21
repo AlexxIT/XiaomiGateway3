@@ -42,7 +42,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
         return True
 
     async def e1_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic.endswith('/heartbeat'):
+        if msg.topic.endswith("/heartbeat"):
             payload = self.device.decode(GATEWAY, msg.json)
             self.device.update(payload)
 
@@ -66,13 +66,16 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
                 rssi = await sh.read_file(
                     "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
                 )
-                payload = self.device.decode(GATEWAY, {
-                    "serial": serial.decode(),
-                    "free_mem": int(free_mem),
-                    "load_avg": load_avg.decode(),
-                    "run_time": int(run_time),
-                    "rssi": int(rssi) + 100
-                })
+                payload = self.device.decode(
+                    GATEWAY,
+                    {
+                        "serial": serial.decode(),
+                        "free_mem": int(free_mem),
+                        "load_avg": load_avg.decode(),
+                        "run_time": int(run_time),
+                        "rssi": int(rssi) + 100,
+                    },
+                )
                 self.device.update(payload)
 
         except Exception as e:

@@ -44,8 +44,11 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
         brand, name, market = info if len(info) == 3 else info + [None]
 
         if type == ZIGBEE and not is_mihome_zigbee(model):
-            url = "https://www.zigbee2mqtt.io/supported-devices/#s=" + market \
-                if market else None
+            url = (
+                "https://www.zigbee2mqtt.io/supported-devices/#s=" + market
+                if market
+                else None
+            )
         else:
             url = f"https://home.miot-spec.com/s/{model}"
 
@@ -66,7 +69,7 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
             name=f"{brand} {name}",
             url=url,
             spec=desc["spec"],
-            ttl=ttl
+            ttl=ttl,
         )
     raise RuntimeError
 
@@ -89,12 +92,18 @@ def get_buttons(info_model: str) -> Optional[List[str]]:
 
     for device in DEVICES:
         if model in device or any(
-                info[2] == market for info in device.values()
-                if isinstance(info, list) and len(info) == 3
+            info[2] == market
+            for info in device.values()
+            if isinstance(info, list) and len(info) == 3
         ):
-            return sorted(set([
-                conv.attr for conv in device["spec"]
-                if conv.attr.startswith("button")
-            ]))
+            return sorted(
+                set(
+                    [
+                        conv.attr
+                        for conv in device["spec"]
+                        if conv.attr.startswith("button")
+                    ]
+                )
+            )
 
     return None

@@ -20,6 +20,7 @@ SIGNAL_TIMER = "timer"
 
 class GatewayBase:
     """devices and defaults are global between all gateways."""
+
     # keys:
     # - Gateway: did, "123456789", X digits
     # - Zigbee: did, "lumi.abcdef", 8 byte hex mac without leading zeros
@@ -49,19 +50,19 @@ class GatewayBase:
 
     @property
     def ble_mode(self):
-        return self.options.get('ble', True)
+        return self.options.get("ble", True)
 
     @property
     def debug_mode(self):
-        return self.options.get('debug', '')
+        return self.options.get("debug", "")
 
     @property
     def zha_mode(self) -> bool:
-        return self.options.get('zha', False)
+        return self.options.get("zha", False)
 
     @property
     def stats_enable(self):
-        return self.options.get('stats', False)
+        return self.options.get("stats", False)
 
     @property
     def device(self) -> Optional[XDevice]:
@@ -69,7 +70,7 @@ class GatewayBase:
 
     def debug(self, msg: str, exc_info=None):
         """Global debug messages. Passed only if default debug enabled."""
-        if 'true' in self.debug_mode:
+        if "true" in self.debug_mode:
             self.log.debug(f"{self.host} [BASE] {msg}", exc_info=exc_info)
 
     def warning(self, msg: str, exc_info=None):
@@ -87,15 +88,14 @@ class GatewayBase:
         """
         self.log.debug(f"{self.host} [{tag}] {msg}")
 
-    def debug_device(self, device: XDevice, msg: str, payload=None,
-                     tag: str = "BASE"):
+    def debug_device(self, device: XDevice, msg: str, payload=None, tag: str = "BASE"):
         """Debug message with device. Passed only if default debug enabled."""
-        if 'true' in self.debug_mode:
+        if "true" in self.debug_mode:
             adv = device.nwk if device.nwk else device.model
             self.log.debug(
                 f"{self.host} [{tag}] {device.mac} ({adv}) {msg} {payload}"
-                if payload else
-                f"{self.host} [{tag}] {device.mac} ({adv}) {msg}"
+                if payload
+                else f"{self.host} [{tag}] {device.mac} ({adv}) {msg}"
             )
 
     def dispatcher_connect(self, signal: str, target: Callable):
@@ -143,28 +143,27 @@ class GatewayBase:
 
         device.setup_entitites(self, stats=self.stats_enable)
         self.debug_device(
-            device, f"setup {device.info.model}:",
-            ", ".join(device.entities.keys())
+            device, f"setup {device.info.model}:", ", ".join(device.entities.keys())
         )
 
     def filter_devices(self, feature: str) -> List[XDevice]:
         return [
-            device for device in self.devices.values()
+            device
+            for device in self.devices.values()
             if self in device.gateways and device.has_support(feature)
         ]
 
     async def miio_send(
-            self, method: str, params: Union[dict, list] = None,
-            timeout: int = 5
+        self, method: str, params: Union[dict, list] = None, timeout: int = 5
     ):
         fut = asyncio.get_event_loop().create_future()
 
         cid = random.randint(1_000_000_000, 2_147_483_647)
         self.miio_ack[cid] = fut
 
-        await self.mqtt.publish("miio/command", {
-            "id": cid, "method": method, "params": params
-        })
+        await self.mqtt.publish(
+            "miio/command", {"id": cid, "method": method, "params": params}
+        )
 
         try:
             await asyncio.wait_for(self.miio_ack[cid], timeout)

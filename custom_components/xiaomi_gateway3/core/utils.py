@@ -8,9 +8,7 @@ from typing import Optional
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
-from homeassistant.helpers import (
-    device_registry as dr, entity_registry as er
-)
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 
@@ -24,8 +22,11 @@ from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
 
 SUPPORTED_MODELS = (
-    'lumi.gateway.mgl03', 'lumi.gateway.aqcn02', 'lumi.gateway.aqcn03',
-    'lumi.gateway.mcn001', 'lumi.gateway.mgl001'
+    "lumi.gateway.mgl03",
+    "lumi.gateway.aqcn02",
+    "lumi.gateway.aqcn03",
+    "lumi.gateway.mcn001",
+    "lumi.gateway.mgl001",
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,8 +48,7 @@ def remove_stats(hass: HomeAssistant, entry_id: str):
     remove = [
         entity.entity_id
         for entity in list(registry.entities.values())
-        if (entity.config_entry_id == entry_id and
-            entity.unique_id.endswith(suffix))
+        if (entity.config_entry_id == entry_id and entity.unique_id.endswith(suffix))
     ]
     for entity_id in remove:
         registry.async_remove(entity_id)
@@ -71,9 +71,9 @@ async def remove_zigbee(unique_id: str):
 @callback
 def update_device_info(hass: HomeAssistant, did: str, **kwargs):
     # lumi.1234567890 => 0x1234567890
-    mac = '0x' + did[5:]
+    mac = "0x" + did[5:]
     registry = dr.async_get(hass)
-    device = registry.async_get_device({('xiaomi_gateway3', mac)}, None)
+    device = registry.async_get_device({("xiaomi_gateway3", mac)}, None)
     if device:
         registry.async_update_device(device.id, **kwargs)
 
@@ -83,7 +83,7 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
     if yaml_devices:
         for k, v in yaml_devices.items():
             # AA:BB:CC:DD:EE:FF => aabbccddeeff
-            k = k.replace(':', '').lower()
+            k = k.replace(":", "").lower()
             XGateway.defaults[k] = v
 
     # 2. Load unique_id from entity registry (backward support old format)
@@ -129,19 +129,17 @@ async def load_devices(hass: HomeAssistant, yaml_devices: dict):
 
 def migrate_options(data):
     data = dict(data)
-    options = {k: data.pop(k) for k in ('ble', 'zha') if k in data}
-    return {'data': data, 'options': options}
+    options = {k: data.pop(k) for k in ("ble", "zha") if k in data}
+    return {"data": data, "options": options}
 
 
-async def check_gateway(
-        host: str, token: str, telnet_cmd: str = None
-) -> Optional[str]:
+async def check_gateway(host: str, token: str, telnet_cmd: str = None) -> Optional[str]:
     # 1. try connect with telnet (custom firmware)?
     try:
         async with shell.Session(host) as sh:
             if sh.model:
                 # 1.1. check token with telnet
-                return None if await sh.get_token() == token else 'wrong_token'
+                return None if await sh.get_token() == token else "wrong_token"
     except Exception:
         pass
 
@@ -151,19 +149,19 @@ async def check_gateway(
 
     # if info is None - devise doesn't answer on pings
     if info is None:
-        return 'cant_connect'
+        return "cant_connect"
 
     # if empty info - device works but not answer on commands
     if not info:
-        return 'wrong_token'
+        return "wrong_token"
 
     # 3. check if right model
-    if info['model'] not in SUPPORTED_MODELS:
-        return 'wrong_model'
+    if info["model"] not in SUPPORTED_MODELS:
+        return "wrong_model"
 
     raw = json.loads(telnet_cmd or TELNET_CMD)
     # fw 1.4.6_0043+ won't answer on cmd without cloud, don't check answer
-    await miio.send(raw['method'], raw.get('params'))
+    await miio.send(raw["method"], raw.get("params"))
 
     # waiting for telnet to start
     await asyncio.sleep(1)
@@ -171,25 +169,26 @@ async def check_gateway(
     try:
         async with shell.Session(host) as sh:
             if not sh.model:
-                return 'wrong_telnet'
+                return "wrong_telnet"
     except Exception:
         return None
 
 
 async def get_lan_key(host: str, token: str):
     device = AsyncMiIO(host, token)
-    resp = await device.send('get_lumi_dpf_aes_key')
+    resp = await device.send("get_lumi_dpf_aes_key")
     if not resp:
         return "Can't connect to gateway"
-    if 'result' not in resp:
+    if "result" not in resp:
         return f"Wrong response: {resp}"
-    resp = resp['result']
+    resp = resp["result"]
     if len(resp[0]) == 16:
         return resp[0]
-    key = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                  for _ in range(16))
-    resp = await device.send('set_lumi_dpf_aes_key', [key])
-    if resp.get('result') == ['ok']:
+    key = "".join(
+        random.choice(string.ascii_lowercase + string.digits) for _ in range(16)
+    )
+    resp = await device.send("set_lumi_dpf_aes_key", [key])
+    if resp.get("result") == ["ok"]:
         return key
     return "Can't update gateway key"
 
@@ -197,12 +196,12 @@ async def get_lan_key(host: str, token: str):
 async def get_room_mapping(cloud: MiCloud, host: str, token: str):
     try:
         device = AsyncMiIO(host, token)
-        local_rooms = await device.send('get_room_mapping')
+        local_rooms = await device.send("get_room_mapping")
         cloud_rooms = await cloud.get_rooms()
-        result = ''
-        for local_id, cloud_id in local_rooms['result']:
+        result = ""
+        for local_id, cloud_id in local_rooms["result"]:
             cloud_name = next(
-                (p['name'] for p in cloud_rooms if p['id'] == cloud_id), '-'
+                (p["name"] for p in cloud_rooms if p["id"] == cloud_id), "-"
             )
             result += f"\n- {local_id}: {cloud_name}"
         return result
@@ -240,9 +239,9 @@ async def get_ble_remotes(host: str, token: str):
         return "Can't connect to lamp"
     if "result" not in resp:
         return f"Wrong response"
-    return "\n".join([
-        f"{p['beaconkey']} ({format_mac(p['mac'])})" for p in resp["result"]
-    ])
+    return "\n".join(
+        [f"{p['beaconkey']} ({format_mac(p['mac'])})" for p in resp["result"]]
+    )
 
 
 def format_mac(s: str) -> str:
@@ -253,31 +252,32 @@ async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
     url = "https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/"
 
     # Xiaomi Plug should be updated to fw 30 before updating to latest fw
-    if device.model == 'lumi.plug' and 0 < device.fw_ver < 30:
+    if device.model == "lumi.plug" and 0 < device.fw_ver < 30:
         # waiting pull request https://github.com/Koenkk/zigbee-OTA/pull/49
-        return url.replace('Koenkk', 'AlexxIT') + \
-               'images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota'
+        return (
+            url.replace("Koenkk", "AlexxIT")
+            + "images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota"
+        )
 
     r = await async_get_clientsession(hass).get(url + "index.json")
     items = await r.json(content_type=None)
     for item in items:
-        if item.get('modelId') == device.model:
-            return url + item['path']
+        if item.get("modelId") == device.model:
+            return url + item["path"]
 
     return None
 
 
 async def run_zigbee_ota(
-        hass: HomeAssistant, gateway: "XGateway", device: "XDevice"
+    hass: HomeAssistant, gateway: "XGateway", device: "XDevice"
 ) -> Optional[bool]:
     url = await get_ota_link(hass, device)
     if url:
         gateway.debug_device(device, "update", url)
-        resp = await gateway.miio_send('miIO.subdev_ota', {
-            'did': device.did,
-            'subdev_url': url
-        })
-        if not resp or resp.get('result') != ['ok']:
+        resp = await gateway.miio_send(
+            "miIO.subdev_ota", {"did": device.did, "subdev_url": url}
+        )
+        if not resp or resp.get("result") != ["ok"]:
             _LOGGER.error(f"Can't run update process: {resp}")
             return None
         return True

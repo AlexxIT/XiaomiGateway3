@@ -49,7 +49,7 @@ class GateMGW2(
         self.add_device(self.did, device)
 
     async def mgw2_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic.endswith('/heartbeat'):
+        if msg.topic.endswith("/heartbeat"):
             payload = self.device.decode(GATEWAY, msg.json)
             self.device.update(payload)
 
@@ -73,13 +73,16 @@ class GateMGW2(
                 rssi = await sh.read_file(
                     "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
                 )
-                payload = self.device.decode(GATEWAY, {
-                    "serial": serial.decode(),
-                    "free_mem": int(free_mem),
-                    "load_avg": load_avg.decode(),
-                    "run_time": int(run_time),
-                    "rssi": int(rssi) + 100 if rssi else 0
-                })
+                payload = self.device.decode(
+                    GATEWAY,
+                    {
+                        "serial": serial.decode(),
+                        "free_mem": int(free_mem),
+                        "load_avg": load_avg.decode(),
+                        "run_time": int(run_time),
+                        "rssi": int(rssi) + 100 if rssi else 0,
+                    },
+                )
                 self.device.update(payload)
 
         except Exception as e:
