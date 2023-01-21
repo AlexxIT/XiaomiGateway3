@@ -60,7 +60,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
 
     @property
     def telnet_cmd(self):
-        return self.options.get("telnet_cmd") or TELNET_CMD
+        return TELNET_CMD
 
     def start(self):
         self.main_task = asyncio.create_task(self.run_forever())
