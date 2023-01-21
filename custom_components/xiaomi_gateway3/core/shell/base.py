@@ -32,8 +32,7 @@ class TelnetShell:
         self.writer.close()
         await self.writer.wait_closed()
 
-    async def exec(self, command: str, as_bytes=False, timeout=10) \
-            -> Union[str, bytes]:
+    async def exec(self, command: str, as_bytes=False, timeout=10) -> Union[str, bytes]:
         """Run command and return it result."""
         self.writer.write(command.encode() + b"\n")
         coro = self.reader.readuntil(b"# ")
@@ -76,6 +75,9 @@ class TelnetShell:
 
         if md5 in await self.exec(cmd):
             return OK
+
+        # if there is an old version of the file
+        await self.exec("killall " + filename)
 
         # download can take up to 3 minutes for Chinese users
         await self.exec(
