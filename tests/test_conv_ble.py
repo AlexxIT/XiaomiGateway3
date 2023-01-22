@@ -40,10 +40,25 @@ def test_new_th():
     assert device.info.name == "Xiaomi TH Sensor"
     device.setup_converters()
 
+    # old format
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/490
     p = device.decode("mibeacon", {"eid": 19464, "edata": "cdcc3e42"})
     assert p == {"humidity": 47.7}
+
     p = device.decode("mibeacon", {"eid": 19457, "edata": "cdcca841"})
     assert p == {"temperature": 21.1}
+
+    # new miIO format for Gateway fw 1.5.4+
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/929
+    p = device.decode_miot(
+        [{"did": "blt.3.123", "siid": 3, "piid": 1008, "value": 39.099998, "tid": 153}]
+    )
+    assert p == {"humidity": 39.1}
+
+    p = device.decode_miot(
+        [{"did": "blt.3.123", "siid": 3, "piid": 1001, "value": 24.600000, "tid": 154}]
+    )
+    assert p == {"temperature": 24.6}
 
 
 def test_lock():
@@ -71,10 +86,11 @@ def test_lock():
 
 
 def test_9095():
-    device = XDevice(BLE, 9095, DID2, MAC)
+    device = XDevice(BLE, 9095, DID, MAC)
     assert device.info.name == "Xiaomi Wireless Button"
     device.setup_converters()
 
+    # old format
     p = device.decode("mibeacon", {"eid": 19980, "edata": ""})
     assert p == {"action": "single"}
 
@@ -83,3 +99,19 @@ def test_9095():
 
     p = device.decode("mibeacon", {"eid": 19982, "edata": ""})
     assert p == {"action": "hold"}
+
+    # new format
+    p = device.decode_miot(
+        [{"did": DID, "siid": 3, "eiid": 1012, "arguments": []}]
+    )
+    assert p == {"action": "single", "button": 1}
+
+    p = device.decode_miot(
+        [{"did": DID, "siid": 3, "eiid": 1013, "arguments": []}]
+    )
+    assert p == {"action": "double", "button": 2}
+
+    p = device.decode_miot(
+        [{"did": DID, "siid": 3, "eiid": 1014, "arguments": []}]
+    )
+    assert p == {"action": "hold", "button": 16}

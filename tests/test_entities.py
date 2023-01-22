@@ -125,29 +125,3 @@ def test_aqara_climate_e1():
         },
         False,
     ]
-
-
-def test_miot_ble_sensor():
-    gw = XGateway("", "")
-    device = XDevice(BLE, 4611, "blt.3.123", "112233aabbcc")
-    gw.add_device(device.did, device)
-
-    # old format
-    # https://github.com/AlexxIT/XiaomiGateway3/issues/490
-    p = device.decode("mibeacon", {"eid": 19464, "edata": "cdcc3e42"})
-    assert p == {"humidity": 47.7}
-
-    p = device.decode("mibeacon", {"eid": 19457, "edata": "cdcca841"})
-    assert p == {"temperature": 21.1}
-
-    # new miIO format for Gateway fw 1.5.4+
-    # https://github.com/AlexxIT/XiaomiGateway3/issues/929
-    p = device.decode_miot(
-        [{"did": "blt.3.123", "siid": 3, "piid": 1008, "value": 39.099998, "tid": 153}]
-    )
-    assert p == {"humidity": 39.1}
-
-    p = device.decode_miot(
-        [{"did": "blt.3.123", "siid": 3, "piid": 1001, "value": 24.600000, "tid": 154}]
-    )
-    assert p == {"temperature": 24.6}

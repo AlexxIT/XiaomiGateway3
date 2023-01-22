@@ -1302,8 +1302,15 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, Button, BLEBattery],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    # lumi.remote.mcn001
     9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
-    "spec": [MiBeacon, BLEAction, Button, BLEBattery],
+    "spec": [
+        MiBeacon, BLEAction, Button, BLEBattery,
+        Converter("battery", mi="2.p.1003"),
+        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
+        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
+        ButtonMIConv("button", mi="3.e.1014", value=16),  # hold
+    ],
     "ttl": "6h"  # battery every 6 hours
 }, {
     3641: ["Xiaomi", "Door Lock 1S", "XMZNMS08LM"],
