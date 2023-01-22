@@ -325,6 +325,10 @@ class MiBeaconConv(Converter):
         elif eid == 0x4C01 and len(data) == 4:
             payload["temperature"] = round(struct.unpack("<f", data)[0], 2)
 
+        elif eid == 0x4C02:
+            # xiaomi TH Sensor 3  Humidity
+            payload["humidity"] = data[0]
+
         elif eid == 0x4C08 and len(data) == 4:
             payload["humidity"] = round(struct.unpack("<f", data)[0], 2)
 

@@ -1195,6 +1195,13 @@ DEVICES += [{
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
+    9538: ["Xiaomi", "TH Clock 2", "miaomiaoce.sensor_ht.t8"],
+    "spec": [
+        MiBeacon, BLETemperature, BLEHumidity,
+        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
+        MathConv("humidity", mi="3.p.1002", min=0, max=100, round=0),
+    ]
+}, {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
     "spec": [
         MiBeacon, BLEBattery, BLELight, BLEMotion,
