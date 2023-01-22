@@ -1195,7 +1195,7 @@ DEVICES += [{
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
-    9538: ["Xiaomi", "TH Clock 2", "miaomiaoce.sensor_ht.t8"],
+    9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
     10290: ["Xiaomi", "TH Sensor 3", "MJWSDO5MMC"],
     "spec": [
@@ -1280,7 +1280,7 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
     "ttl": "60m",  # battery every 5 min
 }, {
-    10987: ["Linptech", "Linptech Motion Sensor v2", "hs1bb"],
+    10987: ["Linptech", "Linptech Motion Sensor v2", "HS1BB"],
     "spec": [
         MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
