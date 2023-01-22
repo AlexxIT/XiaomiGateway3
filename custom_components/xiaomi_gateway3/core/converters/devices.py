@@ -1181,9 +1181,17 @@ DEVICES += [{
     1647: ["Xiaomi", "Qingping TH Lite", "CGDK2"],
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
+    "spec": [
+        MiBeacon, BLETemperature, BLEHumidity,
+        Converter("battery", "sensor", enabled=None),  # no in new firmwares
+    ],
+}, {
     4611: ["Xiaomi", "TH Sensor", "XMWSDJ04MMC"],
     "spec": [
         MiBeacon, BLETemperature, BLEHumidity,
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/929
+        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
+        MathConv("humidity", mi="3.p.1008", min=0, max=100, round=1),
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
