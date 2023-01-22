@@ -1280,10 +1280,13 @@ DEVICES += [{
     "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
     "ttl": "60m",  # battery every 5 min
 }, {
-    10987: ["Linptech", "Linptech Motion Sensor v2", "HS1BB"],
+    10987: ["Linptech", "Motion Sensor 2", "HS1BB"],
     "spec": [
         MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
+        Converter("illuminance", mi="2.p.1005"),
+        Converter("motion", mi="2.e.1008"),
+        Converter("battery", mi="3.p.1003"),
     ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/657

@@ -101,17 +101,31 @@ def test_9095():
     assert p == {"action": "hold"}
 
     # new format
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1012, "arguments": []}]
-    )
+    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1012, "arguments": []}])
     assert p == {"action": "single", "button": 1}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1013, "arguments": []}]
-    )
+    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1013, "arguments": []}])
     assert p == {"action": "double", "button": 2}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1014, "arguments": []}]
-    )
+    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1014, "arguments": []}])
     assert p == {"action": "hold", "button": 16}
+
+
+def test_10987():
+    device = XDevice(BLE, 10987, DID, MAC)
+    assert device.info.name == "Linptech Motion Sensor 2"
+    device.setup_converters()
+
+    # old format
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/809
+    p = device.decode(
+        "mibeacon",
+        {
+            "did": "blt.3.1bc9srn94eg00",
+            "eid": 18952,
+            "edata": "00008041",
+            "pdid": 10987,
+            "seq": 72,
+        },
+    )
+    assert p == {"motion": True, "illuminance": 16.0}
