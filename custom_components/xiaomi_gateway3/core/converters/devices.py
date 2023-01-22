@@ -1196,6 +1196,8 @@ DEVICES += [{
     ],
 }, {
     9538: ["Xiaomi", "TH Clock 2", "miaomiaoce.sensor_ht.t8"],
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
+    10290: ["Xiaomi", "TH Sensor 3", "MJWSDO5MMC"],
     "spec": [
         MiBeacon, BLETemperature, BLEHumidity,
         MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
