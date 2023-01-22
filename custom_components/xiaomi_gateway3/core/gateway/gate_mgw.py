@@ -57,7 +57,7 @@ class GateMGW(
         if self.available is None and self.did is None:
             await self.gw3_read_device(sh)
 
-        if not self.zha_mode and self.options.get('memory'):
+        if not self.zha_mode and self.options.get("memory"):
             self.debug("Init Zigbee in memory storage")
             sh.patch_memory_zigbee()
 
@@ -78,16 +78,15 @@ class GateMGW(
     #     self.device.update({GATEWAY: False})
 
     async def gw3_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == "miio/report" and \
-                b'"event.gw.heartbeat"' in msg.payload:
-            payload = msg.json['params'][0]
+        if msg.topic == "miio/report" and b'"event.gw.heartbeat"' in msg.payload:
+            payload = msg.json["params"][0]
             payload = self.device.decode(GATEWAY, payload)
             self.device.update(payload)
 
             # time offset may changed right after gw.heartbeat
             await self.gw3_update_time_offset()
 
-        elif msg.topic.endswith('/heartbeat'):
+        elif msg.topic.endswith("/heartbeat"):
             payload = self.device.decode(GATEWAY, msg.json)
             self.device.update(payload)
 
@@ -110,10 +109,8 @@ class GateMGW(
     async def gw3_update_serial_stats(self):
         try:
             async with shell.Session(self.host) as sh:
-                serial = await sh.read_file('/proc/tty/driver/serial')
-                payload = self.device.decode(
-                    GATEWAY, {"serial": serial.decode()}
-                )
+                serial = await sh.read_file("/proc/tty/driver/serial")
+                payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
                 self.device.update(payload)
         except Exception as e:
             self.warning("Can't update gateway stats", e)

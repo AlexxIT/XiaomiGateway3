@@ -1,5 +1,8 @@
-from homeassistant.components.cover import CoverEntity, ATTR_POSITION, \
-    ATTR_CURRENT_POSITION
+from homeassistant.components.cover import (
+    CoverEntity,
+    ATTR_POSITION,
+    ATTR_CURRENT_POSITION,
+)
 from homeassistant.const import STATE_CLOSING, STATE_OPENING
 from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -31,12 +34,12 @@ class XiaomiCover(XEntity, CoverEntity, RestoreEntity):
 
     @callback
     def async_set_state(self, data: dict):
-        if 'run_state' in data:
+        if "run_state" in data:
             self._attr_state = data["run_state"]
             self._attr_is_opening = self._attr_state == STATE_OPENING
             self._attr_is_closing = self._attr_state == STATE_CLOSING
-        if 'position' in data:
-            self._attr_current_cover_position = data['position']
+        if "position" in data:
+            self._attr_current_cover_position = data["position"]
             # https://github.com/AlexxIT/XiaomiGateway3/issues/771
             self._attr_is_closed = self._attr_current_cover_position <= 2
 
@@ -44,10 +47,9 @@ class XiaomiCover(XEntity, CoverEntity, RestoreEntity):
     def async_restore_last_state(self, state: str, attrs: dict):
         if not state:
             return
-        self.async_set_state({
-            "run_state": state,
-            "position": attrs[ATTR_CURRENT_POSITION]
-        })
+        self.async_set_state(
+            {"run_state": state, "position": attrs[ATTR_CURRENT_POSITION]}
+        )
 
     async def async_open_cover(self, **kwargs):
         await self.device_send({self.attr: "open"})

@@ -12,6 +12,12 @@ DOWNLOAD = 2
 
 RUN_OPENMIIO = "/data/openmiio_agent miio mqtt cache z3 --zigbee.tcp=8888 > /var/log/openmiio.log 2>&1 &"
 
+URL_MIPS = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent-1.0.0?viasf=1"
+MD5_MIPS = "a2b70929a828fbe2fe822b881b0e118f"
+
+URL_ARM = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent-1.0.0?viasf=1"
+MD5_ARM = "7d7c18e91a1222994c98dc8920990ae8"
+
 
 @dataclass
 class TelnetShell:
@@ -26,8 +32,7 @@ class TelnetShell:
         self.writer.close()
         await self.writer.wait_closed()
 
-    async def exec(self, command: str, as_bytes=False, timeout=10) \
-            -> Union[str, bytes]:
+    async def exec(self, command: str, as_bytes=False, timeout=10) -> Union[str, bytes]:
         """Run command and return it result."""
         self.writer.write(command.encode() + b"\n")
         coro = self.reader.readuntil(b"# ")
@@ -71,10 +76,11 @@ class TelnetShell:
         if md5 in await self.exec(cmd):
             return OK
 
+        # if there is an old version of the file
+        await self.exec("killall " + filename)
+
         # download can take up to 3 minutes for Chinese users
-        await self.exec(
-            f"wget {url} -O {filename} && chmod +x {filename}", timeout=300
-        )
+        await self.exec(f"wget {url} -O {filename} && chmod +x {filename}", timeout=300)
 
         return DOWNLOAD if md5 in await self.exec(cmd) else ERROR
 

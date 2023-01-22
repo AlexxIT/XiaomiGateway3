@@ -3,7 +3,7 @@ import hashlib
 import re
 from typing import List
 
-from .base import ShellMultimode
+from .base import ShellMultimode, URL_MIPS, MD5_MIPS
 
 CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"
 LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bin && /data/busybox chattr +i /data/firmware/firmware_ota.bin"
@@ -18,14 +18,17 @@ TAR_DATA = "tar -czO /data/miio/mible_local.db* /data/silicon_zigbee_host/*.txt 
 URL_BUSYBOX = "http://master.dl.sourceforge.net/project/mgl03/bin/busybox?viasf=1"
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
 
-URL_AGENT = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent?viasf=1"
-MD5_AGENT = "1defd8048bff54a726a5a187f729a1bd"
-
 
 def sed(app: str, pattern: str, repl: str):
     """sed with extended regex and edit file in-place"""
-    repl = repl.replace('$', r'\$').replace('&', r'\&').replace('=', r'\='). \
-        replace('`', r'\`').replace('"', '\\"').replace('\n', '\\n')
+    repl = (
+        repl.replace("$", r"\$")
+        .replace("&", r"\&")
+        .replace("=", r"\=")
+        .replace("`", r"\`")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+    )
     return f'sed -r "s={pattern}={repl}=" -i /tmp/{app}'
 
 
@@ -36,14 +39,16 @@ PATCH_MEMORY_BLUETOOTH2 = sed(
 )
 # every 5 min sync sqlite DB from memory to NAND if changed
 PATCH_MEMORY_BLUETOOTH3 = sed(
-    "daemon_miio.sh", "^\tdo$", """\tdo
+    "daemon_miio.sh",
+    "^\tdo$",
+    """\tdo
 if [ ${#N} -eq 60 ]; then
   if [ "`md5sum /tmp/miio/mible_local.db|cut -d' ' -f1`" != "`md5sum /data/miio/mible_local.db|cut -d' ' -f1`" ]; then
     cp /tmp/miio/mible_local.db /data/miio
     echo "`date` bluetooth" >> /var/log/storage_sync.log
   fi; N=
 fi; N=$N.
-"""
+""",
 )
 
 # move zigbee DB to tmp (memory)
@@ -53,7 +58,9 @@ PATCH_MEMORY_ZIGBEE2 = sed(
 )
 # every 5 min sync zigbee DB if device list changed
 PATCH_MEMORY_ZIGBEE3 = sed(
-    "daemon_app.sh", "^\tdo$", """\tdo
+    "daemon_app.sh",
+    "^\tdo$",
+    """\tdo
 if [ ${#N} -eq 60 ]; then
   if [ "`md5sum /tmp/zigbee_gw/device_properties.json|cut -d' ' -f1`" != "`md5sum /data/zigbee_gw/device_properties.json|cut -d' ' -f1`" ]; then
     cp /tmp/zigbee_gw/device_properties.json /data/zigbee_gw
@@ -61,7 +68,7 @@ if [ ${#N} -eq 60 ]; then
     echo "`date` zigbee" >> /var/log/storage_sync.log
   fi; N=
 fi; N=$N.
-"""
+""",
 )
 
 # patch basic_gw file to not beeps with 5 sec Motion Sensors
@@ -73,7 +80,9 @@ PATCH_DISABLE_BUZZER2 = sed("daemon_miio.sh", "^ +basic_gw", "/tmp/basic_gw")
 SYNC_MEMORY_FILE = """[ "`md5sum /tmp/{0}|cut -d' ' -f1`" != "`md5sum /data/{0}|cut -d' ' -f1`" ] && cp /tmp/{0} /data/{0}"""
 
 # `ls -1t` - sort files by change time, `sed q` - leave only first row
-DB_BLUETOOTH = "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
+DB_BLUETOOTH = (
+    "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
+)
 # `sed...` - remove filename and adds "*.json" on its place
 DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
 
@@ -102,7 +111,7 @@ class ShellMGW(ShellMultimode):
         return await self.exec("ps -ww | grep -v ' 0 SW'")
 
     async def check_openmiio_agent(self) -> int:
-        return await self.check_bin("openmiio_agent", MD5_AGENT, URL_AGENT)
+        return await self.check_bin("openmiio_agent", MD5_MIPS, URL_MIPS)
 
     async def run_ftp(self):
         if await self.check_bin("busybox", MD5_BUSYBOX, URL_BUSYBOX):
@@ -123,7 +132,7 @@ class ShellMGW(ShellMultimode):
         resp = await self.exec(
             "ls -1 /tmp/miio/mible_local.db /tmp/zigbee_gw/* 2>/dev/null"
         )
-        for file in resp.split('\r\n'):
+        for file in resp.split("\r\n"):
             # sync file if md5sum not equal
             command = SYNC_MEMORY_FILE.format(file[5:])
             await self.exec(command)
@@ -174,7 +183,9 @@ class ShellMGW(ShellMultimode):
 
     def patch_memory_zigbee(self):
         self.app_patches += [
-            PATCH_MEMORY_ZIGBEE1, PATCH_MEMORY_ZIGBEE2, PATCH_MEMORY_ZIGBEE3
+            PATCH_MEMORY_ZIGBEE1,
+            PATCH_MEMORY_ZIGBEE2,
+            PATCH_MEMORY_ZIGBEE3,
         ]
 
     def patch_memory_bluetooth(self):
@@ -185,8 +196,7 @@ class ShellMGW(ShellMultimode):
     @property
     def app_ps(self):
         if self.app_patches:
-            return hashlib.md5(
-                '\n'.join(self.app_patches).encode()).hexdigest()
+            return hashlib.md5("\n".join(self.app_patches).encode()).hexdigest()
         return "/bin/daemon_app.sh"
 
     async def update_daemon_app(self) -> int:
@@ -210,18 +220,15 @@ class ShellMGW(ShellMultimode):
     @property
     def miio_ps(self):
         if self.miio_patches:
-            return hashlib.md5(
-                '\n'.join(self.miio_patches).encode()).hexdigest()
-        return '/bin/daemon_miio.sh'
+            return hashlib.md5("\n".join(self.miio_patches).encode()).hexdigest()
+        return "/bin/daemon_miio.sh"
 
     async def update_daemon_miio(self) -> int:
         """Run default daemon_miio if no patches. Or run patched daemon_miio
         with patches hash in process list.
         """
         await self.exec("killall daemon_miio.sh")
-        await self.exec(
-            "killall silabs_ncp_bt; killall -9 basic_gw"
-        )
+        await self.exec("killall silabs_ncp_bt; killall -9 basic_gw")
 
         if not self.miio_patches:
             await self.exec(f"daemon_miio.sh &")

@@ -40,7 +40,7 @@ from aiohttp import ClientSession
 
 _LOGGER = logging.getLogger(__name__)
 
-SERVERS = ['cn', 'de', 'i2', 'ru', 'sg', 'us']
+SERVERS = ["cn", "de", "i2", "ru", "sg", "us"]
 UA = "Android-7.1.1-1.0.0-ONEPLUS A3010-136-%s APP/xiaomi.smarthome APPV/62830"
 
 
@@ -50,23 +50,23 @@ class MiCloud:
 
     def __init__(self, session: ClientSession, servers: list = None):
         self.session = session
-        self.servers = servers or ['cn']
+        self.servers = servers or ["cn"]
         self.device_id = get_random_string(16)
 
     async def login(self, username: str, password: str):
         try:
             payload = await self._login_step1()
             data = await self._login_step2(username, password, payload)
-            self.verify = data.get('notificationUrl')
-            if not data['location']:
+            self.verify = data.get("notificationUrl")
+            if not data["location"]:
                 return False
 
-            token = await self._login_step3(data['location'])
+            token = await self._login_step3(data["location"])
 
             self.auth = {
-                'user_id': data['userId'],
-                'ssecurity': data['ssecurity'],
-                'service_token': token
+                "user_id": data["userId"],
+                "ssecurity": data["ssecurity"],
+                "service_token": token,
             }
 
             return True
@@ -77,34 +77,37 @@ class MiCloud:
 
     async def _login_step1(self):
         r = await self.session.get(
-            'https://account.xiaomi.com/pass/serviceLogin',
-            cookies={'sdkVersion': '3.8.6', 'deviceId': self.device_id},
-            headers={'User-Agent': UA % self.device_id},
-            params={'sid': 'xiaomiio', '_json': 'true'})
+            "https://account.xiaomi.com/pass/serviceLogin",
+            cookies={"sdkVersion": "3.8.6", "deviceId": self.device_id},
+            headers={"User-Agent": UA % self.device_id},
+            params={"sid": "xiaomiio", "_json": "true"},
+        )
         raw = await r.read()
         _LOGGER.debug(f"MiCloud step1")
         resp: dict = json.loads(raw[11:])
-        return {k: v for k, v in resp.items()
-                if k in ('sid', 'qs', 'callback', '_sign')}
+        return {
+            k: v for k, v in resp.items() if k in ("sid", "qs", "callback", "_sign")
+        }
 
     async def _login_step2(self, username: str, password: str, payload: dict):
-        payload['user'] = username
-        payload['hash'] = hashlib.md5(password.encode()).hexdigest().upper()
+        payload["user"] = username
+        payload["hash"] = hashlib.md5(password.encode()).hexdigest().upper()
 
         r = await self.session.post(
-            'https://account.xiaomi.com/pass/serviceLoginAuth2',
-            cookies={'sdkVersion': '3.8.6', 'deviceId': self.device_id},
+            "https://account.xiaomi.com/pass/serviceLoginAuth2",
+            cookies={"sdkVersion": "3.8.6", "deviceId": self.device_id},
             data=payload,
-            headers={'User-Agent': UA % self.device_id},
-            params={'_json': 'true'})
+            headers={"User-Agent": UA % self.device_id},
+            params={"_json": "true"},
+        )
         raw = await r.read()
         _LOGGER.debug(f"MiCloud step2")
         resp = json.loads(raw[11:])
         return resp
 
     async def _login_step3(self, location):
-        r = await self.session.get(location, headers={'User-Agent': UA})
-        service_token = r.cookies['serviceToken'].value
+        r = await self.session.get(location, headers={"User-Agent": UA})
+        service_token = r.cookies["serviceToken"].value
         _LOGGER.debug(f"MiCloud step3")
         return service_token
 
@@ -113,79 +116,83 @@ class MiCloud:
             "getVirtualModel": True,
             "getHuamiDevices": 1,
             "get_split_device": False,
-            "support_smart_home": True
+            "support_smart_home": True,
         }
 
         total = []
         for server in self.servers:
-            resp = await self.request(
-                server, '/v2/home/device_list_page', payload
-            )
+            resp = await self.request(server, "/v2/home/device_list_page", payload)
             if resp is None:
                 return None
-            total += resp['list']
+            total += resp["list"]
         return total
 
     async def get_rooms(self):
-        payload = {'fg': True, 'fetch_share': True, 'limit': 300}
+        payload = {"fg": True, "fetch_share": True, "limit": 300}
 
         total = []
         for server in self.servers:
-            resp = await self.request(server, '/v2/homeroom/gethome', payload)
+            resp = await self.request(server, "/v2/homeroom/gethome", payload)
             if resp is None:
                 return None
-            for home in resp['homelist']:
-                total += home['roomlist']
+            for home in resp["homelist"]:
+                total += home["roomlist"]
         return total
 
     async def get_bindkey(self, did: str):
-        payload = {'did': did, 'pdid': 1}
+        payload = {"did": did, "pdid": 1}
         for server in self.servers:
-            resp = await self.request(server, '/v2/device/blt_get_beaconkey',
-                                      payload)
+            resp = await self.request(server, "/v2/device/blt_get_beaconkey", payload)
             if resp:
-                return resp['beaconkey']
+                return resp["beaconkey"]
         return None
 
     async def request(self, server: str, url: str, payload: dict):
         assert server in SERVERS, "Wrong server: " + server
-        baseurl = 'https://api.io.mi.com/app' if server == 'cn' \
+        baseurl = (
+            "https://api.io.mi.com/app"
+            if server == "cn"
             else f"https://{server}.api.io.mi.com/app"
+        )
 
-        data = json.dumps(payload, separators=(',', ':'))
+        data = json.dumps(payload, separators=(",", ":"))
 
         nonce = gen_nonce()
-        signed_nonce = gen_signed_nonce(self.auth['ssecurity'], nonce)
+        signed_nonce = gen_signed_nonce(self.auth["ssecurity"], nonce)
 
         try:
-            params = {
-                'data': data
-            }
-            params['rc4_hash__'] = gen_signature(url, signed_nonce, params)
-            params = {
-                k: encrypt_rc4(signed_nonce, v) for (k, v) in params.items()
-            }
-            params.update({
-                'signature': gen_signature(url, signed_nonce, params),
-                'ssecurity': self.auth['ssecurity'],
-                '_nonce': nonce
-            })
-            r = await self.session.post(baseurl + url, cookies={
-                'userId': self.auth['user_id'],
-                'serviceToken': self.auth['service_token'],
-                'locale': 'en_US'
-            }, headers={
-                'Accept-Encoding': 'identity',
-                'User-Agent': UA,
-                'x-xiaomi-protocal-flag-cli': 'PROTOCAL-HTTP2',
-                'MIOT-ENCRYPT-ALGORITHM': 'ENCRYPT-RC4'
-            }, data=params, timeout=10)
+            params = {"data": data}
+            params["rc4_hash__"] = gen_signature(url, signed_nonce, params)
+            params = {k: encrypt_rc4(signed_nonce, v) for (k, v) in params.items()}
+            params.update(
+                {
+                    "signature": gen_signature(url, signed_nonce, params),
+                    "ssecurity": self.auth["ssecurity"],
+                    "_nonce": nonce,
+                }
+            )
+            r = await self.session.post(
+                baseurl + url,
+                cookies={
+                    "userId": self.auth["user_id"],
+                    "serviceToken": self.auth["service_token"],
+                    "locale": "en_US",
+                },
+                headers={
+                    "Accept-Encoding": "identity",
+                    "User-Agent": UA,
+                    "x-xiaomi-protocal-flag-cli": "PROTOCAL-HTTP2",
+                    "MIOT-ENCRYPT-ALGORITHM": "ENCRYPT-RC4",
+                },
+                data=params,
+                timeout=10,
+            )
 
             resp = await r.text()
             resp = json.loads(decrypt_rc4(signed_nonce, resp))
             # _LOGGER.debug(f"Response from MIoT API {url}: {resp}")
-            assert resp['code'] == 0, resp
-            return resp['result']
+            assert resp["code"] == 0, resp
+            return resp["result"]
 
         except asyncio.TimeoutError:
             _LOGGER.error(f"Timeout while requesting MIoT api {url}")
@@ -239,12 +246,12 @@ class RC4:
 
 def get_random_string(length: int):
     seq = string.ascii_uppercase + string.digits
-    return ''.join((random.choice(seq) for _ in range(length)))
+    return "".join((random.choice(seq) for _ in range(length)))
 
 
 def gen_nonce() -> str:
     """Time based nonce."""
-    nonce = os.urandom(8) + int(time.time() / 60).to_bytes(4, 'big')
+    nonce = os.urandom(8) + int(time.time() / 60).to_bytes(4, "big")
     return base64.b64encode(nonce).decode()
 
 
@@ -258,12 +265,8 @@ def gen_signed_nonce(ssecret: str, nonce: str) -> str:
 
 def gen_signature(url: str, signed_nonce: str, data: dict) -> str:
     """Request signature based on url, signed_nonce, nonce and data."""
-    sign = '&'.join(
-        (
-                ['POST', url]
-                + [f"{k}={v}" for k, v in data.items()]
-                + [signed_nonce]
-        )
+    sign = "&".join(
+        (["POST", url] + [f"{k}={v}" for k, v in data.items()] + [signed_nonce])
     )
     signature = hashlib.sha1(sign.encode()).digest()
     return base64.b64encode(signature).decode()
@@ -276,5 +279,4 @@ def encrypt_rc4(pwd, data):
 
 
 def decrypt_rc4(pwd, data):
-    return RC4(base64.b64decode(pwd.encode())).init1024(). \
-        crypt(base64.b64decode(data))
+    return RC4(base64.b64decode(pwd.encode())).init1024().crypt(base64.b64decode(data))

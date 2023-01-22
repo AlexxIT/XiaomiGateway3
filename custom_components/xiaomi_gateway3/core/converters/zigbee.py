@@ -48,12 +48,13 @@ def generate_device(manufacturer: str, model: str) -> Optional[Device]:
 @dataclass
 class ZConverter(Converter):
     """Basic zigbee converter."""
+
     ep: int = 1
     zattr = None
     bind: bool = None
     report: str = None
 
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, value: dict):
         if value["endpoint"] == self.ep and self.zattr in value:
             payload[self.attr] = value[self.zattr]
 
@@ -74,8 +75,13 @@ class ZConverter(Converter):
             maxt = int(parse_time(maxt))
             change = int(change)
             cmd = zdb_report(
-                device.nwk, self.ep, self.zigbee, self.zattr,
-                mint, maxt, change,
+                device.nwk,
+                self.ep,
+                self.zigbee,
+                self.zattr,
+                mint,
+                maxt,
+                change,
             )
             payload.setdefault("commands", []).extend(cmd)
 
@@ -83,7 +89,7 @@ class ZConverter(Converter):
 class ZBoolConv(ZConverter):
     """Basic zigbee bool converter."""
 
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, value: dict):
         if value["endpoint"] == self.ep and self.zattr in value:
             payload[self.attr] = bool(value[self.zattr])
 
@@ -97,15 +103,13 @@ class ZBoolConv(ZConverter):
 class ZMapConv(ZConverter):
     map = {}
 
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, value: dict):
         if self.zattr in value:
             payload[self.attr] = self.map.get(value[self.zattr])
 
     def encode(self, device: "XDevice", payload: dict, value: str):
         v = next(k for k, v in self.map.items() if v == value)
-        cmd = zcl_write(
-            device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30
-        )
+        cmd = zcl_write(device.nwk, self.ep, self.zigbee, self.zattr, v, type=0x30)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -113,7 +117,7 @@ class ZMapConv(ZConverter):
 class ZMathConv(ZConverter):
     multiply: float = 1
 
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, value: dict):
         if value["endpoint"] == self.ep and self.zattr in value:
             payload[self.attr] = value[self.zattr] * self.multiply
 
@@ -159,8 +163,12 @@ class ZElectricalConv(ZMathConv):
     def read(self, device: "XDevice", payload: dict):
         # we can read three attrs from one cluster with single call
         cmd = zcl_read(
-            device.nwk, self.ep, self.zigbee, "rms_voltage", "rms_current",
-            "active_power"
+            device.nwk,
+            self.ep,
+            self.zigbee,
+            "rms_voltage",
+            "rms_current",
+            "active_power",
         )
         payload.setdefault("commands", []).extend(cmd)
 
@@ -255,9 +263,7 @@ class ZBatteryConv(ZConverter):
             payload["battery_voltage"] = value["battery_voltage"] * 100
 
     def read(self, device: "XDevice", payload: dict):
-        cmd = zcl_read(
-            device.nwk, self.ep, self.zigbee, self.zattr, "battery_voltage"
-        )
+        cmd = zcl_read(device.nwk, self.ep, self.zigbee, self.zattr, "battery_voltage")
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -273,6 +279,7 @@ class ZBatteryConv(ZConverter):
 ###############################################################################
 # Specific defices converters
 ###############################################################################
+
 
 class ZTuyaChildModeConv(ZBoolConv):
     zigbee = "on_off"
@@ -316,8 +323,9 @@ class ZTuyaPlugModeConv(ZMapConv):
 class ZTuyaButtonConfig(ZConverter):
     def config(self, device: "XDevice", payload: dict, gateway):
         # some stupid but necessary magic from zigbee2mqtt
-        cmd = zcl_read(device.nwk, self.ep, "on_off", 0x0004, 0x000, 0x0001,
-                       0x0005, 0x0007, 0xfffe)
+        cmd = zcl_read(
+            device.nwk, self.ep, "on_off", 0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xFFFE
+        )
         cmd += zcl_read(device.nwk, self.ep, 0xE001, 0xD011)
         payload.setdefault("commands", []).extend(cmd)
 
@@ -327,10 +335,9 @@ class ZTuyaButtonConv(ZConverter):
     zattr = "on_off"
     map = {0: SINGLE, 1: DOUBLE, 2: HOLD}
 
-    def decode(self, device: 'XDevice', payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, value: dict):
         # TS004F sends click three times with same seq number
-        if device.extra.get("seq") == value["seq"] or \
-                value["endpoint"] != self.ep:
+        if device.extra.get("seq") == value["seq"] or value["endpoint"] != self.ep:
             return
 
         device.extra["seq"] = value["seq"]
@@ -364,11 +371,13 @@ class ZAqaraCubeMain(Converter):
         elif value & 0x80:
             payload.update({"action": "flip180", "side": value & 0b111})
         elif value & 0x40:
-            payload.update({
-                "action": "flip90",
-                "from_side": (value >> 3) & 0b111,
-                "to_side": value & 0b111,
-            })
+            payload.update(
+                {
+                    "action": "flip90",
+                    "from_side": (value >> 3) & 0b111,
+                    "to_side": value & 0b111,
+                }
+            )
 
 
 class ZAqaraCubeRotate(Converter):
@@ -377,11 +386,13 @@ class ZAqaraCubeRotate(Converter):
     childs = {"duration"}
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        payload.update({
-            "action": "rotate",
-            "angle": round(value["present_value"]),
-            "duration": round(value[65285] * 0.001, 2),
-        })
+        payload.update(
+            {
+                "action": "rotate",
+                "angle": round(value["present_value"]),
+                "duration": round(value[65285] * 0.001, 2),
+            }
+        )
 
 
 class ZSonoffButtonConv(ZConverter):
@@ -410,8 +421,13 @@ class ZHueDimmerOnConv(ZConverter):
 
         # Thanks to zigbee2mqtt and ZHA (some unknown magic)
         cmd = zcl_write(
-            device.nwk, 2, cluster="basic", attr=0x0031, data=0x000B,
-            mfg=0x100B, type=0x19
+            device.nwk,
+            2,
+            cluster="basic",
+            attr=0x0031,
+            data=0x000B,
+            mfg=0x100B,
+            type=0x19,
         )
         payload.setdefault("commands", []).extend(cmd)
 
@@ -450,6 +466,7 @@ class ZXiaomiColorTempConv(Converter):
     """Converter decode and read data in Lumi format for support heartbeats.
     But encode data in Zigbee format for support transition.
     """
+
     minm = 153  # mireds (Aqara Bulb)
     maxm = 370  # mireds (Aqara Bulb)
 
@@ -513,8 +530,7 @@ class ZAqaraOppleMode(ZConverter):
     def encode(self, device: "XDevice", payload: dict, value: Any):
         value = next(k for k, v in self.map.items() if v == value)
         cmd = zcl_write(
-            device.nwk, self.ep, self.zigbee, 9, value, type=0x20,
-            mfg=0x115f
+            device.nwk, self.ep, self.zigbee, 9, value, type=0x20, mfg=0x115F
         )
         payload.setdefault("commands", []).extend(cmd)
 

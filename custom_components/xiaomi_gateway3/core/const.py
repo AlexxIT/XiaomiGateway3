@@ -1,4 +1,4 @@
-DOMAIN = 'xiaomi_gateway3'
+DOMAIN = "xiaomi_gateway3"
 TITLE = "Xiaomi Gateway 3"
 
 

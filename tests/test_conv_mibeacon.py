@@ -15,13 +15,13 @@ def test_night_light():
     device.setup_converters()
 
     p = device.decode("mibeacon", {"eid": 15, "edata": "640000"})
-    assert p == {'light': True, 'motion': True}
-    p = device.decode("mibeacon", {'eid': 4103, 'edata': '640000'})
-    assert p == {'light': True}
-    p = device.decode("mibeacon", {'eid': 4106, 'edata': '64'})
-    assert p == {'battery': 100}
-    p = device.decode("mibeacon", {'eid': 4119, 'edata': '78000000'})
-    assert p == {'idle_time': 120}
+    assert p == {"light": True, "motion": True}
+    p = device.decode("mibeacon", {"eid": 4103, "edata": "640000"})
+    assert p == {"light": True}
+    p = device.decode("mibeacon", {"eid": 4106, "edata": "64"})
+    assert p == {"battery": 100}
+    p = device.decode("mibeacon", {"eid": 4119, "edata": "78000000"})
+    assert p == {"idle_time": 120}
 
 
 def test_kettle():
@@ -29,10 +29,10 @@ def test_kettle():
     assert device.info.name == "Xiaomi Kettle"
     device.setup_converters()
 
-    p = device.decode("mibeacon", {'eid': 4101, 'edata': '0063'})
-    assert p == {'power': False, 'state': 'idle', 'temperature': 99}
-    p = device.decode("mibeacon", {'eid': 4101, 'edata': '0154'})
-    assert p == {'power': True, 'state': 'heat', 'temperature': 84}
+    p = device.decode("mibeacon", {"eid": 4101, "edata": "0063"})
+    assert p == {"power": False, "state": "idle", "temperature": 99}
+    p = device.decode("mibeacon", {"eid": 4101, "edata": "0154"})
+    assert p == {"power": True, "state": "heat", "temperature": 84}
 
 
 def test_new_th():
@@ -40,10 +40,10 @@ def test_new_th():
     assert device.info.name == "Xiaomi TH Sensor"
     device.setup_converters()
 
-    p = device.decode("mibeacon", {'eid': 19464, 'edata': 'cdcc3e42'})
-    assert p == {'humidity': 47.7}
-    p = device.decode("mibeacon", {'eid': 19457, 'edata': 'cdcca841'})
-    assert p == {'temperature': 21.1}
+    p = device.decode("mibeacon", {"eid": 19464, "edata": "cdcc3e42"})
+    assert p == {"humidity": 47.7}
+    p = device.decode("mibeacon", {"eid": 19457, "edata": "cdcca841"})
+    assert p == {"temperature": 21.1}
 
 
 def test_lock():
@@ -51,8 +51,8 @@ def test_lock():
     assert device.info.name == "Aqara Door Lock N100 (Bluetooth)"
     device.setup_converters()
 
-    p = device.decode("mibeacon", {'eid': 4106, 'edata': '329aaecd62'})
-    assert p == {'battery': 50}
+    p = device.decode("mibeacon", {"eid": 4106, "edata": "329aaecd62"})
+    assert p == {"battery": 50}
 
     p = device.decode("mibeacon", {"eid": 11, "edata": "a400000000b8aecd62"})
     assert p
@@ -68,3 +68,18 @@ def test_lock():
 
     p = device.decode("mibeacon", {"eid": 6, "edata": "ffffffff00"})
     assert p
+
+
+def test_9095():
+    device = XDevice(BLE, 9095, DID2, MAC)
+    assert device.info.name == "Xiaomi Wireless Button"
+    device.setup_converters()
+
+    p = device.decode("mibeacon", {"eid": 19980, "edata": ""})
+    assert p == {"action": "single"}
+
+    p = device.decode("mibeacon", {"eid": 19981, "edata": ""})
+    assert p == {"action": "double"}
+
+    p = device.decode("mibeacon", {"eid": 19982, "edata": ""})
+    assert p == {"action": "hold"}

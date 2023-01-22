@@ -1,5 +1,6 @@
 from homeassistant.components.climate import *
 from homeassistant.components.climate.const import *
+from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import callback
 
 from . import DOMAIN
@@ -11,7 +12,7 @@ from .core.gateway import XGateway
 ACTIONS = {
     HVAC_MODE_OFF: CURRENT_HVAC_OFF,
     HVAC_MODE_COOL: CURRENT_HVAC_COOL,
-    HVAC_MODE_HEAT: CURRENT_HVAC_HEAT
+    HVAC_MODE_HEAT: CURRENT_HVAC_HEAT,
 }
 
 
@@ -20,6 +21,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if conv.attr in device.entities:
             entity: XEntity = device.entities[conv.attr]
             entity.gw = gateway
+        elif conv.mi == "4.21.85":
+            entity = AqaraE1(gateway, device, conv)
         else:
             entity = XiaomiClimate(gateway, device, conv)
         async_add_entities([entity])
@@ -70,3 +73,48 @@ class XiaomiClimate(XEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         payload = {"hvac_mode": hvac_mode}
         await self.device_send({self.attr: payload})
+
+
+# noinspection PyAbstractClass
+class AqaraE1(XEntity, ClimateEntity):
+    _attr_hvac_mode = None
+    _attr_hvac_modes = [HVAC_MODE_OFF, HVAC_MODE_HEAT, HVAC_MODE_AUTO]
+    _attr_supported_features = SUPPORT_TARGET_TEMPERATURE
+    _attr_temperature_unit = TEMP_CELSIUS
+    _attr_max_temp = 30
+    _attr_min_temp = 5
+    _attr_target_temperature_step = 0.5
+
+    _enabled = None
+    _mode = None
+
+    @callback
+    def async_set_state(self, data: dict):
+        if "climate" in data:
+            self._enabled = data["climate"]
+        if "mode" in data:
+            self._mode = data["mode"]
+        if "current_temp" in data:
+            self._attr_current_temperature = data["current_temp"]
+        if "target_temp" in data:
+            self._attr_target_temperature = data["target_temp"]
+
+        if self._enabled is None or self._mode is None:
+            return
+
+        self._attr_hvac_mode = self._mode if self._enabled else HVAC_MODE_OFF
+
+    async def async_update(self):
+        await self.device_read(self.subscribed_attrs)
+
+    async def async_set_temperature(self, **kwargs) -> None:
+        await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
+
+    async def async_set_hvac_mode(self, hvac_mode: str) -> None:
+        if hvac_mode in (HVAC_MODE_HEAT, HVAC_MODE_AUTO):
+            payload = {"mode": hvac_mode}
+        elif hvac_mode == HVAC_MODE_OFF:
+            payload = {"climate": False}
+        else:
+            return
+        await self.device_send(payload)

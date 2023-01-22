@@ -31,7 +31,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class XiaomiSelectBase(XEntity, SelectEntity):
     _attr_current_option: str = None
 
-    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
 
         if hasattr(conv, "map"):
@@ -72,17 +72,29 @@ class CommandSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_device_class = "command"
 
-    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
         if device.model == "lumi.gateway.mgl03":
             self._attr_options = [
-                CMD_PAIR, CMD_BIND, CMD_OTA, CMD_CONFIG, CMD_PARENTSCAN,
-                CMD_FLASHZB, CMD_FWLOCK, CMD_REBOOT, CMD_FTP,
+                CMD_PAIR,
+                CMD_BIND,
+                CMD_OTA,
+                CMD_CONFIG,
+                CMD_PARENTSCAN,
+                CMD_FLASHZB,
+                CMD_FWLOCK,
+                CMD_REBOOT,
+                CMD_FTP,
             ]
         else:
             self._attr_options = [
-                CMD_PAIR, CMD_BIND, CMD_OTA, CMD_CONFIG, CMD_PARENTSCAN,
-                CMD_REBOOT, CMD_FTP,
+                CMD_PAIR,
+                CMD_BIND,
+                CMD_OTA,
+                CMD_CONFIG,
+                CMD_PARENTSCAN,
+                CMD_REBOOT,
+                CMD_FTP,
             ]
 
     @callback
@@ -155,9 +167,7 @@ class DataSelect(XEntity, SelectEntity):
 
     def set_devices(self, feature: str):
         """Set options list with devices list."""
-        devices = [
-            f"{d.mac}: {d.name}" for d in self.gw.filter_devices(feature)
-        ]
+        devices = [f"{d.mac}: {d.name}" for d in self.gw.filter_devices(feature)]
         if devices:
             self.set_options(None, devices)
         else:
@@ -281,13 +291,10 @@ class DataSelect(XEntity, SelectEntity):
     def step_command_firmwarelock(self, value: dict):
         lock = value["lock"]
         if lock is None:
-            self.set_options(
-                OPT_UNKNOWN, [OPT_UNKNOWN, OPT_ENABLED, OPT_DISABLED]
-            )
+            self.set_options(OPT_UNKNOWN, [OPT_UNKNOWN, OPT_ENABLED, OPT_DISABLED])
         else:
             self.set_options(
-                OPT_ENABLED if lock else OPT_DISABLED,
-                [OPT_ENABLED, OPT_DISABLED]
+                OPT_ENABLED if lock else OPT_DISABLED, [OPT_ENABLED, OPT_DISABLED]
             )
 
     async def step_user_firmwarelock(self, option: str):

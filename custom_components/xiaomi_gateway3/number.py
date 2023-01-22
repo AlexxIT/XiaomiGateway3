@@ -26,7 +26,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class XiaomiNumber(XEntity, NumberEntity):
     _attr_value: float = None
 
-    def __init__(self, gateway: 'XGateway', device: XDevice, conv: Converter):
+    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
 
         if hasattr(conv, "min"):
@@ -48,8 +48,11 @@ class XiaomiNumber(XEntity, NumberEntity):
 
     # backward compatibility fix
     if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 8):
+
         async def async_set_native_value(self, value: float) -> None:
             await self.device_send({self.attr: value})
+
     else:
+
         async def async_set_value(self, value: float) -> None:
             await self.device_send({self.attr: value})

@@ -1,7 +1,6 @@
 import json
 
-from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, \
-    SIGNAL_MQTT_PUB
+from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_CON, SIGNAL_MQTT_PUB
 from .. import shell
 from ..converters import GATEWAY
 from ..device import XDevice, ZIGBEE
@@ -25,8 +24,8 @@ class LumiGateway(GatewayBase):
 
     async def lumi_read_devices(self, sh: shell.TelnetShell):
         # 2. Read zigbee devices
-        raw = await sh.read_file('/data/zigbee/device.info')
-        lumi = json.loads(raw)['devInfo']
+        raw = await sh.read_file("/data/zigbee/device.info")
+        lumi = json.loads(raw)["devInfo"]
 
         for item in lumi:
             did = item["did"]
@@ -34,10 +33,8 @@ class LumiGateway(GatewayBase):
             if not device:
                 # adds leading zeroes to mac
                 mac = f"0x{item['mac'][2:]:>016s}"
-                device = XDevice(
-                    ZIGBEE, item['model'], did, mac, item['shortId']
-                )
-                device.extra = {'fw_ver': item['appVer']}
+                device = XDevice(ZIGBEE, item["model"], did, mac, item["shortId"])
+                device.extra = {"fw_ver": item["appVer"]}
                 # 'hw_ver': item['hardVer'],
                 # 'mod_ver': item['model_ver'],
 
@@ -57,7 +54,7 @@ class LumiGateway(GatewayBase):
             await self.lumi_read(device, payload)
 
     async def lumi_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == 'zigbee/send':
+        if msg.topic == "zigbee/send":
             await self.lumi_process_lumi(msg.json)
 
     async def lumi_send(self, device: XDevice, payload: dict):
@@ -65,14 +62,14 @@ class LumiGateway(GatewayBase):
         # self.debug_device(device, "send", payload, tag="LUMI")
         did = device.did if device.type != GATEWAY else "lumi.0"
         payload.update({"cmd": "write", "did": did})
-        await self.mqtt.publish('zigbee/recv', payload)
+        await self.mqtt.publish("zigbee/recv", payload)
 
     async def lumi_read(self, device: XDevice, payload: dict):
         assert "params" in payload or "mi_spec" in payload, payload
         # self.debug_device(device, "read", payload, tag="LUMI")
         payload["did"] = device.did if device.type != GATEWAY else "lumi.0"
         payload.setdefault("cmd", "read")
-        await self.mqtt.publish('zigbee/recv', payload)
+        await self.mqtt.publish("zigbee/recv", payload)
 
     async def lumi_process_lumi(self, data: dict):
         # cmd:
@@ -82,18 +79,18 @@ class LumiGateway(GatewayBase):
         # - read_rsp, write_rsp - gateway execute command (device may not
         #   receive it)
         # - write_ack - response from device (device receive command)
-        if data['cmd'] == 'heartbeat':
-            data = data['params'][0]
-        elif data['cmd'] in ("report", "read_rsp"):
+        if data["cmd"] == "heartbeat":
+            data = data["params"][0]
+        elif data["cmd"] in ("report", "read_rsp"):
             pass
-        elif data['cmd'] == 'write_rsp':
+        elif data["cmd"] == "write_rsp":
             # process write response only from Gateway
-            if data['did'] != 'lumi.0':
+            if data["did"] != "lumi.0":
                 return
         else:
             return
 
-        did = data['did'] if data['did'] != 'lumi.0' else self.did
+        did = data["did"] if data["did"] != "lumi.0" else self.did
 
         # skip without callback and without data
         if did not in self.devices:

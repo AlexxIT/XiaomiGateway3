@@ -26,7 +26,7 @@
         }
       },
       "token": {
-        "description": "You can obtain Mi Home token automatically with [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) or [manually](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Read about **open telnet command** in [documentation](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "description": "You can obtain Mi Home token automatically with [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) or [manually](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
         "data": {
           "host": "Host",
           "token": "Token",

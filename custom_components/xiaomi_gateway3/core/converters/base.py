@@ -21,6 +21,7 @@ def parse_time(value: str) -> float:
 # Base (global) converters
 ###############################################################################
 
+
 @dataclass
 class Converter:
     attr: str  # hass attribute
@@ -163,9 +164,7 @@ class BatteryConv(Converter):
         elif value >= self.max:
             payload[self.attr] = 100
         else:
-            payload[self.attr] = int(
-                100.0 * (value - self.min) / (self.max - self.min)
-            )
+            payload[self.attr] = int(100.0 * (value - self.min) / (self.max - self.min))
 
 
 class ButtonConv(Converter):
@@ -193,6 +192,7 @@ class ButtonMIConv(ButtonConv):
 # Device converters
 ###############################################################################
 
+
 class VibrationConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
         payload[self.attr] = value
@@ -219,9 +219,9 @@ class CloudLinkConv(Converter):
 
 class ResetsConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: int):
-        if 'resets0' not in device.extra:
-            device.extra['resets0'] = value
-        payload['new_resets'] = value - device.extra['resets0']
+        if "resets0" not in device.extra:
+            device.extra["resets0"] = value
+        payload["new_resets"] = value - device.extra["resets0"]
         super().decode(device, payload, value)
 
 
@@ -237,14 +237,14 @@ class ClimateConv(Converter):
     def encode(self, device: "XDevice", payload: dict, value: dict):
         if self.attr not in device.extra:
             return
-        b = bytearray(device.extra[self.attr].to_bytes(4, 'big'))
+        b = bytearray(device.extra[self.attr].to_bytes(4, "big"))
         if "hvac_mode" in value:
             b[0] = self.hvac[value["hvac_mode"]]
         if "fan_mode" in value:
             b[1] = self.fan[value["fan_mode"]]
         if "target_temp" in value:
             b[3] = int(value["target_temp"])
-        value = int.from_bytes(b, 'big')
+        value = int.from_bytes(b, "big")
         super().encode(device, payload, value)
 
 
@@ -256,9 +256,7 @@ class ClimateTempConv(Converter):
 # we need get pos with one property and set pos with another
 class CurtainPosConv(Converter):
     def encode(self, device: "XDevice", payload: dict, value: Any):
-        conv = next(
-            c for c in device.converters if c.attr == "target_position"
-        )
+        conv = next(c for c in device.converters if c.attr == "target_position")
         conv.encode(device, payload, value)
 
 
@@ -387,9 +385,7 @@ class RemoveDIDConv(Converter):
 Temperature = MathConv(
     "temperature", "sensor", mi="0.1.85", multiply=0.01, min=-4000, max=12500
 )
-Humidity = MathConv(
-    "humidity", "sensor", mi="0.2.85", multiply=0.01, min=0, max=10000
-)
+Humidity = MathConv("humidity", "sensor", mi="0.2.85", multiply=0.01, min=0, max=10000)
 # Pressure = MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01)
 
 # Motion = BoolConv("motion", "binary_sensor", mi="3.1.85")
@@ -400,9 +396,7 @@ Power = MathConv("power", "sensor", mi="0.12.85", round=2)
 Energy = MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2)
 Current = MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2)
 
-ChipTemp = Converter(
-    "chip_temperature", "sensor", mi="8.0.2006", enabled=False
-)
+ChipTemp = Converter("chip_temperature", "sensor", mi="8.0.2006", enabled=False)
 
 # switches and relays
 Outlet = BoolConv("outlet", "switch", mi="4.1.85")
@@ -426,12 +420,9 @@ Button13 = ButtonConv("button_both_13", mi="13.6.85")
 Button23 = ButtonConv("button_both_23", mi="13.7.85")
 
 PowerOffMemory = MapConv(
-    "power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY,
-    enabled=False
+    "power_on_state", "switch", mi="8.0.2030", map=POWEROFF_MEMORY, enabled=False
 )
-ChargeProtect = BoolConv(
-    "charge_protect", "switch", mi="8.0.2031", enabled=False
-)
+ChargeProtect = BoolConv("charge_protect", "switch", mi="8.0.2031", enabled=False)
 Led = BoolConv("led", "switch", mi="8.0.2032", enabled=False)
 
 Wireless = BoolConv("wireless", "switch", mi="4.10.85", enabled=False)
@@ -448,9 +439,7 @@ Wireless3 = BoolConv("wireless_3", "switch", mi="4.12.85", enabled=False)
 # converts voltage to percent and shows voltage in attributes
 # users can adds separate voltage sensor or original percent sensor
 Battery = BatteryConv("battery", "sensor", mi="8.0.2008")
-BatteryLow = BoolConv(
-    "battery_low", "binary_sensor", mi="8.0.9001", enabled=False
-)
+BatteryLow = BoolConv("battery_low", "binary_sensor", mi="8.0.9001", enabled=False)
 BatteryOrig = Converter("battery_original", mi="8.0.2001", enabled=False)
 
 # zigbee3 devices

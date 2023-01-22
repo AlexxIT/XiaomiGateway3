@@ -27,13 +27,13 @@ class SilabsGateway(GatewayBase):
         if self.ieee is not None:
             return
         # 1. Read coordinator info
-        raw = await sh.read_file('/data/zigbee/coordinator.info')
+        raw = await sh.read_file("/data/zigbee/coordinator.info")
         info = json.loads(raw)
         self.ieee = info["mac"][2:].upper()
         assert len(self.ieee) == 16
 
     async def silabs_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic.endswith('/MessageReceived'):
+        if msg.topic.endswith("/MessageReceived"):
             await self.silabs_process_recv(msg.json)
         elif msg.topic.endswith("/MessagePreSentCallback"):
             await self.silabs_process_send(msg.json)
@@ -42,7 +42,7 @@ class SilabsGateway(GatewayBase):
             await self.silabs_process_join(data)
 
     async def silabs_process_recv(self, data: dict):
-        mac = data['eui64'].lower()
+        mac = data["eui64"].lower()
         nwk = data["sourceAddress"].lower()
         zb_msg = None
 
@@ -54,7 +54,7 @@ class SilabsGateway(GatewayBase):
         if mac == "0x0000000000000000" or nwk == "0x0000":
             return
 
-        did = 'lumi.' + mac.lstrip('0x')
+        did = "lumi." + mac.lstrip("0x")
         device: XDevice = self.devices.get(did)
         if not device:
             # we need to save device to know its NWK in future
@@ -88,7 +88,7 @@ class SilabsGateway(GatewayBase):
     async def silabs_process_send(self, data: dict):
         if "zigbee" not in self.debug_mode:
             return
-        did = "lumi." + data["eui64"].lstrip('0x').lower()
+        did = "lumi." + data["eui64"].lstrip("0x").lower()
         if did not in self.devices:
             return
         device = self.devices[did]
@@ -158,9 +158,9 @@ class SilabsGateway(GatewayBase):
             "deviceEndpoint": {
                 "eui64": device.mac.upper(),
                 "endpoint": 0,
-                "clusterInfo": []
+                "clusterInfo": [],
             },
-            "firstjoined": 1
+            "firstjoined": 1,
         }
         await self.mqtt.publish(f"gw/{self.ieee}/devicejoined", payload)
 

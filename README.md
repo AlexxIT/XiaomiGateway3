@@ -1,20 +1,14 @@
 # Xiaomi Gateway 3 for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
-[![Donate](https://img.shields.io/badge/donate-BuyMeCoffee-yellow.svg)](https://www.buymeacoffee.com/AlexxIT)
-[![Donate](https://img.shields.io/badge/donate-YooMoney-8C3FFD.svg)](https://yoomoney.ru/to/41001428278477)
 
-![](logo.png)
-
-| Gateway | Xiaomi Mijia Smart<br>Multi-Mode Gateway | Aqara Hub E1 | Aqara Camera Hub G3 |
-|---------|---|---|---|
-| China model | **ZNDMWG03LM**<br>![](https://via.placeholder.com/10/00ff00/000000?text=+) supported | **ZHWG16LM**<br>![](https://via.placeholder.com/10/00ff00/000000?text=+) supported    | **ZNSXJ13LM**<br>![](https://via.placeholder.com/10/ffff00/000000?text=+) in plans |
-| Euro model  | **ZNDMWG02LM**<br>![](https://via.placeholder.com/10/00ff00/000000?text=+) supported | **HE1-G01**<br> ![](https://via.placeholder.com/10/ff0000/000000?text=+) waiting hack | **CH-H03**<br>   ![](https://via.placeholder.com/10/ffff00/000000?text=+) in plans |
-| Mi Home               | **yes** | **yes** | **no**  |
-| Aqara Home            | **no**  | **no**  | **yes** |
-| Xiaomi/Aqara Zigbee   | **yes** | **yes** |         |
-| Xiaomi Bluetooth BLE  | **yes** | **no**  |         |
-| Xiaomi Bluetooth Mesh | **yes** | **no**  |         |
+| Gateway               | Xiaomi Multimode Gateway   | Xiaomi Multimode Gateway 2 | Aqara Hub E1             |
+|-----------------------|----------------------------|----------------------------|--------------------------|
+| China model           | **ZNDMWG03LM (supported)** | **DMWG03LM (supported)**   | **ZHWG16LM (supported)** |
+| Euro model            | **ZNDMWG02LM (supported)** | **ZNDMWG04LM (supported)** | **HE1-G01 (not!!!)**     |
+| Xiaomi/Aqara Zigbee   | **yes**                    | **yes**                    | **yes**                  |
+| Xiaomi Bluetooth BLE  | **yes**                    | **yes**                    | **no**                   |
+| Xiaomi Bluetooth Mesh | **yes**                    | **yes**                    | **no**                   |
 
 Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
 
@@ -24,7 +18,43 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 > - Xiaomi Gateway EU (DGNWG05LM), Aqara Hub (ZHWG11LM) - [external link](https://openlumi.github.io/)
 > - Aqara G2H (ZNSXJ12LM), Aqara H1 CN (QBCZWG11LM), Aqara M1S CN (ZHWG15LM), Aqara M2 CN (ZHWG12LM), Aqara P3 CN (KTBL12LM) - [external link](https://github.com/niceboygithub/AqaraGateway)
 
-# FAQ
+## TOC
+
+<!-- TOC -->
+* [Xiaomi Gateway 3 for Home Assistant](#xiaomi-gateway-3-for-home-assistant)
+  * [TOC](#toc)
+  * [FAQ](#faq)
+  * [Supported Firmwares](#supported-firmwares)
+  * [Regional Restrictions](#regional-restrictions)
+  * [Supported Devices](#supported-devices)
+    * [Supported Gateways](#supported-gateways)
+    * [Supported Xiaomi Zigbee](#supported-xiaomi-zigbee)
+    * [Supported Other Zigbee](#supported-other-zigbee)
+    * [Supported Xiaomi BLE](#supported-xiaomi-ble)
+    * [Supported Xiaomi Mesh](#supported-xiaomi-mesh)
+  * [Installation](#installation)
+  * [Configuration](#configuration)
+  * [Network configuration](#network-configuration)
+  * [Statistics table](#statistics-table)
+  * [Gateway controls](#gateway-controls)
+  * [Advanced config](#advanced-config)
+    * [Integration config](#integration-config)
+    * [Devices config](#devices-config)
+    * [Entities customize](#entities-customize)
+  * [Zigbee Home Automation Mode](#zigbee-home-automation-mode)
+  * [Zigbee2MQTT Mode](#zigbee2mqtt-mode)
+  * [Handle Button Actions](#handle-button-actions)
+  * [Handle BLE Locks](#handle-ble-locks)
+  * [Obtain Mi Home device token](#obtain-mi-home-device-token)
+  * [Multiple Hass](#multiple-hass)
+  * [Disable Buzzer](#disable-buzzer)
+  * [How it works](#how-it-works)
+  * [Troubleshooting](#troubleshooting)
+  * [Debug mode](#debug-mode)
+  * [Useful links](#useful-links)
+<!-- TOC -->
+
+## FAQ
 
 **Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**  
 A. No. The integration does not support Xiaomi Wi-Fi devices.
@@ -38,7 +68,7 @@ A. Beeps AFTER adding Zigbee devices:
 2. New device successfully added.
 3. Unsupported device model.
 
-Also, if you using hacked motion sensor - the gateway will periodically beeps. You can disable it in integration settings. 
+Also, if you are using hacked motion sensor - the gateway will periodically beeps. You can disable it in integration settings. 
 
 **Q. Does the integration work without internet?**  
 A. Partially. The component connects to a hub on the local network. Zigbee devices work without internet. But adding new Zigbee devices to Mi Home requires Internet. Updating BLE device data may not work without Internet.
@@ -64,11 +94,11 @@ A. The hub can connect directly up to 32 battery-powered devices (end devices). 
 **Q. Why does the two-button switch only have one entity action?**  
 A. All button clicks are displayed in the status of that one entity.
 
-# Supported Firmwares
+## Supported Firmwares
 
 Component support original gateway firmware. You do not need to manually open, solder and flash the devices.
 
-#### Xiaomi Mijia Smart Multi-Mode Gateway
+**Xiaomi Mijia Smart Multi-Mode Gateway**
 
 Maintain firmware: `v1.5.0_0102`. You **should** use [custom open telnet command](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)
 
@@ -84,15 +114,15 @@ Component can block fw updates with **Lock Firmware** function. Mi Home app will
 
 Additionally, the integration supports [custom firmware](https://github.com/zvldz/mgl03_fw/tree/main/firmware). The custom firmware works the same way as the original firmware and will not give you new features or support for new devices.
 
-# Regional Restrictions
+## Regional Restrictions
 
-Device | MiHome EU | MiHome CN | Vevs EU | Vevs CN
----|---|---|---|---
-Gateway 3 (CN and EU) | supported | supported | supported | supported
-Zigbee old series | supported | supported | supported | supported
-Zigbee E1 series (CN and EU) | no        | supported | no        | supported
-Zigbee H1 and T1 series (CN and EU) | no | partially | no | some models
-Bluetooth BLE and Mesh | some models | supported | supported | supported
+| Device                              | MiHome EU   | MiHome CN | Vevs EU   | Vevs CN     |
+|-------------------------------------|-------------|-----------|-----------|-------------|
+ | Gateway 3 (CN and EU)               | supported   | supported | supported | supported   |
+ | Zigbee old series                   | supported   | supported | supported | supported   |
+ | Zigbee E1 series (CN and EU)        | no          | supported | no        | supported   |
+ | Zigbee H1 and T1 series (CN and EU) | no          | partially | no        | some models |
+ | Bluetooth BLE and Mesh              | some models | supported | supported | supported   |
 
 **Xiaomi Mijia Smart Multi-Mode Gateway** has two models - `ZNDMWG03LM` (China) and `ZNDMWG02LM`/`YTC4044GL` (Euro). Both this models can be added to China or to Euro cloud servers.
 
@@ -112,7 +142,7 @@ If you control your devices from Home Assistant - it makes absolutely no differe
 
 **PS.** Some Aqara devices are not supported at all in Mi Home in any version, e.g. **Aqara Door Lock N100 Zigbee version**.
 
-# Supported Devices
+## Supported Devices
 
 Gateway Zigbee chip can work in three modes:
 
@@ -156,7 +186,7 @@ You can change the operation of an existing device or add support for any **Xiao
 It is welcomed if you return a working converter to integration. You can create an issue or make a pull request.
 
 <!--supported-->
-## Supported Gateways
+### Supported Gateways
 
 Total devices: 2
 
@@ -165,7 +195,7 @@ Brand|Name|Model|Entities|S
 Aqara|Hub E1 CN|[ZHWG16LM](https://home.miot-spec.com/s/lumi.gateway.aqcn02)|command, data, gateway|3
 Xiaomi|Gateway 3|[ZNDMWG03LM ZNDMWG02LM](https://home.miot-spec.com/s/lumi.gateway.mgl03)|alarm, command, data, cloud_link, led, gateway|4
 
-## Supported Xiaomi Zigbee
+### Supported Xiaomi Zigbee
 
 Total devices: 82
 
@@ -255,7 +285,7 @@ Xiaomi|Plug TW|[ZNCZ03LM](https://home.miot-spec.com/s/lumi.plug.mitw01)|plug, p
 Xiaomi|Plug US|[ZNCZ12LM](https://home.miot-spec.com/s/lumi.plug.maus01)|plug, power, energy, chip_temperature, power_on_state, charge_protect, led|5
 Xiaomi|TH Sensor|[WSDCGQ01LM](https://home.miot-spec.com/s/lumi.sensor_ht)|temperature, humidity, battery, battery_low, chip_temperature|
 
-## Supported Other Zigbee
+### Supported Other Zigbee
 
 Total devices: 18
 
@@ -280,7 +310,7 @@ Unknown|Dimmer|[LXZ8-02A](https://www.zigbee2mqtt.io/supported-devices/#s=LXZ8-0
 UseeLink|Power Strip|[SM-SO306E](https://www.zigbee2mqtt.io/supported-devices/#s=SM-SO306E)|channel_1, channel_2, channel_3, channel_4, usb, power_on_state|5
 eWeLink|Zigbee OnOff Controller|[SA-003-Zigbee](https://www.zigbee2mqtt.io/supported-devices/#s=SA-003-Zigbee)|switch|5
 
-## Supported Xiaomi BLE
+### Supported Xiaomi BLE
 
 Total devices: 33
 
@@ -320,7 +350,7 @@ Xiaomi|ZenMeasure Clock|[MHO-C303](https://home.miot-spec.com/s/1747)|temperatur
 Xiaomi|ZenMeasure TH|[MHO-C401](https://home.miot-spec.com/s/903)|temperature, humidity, battery*|
 Yeelight|Button S1|[YLAI003](https://home.miot-spec.com/s/1983)|action, battery|
 
-## Supported Xiaomi Mesh
+### Supported Xiaomi Mesh
 
 Total devices: 32
 
@@ -362,7 +392,7 @@ Yeelight|Mesh Spotlight|[YLSD04YL](https://home.miot-spec.com/s/997)|light, flex
 
 <!--supported-->
 
-# Installation
+## Installation
 
 **Video DEMO**
 
@@ -374,7 +404,7 @@ Yeelight|Mesh Spotlight|[YLSD04YL](https://home.miot-spec.com/s/997)|light, flex
 
 **Method 2.** Manually copy `xiaomi_gateway3` folder from [latest release](https://github.com/AlexxIT/XiaomiGateway3/releases/latest) to `/config/custom_components` folder.
 
-# Configuration
+## Configuration
 
 **Video DEMO**
 
@@ -392,7 +422,7 @@ You may skip 1st step if you know token for you Gateway. If you have multiple Ga
 
 **ATTENTION:** If you using two Hass with one gateway - you should use same integration version on both of them! 
 
-# Network configuration 
+## Network configuration 
 
 All settings are **important** or you may have an unstable operation of the gateway.
 
@@ -411,7 +441,7 @@ All settings are **important** or you may have an unstable operation of the gate
 
 With the following settings the operation of the gateway may be **unstable**: different subnets, closed ping to router, Wi-Fi channel 40MHz, WPA3.
 
-# Statistics table
+## Statistics table
 
 ![](zigbee_table.png)
 
@@ -463,7 +493,7 @@ With the following settings the operation of the gateway may be **unstable**: di
 - **msg_received** - amount of messages received from the device
 - **last_msg** - type of last received message
 
-# Gateway controls
+## Gateway controls
 
 The old version of integration used two switches, pair and firmware_lock. If you still have them after the upgrade, remove them manually.
 
@@ -486,9 +516,9 @@ Available commands:
 - **Gateway Enable FTP** - enable FTP on gateway
 - **Gateway Dump Data** - save all gateway data in the Hass configuration folder
 
-# Advanced config
+## Advanced config
 
-## Integration config
+### Integration config
 
 > Configuration > Integrations > Xiaomi Gateway 3 > CONFIGURE
 
@@ -501,10 +531,6 @@ Available commands:
 
 Don't enable DANGER settings if you don't know what you doing.
 
-**[DANGER] Disable buzzer**
-
-Mute the gateway when the user presses the button on the zigbee device. The same sound is made by the gateway for [Aqara Motion Sensor Hack for 5 sec](https://community.home-assistant.io/t/aqara-motion-sensor-hack-for-5-sec/147959). This is dangerous because you must remember that you will lose confirmation beep for all zigbee devices on the gateway.
-
 **[DANGER] Use storage in memory**
 
 Multi-Mode Gateway has an hardware problem with interruptions for zigbee and bluetooth serial data. You can lose zigbee or bluetooth data when writing to the gateway permanent memory. This setting reduces the amount of writing to the gateway's permanent memory. But if you restart the gateway at an bad moment - you may lose the newly added devices and have to add them again.
@@ -515,7 +541,7 @@ This setting switches the zigbee chip into ZHA or zigbee2mqtt support mode. When
 
 **Attention!** This mode is retained even when the integration is removed or when the gateway is rebooted or reset. When reinstalling integration, the mode may be displayed as off, although it may actually be on. If you are not sure what mode is on - turn the setting on, wait for it to turn on without errors, and then turn it off and wait for it to turn off without errors.
 
-## Devices config
+### Devices config
 
 This options configured in the `configuration.yaml`. Section: `xiaomi_gateway3 > devices > IEEE or MAC`.
 
@@ -605,7 +631,7 @@ xiaomi_gateway3:
     }}}{% endif %}
 ```
 
-## Entities customize
+### Entities customize
 
 This options configured in the `configuration.yaml`. Section: `homeassistant > customize > entity_id`.
 
@@ -657,7 +683,7 @@ homeassistant:
       default_transition: 5
 ```
 
-# Zigbee Home Automation Mode
+## Zigbee Home Automation Mode
 
 **Supported only for Multi-Mode Gateway.**
 
@@ -685,7 +711,7 @@ You can change the operating mode at any time. This mode will flash firmware of 
 
 Thanks to [@zvldz](https://github.com/zvldz) for help with [socat](http://www.dest-unreach.org/socat/).
 
-# Zigbee2MQTT Mode
+## Zigbee2MQTT Mode
 
 > **Important:** The zigbee chip of this gateway (EFR32 EZSP v8) is supported in zigbee2mqtt in [experimental mode](https://www.zigbee2mqtt.io/guide/adapters/#experimental).
 
@@ -715,7 +741,7 @@ You can use this mode with thank to this peoples:
 - [@CODeRUS](https://github.com/CODeRUS) and [@zvldz](https://github.com/zvldz) - adapted the script to flash the chip
 - [@faronov](https://github.com/faronov) - complied a new version of firmware 
 
-# Handle Button Actions
+## Handle Button Actions
 
 **Video DEMO**
 
@@ -743,13 +769,13 @@ automation:
   mode: single
 ```
 
-# Handle BLE Locks
+## Handle BLE Locks
 
 <img src="bluetooth_lock.png" width="810">
 
 Read more in [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki/Handle-BLE-Locks).
 
-# Obtain Mi Home device token
+## Obtain Mi Home device token
 
 **Video DEMO**
 
@@ -765,7 +791,7 @@ Also you can get:
 
 <img src="cloud_tokens.png" width="1202">
 
-# Multiple Hass
+## Multiple Hass
 
 It's safe to use multiple Hass servers (main and reserve) with integration, but:
 
@@ -775,13 +801,13 @@ It's safe to use multiple Hass servers (main and reserve) with integration, but:
    - ZHA integration should be installed only on one Hass
    - Gateway integration may be installed only on one Hass or on both, but with same integration version and same integration settings
 
-# Disable Buzzer
+## Disable Buzzer
 
 This option disable only beeps from hacked motion sensor (5 sec):
 
-> Configuration > Integrations > Xiaomi Gateway 3 > Options > Disable buzzer
+**TODO...**
 
-# How it works
+## How it works
 
 The component enables **Telnet** on Gateway via [Miio protocol](https://github.com/rytilahti/python-miio).
 
@@ -791,15 +817,15 @@ The component starts the **MQTT Server** on the public port of the Gateway. All 
 
 After rebooting the device, all changes will be reset. The component will launch Telnet and public MQTT every time it detects that they are disabled.
 
-# Troubleshooting
+## Troubleshooting
 
-### Can't connect to gateway
+**Can't connect to gateway**
 
 - Check [network config](#network-configuration) readme section
 - Check if the Gateway really has the IP-address you set in the configuration
 - Check if the Gateway really use the MiHome token you set in the configuration. When you add a hub to MiHome - its token changes. The integration only updates tokens when Hass starts. And only if there are no problems with connection to the cloud servers. If there are problems, the old (wrong) token value will be shown.
 
-### Lost connection with Zigbee and Bluetooth devices
+**Lost connection with Zigbee and Bluetooth devices**
 
 - Check [network config](#network-configuration) readme section, gateway and Wi-Fi router settings must be fully matched to all items in the section
 - Turn on stat sesors (Configuration > Integrations > Gateway 3 > Configure > Add statisic sensors)
@@ -812,7 +838,7 @@ After rebooting the device, all changes will be reset. The component will launch
 - Check the distance between the Gateway and the device, greater distances and barriers - the less stable the operation
 - Check the gateway zigbee TX power, you can try to increase it if you need (`radio_tx_power` attribute in `_gateway` sensor)
 
-# Debug mode
+## Debug mode
 
 Logging can be setup from:
 
@@ -862,7 +888,7 @@ logger:
     custom_components.xiaomi_gateway3: debug
 ```
 
-# Useful links
+## Useful links
 
 - [Russian Telegram Community](https://t.me/xiaomi_gw_v3_hack)
 - [Italian Telegram Community](https://t.me/HassioHelp)

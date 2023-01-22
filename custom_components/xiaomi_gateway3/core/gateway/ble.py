@@ -1,4 +1,3 @@
-from . import miot
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB
 from .. import shell
 from ..device import XDevice, BLE
@@ -19,7 +18,7 @@ class BLEGateway(GatewayBase):
             db = await sh.read_db_bluetooth()
 
             # load BLE devices
-            rows = sh.db.read_table('gateway_authed_table')
+            rows = sh.db.read_table("gateway_authed_table")
             for row in rows:
                 # BLE key is mac
                 mac = reverse_mac(row[1])
@@ -34,7 +33,7 @@ class BLEGateway(GatewayBase):
         if self.available is None:
             await self.ble_read_devices(sh)
 
-        if self.options.get('memory') and sh.model == "mgw":
+        if self.options.get("memory") and sh.model == "mgw":
             self.debug("Init Bluetooth in memory storage")
             sh.patch_memory_bluetooth()
 
@@ -49,30 +48,28 @@ class BLEGateway(GatewayBase):
 
         # some devices doesn't send mac, only number did
         # https://github.com/AlexxIT/XiaomiGateway3/issues/24
-        if 'mac' in data['dev']:
-            mac = data['dev']['mac'].replace(':', '').lower()
+        if "mac" in data["dev"]:
+            mac = data["dev"]["mac"].replace(":", "").lower()
             device = self.devices.get(mac)
             if not device:
-                device = XDevice(
-                    BLE, data['dev']['pdid'], data['dev']['did'], mac
-                )
+                device = XDevice(BLE, data["dev"]["pdid"], data["dev"]["did"], mac)
                 self.add_device(mac, device)
         else:
-            device = next((
-                d for d in self.devices.values() if d.did == data['dev']['did']
-            ), None)
+            device = next(
+                (d for d in self.devices.values() if d.did == data["dev"]["did"]), None
+            )
             if not device:
                 self.debug(f"Unregistered BLEE device {data}")
                 return
 
-        if device.extra.get('seq') == data['frmCnt']:
+        if device.extra.get("seq") == data["frmCnt"]:
             return
-        device.extra['seq'] = data['frmCnt']
+        device.extra["seq"] = data["frmCnt"]
 
-        if isinstance(data['evt'], list):
-            payload = data['evt'][0]
-        elif isinstance(data['evt'], dict):
-            payload = data['evt']
+        if isinstance(data["evt"], list):
+            payload = data["evt"][0]
+        elif isinstance(data["evt"], dict):
+            payload = data["evt"]
         else:
             raise NotImplementedError
 

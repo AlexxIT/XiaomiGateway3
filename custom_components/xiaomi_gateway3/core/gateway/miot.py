@@ -19,14 +19,14 @@ class MIoTGateway(GatewayBase):
 
     async def miot_process_properties(self, data: list):
         """Can receive multiple properties from multiple devices.
-           data = [{'did':123,'siid':2,'piid':1,'value:True}]
+        data = [{'did':123,'siid':2,'piid':1,'value:True}]
         """
         # convert miio response format to multiple responses in lumi format
         devices: Dict[str, Optional[list]] = {}
         for item in data:
-            if item['did'] not in self.devices:
+            if item["did"] not in self.devices:
                 continue
-            devices.setdefault(item['did'], []).append(item)
+            devices.setdefault(item["did"], []).append(item)
 
         for did, payload in devices.items():
             device = self.devices[did]
@@ -50,8 +50,7 @@ class MIoTGateway(GatewayBase):
         resp = await self.miio_send("set_properties", payload["mi_spec"])
         return resp and "result" in resp
 
-    async def miot_read(self, device: XDevice, payload: dict) \
-            -> Optional[dict]:
+    async def miot_read(self, device: XDevice, payload: dict) -> Optional[dict]:
         assert "mi_spec" in payload, payload
         self.debug_device(device, "read", payload, tag="MIOT")
         for item in payload["mi_spec"]:
@@ -59,4 +58,4 @@ class MIoTGateway(GatewayBase):
         resp = await self.miio_send("get_properties", payload["mi_spec"])
         if resp is None or "result" not in resp:
             return None
-        return device.decode_miot(resp['result'])
+        return device.decode_miot(resp["result"])

@@ -35,22 +35,25 @@ from homeassistant.helpers import config_validation as cv
 
 FMT = "%(asctime)s %(message)s"
 
-CONFIG_SCHEMA = vol.Schema({
-    vol.Optional('level', default='debug'): cv.string,
-    vol.Optional('propagate', default=True): cv.boolean,
-    vol.Optional(CONF_FILENAME): cv.string,
-    vol.Optional('mode', default='a'): cv.string,
-    vol.Optional('max_bytes', default=0): cv.positive_int,
-    vol.Optional('backup_count', default=0): cv.positive_int,
-    vol.Optional('format', default=FMT): cv.string,
-}, extra=vol.ALLOW_EXTRA)
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Optional("level", default="debug"): cv.string,
+        vol.Optional("propagate", default=True): cv.boolean,
+        vol.Optional(CONF_FILENAME): cv.string,
+        vol.Optional("mode", default="a"): cv.string,
+        vol.Optional("max_bytes", default=0): cv.positive_int,
+        vol.Optional("backup_count", default=0): cv.positive_int,
+        vol.Optional("format", default=FMT): cv.string,
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 def init(logger_name: str, config: dict, config_dir: str = None):
-    level = config['level'].upper()
+    level = config["level"].upper()
 
     logger = logging.getLogger(logger_name)
-    logger.propagate = config['propagate']
+    logger.propagate = config["propagate"]
     logger.setLevel(level)
 
     filename = config.get(CONF_FILENAME)
@@ -60,12 +63,12 @@ def init(logger_name: str, config: dict, config_dir: str = None):
 
         handler = RotatingFileHandler(
             filename,
-            config['mode'],
-            config['max_bytes'],
-            config['backup_count'],
+            config["mode"],
+            config["max_bytes"],
+            config["backup_count"],
         )
 
-        fmt = Formatter(config['format'])
+        fmt = Formatter(config["format"])
         handler.setFormatter(fmt)
 
         logger.addHandler(handler)

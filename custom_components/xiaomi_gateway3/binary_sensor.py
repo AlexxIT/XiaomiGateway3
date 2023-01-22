@@ -43,9 +43,11 @@ class XiaomiBinaryBase(XEntity, BinarySensorEntity):
     def async_set_state(self, data: dict):
         if self.attr in data:
             # support invert_state for sensor
-            self._attr_is_on = not data[self.attr] \
-                if self.customize.get(CONF_INVERT_STATE, False) \
+            self._attr_is_on = (
+                not data[self.attr]
+                if self.customize.get(CONF_INVERT_STATE, False)
                 else data[self.attr]
+            )
 
         for k, v in data.items():
             if k in self.subscribed_attrs and k != self.attr:
@@ -119,8 +121,9 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
             self._clear_task.cancel()
 
         self._attr_is_on = True
-        self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = \
-            now().isoformat(timespec="seconds")
+        self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = now().isoformat(
+            timespec="seconds"
+        )
         self._last_on = ts
 
         # if customize of any entity will be changed from GUI - default value
@@ -144,6 +147,4 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
             )
 
         # repeat event from Aqara integration
-        self.hass.bus.async_fire("xiaomi_aqara.motion", {
-            "entity_id": self.entity_id
-        })
+        self.hass.bus.async_fire("xiaomi_aqara.motion", {"entity_id": self.entity_id})

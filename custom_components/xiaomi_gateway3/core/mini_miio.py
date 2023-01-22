@@ -23,6 +23,7 @@ HELLO = bytes.fromhex(
 
 class BasemiIO:
     """A simple class that implements the miIO protocol."""
+
     device_id = None
     delta_ts = None
     debug = False
@@ -34,8 +35,9 @@ class BasemiIO:
 
         key = hashlib.md5(self.token).digest()
         iv = hashlib.md5(key + self.token).digest()
-        self.cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
-                             backend=default_backend())
+        self.cipher = Cipher(
+            algorithms.AES(key), modes.CBC(iv), backend=default_backend()
+        )
 
     def _encrypt(self, plaintext: bytes):
         padder = padding.PKCS7(128).padder()
@@ -51,21 +53,23 @@ class BasemiIO:
         unpadder = padding.PKCS7(128).unpadder()
         return unpadder.update(padded_plaintext) + unpadder.finalize()
 
-    def _pack_raw(self, msg_id: int, method: str,
-                  params: Union[dict, list] = None):
+    def _pack_raw(self, msg_id: int, method: str, params: Union[dict, list] = None):
         # latest zero unnecessary
-        payload = json.dumps({
-            'id': msg_id,
-            'method': method, 'params': params or []
-        }, separators=(',', ':')).encode() + b'\x00'
+        payload = (
+            json.dumps(
+                {"id": msg_id, "method": method, "params": params or []},
+                separators=(",", ":"),
+            ).encode()
+            + b"\x00"
+        )
 
         data = self._encrypt(payload)
 
-        raw = b'\x21\x31'
-        raw += (32 + len(data)).to_bytes(2, 'big')  # total length
-        raw += b'\x00\x00\x00\x00'  # unknow
-        raw += self.device_id.to_bytes(4, 'big')
-        raw += int(time.time() - self.delta_ts).to_bytes(4, 'big')
+        raw = b"\x21\x31"
+        raw += (32 + len(data)).to_bytes(2, "big")  # total length
+        raw += b"\x00\x00\x00\x00"  # unknow
+        raw += self.device_id.to_bytes(4, "big")
+        raw += int(time.time() - self.delta_ts).to_bytes(4, "big")
 
         raw += hashlib.md5(raw + self.token + data).digest()
         raw += data
@@ -75,7 +79,7 @@ class BasemiIO:
         return raw
 
     def _unpack_raw(self, raw: bytes):
-        assert raw[:2] == b'\x21\x31'
+        assert raw[:2] == b"\x21\x31"
         # length = int.from_bytes(raw[2:4], 'big')
         # unknown = raw[4:8]
         # device_id = int.from_bytes(raw[8:12], 'big')
@@ -94,9 +98,9 @@ class SyncMiIO(BasemiIO):
         try:
             sock.sendto(HELLO, self.addr)
             raw = sock.recv(1024)
-            if raw[:2] == b'\x21\x31':
-                self.device_id = int.from_bytes(raw[8:12], 'big')
-                self.delta_ts = time.time() - int.from_bytes(raw[12:16], 'big')
+            if raw[:2] == b"\x21\x31":
+                self.device_id = int.from_bytes(raw[8:12], "big")
+                self.delta_ts = time.time() - int.from_bytes(raw[12:16], "big")
                 return True
         except Exception:
             pass
@@ -128,17 +132,17 @@ class SyncMiIO(BasemiIO):
                 # can receive more than 1024 bytes (1056 approximate maximum)
                 raw_recv = sock.recv(10240)
                 t = time.monotonic() - t
-                data = self._unpack_raw(raw_recv).rstrip(b'\x00')
+                data = self._unpack_raw(raw_recv).rstrip(b"\x00")
 
-                if data == b'':
+                if data == b"":
                     # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
                     # command with empty answer
-                    data = {'result': ''}
+                    data = {"result": ""}
                     break
 
                 data = json.loads(data)
                 # check if we received response for our cmd
-                if data['id'] == msg_id:
+                if data["id"] == msg_id:
                     break
 
                 _LOGGER.debug(f"{self.addr[0]} | wrong ID")
@@ -154,8 +158,8 @@ class SyncMiIO(BasemiIO):
         else:
             _LOGGER.warning(
                 f"{self.addr[0]} | Device offline"
-                if pings >= 2 else
-                f"{self.addr[0]} | Can't send {method} {params}"
+                if pings >= 2
+                else f"{self.addr[0]} | Can't send {method} {params}"
             )
             return None
 
@@ -165,8 +169,8 @@ class SyncMiIO(BasemiIO):
                 f"recv {len(raw_recv)}B in {t:.1f} sec and {times} try"
             )
 
-        if 'result' in data:
-            return data['result']
+        if "result" in data:
+            return data["result"]
         else:
             _LOGGER.debug(f"{self.addr[0]} | {data}")
             return None
@@ -181,7 +185,7 @@ class SyncMiIO(BasemiIO):
             # be lower than 1024 and response should be not more than 1056.
             # {'did':'1234567890','siid': 2,'piid': 1,'value': False,'code': 0}
             for i in range(0, len(params), 15):
-                result += self.send(method, params[i:i + 15])
+                result += self.send(method, params[i : i + 15])
             return result
         except Exception:
             return None
@@ -195,7 +199,7 @@ class SyncMiIO(BasemiIO):
         Response None, device_id not None - device ok, token wrong
         Response None, device_id None - device offline
         """
-        return self.send('miIO.info')
+        return self.send("miIO.info")
 
 
 # noinspection PyUnusedLocal
@@ -254,9 +258,9 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         try:
             sock.sendto(HELLO)
             raw = await sock.recv(1024)
-            if raw[:2] == b'\x21\x31':
-                self.device_id = int.from_bytes(raw[8:12], 'big')
-                self.delta_ts = time.time() - int.from_bytes(raw[12:16], 'big')
+            if raw[:2] == b"\x21\x31":
+                self.device_id = int.from_bytes(raw[8:12], "big")
+                self.delta_ts = time.time() - int.from_bytes(raw[12:16], "big")
                 return True
         except Exception:
             pass
@@ -294,16 +298,16 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
                 sock.sendto(raw_send)
                 # can receive more than 1024 bytes (1056 approximate maximum)
                 raw_recv = await sock.recv(10240)
-                data = self._unpack_raw(raw_recv).rstrip(b'\x00')
+                data = self._unpack_raw(raw_recv).rstrip(b"\x00")
 
-                if data == b'':
+                if data == b"":
                     # mgl03 fw 1.4.6_0012 without Internet respond on miIO.info
                     # command with empty answer
                     continue
 
                 data = json.loads(data)
                 # check if we received response for our cmd
-                if data['id'] != msg_id:
+                if data["id"] != msg_id:
                     _LOGGER.debug(f"{self.addr[0]} | wrong answer ID")
                     continue
 
@@ -334,13 +338,13 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         try:
             result = []
             for i in range(0, len(params), 15):
-                resp = await self.send(method, params[i:i + 15])
-                result += resp['result']
+                resp = await self.send(method, params[i : i + 15])
+                result += resp["result"]
             return result
         except Exception:
             return None
 
     async def info(self):
         """Get info about miIO device."""
-        resp = await self.send('miIO.info')
-        return resp.get('result') if resp else resp
+        resp = await self.send("miIO.info")
+        return resp.get("result") if resp else resp

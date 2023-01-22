@@ -11,13 +11,14 @@ from .shell_mgw2 import ShellMGW2
 class Session:
     """Support automatic closing session in case of trouble. Example of usage:
 
-        try:
-            async with shell.Session(host) as session:
-                sh = await session.login()
-                return True
-        except Exception:
-            return False
+    try:
+        async with shell.Session(host) as session:
+            sh = await session.login()
+            return True
+    except Exception:
+        return False
     """
+
     reader: asyncio.StreamReader
     writer: asyncio.StreamWriter
 
@@ -58,7 +59,7 @@ class Session:
 
 
 NTP_DELTA = 2208988800  # 1970-01-01 00:00:00
-NTP_QUERY = b'\x1b' + 47 * b'\0'
+NTP_QUERY = b"\x1b" + 47 * b"\0"
 
 
 def ntp_time(host: str) -> float:
@@ -69,9 +70,9 @@ def ntp_time(host: str) -> float:
         sock.sendto(NTP_QUERY, (host, 123))
         raw = sock.recv(1024)
 
-        integ = int.from_bytes(raw[-8:-4], 'big')
-        fract = int.from_bytes(raw[-4:], 'big')
-        return integ + float(fract) / 2 ** 32 - NTP_DELTA
+        integ = int.from_bytes(raw[-8:-4], "big")
+        fract = int.from_bytes(raw[-4:], "big")
+        return integ + float(fract) / 2**32 - NTP_DELTA
     except Exception:
         return 0
     finally:

@@ -6,8 +6,15 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from . import converters
-from .converters import Converter, LUMI_GLOBALS, GATEWAY, ZIGBEE, \
-    BLE, MESH, MESH_GROUP_MODEL
+from .converters import (
+    Converter,
+    LUMI_GLOBALS,
+    GATEWAY,
+    ZIGBEE,
+    BLE,
+    MESH,
+    MESH_GROUP_MODEL,
+)
 from .converters.stats import STAT_GLOBALS
 
 if TYPE_CHECKING:
@@ -48,8 +55,14 @@ class XDevice:
 
     _available: bool = None
 
-    def __init__(self, type: str, model: Union[str, int, None], did: str,
-                 mac: str, nwk: str = None):
+    def __init__(
+        self,
+        type: str,
+        model: Union[str, int, None],
+        did: str,
+        mac: str,
+        nwk: str = None,
+    ):
         """Base class to handle device of any type."""
         assert type in (GATEWAY, ZIGBEE, BLE, MESH)
         if type == ZIGBEE:
@@ -82,20 +95,16 @@ class XDevice:
         # device brand, model, name and converters
         self.info = converters.get_device_info(model, type) if model else None
         # all device entities
-        self.entities: Dict[str, 'XEntity'] = {}
+        self.entities: Dict[str, "XEntity"] = {}
         # device gateways (one for GW and Zigbee), multiple for BLE and Mesh
-        self.gateways: List['GatewayBase'] = []
+        self.gateways: List["GatewayBase"] = []
 
         # internal device storage from any useful data
         self.extra: Dict[str, Any] = {}
         self.lazy_setup = set()
 
     def as_dict(self, ts: float) -> dict:
-        resp = {
-            k: getattr(self, k) for k in (
-                "type", "model", "fw_ver", "available"
-            )
-        }
+        resp = {k: getattr(self, k) for k in ("type", "model", "fw_ver", "available")}
         if self.decode_ts:
             resp["decode_time"] = round(ts - self.decode_ts)
         if self.encode_ts:
@@ -138,7 +147,7 @@ class XDevice:
     @property
     def ieee(self) -> str:
         """For Hass device connections."""
-        return ":".join([self.mac[i:i + 2] for i in range(2, 18, 2)])
+        return ":".join([self.mac[i : i + 2] for i in range(2, 18, 2)])
 
     @property
     def has_zigbee_conv(self) -> bool:
@@ -162,8 +171,11 @@ class XDevice:
                 return True
 
             conv = self.converters[0]
-            return conv.zigbee == "on_off" and conv.domain == "sensor" and \
-                   getattr(conv, "bind", False)
+            return (
+                conv.zigbee == "on_off"
+                and conv.domain == "sensor"
+                and getattr(conv, "bind", False)
+            )
 
         if feature == "bind_to":
             conv = self.converters[0]
@@ -207,7 +219,7 @@ class XDevice:
         s += f", {self.nwk})" if self.nwk else ")"
         return s
 
-    def setup_entitites(self, gateway: 'GatewayBase', stats: bool = False):
+    def setup_entitites(self, gateway: "GatewayBase", stats: bool = False):
         """
         xiaomi_gateway3:
           devices:
@@ -304,8 +316,7 @@ class XDevice:
             self.available_timeout = self.info.ttl or POWER_AVAILABLE
             self.poll_timeout = POWER_POLL
 
-        self.available = \
-            (time.time() - self.decode_ts) < self.available_timeout
+        self.available = (time.time() - self.decode_ts) < self.available_timeout
 
     def decode(self, attr_name: str, value: Any) -> Optional[dict]:
         """Find converter by attr_name and decode value."""
@@ -334,7 +345,7 @@ class XDevice:
                 if v:
                     if "piid" in v[0] or "eiid" in v[0] and "siid" not in v[0]:
                         if "siid" in param:
-                           v[0]["siid"] = param["siid"]
+                            v[0]["siid"] = param["siid"]
 
             # res_name is Lumi format
             if "res_name" in param:
@@ -453,8 +464,8 @@ def logger_wrapper(func, log: deque, name: str = None):
             ts = datetime.now().isoformat(timespec="milliseconds")
             log.append(
                 {"ts": ts, "type": name, "value": args[0]}
-                if name else
-                {"ts": ts, "type": "decode_" + args[0], "value": args[1]}
+                if name
+                else {"ts": ts, "type": "decode_" + args[0], "value": args[1]}
             )
         return func(*args)
 
@@ -465,16 +476,12 @@ def logger(device: XDevice) -> Optional[list]:
     if "logger" not in device.extra:
         device.extra["logger"] = log = deque(maxlen=100)
         device.decode = logger_wrapper(device.decode, log)
-        device.decode_lumi = logger_wrapper(
-            device.decode_lumi, log, "decode_lumi"
-        )
+        device.decode_lumi = logger_wrapper(device.decode_lumi, log, "decode_lumi")
         device.decode_zigbee = logger_wrapper(
             device.decode_zigbee, log, "decode_silabs"
         )
         device.encode = logger_wrapper(device.encode, log, "encode")
-        device.encode_read = logger_wrapper(
-            device.encode_read, log, "encode_read"
-        )
+        device.encode_read = logger_wrapper(device.encode_read, log, "encode_read")
         return None
 
     return list(device.extra["logger"])

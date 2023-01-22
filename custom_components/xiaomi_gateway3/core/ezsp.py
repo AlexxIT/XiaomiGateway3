@@ -32,9 +32,15 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
         return False
 
     try:
-        await async_process_requirements(hass, DOMAIN, [
-            'bellows>=0.29.0', 'pyserial>=3.5', 'pyserial-asyncio>=0.5',
-        ])
+        await async_process_requirements(
+            hass,
+            DOMAIN,
+            [
+                "bellows>=0.29.0",
+                "pyserial>=3.5",
+                "pyserial-asyncio>=0.5",
+            ],
+        )
 
         await sh.exec(
             "zigbee_inter_bootloader.sh 1; zigbee_reset.sh 0; zigbee_reset.sh 1; "
@@ -57,13 +63,13 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
             "killall openmiio_agent; /data/openmiio_agent --zigbee.tcp=8889 --zigbee.baud=115200 &"
         )
 
-        await async_process_requirements(hass, DOMAIN, ['xmodem==0.4.6'])
+        await async_process_requirements(hass, DOMAIN, ["xmodem==0.4.6"])
 
         client = async_create_clientsession(hass)
         r = await client.get(
             "https://master.dl.sourceforge.net/project/mgl03/zigbee/mgl03_ncp_6_7_10_b38400_sw.gbl?viasf=1"
-            if custom else
-            "https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1"
+            if custom
+            else "https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1"
         )
         content = await r.read()
 
@@ -136,7 +142,7 @@ def flash_firmware(host: str, content: bytes) -> bool:
         from xmodem import XMODEM
 
         modem = XMODEM(getc, putc)
-        modem.log = _LOGGER.getChild('xmodem')
+        modem.log = _LOGGER.getChild("xmodem")
         stream = io.BytesIO(content)
 
         if not modem.send(stream):

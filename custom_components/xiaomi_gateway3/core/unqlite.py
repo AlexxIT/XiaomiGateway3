@@ -18,18 +18,18 @@ class Unqlite:
 
     def read(self, length: int):
         self.pos += length
-        return self.raw[self.pos - length:self.pos]
+        return self.raw[self.pos - length : self.pos]
 
     def read_int(self, length: int):
-        return int.from_bytes(self.read(length), 'big')
+        return int.from_bytes(self.read(length), "big")
 
     def read_db_header(self):
-        assert self.read(7) == b'unqlite', "Wrong file signature"
-        assert self.read(4) == b'\xDB\x7C\x27\x12', "Wrong DB magic"
+        assert self.read(7) == b"unqlite", "Wrong file signature"
+        assert self.read(4) == b"\xDB\x7C\x27\x12", "Wrong DB magic"
         creation_time = self.read_int(4)
         sector_size = self.read_int(4)
         self.page_size = self.read_int(4)
-        assert self.read(6) == b'\x00\x04hash', "Unsupported hash"
+        assert self.read(6) == b"\x00\x04hash", "Unsupported hash"
 
     # def read_header2(self):
     #     self.pos = self.page_size
@@ -73,7 +73,7 @@ class Unqlite:
                 self.pos = page_offset + next_offset
                 k, v, next_offset = self.read_cell()
                 # data sometimes corrupted: b'lumi.158d0004\xb4f9abb.prop'
-                result[k.decode(errors='replace')] = v.decode(errors='replace')
+                result[k.decode(errors="replace")] = v.decode(errors="replace")
             page_offset += self.page_size
 
         return result
@@ -95,16 +95,16 @@ class SQLite:
 
     def read(self, length: int):
         self.pos += length
-        return self.raw[self.pos - length:self.pos]
+        return self.raw[self.pos - length : self.pos]
 
     def read_int(self, length: int):
-        return int.from_bytes(self.read(length), 'big')
+        return int.from_bytes(self.read(length), "big")
 
     def read_varint(self):
         result = 0
         while True:
             i = self.read_int(1)
-            result += i & 0x7f
+            result += i & 0x7F
             if i < 0x80:
                 break
             result <<= 7
@@ -112,7 +112,7 @@ class SQLite:
         return result
 
     def read_db_header(self):
-        assert self.read(16) == b'SQLite format 3\0', "Wrong file signature"
+        assert self.read(16) == b"SQLite format 3\0", "Wrong file signature"
         self.page_size = self.read_int(2)
 
     def read_page(self, page_num: int):
@@ -121,9 +121,9 @@ class SQLite:
         # B-tree Page Header Format
         page_type = self.read(1)
 
-        if page_type == b'\x0D':
+        if page_type == b"\x0D":
             return self._read_leaf_table(page_num)
-        elif page_type == b'\x05':
+        elif page_type == b"\x05":
             return self._read_interior_table(page_num)
         else:
             raise NotImplemented
