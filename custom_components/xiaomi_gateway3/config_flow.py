@@ -7,6 +7,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from . import DOMAIN
 from .core import utils
+from .core.const import PID_BLE, PID_WIFI, PID_WIFI_BLE
 from .core.xiaomi_cloud import MiCloud
 
 ACTIONS = {"cloud": "Add Mi Cloud Account", "token": "Add Gateway using Token"}
@@ -176,7 +177,7 @@ class OptionsFlowHandler(OptionsFlow):
                 if device["did"] == did
             )
 
-            if device["pid"] != 6:
+            if device["pid"] != PID_BLE:
                 device_info = (
                     f"Name: {device['name']}\n"
                     f"Model: {device['model']}\n"
@@ -219,10 +220,9 @@ class OptionsFlowHandler(OptionsFlow):
 
         devices = {}
         for device in self.hass.data[DOMAIN].get("devices", []):
-            # 0 - wifi, 6 - ble, 8 - wifi+ble
-            if device["pid"] in (0, 8):
+            if device["pid"] in (PID_WIFI, PID_WIFI_BLE):
                 info = device["localip"]
-            elif device["pid"] == 6:
+            elif device["pid"] == PID_BLE:
                 info = "BLE"
             else:
                 continue
