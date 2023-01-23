@@ -20,12 +20,13 @@ class BLEGateway(GatewayBase):
             # load BLE devices
             rows = sh.db.read_table("gateway_authed_table")
             for row in rows:
-                # BLE key is mac
                 mac = reverse_mac(row[1])
-                device = self.devices.get(mac)
+                model = row[2]
+                did = row[4]
+                device = self.devices.get(did)
                 if not device:
-                    device = XDevice(BLE, row[2], row[4], mac)
-                self.add_device(mac, device)
+                    device = XDevice(BLE, model, did, mac)
+                self.add_device(did, device)
         except Exception:
             pass
 
@@ -46,21 +47,16 @@ class BLEGateway(GatewayBase):
         # 'evt': [{'eid': 15, 'edata': '010000'}],
         # 'frmCnt': 36, 'gwts': 1636208932}
 
-        # some devices doesn't send mac, only number did
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/24
-        if "mac" in data["dev"]:
-            mac = data["dev"]["mac"].replace(":", "").lower()
-            device = self.devices.get(mac)
-            if not device:
-                device = XDevice(BLE, data["dev"]["pdid"], data["dev"]["did"], mac)
-                self.add_device(mac, device)
-        else:
-            device = next(
-                (d for d in self.devices.values() if d.did == data["dev"]["did"]), None
-            )
-            if not device:
-                self.debug(f"Unregistered BLEE device {data}")
+        did = data["dev"]["did"]
+        device = self.devices.get(did)
+        if not device:
+            # https://github.com/AlexxIT/XiaomiGateway3/issues/24
+            if "mac" not in data["dev"]:
+                self.debug(f"Unknown device without mac: {data}")
                 return
+            mac = data["dev"]["mac"].replace(":", "").lower()
+            device = XDevice(BLE, data["dev"]["pdid"], data["dev"]["did"], mac)
+            self.add_device(did, device)
 
         if device.extra.get("seq") == data["frmCnt"]:
             return

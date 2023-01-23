@@ -214,12 +214,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         hass.data[DOMAIN]["devices"] += devices
 
     for device in devices:
-        # key - mac for BLE, and did for others
-        did = (
-            device["did"]
-            if device["pid"] != 6
-            else device["mac"].replace(":", "").lower()
-        )
+        did = device["did"]
         XGateway.defaults.setdefault(did, {})
         # don't override name if exists
         XGateway.defaults[did].setdefault("name", device["name"])
@@ -229,12 +224,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
 
 def _update_devices(devices: list):
     for device in devices:
-        # key - mac for BLE, and did for others
-        did = (
-            device["did"]
-            if device["pid"] != 6
-            else device["mac"].replace(":", "").lower()
-        )
+        did = device["did"]
         XGateway.defaults.setdefault(did, {})
         # don't override name if exists
         XGateway.defaults[did].setdefault("name", device["name"])

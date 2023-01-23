@@ -24,7 +24,7 @@ class GatewayBase:
     # keys:
     # - Gateway: did, "123456789", X digits
     # - Zigbee: did, "lumi.abcdef", 8 byte hex mac without leading zeros
-    # - BLE: mac, "abcdef", 6 byte hex mac
+    # - BLE: mac, "blt.x.xxx", alphanum
     # - Mesh: did, "123456789", X digits
     # - Mesh group: did, "group.123456789"
     devices: Dict[str, XDevice] = {}
