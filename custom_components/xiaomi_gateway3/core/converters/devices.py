@@ -1192,6 +1192,7 @@ DEVICES += [{
         # https://github.com/AlexxIT/XiaomiGateway3/issues/929
         MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
         MathConv("humidity", mi="3.p.1008", min=0, max=100, round=1),
+        Converter("battery", mi="2.p.1003"),
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
