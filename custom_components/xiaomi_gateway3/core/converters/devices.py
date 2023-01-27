@@ -1196,13 +1196,15 @@ DEVICES += [{
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t8
     9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
-    10290: ["Xiaomi", "TH Sensor 3", "MJWSDO5MMC"],
+    10290: ["Xiaomi", "TH Sensor 3", "MJWSD05MMC"],
     "spec": [
         MiBeacon, BLETemperature, BLEHumidity,
         MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
         MathConv("humidity", mi="3.p.1002", min=0, max=100, round=0),
+        Converter("battery", "sensor", mi="2.p.1003", enabled=None),
     ]
 }, {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
