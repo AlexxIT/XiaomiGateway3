@@ -99,7 +99,7 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 async def read_firmware(host: str) -> Optional[str]:
     from bellows.ezsp import EZSP
 
-    ezsp = EZSP({"path": f"socket://{host}:8889", "flow_control": None})
+    ezsp = EZSP({"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None})
     try:
         await asyncio.wait_for(ezsp._probe(), timeout=10)
     except asyncio.TimeoutError:
