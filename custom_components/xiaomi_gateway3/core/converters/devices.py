@@ -1281,7 +1281,13 @@ DEVICES += [{
     ],
 }, {
     6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
-    "spec": [MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery],
+    "spec": [
+        MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery,
+        Converter("battery", mi="2.p.1003"),
+        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
+        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
+        ButtonMIConv("button", mi="3.e.1014", value=4),  # both single
+    ],
     "ttl": "60m",  # battery every 5 min
 }, {
     10987: ["Linptech", "Motion Sensor 2", "HS1BB"],
