@@ -342,10 +342,11 @@ class XDevice:
                 v = param["value"]
             else:
                 v = param["arguments"]
-                if v:
-                    if "piid" in v[0] or "eiid" in v[0] and "siid" not in v[0]:
-                        if "siid" in param:
-                            v[0]["siid"] = param["siid"]
+                if v and "siid" in param:
+                    # add siid to every argument
+                    for item in param["arguments"]:
+                        if "piid" in item or "eiid" in item and "siid" not in item:
+                            item["siid"] = param["siid"]
 
             # res_name is Lumi format
             if "res_name" in param:

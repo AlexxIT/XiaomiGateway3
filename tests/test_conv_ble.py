@@ -129,3 +129,18 @@ def test_10987():
         },
     )
     assert p == {"motion": True, "illuminance": 16.0}
+
+    # new format
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/956
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 2,
+                "eiid": 1008,
+                "tid": 240,
+                "arguments": [{"piid": 1005, "value": 23.000000}],
+            }
+        ]
+    )
+    assert p == {"motion": True, "illuminance": 23.0}

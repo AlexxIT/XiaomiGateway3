@@ -77,10 +77,8 @@ class BoolConv(Converter):
 
 @dataclass
 class EventConv(Converter):
-    value: Any = None
-
     def decode(self, device: "XDevice", payload: dict, value: list):
-        payload[self.attr] = self.value
+        payload[self.attr] = True
         if len(value) > 0:
             payload.update(device.decode_lumi(value))
 

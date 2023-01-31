@@ -338,7 +338,7 @@ DEVICES += [{
     # motion sensor E1 with illuminance
     "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
     "spec": [
-        EventConv("motion", "binary_sensor", mi="2.e.1", value=True),
+        EventConv("motion", "binary_sensor", mi="2.e.1"),
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
@@ -538,7 +538,7 @@ DEVICES += [{
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
     # "support": 5,  # @zvldz
     "spec": [
-        EventConv("motion", "binary_sensor", mi="4.e.1", value=True),
+        EventConv("motion", "binary_sensor", mi="4.e.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
         MapConv("sensitivity", "select", mi="8.p.1", map={
             1: "low", 2: "medium", 3: "high"
@@ -1289,7 +1289,7 @@ DEVICES += [{
         MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
         Converter("illuminance", mi="2.p.1005"),
-        Converter("motion", mi="2.e.1008"),
+        EventConv("motion", mi="2.e.1008"),
         Converter("battery", mi="3.p.1003"),
     ],
 }, {
