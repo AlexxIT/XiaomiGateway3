@@ -398,7 +398,7 @@ Total devices: 49
 
 [![Mi Cloud authorization in Home Assistant with Xiaomi Gateway 3](https://img.youtube.com/vi/rU_ATCVKx78/mqdefault.jpg)](https://www.youtube.com/watch?v=rU_ATCVKx78)
 
-Configuration > Integrations > Add Integration > **Xiaomi Gateway3**
+[Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > Add Integration > [Xiaomi Gateway3](https://my.home-assistant.io/redirect/config_flow_start/?domain=xiaomi_gateway3)
 
 If the integration is not in the list, you need to clear the browser cache.
 
@@ -435,8 +435,7 @@ With the following settings the operation of the gateway may be **unstable**: di
 ![](assets/zigbee_table.png)
 
 1. To enable stats sensors go to:
-
-   > Configuration > Integrations > Xiaomi Gateway 3 > Options > Add statistic sensors
+   - [Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > Xiaomi Gateway 3 > Options > Add statistic sensors
 
 2. Install [Flex Table](https://github.com/custom-cards/flex-table-card) from HACS
 
@@ -509,13 +508,13 @@ Available commands:
 
 ### Integration config
 
-> Configuration > Integrations > Xiaomi Gateway 3 > CONFIGURE
+[Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > Xiaomi Gateway 3 > CONFIGURE
 
 - **Host** - gateway IP-address, should be fixed on your Wi-Fi router
 - **Token** - gateway Mi Home token, changed only when you add gateway to Mi Home app
 - **Support Bluetooth devices** - enable processing BLE and Mesh devices data from gateway
 - **Add statistic sensors** - [read more](#statistics-table)
-- **Debug logs** - enable different levels of logging
+- **Debug logs** - enable different levels of logging ([read more](#debug-mode))
 
 Don't enable DANGER settings if you don't know what you doing.
 
@@ -792,7 +791,7 @@ After rebooting the gateway, all changes will be reset. The component will launc
 **Lost connection with Zigbee and Bluetooth devices**
 
 - Check [network config](#network-configuration) readme section, gateway and Wi-Fi router settings must be fully matched to all items in the section
-- Turn on stat sesors (Configuration > Integrations > Gateway 3 > Configure > Add statisic sensors)
+- Turn on stat sesors ([Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > Gateway 3 > Configure > Add statisic sensors)
 - Check that the connection to the Gateway is not dropped for weeks (`_gateway` sensor value means connection uptime)
 - Check that the zigbee error rate is not increasing at a high rate (`zigbee_oe` attribute in `_gateway` sensor, normal rate: 1-2 errors per hour)
 - Check that CPU utilisation is within normal values (`load_avg` attribute in `_gateway` sensor (first 3 items), normal value: below 3)
@@ -808,15 +807,14 @@ Logging can be setup from:
 
 **1. Integration config (GUI)**
 
-Configuration > Integrations > Xiaomi Gateway 3 > Configure > Debug
+**Enable:**
 
-Shows only component logs. The link to the logs is always random and will apear in Notifications.
+- [Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > **Xiaomi Gateway 3** > Configure > Debug logs: Basic, MQTT, Zigbee > Refresh the Home Assistant web page.
 
-By adding params to url, you can filter data in the logs, enable auto refresh (in seconds) and tail last lines.
+**View:**
 
-```
-http://192.168.1.123:8123/c4e99cfc-0c83-4a39-b7f0-278b0e719bd1?q=ble_event&r=2&t=100
-```
+- [Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > **Xiaomi Gateway 3** > Three dots > Known Issues
+- or [System information](https://my.home-assistant.io/redirect/system_health/) > **Xiaomi Gateway 3** > debug
 
 **2. Integration config (YAML)**
 
