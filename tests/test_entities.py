@@ -3,11 +3,13 @@ import asyncio
 from homeassistant.components.sensor import DOMAIN
 from homeassistant.core import HomeAssistant
 
+from custom_components.xiaomi_gateway3.binary_sensor import XiaomiBinarySensor
 from custom_components.xiaomi_gateway3.climate import AqaraE1
-from custom_components.xiaomi_gateway3.core.converters import ZIGBEE, BLE
+from custom_components.xiaomi_gateway3.core.converters import ZIGBEE
 from custom_components.xiaomi_gateway3.core.device import XDevice
 from custom_components.xiaomi_gateway3.core.gateway import XGateway
 from custom_components.xiaomi_gateway3.sensor import XiaomiAction
+from custom_components.xiaomi_gateway3.switch import XiaomiSwitch
 
 assert DOMAIN
 
@@ -125,3 +127,33 @@ def test_aqara_climate_e1():
         },
         False,
     ]
+
+
+def test_plug_detection():
+    gw = XGateway("", "")
+    device = XDevice(ZIGBEE, "lumi.plug.mmeu01", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+    device.available = True
+
+    conv = next(conv for conv in device.converters if conv.attr == "plug")
+    switch = XiaomiSwitch(gw, device, conv)
+    switch.hass = Hass()
+    switch.async_write_ha_state()
+
+    state = switch.hass.states.get(switch.entity_id)
+    assert state.attributes == {
+        "device_class": "plug",
+        "icon": "mdi:power-plug",
+        "friendly_name": "Xiaomi Plug EU",
+    }
+
+    conv = next(conv for conv in device.converters if conv.attr == "plug_detection")
+    binary = XiaomiBinarySensor(gw, device, conv)
+    binary.hass = Hass()
+    binary.async_write_ha_state()
+
+    state = binary.hass.states.get(binary.entity_id)
+    assert state.attributes == {
+        "device_class": "plug",
+        "friendly_name": "Xiaomi Plug EU Plug Detection",
+    }

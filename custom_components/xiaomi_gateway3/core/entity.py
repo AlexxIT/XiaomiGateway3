@@ -32,6 +32,7 @@ DEVICE_CLASSES = {
     "cloud_link": BinarySensorDeviceClass.CONNECTIVITY,
     "contact": BinarySensorDeviceClass.DOOR,
     "latch": BinarySensorDeviceClass.LOCK,
+    "plug_detection": BinarySensorDeviceClass.PLUG,
     "reverse": BinarySensorDeviceClass.LOCK,
     "square": BinarySensorDeviceClass.LOCK,
     "water_leak": BinarySensorDeviceClass.MOISTURE,
