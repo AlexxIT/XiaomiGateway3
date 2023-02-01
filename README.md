@@ -674,8 +674,9 @@ Starting with version 3, there is no operation mode switch. To turn it on, confi
 
 Settings > Integrations > Add > Zigbee Home Automation > EZSP:
 
-- **Serial:** `socket://{gatewayIP}:8888`
-- **Speed:** `115200`
+- **Serial device path:** `socket://{gatewayIP}:8888`
+- **port speed:** any
+- **data flow control**: any
 
 When you turn on ZHA mode - Zigbee devices in Mi Home will stop working. BLE and Mesh devices will continue to work in Mi Home and Hass.
 
