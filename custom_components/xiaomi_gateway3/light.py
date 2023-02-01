@@ -157,7 +157,8 @@ class XiaomiMeshGroup(XiaomiMeshBase):
             return
         for did in self.device.extra["childs"]:
             child = self.gw.devices[did]
-            child.entities.pop(self.attr)
+            # None - fix https://github.com/AlexxIT/XiaomiGateway3/issues/905
+            child.entities.pop(self.attr, None)
 
     async def async_update(self):
         # To update a group - request an update of its children
