@@ -234,7 +234,9 @@ class XEntity(Entity):
             assert "params" in payload or "mi_spec" in payload, payload
 
             if "mi_spec" in payload:
-                await self.gw.miot_send(self.device, payload)
+                ok = await self.gw.miot_send(self.device, payload)
+                if ok:
+                    await self.miot_after_send(value)
             else:
                 await self.gw.lumi_send(self.device, payload)
 
@@ -251,16 +253,20 @@ class XEntity(Entity):
             if not ok or self.attr == "group":
                 return
 
-            payload = self.device.encode_read(self.subscribed_attrs)
-            for _ in range(10):
-                await asyncio.sleep(0.5)
-                data = await self.gw.miot_read(self.device, payload)
-                # check that all read attrs are equal to send attrs
-                if not data or any(data.get(k) != v for k, v in value.items()):
-                    continue
-                self.async_set_state(data)
-                self._async_write_ha_state()
-                break
+            await self.miot_after_send(value)
+
+    async def miot_after_send(self, value: dict):
+        # TODO: rewrite me
+        payload = self.device.encode_read(self.subscribed_attrs)
+        for _ in range(10):
+            await asyncio.sleep(0.5)
+            data = await self.gw.miot_read(self.device, payload)
+            # check that all read attrs are equal to send attrs
+            if not data or any(data.get(k) != v for k, v in value.items()):
+                continue
+            self.async_set_state(data)
+            self._async_write_ha_state()
+            break
 
     async def device_read(self, attrs: set):
         payload = self.device.encode_read(attrs)
