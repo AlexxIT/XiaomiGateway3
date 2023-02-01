@@ -1157,6 +1157,71 @@ DEVICES += [{
 # BLE
 ########################################################################################
 
+# Xiaomi BLE MiBeacon + MIoT spec
+DEVICES += [{
+    4611: ["Xiaomi", "TH Sensor", "XMWSDJ04MMC"],
+    "spec": [
+        MiBeacon, BLETemperature, BLEHumidity,
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/929
+        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
+        MathConv("humidity", mi="3.p.1008", min=0, max=100, round=1),
+        Converter("battery", mi="2.p.1003"),
+        Converter("battery", "sensor", enabled=None),  # no in new firmwares
+    ],
+}, {
+    6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
+    "spec": [
+        MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery,
+        Converter("battery", mi="2.p.1003"),
+        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
+        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
+        ButtonMIConv("button", mi="3.e.1014", value=4),  # both single
+    ],
+    "ttl": "60m",  # battery every 5 min
+}, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/826
+    7184: ["Linptech", "Wireless Button", "K11"],
+    "spec": [
+        MiBeacon, BLEAction, Button, BLEBattery,
+        Converter("battery", mi="2.p.1003"),
+        BLEEvent("action", mi="3.e.1012", map={1: SINGLE, 8: HOLD, 15: DOUBLE}),
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
+    # lumi.remote.mcn001
+    9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
+    "spec": [
+        MiBeacon, BLEAction, Button, BLEBattery,
+        Converter("battery", mi="2.p.1003"),
+        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
+        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
+        ButtonMIConv("button", mi="3.e.1014", value=16),  # hold
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t8
+    9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
+    10290: ["Xiaomi", "TH Sensor 3", "MJWSD05MMC"],
+    "spec": [
+        MiBeacon, BLETemperature, BLEHumidity,
+        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
+        MathConv("humidity", mi="3.p.1002", min=0, max=100, round=0),
+        Converter("battery", mi="2.p.1003"),
+        Converter("battery", "sensor", enabled=None),  # no in new firmwares
+    ]
+}, {
+    10987: ["Linptech", "Motion Sensor 2", "HS1BB"],
+    "spec": [
+        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
+        Converter("idle_time", "sensor", enabled=False),
+        Converter("illuminance", mi="2.p.1005"),
+        EventConv("motion", mi="2.e.1008"),
+        Converter("battery", mi="3.p.1003"),
+    ],
+}]
+
+# Xiaomi BLE MiBeacon only spec
 # https://custom-components.github.io/ble_monitor/by_brand
 DEVICES += [{
     152: ["Xiaomi", "Flower Care", "HHCCJCY01"],
@@ -1185,28 +1250,6 @@ DEVICES += [{
         MiBeacon, BLETemperature, BLEHumidity,
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
-}, {
-    4611: ["Xiaomi", "TH Sensor", "XMWSDJ04MMC"],
-    "spec": [
-        MiBeacon, BLETemperature, BLEHumidity,
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/929
-        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
-        MathConv("humidity", mi="3.p.1008", min=0, max=100, round=1),
-        Converter("battery", mi="2.p.1003"),
-        Converter("battery", "sensor", enabled=None),  # no in new firmwares
-    ],
-}, {
-    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t8
-    9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
-    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
-    10290: ["Xiaomi", "TH Sensor 3", "MJWSD05MMC"],
-    "spec": [
-        MiBeacon, BLETemperature, BLEHumidity,
-        MathConv("temperature", mi="3.p.1001", min=-30, max=100, round=1),
-        MathConv("humidity", mi="3.p.1002", min=0, max=100, round=0),
-        Converter("battery", mi="2.p.1003"),
-        Converter("battery", "sensor", enabled=None),  # no in new firmwares
-    ]
 }, {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A"],  # 15,4103,4106,4119,4120
     "spec": [
@@ -1280,25 +1323,6 @@ DEVICES += [{
         Converter("lock", "binary_sensor"),
     ],
 }, {
-    6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
-    "spec": [
-        MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery,
-        Converter("battery", mi="2.p.1003"),
-        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
-        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
-        ButtonMIConv("button", mi="3.e.1014", value=4),  # both single
-    ],
-    "ttl": "60m",  # battery every 5 min
-}, {
-    10987: ["Linptech", "Motion Sensor 2", "HS1BB"],
-    "spec": [
-        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
-        Converter("idle_time", "sensor", enabled=False),
-        Converter("illuminance", mi="2.p.1005"),
-        EventConv("motion", mi="2.e.1008"),
-        Converter("battery", mi="3.p.1003"),
-    ],
-}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/657
     2444: ["Xiaomi", "Door Lock", "XMZNMST02YD"],
     "spec": [
@@ -1309,22 +1333,6 @@ DEVICES += [{
         Converter("opening", "binary_sensor"),
     ],
     "ttl": "6h"
-}, {
-    # https://github.com/AlexxIT/XiaomiGateway3/issues/826
-    7184: ["Linptech", "Wireless Button", "K11"],
-    "spec": [MiBeacon, BLEAction, Button, BLEBattery],
-    "ttl": "6h"  # battery every 6 hours
-}, {
-    # lumi.remote.mcn001
-    9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
-    "spec": [
-        MiBeacon, BLEAction, Button, BLEBattery,
-        Converter("battery", mi="2.p.1003"),
-        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
-        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
-        ButtonMIConv("button", mi="3.e.1014", value=16),  # hold
-    ],
-    "ttl": "6h"  # battery every 6 hours
 }, {
     3641: ["Xiaomi", "Door Lock 1S", "XMZNMS08LM"],
     "spec": [

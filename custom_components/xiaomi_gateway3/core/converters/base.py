@@ -336,6 +336,17 @@ class ParentConv(Converter):
             payload[self.attr] = "-"
 
 
+@dataclass
+class BLEEvent(Converter):
+    map: dict = None
+
+    def decode(self, device: "XDevice", payload: dict, value: list):
+        try:
+            payload[self.attr] = self.map.get(value[0]["value"])
+        except:
+            pass
+
+
 class OTAConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: Any):
         super().decode(device, payload, value)

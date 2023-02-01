@@ -120,13 +120,7 @@ def test_10987():
     # https://github.com/AlexxIT/XiaomiGateway3/issues/809
     p = device.decode(
         "mibeacon",
-        {
-            "did": "blt.3.1bc9srn94eg00",
-            "eid": 18952,
-            "edata": "00008041",
-            "pdid": 10987,
-            "seq": 72,
-        },
+        {"did": DID, "eid": 18952, "edata": "00008041", "pdid": 10987, "seq": 72},
     )
     assert p == {"motion": True, "illuminance": 16.0}
 
@@ -144,3 +138,46 @@ def test_10987():
         ]
     )
     assert p == {"motion": True, "illuminance": 23.0}
+
+
+def test_7184():
+    device = XDevice(BLE, 7184, DID, MAC)
+    assert device.info.name == "Linptech Wireless Button"
+    device.setup_converters()
+
+    # old format
+    # https://github.com/AlexxIT/XiaomiGateway3/pull/844
+    p = device.decode(
+        "mibeacon",
+        {"did": DID, "eid": 19980, "edata": "01", "pdid": 7184},
+    )
+    assert p == {"action": "single"}
+
+    # new format
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/867
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/826
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 3,
+                "eiid": 1012,
+                "tid": 117,
+                "arguments": [{"piid": 1, "value": 1}],
+            }
+        ]
+    )
+    assert p == {"action": "single"}
+
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 3,
+                "eiid": 1012,
+                "tid": 117,
+                "arguments": [{"piid": 1, "value": 15}],
+            }
+        ]
+    )
+    assert p == {"action": "double"}
