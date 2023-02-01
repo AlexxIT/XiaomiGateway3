@@ -1806,6 +1806,14 @@ DEVICES += [{
         Converter("led", "switch", mi="4.p.1"),
     ],
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/835
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lemesh-sw1a02:1:0000C808
+    3001: ["LeMesh", "Switch Sensor", "lemesh.switch.sw1a02"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),  # bool
+        BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
