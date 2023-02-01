@@ -1637,7 +1637,7 @@ DEVICES += [{
             0: "auto", 1: "battery", 2: "usb"
         }, enabled=False)
     ],
-    "ttl": "1440m"
+    "ttl": "1440m"  # https://github.com/AlexxIT/XiaomiGateway3/issues/804
 }, {
     4737: ["Xiaomi", "Smart Charging Table Lamp", "MJTD04YL"],
     "spec": [
