@@ -12,11 +12,11 @@ DOWNLOAD = 2
 
 RUN_OPENMIIO = "/data/openmiio_agent miio mqtt cache z3 --zigbee.tcp=8888 > /var/log/openmiio.log 2>&1 &"
 
-URL_MIPS = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent-1.0.0?viasf=1"
-MD5_MIPS = "a2b70929a828fbe2fe822b881b0e118f"
+URL_MIPS = "http://master.dl.sourceforge.net/project/mgl03/openmiio_agent/openmiio_agent-1.0.1?viasf=1"
+MD5_MIPS = "f399592d20b23e5aef449e7dc9d9af79"
 
-URL_ARM = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent-1.0.0?viasf=1"
-MD5_ARM = "7d7c18e91a1222994c98dc8920990ae8"
+URL_ARM = "http://master.dl.sourceforge.net/project/aqcn02/openmiio_agent/openmiio_agent-1.0.1?viasf=1"
+MD5_ARM = "7676aa0c71095f2a48c958637435930c"
 
 
 @dataclass
