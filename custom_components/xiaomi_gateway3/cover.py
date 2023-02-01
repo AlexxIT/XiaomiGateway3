@@ -45,11 +45,11 @@ class XiaomiCover(XEntity, CoverEntity, RestoreEntity):
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
-        if not state:
-            return
-        self.async_set_state(
-            {"run_state": state, "position": attrs[ATTR_CURRENT_POSITION]}
-        )
+        if state:
+            self.async_set_state({"run_state": state})
+        if ATTR_CURRENT_POSITION in attrs:
+            # fix https://github.com/AlexxIT/XiaomiGateway3/issues/864
+            self.async_set_state({"position": attrs[ATTR_CURRENT_POSITION]})
 
     async def async_open_cover(self, **kwargs):
         await self.device_send({self.attr: "open"})
