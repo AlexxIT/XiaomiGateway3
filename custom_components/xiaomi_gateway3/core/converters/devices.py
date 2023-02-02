@@ -1179,13 +1179,19 @@ DEVICES += [{
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
     ],
 }, {
-    6473: ["Xiaomi", "Wireless Button (Double)", "XMWXKG01YL"],
+    6473: ["Xiaomi", "Double Button", "XMWXKG01YL"],
     "spec": [
         MiBeacon, BLEAction, Button1, Button2, ButtonBoth, BLEBattery,
         Converter("battery", mi="2.p.1003"),
-        ButtonMIConv("button", mi="3.e.1012", value=1),  # single
-        ButtonMIConv("button", mi="3.e.1013", value=2),  # double
-        ButtonMIConv("button", mi="3.e.1014", value=4),  # both single
+        BLEEvent("action", mi="3.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_both_single"
+        }),
+        BLEEvent("action", mi="3.e.1013", map={
+            1: "button_1_double", 2: "button_2_double"
+        }),
+        BLEEvent("action", mi="3.e.1014", map={
+            1: "button_1_hold", 2: "button_2_hold"
+        }),
     ],
     "ttl": "60m",  # battery every 5 min
 }, {
