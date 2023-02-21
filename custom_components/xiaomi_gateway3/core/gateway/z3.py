@@ -84,7 +84,7 @@ class Z3Gateway(GatewayBase):
         try:
             raw = self.z3_buffer["plugin device-table print"]
             dt = re.findall(
-                r"\d+ ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}(\w+) (\d+)", raw
+                r" ([A-F0-9]{4}): {2}([A-F0-9]{16}) 0 {2}(\w+) ", raw
             )
 
             raw = self.z3_buffer["plugin stack-diagnostics child-table"]
@@ -102,7 +102,7 @@ class Z3Gateway(GatewayBase):
 
             # nwk: FFFF, ieee: FFFFFFFFFFFFFFFF, ago: int
             # state: JOINED, LEAVE_SENT (32)
-            for nwk, ieee, state, ago in dt:
+            for nwk, ieee, state in dt:
                 if state == "LEAVE_SENT":
                     continue
 
@@ -130,7 +130,6 @@ class Z3Gateway(GatewayBase):
                 payload = {
                     # 'eui64': '0x' + ieee,
                     # 'nwk': nwk,
-                    # 'ago': int(ago),
                     "type": type_,
                     "parent": parent,
                 }
