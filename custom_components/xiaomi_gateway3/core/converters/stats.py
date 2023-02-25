@@ -158,7 +158,7 @@ class ZigbeeStatsConverter(Converter):
                     )
                     # sometimes device repeat message, skip this situation:
                     # 0xF6 > 0xF7 > 0xF8 > 0xF7 > 0xF8 > 0xF9
-                    if 0 < miss < 254:
+                    if 0 < miss < 240:
                         device.extra["msg_missed"] += miss
 
                 device.extra["last_seq1"] = new_seq1
