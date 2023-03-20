@@ -125,7 +125,10 @@ class BrightnessConv(Converter):
         payload[self.attr] = value / self.max * 255.0
 
     def encode(self, device: "XDevice", payload: dict, value: float):
-        value = round(value / 255.0 * self.max)
+        if type(value) is tuple:
+            value = round(value[0] / 255.0 * self.max)
+        else:
+            value = round(value / 255.0 * self.max)
         super().encode(device, payload, int(value))
 
 
@@ -140,7 +143,10 @@ class ColorTempKelvin(Converter):
         payload[self.attr] = int(1000000.0 / value)
 
     def encode(self, device: "XDevice", payload: dict, value: int):
-        value = int(1000000.0 / value)
+        if type(value) is tuple:
+            value = int(1000000.0 / value[0])
+        else:
+            value = int(1000000.0 / value)
         if value < self.mink:
             value = self.mink
         if value > self.maxk:
