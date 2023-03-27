@@ -626,9 +626,9 @@ DEVICES += [{
         Converter("switch", "switch", mi="2.p.1"),
         Converter("chip_temperature", "sensor", mi="2.p.6", enabled=False),
         MapConv("power_on_state", "select", mi="4.p.1", map=POWEROFF_MEMORY,
-               enabled=False),
-        MapConv("switch_type", "select", mi="6.p.2", map={1: "toggle", 2: "momentary"},
-               enabled=False),
+                enabled=False),
+        MapConv("mode", "select", mi="6.p.2", map={1: "toggle", 2: "momentary"},
+                enabled=False),
     ],
 }, {
     # https://www.aqara.com/en/single_switch_T1_with-neutral.html
@@ -642,8 +642,8 @@ DEVICES += [{
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
                 enabled=False),
-        MapConv("switch_type", "select", mi="7.p.2", map={1: "toggle", 2: "momentary"},
-               enabled=False),
+        MapConv("mode", "select", mi="7.p.2", map={1: "toggle", 2: "momentary"},
+                enabled=False),
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:outlet:0000A002:lumi-maeu01:1
