@@ -1310,6 +1310,14 @@ DEVICES += [{
     ],
     "ttl": "3d",  # battery every 1 day
 }, {
+    6281: ["Linptech", "Door/Window Sensor", "MS1BB"],
+    "spec": [
+        MiBeacon, BLEContact, BLEBattery,
+        MapConv("contact", mi="2.p.1004", map={1: True, 2: False}),
+        Converter("battery", mi="3.p.1003"),
+    ],
+    "ttl": "60m",
+}, {
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI"],
     "spec": [MiBeacon, BLEAction, BLESmoke, BLEBattery],
     "ttl": "60m",  # battery every 4:30 min
