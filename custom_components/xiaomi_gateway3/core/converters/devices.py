@@ -1820,6 +1820,14 @@ DEVICES += [{
         BoolConv("led", "switch", mi="5.p.1", enabled=False),  # uint8
     ],
 }, {
+    # https://home.miot-spec.com/s/10789
+    10789: ["Zxgs", "Mesh Two Color Scene Light", "zxgs.light.bdcl01"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
