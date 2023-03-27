@@ -38,18 +38,18 @@ UNITS = {
     "humidity": PERCENTAGE,
     # zb light and motion and ble flower - lux
     "illuminance": LIGHT_LUX,
-    "power": POWER_WATT,
-    "voltage": ELECTRIC_POTENTIAL_VOLT,
-    "current": ELECTRIC_CURRENT_AMPERE,
-    "pressure": PRESSURE_HPA,
-    "temperature": TEMP_CELSIUS,
-    "energy": ENERGY_KILO_WATT_HOUR,
-    "chip_temperature": TEMP_CELSIUS,
+    "power": POWER_WATT, # Deprecated: please use UnitOfPower.WATT.
+    "voltage": ELECTRIC_POTENTIAL_VOLT, # Deprecated: please use UnitOfElectricPotential.VOLT.
+    "current": ELECTRIC_CURRENT_AMPERE, # Deprecated: please use UnitOfElectricCurrent.AMPERE.
+    "pressure": PRESSURE_HPA,  # Deprecated: please use UnitOfPressure.HPA
+    "temperature": TEMP_CELSIUS, # Deprecated: please use UnitOfTemperature.CELSIUS
+    "energy": ENERGY_KILO_WATT_HOUR, # Deprecated: please use UnitOfEnergy.KILO_WATT_HOUR.
+    "chip_temperature": TEMP_CELSIUS, # Deprecated: please use UnitOfTemperature.CELSIUS
     "conductivity": CONDUCTIVITY,
     "gas_density": "% LEL",
-    "idle_time": TIME_SECONDS,
+    "idle_time": TIME_SECONDS, # Deprecated: please use UnitOfTime.SECONDS.
     "linkquality": "lqi",
-    "max_power": POWER_WATT,
+    "max_power": POWER_WATT, # Deprecated: please use UnitOfPower.WATT.
     "moisture": PERCENTAGE,
     "msg_received": "msg",
     "msg_missed": "msg",
@@ -58,7 +58,8 @@ UNITS = {
     "rssi": SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     "smoke_density": "% obs/ft",
     "supply": PERCENTAGE,
-    "tvoc": CONCENTRATION_PARTS_PER_BILLION,
+    "tvoc": CONCENTRATION_PARTS_PER_BILLION, 
+    "distance": LENGTH_METERS, # Deprecated: please use UnitOfLength.METERS.
     # "link_quality": "lqi",
     # "rssi": "dBm",
     # "msg_received": "msg",
