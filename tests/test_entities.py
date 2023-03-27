@@ -8,6 +8,7 @@ from custom_components.xiaomi_gateway3.climate import AqaraE1
 from custom_components.xiaomi_gateway3.core.converters import ZIGBEE
 from custom_components.xiaomi_gateway3.core.device import XDevice
 from custom_components.xiaomi_gateway3.core.gateway import XGateway
+from custom_components.xiaomi_gateway3.light import XiaomiZigbeeLight
 from custom_components.xiaomi_gateway3.sensor import XiaomiAction
 from custom_components.xiaomi_gateway3.switch import XiaomiSwitch
 
@@ -157,3 +158,20 @@ def test_plug_detection():
         "device_class": "plug",
         "friendly_name": "Xiaomi Plug EU Plug Detection",
     }
+
+
+def test_transition():
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1007
+    gw = XGateway("", "")
+    device = XDevice(ZIGBEE, "lumi.light.acn014", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+    device.available = True
+
+    conv = next(conv for conv in device.converters if conv.attr == "light")
+    light = XiaomiZigbeeLight(gw, device, conv)
+    light.hass = Hass()
+    light.async_write_ha_state()
+
+    light.hass.loop.run_until_complete(
+        light.async_turn_on(transition=10)
+    )

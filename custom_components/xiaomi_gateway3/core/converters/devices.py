@@ -913,8 +913,10 @@ DEVICES += [{
     "lumi.light.acn014": ["Aqara", "Bulb T1", "ZNLDP14LM"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        # BrightnessConv("brightness", mi="2.p.2", parent="light"),
+        # ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
+        ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
+        ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
     ],
 }]
 
