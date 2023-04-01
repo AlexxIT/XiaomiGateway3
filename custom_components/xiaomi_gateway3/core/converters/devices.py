@@ -1851,6 +1851,68 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
     ],
 }, {
+    # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/6528
+    6528: ["Unknown", "Mesh Double Wall Switch (with N)", "babai.switch.202m"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+    ]
+}, {
+    # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/6529
+    6529: ["Unknown", "Mesh Triple Wall Switch (with N)", "babai.switch.203m"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
+    ]
+}, {
+    # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/7219
+    7219: ["Unknown", "Mesh Single Wall Switch (no N)", "babai.switch.201ml"],
+    "spec":[
+        Converter("channel", "switch", mi="2.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+    ]
+}, {
+    # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/7220
+    7220: ["Unknown", "Mesh Double Wall Switch (no N)", "babai.switch.202ml"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+    ]
+}, {
+    # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/7221
+    7221: ["Unknown", "Mesh Triple Wall Switch (no N)", "babai.switch.203ml"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
+        BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
+        BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
