@@ -353,11 +353,12 @@ Total devices: 54
 |Unknown|Mesh Switch|[dwdz.switch.sw0a01](https://home.miot-spec.com/s/4252)|switch||
 |Unknown|Mesh Switch Controller|[lemesh.switch.sw0a01](https://home.miot-spec.com/s/2007)|switch||
 |Unknown|Mesh Switch Controller|[lemesh.switch.sw0a02](https://home.miot-spec.com/s/3169)|switch||
-|Unknown|Mesh Double Wall Switch (with N)|[babai.switch.202m"](https://home.miot-spec.com/s/6528)|channel_1, channel_2, wireless_1, wireless_2||
-|Unknown|Mesh Triple Wall Switch (with N)|[babai.switch.203m"](https://home.miot-spec.com/s/6529)|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3||
-|Unknown|Mesh Single Wall Switch (no N)|[babai.switch.201ml"](https://home.miot-spec.com/s/7219)|channel, wireless||
-|Unknown|Mesh Double Wall Switch (no N)|[babai.switch.202ml"](https://home.miot-spec.com/s/7220)|channel_1, channel_2, wireless_1, wireless_2||
-|Unknown|Mesh Triple Wall Switch (no N)|[babai.switch.203ml"](https://home.miot-spec.com/s/7221)|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3||
+|Unknown|Mesh Single Wall Switch (with N) 2021|[babai.switch.201m"](https://home.miot-spec.com/s/6514)|channel, wireless||
+|Unknown|Mesh Double Wall Switch (with N) 2021|[babai.switch.202m"](https://home.miot-spec.com/s/6528)|channel_1, channel_2, wireless_1, wireless_2||
+|Unknown|Mesh Triple Wall Switch (with N) 2021|[babai.switch.203m"](https://home.miot-spec.com/s/6529)|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3||
+|Unknown|Mesh Single Wall Switch (no N) 2021|[babai.switch.201ml"](https://home.miot-spec.com/s/7219)|channel, wireless||
+|Unknown|Mesh Double Wall Switch (no N) 2021|[babai.switch.202ml"](https://home.miot-spec.com/s/7220)|channel_1, channel_2, wireless_1, wireless_2||
+|Unknown|Mesh Triple Wall Switch (no N) 2021|[babai.switch.203ml"](https://home.miot-spec.com/s/7221)|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3||
 |Xiaomi|Electrical Outlet|[ZNCZ01ZM](https://home.miot-spec.com/s/3083)|outlet, power, led, power_protect, power_value||
 |Xiaomi|Mesh Bulb|[MJDP09YL](https://home.miot-spec.com/s/1771)|light, flex_switch, power_on_state|4|
 |Xiaomi|Mesh Double Wall Switch|[DHKG02ZM](https://home.miot-spec.com/s/1946)|channel_1, channel_2, led, wireless_1, wireless_2, action||

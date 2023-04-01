@@ -1852,6 +1852,16 @@ DEVICES += [{
     ],
 }, {
     # A third party module widely used in small brand wall switches
+    # https://home.miot-spec.com/s/6514
+    6514: ["Unknown", "Mesh Single Wall Switch (with N)", "babai.switch.201m"],
+    "spec": [
+        Converter("channel", "switch", mi="2.p.1"),
+
+        # Either Default/Wireless or Default/Atom, depending on hardware
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+    ]
+}, {
+    # A third party module widely used in small brand wall switches
     # https://home.miot-spec.com/s/6528
     6528: ["Unknown", "Mesh Double Wall Switch (with N)", "babai.switch.202m"],
     "spec": [
