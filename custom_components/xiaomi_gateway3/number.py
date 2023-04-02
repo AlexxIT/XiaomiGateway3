@@ -24,35 +24,52 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiNumber(XEntity, NumberEntity):
-    _attr_value: float = None
-
-    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
-        super().__init__(gateway, device, conv)
-
-        if hasattr(conv, "min"):
-            self._attr_min_value = conv.min
-        if hasattr(conv, "max"):
-            self._attr_max_value = conv.max
-
-    @callback
-    def async_set_state(self, data: dict):
-        if self.attr in data:
-            self._attr_value = data[self.attr]
-
-    @callback
-    def async_restore_last_state(self, state: float, attrs: dict):
-        self._attr_value = state
-
-    async def async_update(self):
-        await self.device_read(self.subscribed_attrs)
-
-    # backward compatibility fix
+    # Remove warning
+    # https://community.home-assistant.io/t/depricated-numberentity-features/440282/2
     if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 8):
+        def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
+            super().__init__(gateway, device, conv)
+            if hasattr(conv, "min"):
+                self._attr_native_min_value = conv.min
+            if hasattr(conv, "max"):
+                self._attr_native_max_value = conv.max
 
         async def async_set_native_value(self, value: float) -> None:
             await self.device_send({self.attr: value})
 
-    else:
+        @callback
+        def async_set_state(self, data: dict):
+            self._attr_native_value = data[self.attr]
+
+        @callback
+        def async_restore_last_state(self, state: float, attrs: dict):
+            self._attr_native_value = state
+
+        async def async_update(self):
+            await self.device_read(self.subscribed_attrs)
+
+    
+    # Satisfy codebase of older core 
+    else: # (MAJOR_VERSION, MINOR_VERSION) < (2022, 8):
+        def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
+            super().__init__(gateway, device, conv)
+            if hasattr(conv, "min"):
+                self._attr_min_value = conv.min
+            if hasattr(conv, "max"):
+                self._attr_max_value = conv.max
 
         async def async_set_value(self, value: float) -> None:
             await self.device_send({self.attr: value})
+
+        @callback
+        def async_set_state(self, data: dict):
+            self._attr_value = data[self.attr]
+
+        @callback
+        def async_restore_last_state(self, state: float, attrs: dict):
+            self._attr_value = state
+
+        async def async_update(self):
+            await self.device_read(self.subscribed_attrs)
+
+  
