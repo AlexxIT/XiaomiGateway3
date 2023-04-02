@@ -26,11 +26,10 @@
         }
       },
       "token": {
-        "description": "可以通过 [添加小米云账号](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自动或 [手动](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 获取网关Token。请阅读 [已支持的网关固件版本](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares) 及 [打开 Telnet 命令](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709)。",
+        "description": "可以通过 [添加小米云账号](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自动或 [手动](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 获取网关Token。请阅读 [已支持的网关固件版本](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares)",
         "data": {
           "host": "网关IP",
-          "token": "Token",
-          "telnet_cmd": "打开 Telnet 命令"
+          "token": "Token"
         }
       }
     }

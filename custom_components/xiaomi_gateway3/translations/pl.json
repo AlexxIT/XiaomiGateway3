@@ -26,11 +26,10 @@
         }
       },
       "token": {
-        "description": "Możesz uzyskać token automatycznie używając [danych logowania do konta Xiaomi](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) bądź [ręcznie](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Listę wspieranych wersji oprogramowania możesz znaleźć [tutaj](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "description": "Możesz uzyskać token automatycznie używając [danych logowania do konta Xiaomi](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) bądź [ręcznie](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
         "data": {
           "host": "Host (Adres IP bramki)",
-          "token": "Token",
-          "telnet_cmd": "Komenda do otwarcia protokołu telnet"
+          "token": "Token"
         }
       }
     }
