@@ -56,6 +56,8 @@ ICONS = {
     "smoke_density": "mdi:google-circles-communities",
     "supply": "mdi:gauge",
     "tvoc": "mdi:cloud",
+    # Linptech Presence Sensor ES1
+    "occupancy_duration": "mdi:timer",
 }
 
 ENTITY_CATEGORIES = {
@@ -89,6 +91,17 @@ ENTITY_CATEGORIES = {
     "wireless_1": EntityCategory.CONFIG,
     "wireless_2": EntityCategory.CONFIG,
     "wireless_3": EntityCategory.CONFIG,
+    # Linptech Presence Sensor ES1
+    "distance_00_08": EntityCategory.CONFIG,
+    "distance_08_15": EntityCategory.CONFIG,
+    "distance_15_23": EntityCategory.CONFIG,
+    "distance_23_30": EntityCategory.CONFIG,
+    "distance_30_38": EntityCategory.CONFIG,
+    "distance_38_45": EntityCategory.CONFIG,
+    "distance_45_53": EntityCategory.CONFIG,
+    "distance_53_60": EntityCategory.CONFIG,
+    "approach_distance": EntityCategory.CONFIG,
+    "occupancy_duration": EntityCategory.DIAGNOSTIC,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)

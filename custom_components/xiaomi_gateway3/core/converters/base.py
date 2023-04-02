@@ -118,6 +118,20 @@ class MathConv(Converter):
 
 
 @dataclass
+class MaskConv(Converter):
+    mask: int = 0
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        device.extra[self.attr] = value
+        payload[self.attr] = bool(value & self.mask)
+
+    def encode(self, device: "XDevice", payload: dict, value: bool):
+        new_value = device.extra.get(self.attr, 0)
+        new_value = new_value | self.mask if value else new_value & ~self.mask
+        super().encode(device, payload, new_value)
+
+
+@dataclass
 class BrightnessConv(Converter):
     max: float = 100.0
 

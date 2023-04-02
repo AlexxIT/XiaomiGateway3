@@ -1,5 +1,9 @@
+from homeassistant.components.sensor import DOMAIN
+
 from custom_components.xiaomi_gateway3.core.converters import MESH
 from custom_components.xiaomi_gateway3.core.device import XDevice
+
+assert DOMAIN  # fix circular import
 
 
 def test_mesh():
@@ -37,3 +41,20 @@ def test_brightness():
         {"siid": 2, "piid": 2, "value": 6},
         {"siid": 2, "piid": 3, "value": 3333},
     ]
+
+
+def test_es1():
+    device = XDevice(MESH, 10441, "123", "112233aabbcc")
+    device.setup_converters()
+
+    p = device.decode_lumi(
+        [
+            {
+                "did": "123",
+                "siid": 3,
+                "eiid": 1,
+                "arguments": [{"piid": 1, "value": 1}],
+            }
+        ]
+    )
+    assert p == {"approach_away": True, "action": "approach"}

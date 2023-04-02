@@ -1,5 +1,10 @@
 from homeassistant.components.number import NumberEntity
-from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
+from homeassistant.const import (
+    MAJOR_VERSION,
+    MINOR_VERSION,
+    LENGTH_METERS,
+    TIME_SECONDS,
+)
 from homeassistant.core import callback
 
 from . import DOMAIN
@@ -22,12 +27,21 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     gw.add_setup(__name__, setup)
 
 
+UNITS = {
+    "approach_distance": LENGTH_METERS,
+    "occupancy_timeout": TIME_SECONDS,
+}
+
+
 # noinspection PyAbstractClass
 class XiaomiNumber(XEntity, NumberEntity):
     _attr_value: float = None
 
     def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
+
+        if self.attr in UNITS:
+            self._attr_native_unit_of_measurement = UNITS[self.attr]
 
         if hasattr(conv, "min"):
             self._attr_min_value = conv.min

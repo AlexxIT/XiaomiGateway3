@@ -1810,19 +1810,32 @@ DEVICES += [{
         }),
     ],
 }, {
-    10441: ["Linptech", "Linptech Presence Sensor", "hb01"],
+    10441: ["Linptech", "Presence Sensor ES1", "ES1ZB"],  # linp.sensor_occupy.hb01
     "spec": [
+        # occupancy sensors
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
-        MathConv("no_one_determine_time", "number", mi="2.p.2", min=0, max=10000),
-        Converter("has_someone_duration", "sensor", mi="2.p.3"),
-        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
+        MathConv("occupancy_duration", "sensor", mi="2.p.3", multiply=60),  # minutes
+        MathConv("occupancy_distance", "sensor", mi="3.p.3"),
+        MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),  # minutes
+
+        # occupancy settings
+        MathConv("occupancy_timeout", "number", mi="2.p.2", min=0, max=10000),
+
+        MaskConv("distance_00_08", "switch", mi="3.p.2", mask=1),
+        MaskConv("distance_08_15", "switch", mi="3.p.2", mask=2),
+        MaskConv("distance_15_23", "switch", mi="3.p.2", mask=4),
+        MaskConv("distance_23_30", "switch", mi="3.p.2", mask=8),
+        MaskConv("distance_30_38", "switch", mi="3.p.2", mask=16),
+        MaskConv("distance_38_45", "switch", mi="3.p.2", mask=32),
+        MaskConv("distance_45_53", "switch", mi="3.p.2", mask=64),
+        MaskConv("distance_53_60", "switch", mi="3.p.2", mask=128),
+
+        # other sensors
         Converter("illuminance", "sensor", mi="2.p.5"),
 
-        MapConv("approach_aloof", "sensor", mi="3.p.1", map={
-            0: "Stop", 1: "Approach", 2: "Aloof"
-        }),
-        MathConv("shielding_distance", "number", mi="3.p.2", min=0, max=255),
-        MathConv("body_distance", "sensor", mi="3.p.3"),
+        # approach/away event
+        EventConv("approach_away", mi="3.e.1"),
+        MapConv("action", "sensor", mi="3.p.1", map={0: "", 1: "approach", 2: "away"}),
         MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
 
         Converter("led", "switch", mi="4.p.1"),
