@@ -26,7 +26,7 @@
         }
       },
       "token": {
-        "description": "[Отримайте](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен. Шлюз з прошивкою **1.4.6_0043** і вище підтримується тільки після [перепрошивки](https://github.com/AlexxIT/XiaomiGateway3/wiki)",
+        "description": "[Отримайте](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) Mi Home токен.",
         "data": {
           "host": "IP-адреса",
           "token": "Токен"

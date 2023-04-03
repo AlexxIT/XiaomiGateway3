@@ -194,7 +194,10 @@ class OptionsFlowHandler(OptionsFlow):
                     f"Bindkey: {bindkey}\n"
                 )
 
-            if device["model"] == "lumi.gateway.v3":
+            if device["model"] in utils.SUPPORTED_MODELS:
+                error = await utils.check_gateway(device["localip"], device["token"])
+                device_info += "\nTelnet: " + (error or "open")
+            elif device["model"] == "lumi.gateway.v3":
                 device_info += "\nLAN key: " + await utils.get_lan_key(
                     device["localip"], device["token"]
                 )
