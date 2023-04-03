@@ -24,8 +24,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 # noinspection PyAbstractClass
 class XiaomiNumber(XEntity, NumberEntity):
-    # Remove warning
-    # https://community.home-assistant.io/t/depricated-numberentity-features/440282/2
+    # Avoid assignment and override of deprecated attributes and methods (starting from core 2022.8)
+    # while ensuring backwards compatibility
+    # Addressing: https://github.com/AlexxIT/XiaomiGateway3/issues/984#issue-1586983959
+    #             https://github.com/AlexxIT/XiaomiGateway3/pull/789#issuecomment-1202188504
+    # Fix suggestion: https://community.home-assistant.io/t/depricated-numberentity-features/440282/2
     if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 8):
         def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
             super().__init__(gateway, device, conv)
@@ -48,8 +51,6 @@ class XiaomiNumber(XEntity, NumberEntity):
         async def async_update(self):
             await self.device_read(self.subscribed_attrs)
 
-    
-    # Satisfy codebase of older core 
     else: # (MAJOR_VERSION, MINOR_VERSION) < (2022, 8):
         def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
             super().__init__(gateway, device, conv)
