@@ -26,11 +26,10 @@
         }
       },
       "token": {
-        "description": "Poti obtine tokenul Mi Home in mod automat prin [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) sau [manual](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). Verifica versiunile de firmware suportate in [component docs](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares).",
+        "description": "Poti obtine tokenul Mi Home in mod automat prin [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) sau [manual](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
         "data": {
           "host": "IP Gateway",
-          "token": "Token",
-          "telnet_cmd": "Comanda de deschidere Telnet"
+          "token": "Token"
         }
       }
     }
