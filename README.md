@@ -353,7 +353,7 @@ Total devices: 50
 |Unknown|Mesh Switch|[dwdz.switch.sw0a01](https://home.miot-spec.com/s/4252)|switch||
 |Unknown|Mesh Switch Controller|[lemesh.switch.sw0a01](https://home.miot-spec.com/s/2007)|switch||
 |Unknown|Mesh Switch Controller|[lemesh.switch.sw0a02](https://home.miot-spec.com/s/3169)|switch||
-|Unknown|Mesh Smart Plug V3|[giot.plug.v3shsm](https://home.miot-spec.com/s/giot.plug.v3shsm)|plug, mode power_on_state, jog_mode_default_state, jog_duration, led ||
+|Unknown|Mesh Smart Plug V3|[giot.plug.v3shsm](https://home.miot-spec.com/s/giot.plug.v3shsm)|plug, inching_mode, power_on_state, inching_switch_default_state, inching_time, led ||
 |Xiaomi|Electrical Outlet|[ZNCZ01ZM](https://home.miot-spec.com/s/3083)|outlet, power, led, power_protect, power_value||
 |Xiaomi|Mesh Bulb|[MJDP09YL](https://home.miot-spec.com/s/1771)|light, flex_switch, power_on_state|4|
 |Xiaomi|Mesh Double Wall Switch|[DHKG02ZM](https://home.miot-spec.com/s/1946)|channel_1, channel_2, led, wireless_1, wireless_2, action||

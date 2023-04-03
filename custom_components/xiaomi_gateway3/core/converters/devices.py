@@ -1867,18 +1867,18 @@ DEVICES += [{
     # https://home.miot-spec.com/s/giot.plug.v3shsm
     10920: ["Unknown", "Mesh Smart Plug V3", "giot.plug.v3shsm"],
     "spec": [
-        Converter("plug", "plug", mi="2.p.1"),
-        MapConv("mode","select", mi="2.p.2", map={0:"switch", 1:"jog"}),
+        Converter("plug", "switch", mi="2.p.1"),
+        BoolConv("inching_mode","switch", mi="2.p.2"),
         MapConv("power_on_state", "select", mi="2.p.3", map={0:"off",1:"on",2:"same_as_before"}),
 
-        # Jog mode
-        MapConv("jog_mode_default_state", "select", mi="3.p.1", map={False:"normally_closed",True:"normally_open"}),
-        MathConv("jog_duration", "number", mi="3.p.2",multiply=0.5, min=1, max=7199,round=1),
+        # Inching mode
+        MapConv("inching_switch_default_state", "select", mi="3.p.1", map={False:"normally_off",True:"normally_on"}),
+        MathConv("inching_time", "number", mi="3.p.2",multiply=0.5, min=1, max=7199,round=1),
 
         # LED
         MapConv("led", "select", mi="4.p.1", map={
-            0: "on_when_switch_closed", 
-            1: "on_when_switch_open", 
+            0: "follow_switch", 
+            1: "opposite_to_switch", 
             2: "normally_off", 
             3: "normally_on"
         })
