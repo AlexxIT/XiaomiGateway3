@@ -349,6 +349,15 @@ class ZTuyaButtonConv(ZConverter):
             pass
 
 
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman/blob/528b7626f2970ba87a0792920590926105a3cb48/src/zcl/definition/cluster.ts#LL460C32-L460C37
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/f9115000807b21dcaa06e58c5b8e69baa4e626fe/converters/fromZigbee.js#L867
+class ZPowerOnConv(ZMapConv):
+    zigbee = "on_off"
+    zattr = 16387
+    map = {0: "off", 1: "on", 2: "toggle", 255: "previous"}
+
+
 class ZAqaraCubeMain(Converter):
     zigbee = "multistate_input"
     zattr = "present_value"
@@ -548,5 +557,6 @@ ZLight = ZOnOffConv("light", "light")
 ZBrightness = ZBrightnessConv("brightness", parent="light")
 ZColorTemp = ZColorTempConv("color_temp", parent="light")
 
+ZPowerOn = ZPowerOnConv("power_on_state", "select", enabled=False)
 ZTuyaPowerOn = ZTuyaPowerOnConv("power_on_state", "select", enabled=False)
 # ZTuyaMode = ZTuyaModeConv("mode", "select", enabled=False)
