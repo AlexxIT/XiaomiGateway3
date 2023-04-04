@@ -107,7 +107,7 @@ class GatewayStatsConverter(Converter):
                 {
                     "free_mem": value["free_mem"],
                     "load_avg": value["load_avg"],
-                    "rssi": value["rssi"] - 100,
+                    "rssi": value["rssi"],
                     "uptime": f"{d} days, {h:02}:{m:02}:{s:02}",
                 }
             )

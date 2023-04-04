@@ -73,7 +73,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
                         "free_mem": int(free_mem),
                         "load_avg": load_avg.decode(),
                         "run_time": int(run_time),
-                        "rssi": int(rssi) + 100,
+                        "rssi": int(rssi),
                     },
                 )
                 self.device.update(payload)
