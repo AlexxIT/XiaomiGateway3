@@ -1067,6 +1067,11 @@ DEVICES += [{
     "support": 5,  # @AlexxIT
     "spec": [ZSwitch]
 }, {
+    "ZBMINIL2": ["Sonoff", "Mini L2 (no N)", "ZBMINIL2"],
+    "spec": [
+        ZSwitch, ZPowerOn
+    ]
+}, {
     "Lamp_01": ["Ksentry Electronics", "OnOff Controller", "KS-SM001"],
     "spec": [
         ZOnOffConv("switch", "switch", ep=11, bind=True, report="0s 1h 0"),
