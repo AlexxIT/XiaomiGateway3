@@ -4,7 +4,6 @@ from asyncio import StreamReader, StreamWriter
 from dataclasses import dataclass
 from typing import Union
 
-import aiofiles
 import aiohttp
 
 from ..unqlite import SQLite
@@ -165,8 +164,8 @@ class ShellMultimode(ShellOpenMiio):
 
 async def download(url_or_path: str) -> bytes:
     if not url_or_path.startswith("http"):
-        async with aiofiles.open(url_or_path, "rb") as f:
-            return await f.read()
+        with open(url_or_path, "rb") as f:
+            return f.read()
 
     timeout = aiohttp.ClientTimeout(total=60)
     async with aiohttp.ClientSession(timeout=timeout) as session:
