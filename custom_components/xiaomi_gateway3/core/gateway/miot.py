@@ -11,7 +11,7 @@ class MIoTGateway(GatewayBase):
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.miot_mqtt_publish)
 
     async def miot_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == "miio/report":
+        if msg.topic in ("miio/report", "central/report"):
             if b'"properties_changed"' in msg.payload:
                 await self.miot_process_properties(msg.json["params"])
             elif b'"event_occured"' in msg.payload:

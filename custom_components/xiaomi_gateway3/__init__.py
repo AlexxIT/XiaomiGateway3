@@ -16,7 +16,7 @@ from homeassistant.helpers import (
 from homeassistant.helpers.storage import Store
 
 from . import system_health
-from .core import logger, utils
+from .core import logger, shell, utils
 from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
 from .core.ezsp import update_zigbee_firmware
@@ -39,6 +39,7 @@ DOMAINS = [
 
 CONF_DEVICES = "devices"
 CONF_ATTRIBUTES_TEMPLATE = "attributes_template"
+CONF_OPENMIIO = "openmiio"
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -82,6 +83,9 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     if CONF_ATTRIBUTES_TEMPLATE in config:
         XEntity.attributes_template = config[CONF_ATTRIBUTES_TEMPLATE]
         XEntity.attributes_template.hass = hass
+
+    if conf := config.get(CONF_OPENMIIO):
+        shell.openmiio_setup(conf)
 
     hass.data[DOMAIN] = {}
 

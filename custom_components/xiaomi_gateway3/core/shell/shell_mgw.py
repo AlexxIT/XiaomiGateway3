@@ -3,7 +3,7 @@ import hashlib
 import re
 from typing import List
 
-from .base import ShellMultimode, URL_MIPS, MD5_MIPS
+from . import base
 
 CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"
 LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bin && /data/busybox chattr +i /data/firmware/firmware_ota.bin"
@@ -14,8 +14,7 @@ RUN_FTP = "/data/busybox tcpsvd -E 0.0.0.0 21 /data/busybox ftpd -w &"
 # c create, z gzip, O stdout, C change DIR
 TAR_DATA = "tar -czO /data/miio/mible_local.db* /data/silicon_zigbee_host/*.txt /data/zigbee /data/zigbee_gw 2>/dev/null | base64"
 
-# original link https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel
-URL_BUSYBOX = "http://master.dl.sourceforge.net/project/mgl03/bin/busybox?viasf=1"
+URL_BUSYBOX = "https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel"
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
 
 
@@ -87,7 +86,7 @@ DB_BLUETOOTH = (
 DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
 
 
-class ShellMGW(ShellMultimode):
+class ShellMGW(base.ShellMultimode):
     model = "mgw"
 
     app_patches: List[str] = None
@@ -111,7 +110,9 @@ class ShellMGW(ShellMultimode):
         return await self.exec("ps -ww | grep -v ' 0 SW'")
 
     async def check_openmiio_agent(self) -> int:
-        return await self.check_bin("openmiio_agent", MD5_MIPS, URL_MIPS)
+        return await self.check_bin(
+            "openmiio_agent", base.OPENMIIO_MD5_MIPS, base.OPENMIIO_URL_MIPS
+        )
 
     async def run_ftp(self):
         if await self.check_bin("busybox", MD5_BUSYBOX, URL_BUSYBOX):

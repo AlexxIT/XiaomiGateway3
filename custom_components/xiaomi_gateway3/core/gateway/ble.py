@@ -39,7 +39,10 @@ class BLEGateway(GatewayBase):
             sh.patch_memory_bluetooth()
 
     async def ble_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == "miio/report" and b'"_async.ble_event"' in msg.payload:
+        if (
+            msg.topic in ("miio/report", "central/report")
+            and b'"_async.ble_event"' in msg.payload
+        ):
             await self.ble_process_event(msg.json["params"])
 
     async def ble_process_event(self, data: dict):

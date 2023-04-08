@@ -2,6 +2,7 @@ import asyncio
 import socket
 from typing import Union
 
+from . import base
 from .base import TelnetShell, ShellMultimode
 from .shell_e1 import ShellE1
 from .shell_mgw import ShellMGW
@@ -87,3 +88,9 @@ def check_port(host: str, port: int):
         return s.connect_ex((host, port)) == 0
     finally:
         s.close()
+
+
+def openmiio_setup(config: dict):
+    """Custom config for OPENMIIO_CMD, OPENMIIO_VER, OPENMIIO_MIPS..."""
+    for k, v in config.items():
+        setattr(base, "OPENMIIO_" + k.upper(), v)

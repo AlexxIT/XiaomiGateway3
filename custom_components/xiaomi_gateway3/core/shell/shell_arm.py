@@ -1,10 +1,10 @@
 import asyncio
 
-from .base import ShellOpenMiio, URL_ARM, MD5_ARM
+from . import base
 
 
 # noinspection PyAbstractClass
-class ShellARM(ShellOpenMiio):
+class ShellARM(base.ShellOpenMiio):
     async def login(self):
         self.writer.write(b"root\n")
         await asyncio.sleep(0.1)
@@ -45,4 +45,6 @@ class ShellARM(ShellOpenMiio):
         await self.exec("killall mha_master")
 
     async def check_openmiio_agent(self) -> int:
-        return await self.check_bin("openmiio_agent", MD5_ARM, URL_ARM)
+        return await self.check_bin(
+            "openmiio_agent", base.OPENMIIO_MD5_ARM, base.OPENMIIO_URL_ARM
+        )

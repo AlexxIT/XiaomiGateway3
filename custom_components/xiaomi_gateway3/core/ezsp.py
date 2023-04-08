@@ -11,7 +11,7 @@ from homeassistant.requirements import async_process_requirements
 
 from . import shell
 from .const import DOMAIN
-from .shell.base import RUN_OPENMIIO
+from .shell.base import OPENMIIO_CMD
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
     finally:
         await sh.exec(
             "zigbee_inter_bootloader.sh 1; zigbee_reset.sh 0; zigbee_reset.sh 1; "
-            "killall openmiio_agent; " + RUN_OPENMIIO
+            "killall openmiio_agent; " + OPENMIIO_CMD
         )
         await sh.close()
 
