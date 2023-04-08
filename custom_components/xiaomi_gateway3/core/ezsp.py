@@ -102,10 +102,11 @@ async def read_firmware(host: str) -> Optional[str]:
     ezsp = EZSP({"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None})
     try:
         await asyncio.wait_for(ezsp._probe(), timeout=10)
+        _, _, version = await ezsp.get_board_info()
     except asyncio.TimeoutError:
         return None
-    _, _, version = await ezsp.get_board_info()
-    ezsp.close()
+    finally:
+        ezsp.close()
 
     _LOGGER.debug(f"{host} [FWUP] Current zigbee firmware v{version}")
 
