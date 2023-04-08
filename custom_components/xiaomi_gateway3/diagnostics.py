@@ -49,12 +49,8 @@ async def async_get_device_diagnostics(
         info["device"] = info.pop("devices")[uid]
         info["device"]["unique_id"] = uid
 
-        if device.model.startswith(GATEWAY):
-            gw: XGateway = hass.data[DOMAIN][entry.entry_id]
-            info["data.tar.gz.b64"] = await gw.tar_data()
-        else:
-            device = next(d for d in XGateway.devices.values() if d.unique_id == uid)
-            info["logger"] = logger(device)
+        device = next(d for d in XGateway.devices.values() if d.unique_id == uid)
+        info["logger"] = logger(device)
 
     except Exception as e:
         info["error"] = f"{type(e).__name__}: {e}"
