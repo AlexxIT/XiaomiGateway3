@@ -193,7 +193,7 @@ class XEntity(Entity):
 
         if hasattr(self, "async_get_last_state"):
             state: State = await self.async_get_last_state()
-            if state:
+            if state and state.state != "unavailable":
                 self.async_restore_last_state(state.state, state.attributes)
                 return
 
