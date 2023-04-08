@@ -1,9 +1,15 @@
 import logging
-from typing import Union
+from typing import Union, Dict
 
 from zigpy.types import EUI64
 from zigpy.zcl import Cluster
-from zigpy.zcl.foundation import ZCLHeader, Attribute, ReadAttributeRecord, DATA_TYPES
+from zigpy.zcl.foundation import (
+    ZCLHeader,
+    Attribute,
+    ReadAttributeRecord,
+    DATA_TYPES,
+    ZCLAttributeDef,  # zigpy 0.43.1
+)
 from zigpy.zdo import ZDO
 from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
 
@@ -146,7 +152,7 @@ def decode(data: dict):
                 for attr in attrs:
                     assert isinstance(attr, Attribute)
                     if attr.attrid in cluster.attributes:
-                        name = cluster.attributes[attr.attrid][0]
+                        name = cluster.attributes[attr.attrid].name
                     else:
                         name = attr.attrid
 
@@ -165,7 +171,7 @@ def decode(data: dict):
                 for attr in attrs:
                     assert isinstance(attr, ReadAttributeRecord)
                     if attr.attrid in cluster.attributes:
-                        name = cluster.attributes[attr.attrid][0]
+                        name = cluster.attributes[attr.attrid].name
                     else:
                         name = attr.attrid
 
@@ -245,10 +251,10 @@ def get_cluster(cluster: str) -> Cluster:
     )
 
 
-def get_attr(attributes: dict, attr) -> int:
+def get_attr(attributes: Dict[int, ZCLAttributeDef], attr) -> int:
     if isinstance(attr, int):
         return attr
-    return next(k for k, v in attributes.items() if v[0] == attr)
+    return next(k for k, v in attributes.items() if v.name == attr)
 
 
 def get_attr_type(attributes: dict, attr: str) -> (int, int):

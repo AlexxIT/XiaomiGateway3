@@ -208,3 +208,16 @@ def test_misc():
         "nwk": 0x2327,
         "ieee": EUI64.convert("00:15:8d:00:03:93:6a:5d"),
     }
+
+
+def test_hass2023_4():
+    device = XDevice(ZIGBEE, "01MINIZB", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    p = device.encode_read({"switch"})
+    assert p == {
+        "commands": [
+            {"commandcli": "zcl global read 6 0"},
+            {"commandcli": "send 0x12ab 1 1"},
+        ]
+    }
