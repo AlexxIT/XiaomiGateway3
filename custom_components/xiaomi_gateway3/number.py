@@ -34,9 +34,40 @@ UNITS = {
 
 
 # noinspection PyAbstractClass
-class XiaomiNumber(XEntity, NumberEntity):
-    _attr_value: float = None
+class BackToTheNumberEntity(NumberEntity):
+    if (MAJOR_VERSION, MINOR_VERSION) < (2022, 7):
+        _attr_value: float = None
 
+        async def async_set_value(self, value: float) -> None:
+            await self.async_set_native_value(value)
+
+        @property
+        def _attr_native_value(self):
+            return self._attr_value
+
+        @_attr_native_value.setter
+        def _attr_native_value(self, value):
+            self._attr_value = value
+
+        @property
+        def _attr_native_min_value(self):
+            return self._attr_min_value
+
+        @_attr_native_min_value.setter
+        def _attr_native_min_value(self, value):
+            self._attr_min_value = value
+
+        @property
+        def _attr_native_max_value(self):
+            return self._attr_max_value
+
+        @_attr_native_max_value.setter
+        def _attr_native_max_value(self, value):
+            self._attr_max_value = value
+
+
+# noinspection PyAbstractClass
+class XiaomiNumber(XEntity, BackToTheNumberEntity):
     def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
 
@@ -44,29 +75,21 @@ class XiaomiNumber(XEntity, NumberEntity):
             self._attr_native_unit_of_measurement = UNITS[self.attr]
 
         if hasattr(conv, "min"):
-            self._attr_min_value = conv.min
+            self._attr_native_min_value = conv.min
         if hasattr(conv, "max"):
-            self._attr_max_value = conv.max
+            self._attr_native_max_value = conv.max
 
     @callback
     def async_set_state(self, data: dict):
         if self.attr in data:
-            self._attr_value = data[self.attr]
+            self._attr_native_value = data[self.attr]
 
     @callback
     def async_restore_last_state(self, state: float, attrs: dict):
-        self._attr_value = state
+        self._attr_native_value = state
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
 
-    # backward compatibility fix
-    if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 8):
-
-        async def async_set_native_value(self, value: float) -> None:
-            await self.device_send({self.attr: value})
-
-    else:
-
-        async def async_set_value(self, value: float) -> None:
-            await self.device_send({self.attr: value})
+    async def async_set_native_value(self, value: float) -> None:
+        await self.device_send({self.attr: value})
