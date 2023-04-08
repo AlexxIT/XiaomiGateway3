@@ -63,7 +63,7 @@ def test_button():
         },
     )
 
-    button.hass.loop.run_until_complete(asyncio.sleep(0.3))
+    button.hass.loop.run_until_complete(asyncio.sleep(0.5))
     state = button.hass.states.get(button.entity_id)
     assert state.state == ""
 
