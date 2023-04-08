@@ -64,8 +64,10 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, hass_config: dict):
-    if (MAJOR_VERSION, MINOR_VERSION) < (2021, 12):
-        _LOGGER.error("Minimum supported Hass version 2021.12")
+    # Hass 2022.3 zigpy==0.43.0 - doesn't have ZCLAttributeDef
+    # Hass 2022.4 zigpy==0.44.1
+    if (MAJOR_VERSION, MINOR_VERSION) < (2022, 4):
+        _LOGGER.error("Minimum supported Hass version 2022.4")
         return False
 
     config = hass_config.get(DOMAIN) or {}
