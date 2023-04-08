@@ -1741,6 +1741,8 @@ DEVICES += [{
     ],
 }, {
     3788: ["PTX", "Mesh Triple Wall Switch", "090615.switch.meshk3"],
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/993
+    11356: ["PTX", "Mesh Triple Wall Switch", "090615.switch.aksk3"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
