@@ -1480,6 +1480,24 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
     ]
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/971
+    # https://home.miot-spec.com/spec/yeelink.light.ml9
+    11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        Converter("flex_switch", "switch", mi="3.p.6", enabled=False),  # bool
+        MapConv("power_on_state", "select", mi="3.p.7", enabled=False, map={
+            0: "default", 1: "on"
+        }),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        })
+    ]
+}, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
