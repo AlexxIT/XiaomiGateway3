@@ -1873,19 +1873,19 @@ DEVICES += [{
     10920: ["Unknown", "Mesh Smart Plug V3", "giot.plug.v3shsm"],
     "spec": [
         Converter("plug", "switch", mi="2.p.1"),
-        BoolConv("inching_mode","switch", mi="2.p.2"),
-        MapConv("power_on_state", "select", mi="2.p.3", map={0:"off",1:"on",2:"same_as_before"}),
+        MapConv("power_on_state", "select", mi="2.p.3", map={
+            0: "off", 1: "on", 2: "previous"
+        }),
 
         # Inching mode
-        MapConv("inching_switch_default_state", "select", mi="3.p.1", map={False:"normally_off",True:"normally_on"}),
-        MathConv("inching_time", "number", mi="3.p.2",multiply=0.5, min=1, max=7199,round=1),
+        BoolConv("inching_mode", "switch", mi="2.p.2"),
+        MapConv("inching_state", "select", mi="3.p.1", map={False: "off", True: "on"}),
+        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7199,
+                 round=1),
 
         # LED
         MapConv("led", "select", mi="4.p.1", map={
-            0: "follow_switch", 
-            1: "opposite_to_switch", 
-            2: "normally_off", 
-            3: "normally_on"
+            0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"
         })
     ]
 }, {
