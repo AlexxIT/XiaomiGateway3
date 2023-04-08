@@ -1390,10 +1390,12 @@ DEVICES += [{
     982: ["Xiaomi", "Qingping Door Sensor", "CGH1"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1161: ["Xiaomi", "Toothbrush T500", "MES601"],
-    2054: ["Xiaomi", "Toothbrush T700", "MES604"],
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1001
+    1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM"],
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
+    2054: ["Xiaomi", "Toothbrush T700", "MES604"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
