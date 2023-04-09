@@ -1957,7 +1957,7 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/s/5045
-    5045: ["Linptech", "Mesh Triple Wall Switch (no L)", "QE1"],
+    5045: ["Linptech", "Mesh Triple Wall Switch (no L)", "QE1SB-W3(MI)"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
