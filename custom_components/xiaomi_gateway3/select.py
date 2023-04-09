@@ -71,6 +71,7 @@ CMD_FLASHZB = "flashzb"
 class CommandSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_device_class = "command"
+    _attr_translation_key = "command"
 
     def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
@@ -144,6 +145,7 @@ class DataSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_device_class = "data"
     _attr_options = None
+    _attr_translation_key = "data"
     step_id = None
     kwargs = None
 
