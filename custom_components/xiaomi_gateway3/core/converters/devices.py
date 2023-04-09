@@ -1381,6 +1381,32 @@ DEVICES += [{
     ],
     "ttl": "3d"  # battery every 1? day
 }, {
+    # https://home.miot-spec.com/spec/oms.lock.dl01
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/973
+    10249: ["Xiaomi", "Door Lock E10", "XMZNMS01OD"],
+    "spec": [
+        MapConv("door", "sensor", mi="4.p.1021", map={
+            1: "locked", 2: "unlocked", 3: "timeout", 4: "ajar"
+        }),
+
+        EventConv("action", "sensor", mi="3.e.1020"),
+        Converter("key_id", mi="3.p.1"),
+        Converter("method_id", mi="3.p.2"),
+        MapConv("method", mi="3.p.2", map={
+            1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 8: "key",
+            9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual"
+        }),
+        Converter("action_id", mi="3.p.3"),
+        MapConv("action", mi="3.p.3", map={
+            1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside",
+            5: "unlock_inside", 8: "enable_away", 9: "disable_away"
+        }),
+        MapConv("position", mi="3.p.4", map={1: "indoor", 2: "outdoor"}),
+
+        Converter("timestamp", mi="3.p.6"),
+    ],
+    "ttl": "1h"
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
