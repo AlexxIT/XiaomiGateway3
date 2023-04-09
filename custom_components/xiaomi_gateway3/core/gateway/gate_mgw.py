@@ -78,17 +78,11 @@ class GateMGW(
     #     self.device.update({GATEWAY: False})
 
     async def gw3_mqtt_publish(self, msg: MQTTMessage):
+        await self.mqtt_heartbeat(msg)
+
+        # time offset may changed right after gw.heartbeat
         if msg.topic == "miio/report" and b'"event.gw.heartbeat"' in msg.payload:
-            payload = msg.json["params"][0]
-            payload = self.device.decode(GATEWAY, payload)
-            self.device.update(payload)
-
-            # time offset may changed right after gw.heartbeat
             await self.gw3_update_time_offset()
-
-        elif msg.topic.endswith("/heartbeat"):
-            payload = self.device.decode(GATEWAY, msg.json)
-            self.device.update(payload)
 
     async def gw3_timer(self, ts: float):
         if ts < self.gw3_ts:

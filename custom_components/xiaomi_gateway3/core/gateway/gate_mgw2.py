@@ -18,7 +18,7 @@ class GateMGW2(
     mgw2_ts = 0
 
     def mgw2_init(self):
-        self.dispatcher_connect(SIGNAL_MQTT_PUB, self.mgw2_mqtt_publish)
+        self.dispatcher_connect(SIGNAL_MQTT_PUB, self.mqtt_heartbeat)
         self.dispatcher_connect(SIGNAL_TIMER, self.mgw2_timer)
 
     async def mgw2_prepare_gateway(self, sh: shell.ShellMGW2):
@@ -65,24 +65,7 @@ class GateMGW2(
                 serial = await sh.read_file(
                     "/proc/tty/driver/ms_uart | sed 's/1:/2=/' | sed 's/2:/1=/' | sed 's/=/:/' | sort -k1 -g"
                 )
-                free_mem = await sh.read_file(
-                    "/proc/meminfo | grep MemFree: | awk '{print $2}'"
-                )
-                load_avg = await sh.read_file("/proc/loadavg | sed 's/ /|/g'")
-                run_time = await sh.read_file("/proc/uptime | cut -f1 -d.")
-                rssi = await sh.read_file(
-                    "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
-                )
-                payload = self.device.decode(
-                    GATEWAY,
-                    {
-                        "serial": serial.decode(),
-                        "free_mem": int(free_mem),
-                        "load_avg": load_avg.decode(),
-                        "run_time": int(run_time),
-                        "rssi": int(rssi) + 100 if rssi else 0,
-                    },
-                )
+                payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
                 self.device.update(payload)
 
         except Exception as e:

@@ -4,7 +4,6 @@ from .silabs import SilabsGateway
 from .z3 import Z3Gateway
 from .. import shell
 from ..device import XDevice, GATEWAY
-from ..mini_mqtt import MQTTMessage
 
 MODEL = "lumi.gateway.aqcn02"
 
@@ -13,7 +12,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
     e1_ts = 0
 
     def e1_init(self):
-        self.dispatcher_connect(SIGNAL_MQTT_PUB, self.e1_mqtt_publish)
+        self.dispatcher_connect(SIGNAL_MQTT_PUB, self.mqtt_heartbeat)
         self.dispatcher_connect(SIGNAL_TIMER, self.e1_timer)
 
     async def e1_read_device(self, sh: shell.ShellE1):
@@ -41,11 +40,6 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
 
         return True
 
-    async def e1_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic.endswith("/heartbeat"):
-            payload = self.device.decode(GATEWAY, msg.json)
-            self.device.update(payload)
-
     async def e1_timer(self, ts: float):
         if ts < self.e1_ts:
             return
@@ -58,24 +52,7 @@ class GateE1(LumiGateway, SilabsGateway, Z3Gateway):
                 serial = await sh.read_file(
                     "/proc/tty/driver/ms_uart | grep -v ^0 | sort -r"
                 )
-                free_mem = await sh.read_file(
-                    "/proc/meminfo | grep MemFree: | awk '{print $2}'"
-                )
-                load_avg = await sh.read_file("/proc/loadavg | sed 's/ /|/g'")
-                run_time = await sh.read_file("/proc/uptime | cut -f1 -d.")
-                rssi = await sh.read_file(
-                    "/proc/net/wireless | grep wlan0 | awk '{print $4}' | cut -f1 -d."
-                )
-                payload = self.device.decode(
-                    GATEWAY,
-                    {
-                        "serial": serial.decode(),
-                        "free_mem": int(free_mem),
-                        "load_avg": load_avg.decode(),
-                        "run_time": int(run_time),
-                        "rssi": int(rssi) + 100,
-                    },
-                )
+                payload = self.device.decode(GATEWAY, {"serial": serial.decode()})
                 self.device.update(payload)
 
         except Exception as e:

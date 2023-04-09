@@ -4,10 +4,10 @@ import re
 from logging import Logger
 from typing import Callable, Dict, List, Optional, Union
 
-from ..converters import Converter
+from ..converters import Converter, GATEWAY
 from ..device import XDevice
 from ..mini_miio import AsyncMiIO
-from ..mini_mqtt import MiniMQTT
+from ..mini_mqtt import MiniMQTT, MQTTMessage
 
 RE_ENTITIES = re.compile(r"[a-z_]+")
 
@@ -173,3 +173,13 @@ class GatewayBase:
             del self.miio_ack[cid]
 
         return fut.result()
+
+    async def mqtt_heartbeat(self, msg: MQTTMessage):
+        if msg.topic == "miio/report" and b'"event.gw.heartbeat"' in msg.payload:
+            payload = msg.json["params"][0]
+            payload = self.device.decode(GATEWAY, payload)
+            self.device.update(payload)
+
+        elif msg.topic.endswith("/heartbeat"):
+            payload = self.device.decode(GATEWAY, msg.json)
+            self.device.update(payload)
