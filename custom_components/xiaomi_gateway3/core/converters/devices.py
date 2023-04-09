@@ -341,7 +341,7 @@ DEVICES += [{
     # motion sensor E1 with illuminance
     "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
     "spec": [
-        EventConv("motion", "binary_sensor", mi="2.e.1"),
+        EventConv("motion", "binary_sensor", mi="2.e.1", value=True),
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
@@ -541,7 +541,7 @@ DEVICES += [{
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
     # "support": 5,  # @zvldz
     "spec": [
-        EventConv("motion", "binary_sensor", mi="4.e.1"),
+        EventConv("motion", "binary_sensor", mi="4.e.1", value=True),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
         MapConv("sensitivity", "select", mi="8.p.1", map={
             1: "low", 2: "medium", 3: "high"
@@ -1245,7 +1245,7 @@ DEVICES += [{
         MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
         Converter("illuminance", mi="2.p.1005"),
-        EventConv("motion", mi="2.e.1008"),
+        EventConv("motion", mi="2.e.1008", value=True),
         Converter("battery", mi="3.p.1003"),
     ],
 }]
@@ -1403,7 +1403,13 @@ DEVICES += [{
         }),
         MapConv("position", mi="3.p.4", map={1: "indoor", 2: "outdoor"}),
 
-        Converter("timestamp", mi="3.p.6"),
+        Converter("timestamp", mi="3.p.6"),  # lock timestamp
+
+        # doorbell
+        EventConv("action", mi="6.e.1006", value="doorbell"),
+        Converter("timestamp", mi="6.p.1"),  # doorbell timestamp
+
+        Converter("battery", "sensor", mi="5.p.1003"),
     ],
     "ttl": "1h"
 }, {
@@ -1887,7 +1893,7 @@ DEVICES += [{
         Converter("illuminance", "sensor", mi="2.p.5"),
 
         # approach/away event
-        EventConv("approach_away", mi="3.e.1"),
+        EventConv("approach_away", mi="3.e.1", value=True),
         MapConv("action", "sensor", mi="3.p.1", map={0: "", 1: "approach", 2: "away"}),
         MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
 
@@ -1997,7 +2003,7 @@ DEVICES += [{
 
         Converter("compatible_mode", "switch", mi="7.p.4"),
     ],
-},{
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool

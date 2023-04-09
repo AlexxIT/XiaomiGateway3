@@ -284,3 +284,15 @@ def test_10249():
         "position": "outdoor",
         "timestamp": 1676548449,
     }
+
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 6,
+                "eiid": 1006,
+                "arguments": [{"piid": 1, "value": 1681029598}],
+            }
+        ]
+    )
+    assert p == {"action": "doorbell", "timestamp": 1681029598}
