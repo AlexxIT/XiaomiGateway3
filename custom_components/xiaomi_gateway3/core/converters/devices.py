@@ -1934,7 +1934,7 @@ DEVICES += [{
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
 
-        # Either Default/Wireless or Default/Atom, depending on hardware
+        # Either Default/Wireless or Default/Atom, depending on hard    ware
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
     ]
@@ -1956,6 +1956,22 @@ DEVICES += [{
         BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
     ]
 }, {
+    # https://home.miot-spec.com/s/5045
+    5045: ["Linptech", "Mesh Triple Wall Switch QE1", "QE1SB-W3(MI)"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        BoolConv("wireless_1", "switch", mi="2.p.3"),
+        BoolConv("wireless_2", "switch", mi="3.p.3"),
+        BoolConv("wireless_3", "switch", mi="4.p.3"),
+
+        Converter("led", "switch", mi="5.p.1"),
+
+        Converter("compatible_mode", "switch", mi="7.p.4"),
+    ],
+},{
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
