@@ -73,5 +73,42 @@
       "button_both_13": "同时按下第 1、3 键",
       "button_both_23": "同时按下第 2、3 键"
     }
+  },
+  "entity": {
+    "select": {
+      "command": {
+        "state": {
+          "pair": "Zigbee配对",
+          "bind": "Zigbee绑定",
+          "ota": "Zigbee OTA",
+          "config": "Zigbee重新配置",
+          "parentscan": "Zigbee父设备扫描",
+          "firmwarelock": "网关固件锁定",
+          "reboot": "网关重启",
+          "ftp": "网关运行FTP",
+          "flashzb": "Zigbee刷写EZSP"
+        }
+      },
+      "data": {
+        "state": {
+          "enabled": "已启用",
+          "disabled": "已禁用",
+          "unknown": "未知",
+          "ok": "完成",
+          "error": "出错",
+          "permit_join": "允许加入",
+          "stop_join": "停止加入",
+          "cancel": "取消",
+          "key_secure": "发送网络密钥（安全）",
+          "key_legacy": "发送网络密钥（传统）",
+          "no_firmware": "无固件",
+          "bind": "绑定",
+          "unbind": "解除绑定",
+          "no_devices": "没有设备",
+          "original": "原始固件",
+          "custom": "自定义固件"
+        }
+      }
+    }
   }
 }
