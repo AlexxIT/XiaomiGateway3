@@ -65,6 +65,14 @@ class BackToTheNumberEntity(NumberEntity):
         def _attr_native_max_value(self, value):
             self._attr_max_value = value
 
+        @property
+        def _attr_native_step(self):
+            return self._attr_step
+
+        @_attr_native_step.setter
+        def _attr_native_step(self, value):
+            self._attr_step = value
+
 
 # noinspection PyAbstractClass
 class XiaomiNumber(XEntity, BackToTheNumberEntity):
@@ -78,6 +86,8 @@ class XiaomiNumber(XEntity, BackToTheNumberEntity):
             self._attr_native_min_value = conv.min
         if hasattr(conv, "max"):
             self._attr_native_max_value = conv.max
+        if hasattr(conv, "step"):
+            self._attr_native_step = conv.step
 
     @callback
     def async_set_state(self, data: dict):
