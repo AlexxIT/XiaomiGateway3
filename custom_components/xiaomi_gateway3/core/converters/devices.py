@@ -1860,7 +1860,7 @@ DEVICES += [{
         MathConv("distance", "sensor", mi="2.p.6"),
 
         Converter("led", "switch", mi="3.p.1", enabled=True),
-        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8),
+        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8,step=0.1),
         Converter("pir", "switch", mi="3.p.3", enabled=True),
 
         MapConv("occupancy_status", "sensor", mi="2.p.1", map={

@@ -5,6 +5,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, TYPE_CHECKING
 
 from .const import *
+from homeassistant.components.number.const import DEFAULT_STEP
+
 
 if TYPE_CHECKING:
     from ..device import XDevice
@@ -103,6 +105,7 @@ class MathConv(Converter):
     min: float = -float("inf")
     multiply: float = 0
     round: int = None
+    step: float = DEFAULT_STEP
 
     def decode(self, device: "XDevice", payload: dict, value: float):
         if self.min <= value <= self.max:
