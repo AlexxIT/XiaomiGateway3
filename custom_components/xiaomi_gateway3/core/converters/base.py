@@ -486,50 +486,43 @@ LUMI_GLOBALS = {
     # "8.0.2156": Converter("nwk", "sensor"),
 }
 
-class AqaraNoDisturbModeConvGenerator:
-    def __init__(self, mi:str, prefix: str="") -> None:
-        self.mi = mi
-        self.start_attr = prefix + "_start"
-        self.end_attr = prefix + "_end"
+class AqaraLedNoDisturbTimeConv(Converter):
+    """
+        Period encoding:
+        Type: uint32
+        In binary: AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
+            A = end minute
+            B = end hour
+            C = start minute
+            D = start hour
+        Example: 
+            Period: 23:59 - 10:44
+            In decimal: 44 10 59 23
+            In binary: 00101100 00001010 00111011 00010111
+    """
+    map = {
+        (h | (m << 8)): f"{h:02d}:{m:02d}" for h in range(24) for m in range(60)
+    }
+    reversed_map = {
+         f"{h:02d}:{m:02d}":(h | (m << 8)) for h in range(24) for m in range(60)
+    }
+    def __init__(self, attr, mi, start_attr, end_attr):
+        super().__init__(attr=attr, domain="select", mi=mi)
+        self.start_attr = start_attr
+        self.end_attr = end_attr
 
-    def get_convs(self) -> List["AqaraLedOffTimeConv"]:
-        return [
-            AqaraLedOffTimeConv(attr=self.start_attr,mi=self.mi,
-                            start_attr=self.start_attr,
-                            end_attr=self.end_attr),
-            AqaraLedOffTimeConv(attr=self.end_attr ,mi=self.mi,
-                            start_attr=self.start_attr,
-                            end_attr=self.end_attr),
-   
-        ]
-
-
-
-@dataclass
-class AqaraLedOffTimeConv(MapConv):
-    start_attr:str=None
-    end_attr:str=None
-    def __post_init__(self):
-        self.domain = "select"
-        self.map = {
-            (h | (m << 8)): f"{h:02d}:{m:02d}" for h in range(24) for m in range(60)
-        }
-        self.reverse_map = { 
-           v:k for k,v in self.map.items()
-        }
-        self.is_start = self.attr == self.start_attr
+    @property
+    def is_start(self):
+        return self.attr == self.start_attr
 
     def decode(self, device: "XDevice", payload: dict, value: int):
-        super().decode(device,payload, self._decode_start(value) if self.is_start else self._decode_end(value))
-        print(f"decode: {payload}, {value}")
+        mapped_value = self.map[self._decode_start(value) if self.is_start else self._decode_end(value)]
+        super().decode(device,payload, mapped_value)
 
     def encode(self, device: "XDevice", payload: dict, value: Any):
-        super().encode(device,payload,value)
-        print(f"encode: {payload}, {value}")
-        start = self.reverse_map[value if self.is_start else device.entities[self.start_attr].state]
-        end = self.reverse_map[value if not self.is_start else device.entities[self.end_attr].state]
-        # TODO: Find a way to make entity XiaomiSelect while not subclassing MapConv instead of use this trick
-        payload["mi_spec"][0]["value"] = self._encode_start_end(start,end) 
+        start = self.reversed_map[value if self.is_start else device.entities[self.start_attr].state]
+        end = self.reversed_map[value if not self.is_start else device.entities[self.end_attr].state]
+        super().encode(device,payload,self._encode_start_end(start,end))
         
     def _decode_start(self,encoded):
         return encoded & 0xFFFF
