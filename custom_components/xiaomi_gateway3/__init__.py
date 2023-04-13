@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import time
@@ -25,7 +24,7 @@ from .core.xiaomi_cloud import MiCloud
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAINS = [
+PLATFORMS = [
     "alarm_control_panel",
     "binary_sensor",
     "climate",
@@ -117,9 +116,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not entry.update_listeners:
         entry.add_update_listener(async_update_options)
 
-    hass.data[DOMAIN][entry.entry_id] = XGateway(**entry.options)
+    hass.data[DOMAIN][entry.entry_id] = gw = XGateway(**entry.options)
 
-    hass.async_create_task(_setup_domains(hass, entry))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    gw.start()
+
+    entry.async_on_unload(hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, gw.stop))
 
     return True
 
@@ -137,15 +140,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not entry.options.get("stats"):
         utils.remove_stats(hass, entry.entry_id)
 
+    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
     gw: XGateway = hass.data[DOMAIN][entry.entry_id]
     await gw.stop()
-
-    await asyncio.gather(
-        *[
-            hass.config_entries.async_forward_entry_unload(entry, domain)
-            for domain in DOMAINS
-        ]
-    )
 
     return True
 
@@ -153,21 +151,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 # noinspection PyUnusedLocal
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
-
-
-async def _setup_domains(hass: HomeAssistant, entry: ConfigEntry):
-    # init setup for each supported domains
-    await asyncio.gather(
-        *[
-            hass.config_entries.async_forward_entry_setup(entry, domain)
-            for domain in DOMAINS
-        ]
-    )
-
-    gw: XGateway = hass.data[DOMAIN][entry.entry_id]
-    gw.start()
-
-    entry.async_on_unload(hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, gw.stop))
 
 
 async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
