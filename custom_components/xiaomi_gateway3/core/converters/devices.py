@@ -726,6 +726,46 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="9.p.1", enabled=False),
     ],
 }, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-acn040:1
+    "lumi.switch.acn040": ["Aqara", "Triple Wall Switch E1 (with N)", "ZNQBKG31LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        # Button press actions
+        Action,
+        ButtonMIConv("button_1", mi="9.e.1", value=1),  # single
+        ButtonMIConv("button_1", mi="9.e.2", value=2),  # double
+        ButtonMIConv("button_2", mi="10.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="10.e.2", value=2),  # double
+        ButtonMIConv("button_3", mi="11.e.1", value=1),  # single
+        ButtonMIConv("button_3", mi="11.e.2", value=2),  # double
+        ButtonMIConv("button_both_12", mi="12.e.1", value=4),
+        ButtonMIConv("button_both_13", mi="13.e.1", value=4),
+        ButtonMIConv("button_both_23", mi="14.e.1", value=4),
+
+        # Wireless switch
+        # Native false = Wireless, Native true = Relay
+        MapConv("wireless_1", "switch", mi="9.p.1", map={0:True, 1:False},enabled=True),
+        MapConv("wireless_2", "switch", mi="10.p.1",map={0:True, 1:False}, enabled=True),
+        MapConv("wireless_3", "switch", mi="11.p.1", map={0:True, 1:False},enabled=True),
+
+        # Others
+        MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY, enabled=True),
+        MapConv("temperature_alarm", "sensor", mi="8.p.1", map={0:"normal",1:"protected", 2: "abnormal"}, enabled=True),
+
+        # LED control
+        BoolConv("led_inverted", "switch", mi="6.p.2", enabled=True),
+        BoolConv("led_no_disturb", "switch", mi="6.p.1", enabled=True), 
+        AqaraLedNoDisturbTimeConv(attr="led_no_disturb_start",mi="6.p.3",
+                            start_attr="led_no_disturb_start",# must exist
+                            end_attr="led_no_disturb_end"),# must exist
+        AqaraLedNoDisturbTimeConv(attr="led_no_disturb_end",mi="6.p.3",
+                            start_attr="led_no_disturb_start",# must exist
+                            end_attr="led_no_disturb_end"),# must exist
+    ],
+}, {
     # required switch firmware 0.0.0_0030
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1
     "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US (with N)", "WS-USC04"],
