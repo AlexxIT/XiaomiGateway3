@@ -24,8 +24,15 @@ class MIoTGateway(GatewayBase):
         # convert miio response format to multiple responses in lumi format
         devices: Dict[str, Optional[list]] = {}
         for item in data:
-            if item["did"] not in self.devices:
+            device = self.devices.get(item["did"])
+            if not device:
                 continue
+
+            if seq := item.get("tid"):
+                if device.extra.get("seq") == seq:
+                    return
+                device.extra["seq"] = seq
+
             devices.setdefault(item["did"], []).append(item)
 
         for did, payload in devices.items():
@@ -38,6 +45,12 @@ class MIoTGateway(GatewayBase):
         device = self.devices.get(data["did"])
         if not device:
             return
+
+        if seq := data.get("tid"):
+            if device.extra.get("seq") == seq:
+                return
+            device.extra["seq"] = seq
+
         payload = device.decode_miot([data])
         device.update(payload)
 
