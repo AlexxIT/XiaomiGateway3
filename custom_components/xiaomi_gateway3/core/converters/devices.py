@@ -1411,7 +1411,7 @@ DEVICES += [{
 
         Converter("battery", "sensor", mi="5.p.1003"),
     ],
-    "ttl": "1h"
+    "ttl": "25h"
 }, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
