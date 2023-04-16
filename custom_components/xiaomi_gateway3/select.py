@@ -1,30 +1,30 @@
 from homeassistant.components.select import SelectEntity
-from homeassistant.core import callback
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import callback, HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import DOMAIN
 from .core import utils, ezsp
 from .core.converters import Converter
 from .core.device import XDevice, RE_DID
-from .core.entity import XEntity
+from .core.entity import XEntity, setup_entity
 from .core.gateway import XGateway
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        if conv.attr in device.entities:
-            entity: XEntity = device.entities[conv.attr]
-            entity.gw = gateway
-        elif conv.attr == "command":
-            entity = CommandSelect(gateway, device, conv)
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, add_entities: AddEntitiesCallback
+) -> None:
+    def new_entity(gateway: XGateway, device: XDevice, conv: Converter) -> XEntity:
+        if conv.attr == "command":
+            return CommandSelect(gateway, device, conv)
         elif conv.attr == "data":
-            entity = DataSelect(gateway, device, conv)
+            return DataSelect(gateway, device, conv)
         else:
-            entity = XiaomiSelect(gateway, device, conv)
-        async_add_entities([entity])
+            return XiaomiSelect(gateway, device, conv)
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
-    gw.add_setup(__name__, setup)
+    gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
 
 
 # noinspection PyAbstractClass
@@ -71,6 +71,7 @@ CMD_FLASHZB = "flashzb"
 class CommandSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_device_class = "command"
+    _attr_translation_key = "command"
 
     def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
@@ -144,6 +145,7 @@ class DataSelect(XEntity, SelectEntity):
     _attr_current_option = None
     _attr_device_class = "data"
     _attr_options = None
+    _attr_translation_key = "data"
     step_id = None
     kwargs = None
 

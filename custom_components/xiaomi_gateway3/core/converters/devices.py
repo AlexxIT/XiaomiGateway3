@@ -341,7 +341,7 @@ DEVICES += [{
     # motion sensor E1 with illuminance
     "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
     "spec": [
-        EventConv("motion", "binary_sensor", mi="2.e.1"),
+        EventConv("motion", "binary_sensor", mi="2.e.1", value=True),
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
@@ -541,7 +541,7 @@ DEVICES += [{
     "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor EU", "RTCGQ13LM"],
     # "support": 5,  # @zvldz
     "spec": [
-        EventConv("motion", "binary_sensor", mi="4.e.1"),
+        EventConv("motion", "binary_sensor", mi="4.e.1", value=True),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
         MapConv("sensitivity", "select", mi="8.p.1", map={
             1: "low", 2: "medium", 3: "high"
@@ -1245,7 +1245,7 @@ DEVICES += [{
         MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
         Converter("idle_time", "sensor", enabled=False),
         Converter("illuminance", mi="2.p.1005"),
-        EventConv("motion", mi="2.e.1008"),
+        EventConv("motion", mi="2.e.1008", value=True),
         Converter("battery", mi="3.p.1003"),
     ],
 }]
@@ -1380,6 +1380,38 @@ DEVICES += [{
         Converter("contact", "binary_sensor"),
     ],
     "ttl": "3d"  # battery every 1? day
+}, {
+    # https://home.miot-spec.com/spec/oms.lock.dl01
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/973
+    10249: ["Xiaomi", "Door Lock E10", "XMZNMS01OD"],
+    "spec": [
+        MapConv("door", "sensor", mi="4.p.1021", map={
+            1: "locked", 2: "unlocked", 3: "timeout", 4: "ajar"
+        }),
+
+        EventConv("action", "sensor", mi="3.e.1020"),
+        Converter("key_id", mi="3.p.1"),
+        Converter("method_id", mi="3.p.2"),
+        MapConv("method", mi="3.p.2", map={
+            1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 8: "key",
+            9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual"
+        }),
+        Converter("action_id", mi="3.p.3"),
+        MapConv("action", mi="3.p.3", map={
+            1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside",
+            5: "unlock_inside", 8: "enable_away", 9: "disable_away"
+        }),
+        MapConv("position", mi="3.p.4", map={1: "indoor", 2: "outdoor"}),
+
+        Converter("timestamp", mi="3.p.6"),  # lock timestamp
+
+        # doorbell
+        EventConv("action", mi="6.e.1006", value="doorbell"),
+        Converter("timestamp", mi="6.p.1"),  # doorbell timestamp
+
+        Converter("battery", "sensor", mi="5.p.1003"),
+    ],
+    "ttl": "25h"
 }, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
@@ -1828,7 +1860,7 @@ DEVICES += [{
         MathConv("distance", "sensor", mi="2.p.6"),
 
         Converter("led", "switch", mi="3.p.1", enabled=True),
-        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8),
+        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8,step=0.1),
         Converter("pir", "switch", mi="3.p.3", enabled=True),
 
         MapConv("occupancy_status", "sensor", mi="2.p.1", map={
@@ -1861,7 +1893,7 @@ DEVICES += [{
         Converter("illuminance", "sensor", mi="2.p.5"),
 
         # approach/away event
-        EventConv("approach_away", mi="3.e.1"),
+        EventConv("approach_away", mi="3.e.1", value=True),
         MapConv("action", "sensor", mi="3.p.1", map={0: "", 1: "approach", 2: "away"}),
         MathConv("approach_distance", "number", mi="3.p.4", min=1, max=5),
 
@@ -1934,7 +1966,7 @@ DEVICES += [{
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
 
-        # Either Default/Wireless or Default/Atom, depending on hardware
+        # Either Default/Wireless or Default/Atom, depending on hard    ware
         BoolConv("wireless_1", "switch", mi="2.p.2", enabled=False),
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
     ]
@@ -1955,6 +1987,22 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="3.p.2", enabled=False),
         BoolConv("wireless_3", "switch", mi="4.p.2", enabled=False),
     ]
+}, {
+    # https://home.miot-spec.com/s/5045
+    5045: ["Linptech", "Mesh Triple Wall Switch (no L)", "QE1SB-W3(MI)"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        BoolConv("wireless_1", "switch", mi="2.p.3"),
+        BoolConv("wireless_2", "switch", mi="3.p.3"),
+        BoolConv("wireless_3", "switch", mi="4.p.3"),
+
+        Converter("led", "switch", mi="5.p.1"),
+
+        Converter("compatible_mode", "switch", mi="7.p.4"),
+    ],
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [

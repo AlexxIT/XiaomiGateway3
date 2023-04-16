@@ -72,8 +72,23 @@ class XGateway(GateMGW, GateE1, GateMGW2):
         self.main_task.cancel()
 
         for device in self.devices.values():
-            if self in device.gateways:
-                device.gateways.remove(self)
+            if self not in device.gateways:
+                continue
+
+            # 1. Remove this XGateway from XDevice
+            device.gateways.remove(self)
+
+            # 2. Remove this XGateway from XEntity
+            for entity in device.entities.values():
+                if entity.gw == self:
+                    entity.gw = None
+
+            if len(device.gateways) == 0:
+                continue
+
+            # 3. Move this XDevice to another XGateway
+            gw = device.gateways[0]
+            device.setup_entitites(gw, gw.stats_enable)
 
     async def check_port(self, port: int):
         """Check if gateway port open."""

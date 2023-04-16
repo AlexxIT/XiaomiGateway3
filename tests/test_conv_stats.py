@@ -166,3 +166,26 @@ def test_zigbee_stats():
 
     # p = device.decode(ZIGBEE, {'resets': 15})
     # assert p == {'new_resets': 5}
+
+
+def test_154_stats():
+    device = XDevice(GATEWAY, "lumi.gateway.mgl03", DID, MAC)
+    device.setup_converters()
+
+    p = device.decode(
+        GATEWAY,
+        {
+            "serial": """serinfo:1.0 driver revision:
+0: uart:16550A mmio:0x18147000 irq:17 tx:360643 rx:0 RTS|CTS|DTR
+1: uart:16550A mmio:0x18147400 irq:46 tx:1664 rx:36814303 fe:6 RTS|CTS|DTR
+2: uart:16550A mmio:0x18147800 irq:47 tx:56627 rx:88704 oe:52 RTS|DTR"""
+        },
+    )
+    assert p == {
+        "bluetooth_tx": 1664,
+        "bluetooth_rx": 36814303,
+        "bluetooth_fe": 6,
+        "zigbee_tx": 56627,
+        "zigbee_rx": 88704,
+        "zigbee_oe": 52,
+    }

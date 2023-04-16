@@ -103,11 +103,13 @@ class GatewayStatsConverter(Converter):
             h = s % (3600 * 24) // 3600
             m = s % 3600 // 60
             s = s % 60
+            # fw 1.5.4 has negative (right rssi), lower fw - don't
+            rssi = value["rssi"] if value["rssi"] <= 0 else value["rssi"] - 100
             payload.update(
                 {
                     "free_mem": value["free_mem"],
                     "load_avg": value["load_avg"],
-                    "rssi": value["rssi"] - 100,
+                    "rssi": rssi,
                     "uptime": f"{d} days, {h:02}:{m:02}:{s:02}",
                 }
             )

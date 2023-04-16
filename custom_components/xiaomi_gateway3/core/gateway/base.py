@@ -4,10 +4,10 @@ import re
 from logging import Logger
 from typing import Callable, Dict, List, Optional, Union
 
-from ..converters import Converter
+from ..converters import Converter, GATEWAY
 from ..device import XDevice
 from ..mini_miio import AsyncMiIO
-from ..mini_mqtt import MiniMQTT
+from ..mini_mqtt import MiniMQTT, MQTTMessage
 
 RE_ENTITIES = re.compile(r"[a-z_]+")
 
@@ -16,6 +16,8 @@ SIGNAL_MQTT_CON = "mqtt_connect"
 SIGNAL_MQTT_DIS = "mqtt_disconnect"
 SIGNAL_MQTT_PUB = "mqtt_publish"
 SIGNAL_TIMER = "timer"
+
+SetupHandler = Callable[["XGateway", XDevice, Converter], None]
 
 
 class GatewayBase:
@@ -38,7 +40,7 @@ class GatewayBase:
     available: bool = None
 
     dispatcher: Dict[str, List[Callable]] = None
-    setups: Dict[str, Callable] = None
+    setups: Dict[str, SetupHandler] = None
     tasks: List[asyncio.Task] = None
     miio_ack: Dict[int, asyncio.Future] = None
 
@@ -110,21 +112,22 @@ class GatewayBase:
         for handler in self.dispatcher[signal]:
             await handler(**kwargs)
 
-    def add_setup(self, domain: str, handler):
+    def add_setup(self, domain: str, handler: SetupHandler):
         """Add hass entity setup funcion."""
         if "." in domain:
             _, domain = domain.rsplit(".", 1)
         self.setups[domain] = handler
 
     def setup_entity(self, domain: str, device: XDevice, conv: Converter):
-        handler = self.setups.get(domain)
-        if handler:
+        if handler := self.setups.get(domain):
             handler(self, device, conv)
 
     def add_device(self, did: str, device: XDevice):
+        # 1. Add XDevice to XDevices registry
         if did not in self.devices:
             self.devices[did] = device
 
+        # 2. Add this XGateway to device.gateways
         if self not in device.gateways:
             device.gateways.append(self)
 
@@ -132,15 +135,7 @@ class GatewayBase:
         if not device.model:
             return
 
-        # if device.entities:
-        #     # don't setup if device already has setup entities
-        #     self.debug_device(device, "Join to gateway", device.model)
-        #     return
-
-        # don't setup device from second gateway
-        if len(device.gateways) > 1:
-            return
-
+        # 3. Setup entities for this XDevice with this XGateway
         device.setup_entitites(self, stats=self.stats_enable)
         self.debug_device(
             device, f"setup {device.info.model}:", ", ".join(device.entities.keys())
@@ -173,3 +168,13 @@ class GatewayBase:
             del self.miio_ack[cid]
 
         return fut.result()
+
+    async def mqtt_heartbeat(self, msg: MQTTMessage):
+        if msg.topic == "miio/report" and b'"event.gw.heartbeat"' in msg.payload:
+            payload = msg.json["params"][0]
+            payload = self.device.decode(GATEWAY, payload)
+            self.device.update(payload)
+
+        elif msg.topic.endswith("/heartbeat"):
+            payload = self.device.decode(GATEWAY, msg.json)
+            self.device.update(payload)

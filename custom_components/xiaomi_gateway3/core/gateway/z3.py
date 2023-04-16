@@ -77,7 +77,7 @@ class Z3Gateway(GatewayBase):
                 await self.z3_process_parent_scan()
 
         elif self.z3_buffer:
-            self.z3_buffer["buffer"] += payload
+            self.z3_buffer["buffer"] += payload + "\n"
 
     async def z3_process_parent_scan(self):
         self.debug("Process zigbee parent scan response")

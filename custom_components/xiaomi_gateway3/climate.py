@@ -2,11 +2,12 @@ from homeassistant.components.climate import *
 from homeassistant.components.climate.const import *
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DOMAIN
 from .core.converters import Converter
 from .core.device import XDevice
-from .core.entity import XEntity
+from .core.entity import XEntity, setup_entity
 from .core.gateway import XGateway
 
 ACTIONS = {
@@ -16,19 +17,17 @@ ACTIONS = {
 }
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        if conv.attr in device.entities:
-            entity: XEntity = device.entities[conv.attr]
-            entity.gw = gateway
-        elif conv.mi == "4.21.85":
-            entity = AqaraE1(gateway, device, conv)
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, add_entities: AddEntitiesCallback
+) -> None:
+    def new_entity(gateway: XGateway, device: XDevice, conv: Converter) -> XEntity:
+        if conv.mi == "4.21.85":
+            return AqaraE1(gateway, device, conv)
         else:
-            entity = XiaomiClimate(gateway, device, conv)
-        async_add_entities([entity])
+            return XiaomiClimate(gateway, device, conv)
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
-    gw.add_setup(__name__, setup)
+    gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
 
 
 # noinspection PyAbstractClass

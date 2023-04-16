@@ -223,3 +223,76 @@ def test_6473():
         [{"did": DID, "siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 3}]}]
     )
     assert p == {"action": "button_both_single"}
+
+
+def test_10249():
+    device = XDevice(BLE, 10249, DID, MAC)
+    assert device.info.name == "Xiaomi Door Lock E10"
+    device.setup_converters()
+
+    p = device.decode_miot([{"did": DID, "siid": 4, "piid": 1021, "value": 2}])
+    assert p == {"door": "unlocked"}
+
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 3,
+                "eiid": 1020,
+                "arguments": [
+                    {"piid": 1, "value": 65535},  # Operation ID
+                    {"piid": 2, "value": 15},  # Operation Method
+                    {"piid": 3, "value": 2},  # Lock Action
+                    {"piid": 4, "value": 1},  # Operation Position
+                    {"piid": 6, "value": 1676548432},  # Current Time
+                ],
+            }
+        ]
+    )
+    assert p == {
+        "action": "unlock",
+        "key_id": 65535,
+        "method_id": 15,
+        "method": "manual",
+        "action_id": 2,
+        "position": "indoor",
+        "timestamp": 1676548432,
+    }
+
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 3,
+                "eiid": 1020,
+                "arguments": [
+                    {"piid": 1, "value": 102},
+                    {"piid": 2, "value": 2},
+                    {"piid": 3, "value": 2},
+                    {"piid": 4, "value": 2},
+                    {"piid": 6, "value": 1676548449},
+                ],
+            }
+        ]
+    )
+    assert p == {
+        "action": "unlock",
+        "key_id": 102,
+        "method_id": 2,
+        "method": "fingerprint",
+        "action_id": 2,
+        "position": "outdoor",
+        "timestamp": 1676548449,
+    }
+
+    p = device.decode_miot(
+        [
+            {
+                "did": DID,
+                "siid": 6,
+                "eiid": 1006,
+                "arguments": [{"piid": 1, "value": 1681029598}],
+            }
+        ]
+    )
+    assert p == {"action": "doorbell", "timestamp": 1681029598}
