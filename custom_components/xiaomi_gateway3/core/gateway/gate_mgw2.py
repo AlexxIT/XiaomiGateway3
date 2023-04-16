@@ -42,9 +42,11 @@ class GateMGW2(
     async def mgw2_read_device(self, sh: shell.ShellMGW2):
         self.did = await sh.get_did()
         mac = await sh.get_wlan_mac()
+        # For MGW2 add eth0 mac address as alternative for connection.
+        ethmac = await sh.get_eth_mac()
         device = self.devices.get(self.did)
         if not device:
-            device = XDevice(GATEWAY, MODEL, self.did, mac)
+            device = XDevice(GATEWAY, MODEL, self.did, (mac, { ethmac }))
             device.extra = {"fw_ver": sh.ver}
         self.add_device(self.did, device)
 

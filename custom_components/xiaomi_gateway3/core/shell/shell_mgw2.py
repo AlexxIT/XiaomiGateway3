@@ -26,14 +26,6 @@ class ShellMGW2(ShellARM, ShellMultimode):
     def mesh_device_table(self) -> str:
         return "mesh_device_v3"
 
-    async def get_wlan_mac(self) -> str:
-        icmd = "MYPTS=`tty | sed 's/^\/dev\///'`; " + \
-               "RADDR=`who | grep \"$MYPTS\" | awk '{print $7;}' | tr -d '[]'`; " + \
-               "LADDR=`netstat -t | grep \"$RADDR\" | awk '{print $4;}' | sed 's/::ffff://' | cut -d: -f1`; " + \
-                "ip -o a | grep \"inet $LADDR\" | awk '{print $2;}'"
-
-        iface = await self.exec(icmd)
-        iface = iface.strip()
-        iface ="wlan0" if not iface in ("eth0", "wlan0") else iface
-        raw = await self.read_file("/sys/class/net/" + iface + "/address")
-        return raw.decode().rstrip().replace(":", "")
+    async def get_eth_mac(self) -> str:
+        raw = await self.exec("agetprop persist.sys.lan_mac")
+        return raw.rstrip().replace(":", "").lower()

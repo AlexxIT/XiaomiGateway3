@@ -3,7 +3,7 @@ import re
 import time
 from collections import deque
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Tuple, Set, Optional, Union, TYPE_CHECKING
 
 from . import converters
 from .converters import (
@@ -60,7 +60,8 @@ class XDevice:
         type: str,
         model: Union[str, int, None],
         did: str,
-        mac: str,
+        # Accept either string as primary mac or tuple of primary mac and set of alternative macs.
+        mac: Union[str, Tuple[str, Set[str]], None],
         nwk: str = None,
     ):
         """Base class to handle device of any type."""
@@ -68,28 +69,37 @@ class XDevice:
         if type == ZIGBEE:
             assert isinstance(model, str) or model is None
             assert RE_DID.match(did)
-            assert RE_ZIGBEE_MAC.match(mac)
+            assert isinstance(mac, str) and RE_ZIGBEE_MAC.match(mac), mac
             assert RE_NWK.match(nwk)
         elif type == BLE:
             assert isinstance(model, int)
             assert did.startswith("blt.") or did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac)
+            assert isinstance(mac, str) and RE_NETWORK_MAC.match(mac), mac
         elif model == MESH_GROUP_MODEL:
             assert did.startswith("group.")
         elif type == MESH:
             assert isinstance(model, int)
             assert did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac), mac
+            assert isinstance(mac, str) and RE_NETWORK_MAC.match(mac), mac
         elif type == GATEWAY:
             assert isinstance(model, str)
             assert did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac), mac
+            assert (isinstance(mac, str) and RE_NETWORK_MAC.match(mac)) or \
+                   (isinstance(mac, tuple) and RE_NETWORK_MAC.match(mac[0])), mac
+
+        # Filter invalid alternative mac addresses for device.
+        alt_macs = set()
+        if isinstance(mac, tuple) and mac[1] and len(mac[1]):
+            for m in mac[1]:
+                if m and RE_NETWORK_MAC.match(m):
+                    alt_macs.add(m)
 
         # TODO: assert mac
         self.type = type
         self.model = model
         self.did = did
-        self.mac = mac
+        self.mac = mac if isinstance(mac, str) else mac[0]
+        self.alternative_macs = alt_macs if len(alt_macs) else None
         self.nwk = nwk
 
         # device brand, model, name and converters
