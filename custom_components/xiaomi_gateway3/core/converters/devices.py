@@ -758,13 +758,7 @@ DEVICES += [{
         # LED control
         BoolConv("led_inverted", "switch", mi="6.p.2", enabled=True),
         BoolConv("led_no_disturb", "switch", mi="6.p.1", enabled=True), 
-        AqaraLedNoDisturbTimeConv(attr="led_no_disturb_start",mi="6.p.3",
-                            start_attr="led_no_disturb_start",# must exist
-                            end_attr="led_no_disturb_end"),# must exist
-        AqaraLedNoDisturbTimeConv(attr="led_no_disturb_end",mi="6.p.3",
-                            start_attr="led_no_disturb_start",# must exist
-                            end_attr="led_no_disturb_end"),# must exist
-    ],
+    ] + AqaraLedNoDisturbTimeConv.generate_entities(mi="6.p.3", start_attr="led_no_disturb_start", end_attr="led_no_disturb_end"),
 }, {
     # required switch firmware 0.0.0_0030
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1
