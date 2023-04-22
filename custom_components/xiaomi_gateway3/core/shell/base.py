@@ -92,6 +92,8 @@ class TelnetShell:
         raw = await download(url)
         await self.write_file(filepath, raw)
 
+        await self.exec("chmod +x " + filepath)
+
         return DOWNLOAD if md5 in await self.exec(cmd) else ERROR
 
     async def get_running_ps(self) -> str:

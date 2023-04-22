@@ -4,15 +4,17 @@ from datetime import timedelta
 
 from homeassistant.components.automation import ATTR_LAST_TRIGGERED
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util.dt import now
 
 from . import DOMAIN
 from .core.converters import Converter, GATEWAY
 from .core.device import XDevice
-from .core.entity import XEntity
+from .core.entity import XEntity, setup_entity
 from .core.gateway import XGateway
 
 SCAN_INTERVAL = timedelta(seconds=60)
@@ -21,21 +23,19 @@ CONF_INVERT_STATE = "invert_state"
 CONF_OCCUPANCY_TIMEOUT = "occupancy_timeout"
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    def setup(gateway: XGateway, device: XDevice, conv: Converter):
-        if conv.attr in device.entities:
-            entity: XEntity = device.entities[conv.attr]
-            entity.gw = gateway
-        elif conv.attr == "motion":
-            entity = XiaomiMotionSensor(gateway, device, conv)
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, add_entities: AddEntitiesCallback
+) -> None:
+    def new_entity(gateway: XGateway, device: XDevice, conv: Converter) -> XEntity:
+        if conv.attr == "motion":
+            return XiaomiMotionSensor(gateway, device, conv)
         elif conv.attr == GATEWAY:
-            entity = XiaomiGateway(gateway, device, conv)
+            return XiaomiGateway(gateway, device, conv)
         else:
-            entity = XiaomiBinarySensor(gateway, device, conv)
-        async_add_entities([entity])
+            return XiaomiBinarySensor(gateway, device, conv)
 
     gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
-    gw.add_setup(__name__, setup)
+    gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
 
 
 class XiaomiBinaryBase(XEntity, BinarySensorEntity):
