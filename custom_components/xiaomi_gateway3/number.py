@@ -1,4 +1,5 @@
 from homeassistant.components.number import NumberEntity
+from homeassistant.components.number.const import DEFAULT_STEP
 from homeassistant.const import (
     MAJOR_VERSION,
     MINOR_VERSION,
@@ -87,8 +88,8 @@ class XiaomiNumber(XEntity, BackToTheNumberEntity):
             self._attr_native_min_value = conv.min*multiply
         if hasattr(conv, "max"):
             self._attr_native_max_value = conv.max*multiply
-        if hasattr(conv, "step"):
-            self._attr_native_step = conv.step*multiply
+
+        self._attr_native_step = (conv.step if hasattr(conv, "step") else DEFAULT_STEP)*multiply
 
     @callback
     def async_set_state(self, data: dict):
