@@ -482,6 +482,9 @@ DEVICES += [{
 }, {
     "lumi.airrtc.agl001": ["Aqara", "Thermostat E1", "SRTS-A01"],
     "spec": [
+        # https://home.miot-spec.com/spec/lumi.airrtc.agl001
+        # The following code is very different to the spec defined in home.miot-spec.com
+        # thus leave unmodified
         BoolConv("climate", "climate", mi="4.21.85"),
         # 0: Manual module 1: Smart schedule mode 2: Antifreeze mode 3: Installation mode
         MapConv("mode", mi="14.51.85", parent="climate", map={0: "heat", 2: "auto"}),
@@ -1579,6 +1582,7 @@ DEVICES += [{
     ],
 }, {
     # https://www.ixbt.com/live/chome/umnaya-rozetka-xiaomi-zncz01zm-s-energomonitoringom-i-bluetooth-mesh-integraciya-v-home-assistant.html
+    # https://home.miot-spec.com/spec/zimi.plug.zncz01
     3083: ["Xiaomi", "Electrical Outlet", "ZNCZ01ZM"],
     "spec": [
         Converter("outlet", "switch", mi="2.p.1"),
@@ -1586,7 +1590,7 @@ DEVICES += [{
         Converter("led", "switch", mi="4.p.1", enabled=False),
         Converter("power_protect", "switch", mi="7.p.1", enabled=False),
         MathConv("power_value", "number", mi="7.p.2", multiply=0.01,
-                 min=0, max=1638400, enabled=False),
+                 min=0, max=163840000, enabled=False),
     ],
 }, {
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M"],
@@ -1934,8 +1938,8 @@ DEVICES += [{
         # Inching mode
         BoolConv("inching_mode", "switch", mi="2.p.2"),
         MapConv("inching_state", "select", mi="3.p.1", map={False: "off", True: "on"}),
-        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7199,
-                 round=1),
+        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200,
+                 step=1, round=1),
 
         # LED
         MapConv("led", "select", mi="4.p.1", map={
