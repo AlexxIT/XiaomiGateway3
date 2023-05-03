@@ -44,24 +44,22 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
         await sh.exec(
             "zigbee_inter_bootloader.sh 1; zigbee_reset.sh 0; zigbee_reset.sh 1; "
-            "killall openmiio_agent; /data/openmiio_agent --zigbee.tcp=8889 &"
+            "killall openmiio_agent"
         )
+        await sh.exec("/data/openmiio_agent --zigbee.tcp=8889 &")
+        await asyncio.sleep(2)
 
-        await asyncio.sleep(1)
-
+        # some users have broken firmware, so unknown firmware also OK
         cur_fw = await read_firmware(host)
-        if not cur_fw:
-            _LOGGER.error(f"{host} [FWUP] Can't get current firmware")
-            return False
-
-        if cur_fw.startswith(tar_fw):
+        if cur_fw and cur_fw.startswith(tar_fw):
             _LOGGER.debug(f"{host} [FWUP] No need to update")
             return True
 
         await sh.exec(
             "zigbee_inter_bootloader.sh 0; zigbee_reset.sh 0; zigbee_reset.sh 1; "
-            "killall openmiio_agent; /data/openmiio_agent --zigbee.tcp=8889 --zigbee.baud=115200 &"
+            "killall openmiio_agent"
         )
+        await sh.exec("/data/openmiio_agent --zigbee.tcp=8889 --zigbee.baud=115200 &")
 
         await async_process_requirements(hass, DOMAIN, ["xmodem==0.4.6"])
 
@@ -79,8 +77,10 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
         await sh.exec(
             "zigbee_inter_bootloader.sh 1; zigbee_reset.sh 0; zigbee_reset.sh 1; "
-            "killall openmiio_agent; /data/openmiio_agent --zigbee.tcp=8889 &"
+            "killall openmiio_agent"
         )
+        await sh.exec("/data/openmiio_agent --zigbee.tcp=8889 &")
+        await asyncio.sleep(2)
 
         cur_fw = await read_firmware(host)
         return cur_fw and cur_fw.startswith(tar_fw)
