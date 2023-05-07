@@ -105,6 +105,11 @@ ENTITY_CATEGORIES = {
     "distance_53_60": EntityCategory.CONFIG,
     "approach_distance": EntityCategory.CONFIG,
     "occupancy_duration": EntityCategory.DIAGNOSTIC,
+    # Aqara Triple Wall Switch E1 (with N) 
+    "led_inverted": EntityCategory.CONFIG,
+    "led_no_disturb": EntityCategory.CONFIG,
+    "led_no_disturb_start": EntityCategory.CONFIG,
+    "led_no_disturb_end": EntityCategory.CONFIG,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)

@@ -2,7 +2,7 @@ import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, List, Optional, TYPE_CHECKING
 
 from .const import *
 from homeassistant.components.number.const import DEFAULT_STEP
@@ -485,3 +485,61 @@ LUMI_GLOBALS = {
     "8.0.2102": OnlineConv("online", "binary_sensor"),
     # "8.0.2156": Converter("nwk", "sensor"),
 }
+
+class AqaraLedNoDisturbTimeConv(Converter):
+    """
+        Encoding format:
+            Period: <START_HOUR>:<START_MINUTE> - <END_HOUR>:<END_MINUTE>
+            Encoded: AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
+                (Each character represents 1 bit)
+                AAAAAAAA = binary number of <END_MINUTE>
+                BBBBBBBB = binary number of <END_HOUR>
+                CCCCCCCC = binary number of <START_MIN>
+                DDDDDDDD = binary number of <START_HOUR>
+
+        Example: 
+            Period: 23:59 - 10:44
+            Encoded: 00101100 00001010 00111011 00010111
+                00101100 = 44 <END_MINUTE>
+                00001010 = 10 <END_HOUR>
+                00111011 = 59 <START_MIN>
+                00010111 = 23 <START_HOUR>
+    """
+    map = {
+        (h | (m << 8)): f"{h:02d}:{m:02d}" for h in range(24) for m in range(60)
+    }
+    reversed_map = {
+         f"{h:02d}:{m:02d}":(h | (m << 8)) for h in range(24) for m in range(60)
+    }
+    def __init__(self, attr, mi, start_attr, end_attr):
+        super().__init__(attr=attr, domain="select", mi=mi)
+        self.start_attr = start_attr
+        self.end_attr = end_attr
+
+    @property
+    def is_start(self):
+        return self.attr == self.start_attr
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        mapped_value = self.map[self._decode_extract_start(value) if self.is_start else self._decode_extract_end(value)]
+        super().decode(device,payload, mapped_value)
+
+    def encode(self, device: "XDevice", payload: dict, value: Any):
+        start = self.reversed_map[value if self.is_start else device.entities[self.start_attr].state]
+        end = self.reversed_map[value if not self.is_start else device.entities[self.end_attr].state]
+        super().encode(device,payload,self._encode_merge_start_end(start,end))
+        
+    def _decode_extract_start(self,encoded):
+        return encoded & 0xFFFF
+
+    def _decode_extract_end(self,encoded):
+        return (encoded >> 16) & 0xFFFF
+    
+    def _encode_merge_start_end(self,start,end):
+        return start | (end << 16)
+
+    @staticmethod
+    def generate_entities(mi, start_attr,end_attr):
+        return [
+            AqaraLedNoDisturbTimeConv(attr=a, mi=mi, start_attr=start_attr, end_attr=end_attr) for a in (start_attr,end_attr)
+        ]
