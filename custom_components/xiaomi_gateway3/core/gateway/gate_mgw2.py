@@ -42,10 +42,11 @@ class GateMGW2(
     async def mgw2_read_device(self, sh: shell.ShellMGW2):
         self.did = await sh.get_did()
         mac = await sh.get_wlan_mac()
+        mac2 = await sh.get_lan_mac()
         device = self.devices.get(self.did)
         if not device:
             device = XDevice(GATEWAY, MODEL, self.did, mac)
-            device.extra = {"fw_ver": sh.ver}
+            device.extra = {"fw_ver": sh.ver, "mac2": mac2}
         self.add_device(self.did, device)
 
     async def mgw2_mqtt_publish(self, msg: MQTTMessage):

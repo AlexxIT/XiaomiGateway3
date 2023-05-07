@@ -25,3 +25,7 @@ class ShellMGW2(ShellARM, ShellMultimode):
     @property
     def mesh_device_table(self) -> str:
         return "mesh_device_v3"
+
+    async def get_lan_mac(self) -> str:
+        raw = await self.exec("agetprop persist.sys.lan_mac")
+        return raw.rstrip().replace(":", "").lower()

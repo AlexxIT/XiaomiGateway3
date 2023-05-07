@@ -319,6 +319,8 @@ def setup_entity(
             connections = None
         elif device.type in (GATEWAY, BLE, MESH):
             connections = {(CONNECTION_NETWORK_MAC, device.mac)}
+            if mac2 := device.extra.get("mac2"):
+                connections.add((CONNECTION_NETWORK_MAC, mac2))
         else:
             connections = {(CONNECTION_ZIGBEE, device.ieee)}
 
