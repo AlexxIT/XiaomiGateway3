@@ -3,6 +3,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import LENGTH_METERS, TIME_SECONDS
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components.number.const import DEFAULT_STEP
 
 from . import DOMAIN
 from .core.converters import Converter
@@ -35,12 +36,13 @@ class XiaomiNumber(XEntity, NumberEntity):
         if self.attr in UNITS:
             self._attr_native_unit_of_measurement = UNITS[self.attr]
 
+        multiply = conv.multiply if hasattr(conv, "multiply") and conv.multiply else 1
         if hasattr(conv, "min"):
-            self._attr_native_min_value = conv.min
+            self._attr_native_min_value = conv.min*multiply
         if hasattr(conv, "max"):
-            self._attr_native_max_value = conv.max
-        if hasattr(conv, "step"):
-            self._attr_native_step = conv.step
+            self._attr_native_max_value = conv.max*multiply
+
+        self._attr_native_step = (conv.step if hasattr(conv, "step") else DEFAULT_STEP)*multiply
 
     @callback
     def async_set_state(self, data: dict):
