@@ -1930,7 +1930,7 @@ DEVICES += [{
         MathConv("has_someone_duration", "sensor", mi="2.p.3"),
         MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
         MathConv("illuminance", "sensor", mi="2.p.5"),
-        MathConv("distance", "sensor", mi="2.p.6", multiply=0.01), 
+        MathConv("distance", "sensor", mi="2.p.6", multiply=0.01),
 
         Converter("led", "switch", mi="3.p.1", enabled=True),
         MathConv("detect_range", "number", mi="3.p.2", min=0, max=8, step=0.1),
@@ -2084,42 +2084,54 @@ DEVICES += [{
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
-        MapConv("mode", "select",mi="2.p.4", map={0:"Auto",1:"Day",2:"Night",3:"Warmth", 4:"TV", 5:"Reading",6:"Computer",7:"Sleeping Aid", 8: "Wakeup Aid",}),        
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "Auto", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading",
+            6: "Computer", 7: "Sleeping Aid", 8: "Wakeup Aid",
+        }),
         Converter("flex_switch", "switch", mi="2.p.5"),
-        
+
         # Converter("ac_status", "sensor", mi="3.p.1"),
 
-        MapConv("power_on_state", "select", mi="3.p.2", map={0:"off", 1:"on"}),
-        MapConv("turn_on_state", "select", mi="3.p.3", map={0:"previous", 1:"default"}),
+        MapConv("power_on_state", "select", mi="3.p.2", map={0: "off", 1: "on"}),
+        MapConv("turn_on_state", "select", mi="3.p.3",
+                map={0: "previous", 1: "default"}),
 
         MathConv("default_brightness", "number", mi="3.p.4", min=1, max=100),
         MathConv("default_temp", "number", mi="3.p.5", min=2700, max=6500),
 
         MathConv("sleep_aid_minutes", "number", mi="3.p.7", min=1, max=60),
         Converter("sleep_aid_use_custom", "switch", mi="3.p.8"),
-        MathConv("sleep_aid_custom_init_brightness", "number", mi="3.p.9", min=1, max=100),
-        MathConv("sleep_aid_custom_init_temp", "number", mi="3.p.10", min=2700, max=6500),
+        MathConv("sleep_aid_custom_init_brightness", "number", mi="3.p.9", min=1,
+                 max=100),
+        MathConv("sleep_aid_custom_init_temp", "number", mi="3.p.10", min=2700,
+                 max=6500),
 
         MathConv("wakeup_minutes", "number", mi="3.p.11", min=1, max=60),
         Converter("wakeup_use_custom", "switch", mi="3.p.12"),
-        MathConv("wakeup_custom_final_brightness", "number", mi="3.p.13", min=1, max=100),
+        MathConv("wakeup_custom_final_brightness", "number", mi="3.p.13", min=1,
+                 max=100),
         MathConv("wakeup_custom_final_temp", "number", mi="3.p.14", min=2700, max=6500),
-        
-        Converter("night_light", "switch", mi="3.p.15"),
-        MathConv("turn_on_transit_sec", "number", mi="3.p.17", multiply=0.001,min=100, max=30000,step=100,round=1),
-        MathConv("turn_off_transit_sec", "number", mi="3.p.18", multiply=0.001,min=100, max=30000,step=100,round=1),
-        MathConv("change_transit_sec", "number", mi="3.p.19",multiply=0.001, min=100, max=30000,step=100,round=1),
 
-        MathConv("min_brightness", "number", mi="3.p.23", multiply=0.1, min=1, max=500,step=1,round=1),
-    
+        Converter("night_light", "switch", mi="3.p.15"),
+        MathConv("turn_on_transit_sec", "number", mi="3.p.17", multiply=0.001, min=100,
+                 max=30000, step=100, round=1),
+        MathConv("turn_off_transit_sec", "number", mi="3.p.18", multiply=0.001, min=100,
+                 max=30000, step=100, round=1),
+        MathConv("change_transit_sec", "number", mi="3.p.19", multiply=0.001, min=100,
+                 max=30000, step=100, round=1),
+
+        MathConv("min_brightness", "number", mi="3.p.23", multiply=0.1, min=1, max=500,
+                 step=1, round=1),
+
+        GiotTimePatternConv("night_light_time", "text", mi="3.p.16")
+
         # Converter("fill_light_detection", "sensor", mi="3.p.20"),
         # Converter("fill_light_switch", "switch", mi="3.p.21"),
         # MathConv("min_bri_factory", "number", mi="3.p.16", min=1, max=500),
-    ] + GiotLightV5NightLightPeriodConv.generate_entities(mi="3.p.16", start_attr="night_light_start", end_attr="night_light_end")
+    ]
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
     ],
 }]
-

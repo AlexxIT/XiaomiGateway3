@@ -58,3 +58,14 @@ def test_es1():
         ]
     )
     assert p == {"approach_away": True, "action": "approach"}
+
+
+def test_11724():
+    device = XDevice(MESH, 11724, "123", "112233aabbcc")
+    device.setup_converters()
+
+    p = device.decode_lumi([{"did": "123", "siid": 3, "piid": 16, "value": "23591044"}])
+    assert p == {"night_light_time": "23:59-10:44"}
+
+    p = device.encode({"night_light_time": "23:59-10:44"})
+    assert p == {"mi_spec": [{"siid": 3, "piid": 16, "value": "23591044"}]}
