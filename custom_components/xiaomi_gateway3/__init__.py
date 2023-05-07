@@ -71,6 +71,9 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
         _LOGGER.error("Minimum supported Hass version 2022.8")
         return False
 
+    if (MAJOR_VERSION, MINOR_VERSION) >= (2022, 12):
+        PLATFORMS.append("text")
+
     config = hass_config.get(DOMAIN) or {}
 
     if CONF_LOGGER in config:

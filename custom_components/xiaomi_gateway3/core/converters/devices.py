@@ -750,18 +750,24 @@ DEVICES += [{
 
         # Wireless switch
         # Native false = Wireless, Native true = Relay
-        MapConv("wireless_1", "switch", mi="9.p.1", map={0:True, 1:False},enabled=True),
-        MapConv("wireless_2", "switch", mi="10.p.1",map={0:True, 1:False}, enabled=True),
-        MapConv("wireless_3", "switch", mi="11.p.1", map={0:True, 1:False},enabled=True),
+        MapConv("wireless_1", "switch", mi="9.p.1", map={0: True, 1: False},
+                enabled=False),
+        MapConv("wireless_2", "switch", mi="10.p.1", map={0: True, 1: False},
+                enabled=False),
+        MapConv("wireless_3", "switch", mi="11.p.1", map={0: True, 1: False},
+                enabled=False),
 
         # Others
-        MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY, enabled=True),
-        MapConv("temperature_alarm", "sensor", mi="8.p.1", map={0:"normal",1:"protected", 2: "abnormal"}, enabled=True),
+        MapConv("power_on_state", "select", mi="7.p.1", map=POWEROFF_MEMORY,
+                enabled=False),
+        MapConv("temperature_alarm", "sensor", mi="8.p.1",
+                map={0: "normal", 1: "protected", 2: "abnormal"}),
 
         # LED control
-        BoolConv("led_inverted", "switch", mi="6.p.2", enabled=True),
-        BoolConv("led_no_disturb", "switch", mi="6.p.1", enabled=True), 
-    ] + AqaraLedNoDisturbTimeConv.generate_entities(mi="6.p.3", start_attr="led_no_disturb_start", end_attr="led_no_disturb_end"),
+        BoolConv("led_inverted", "switch", mi="6.p.2", enabled=False),
+        BoolConv("led_dnd", "switch", mi="6.p.1", enabled=False),
+        AqaraTimePatternConv("led_dnd_time", "text", mi="6.p.3", enabled=False)
+    ]
 }, {
     # required switch firmware 0.0.0_0030
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lumi-b2naus01:1

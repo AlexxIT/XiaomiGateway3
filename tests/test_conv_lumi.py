@@ -402,3 +402,21 @@ def test_online():
     params = [{"res_name": "8.0.2102", "value": {"status": "offline", "time": 1000}}]
     assert device.decode_lumi(params) == {}
     assert device.decode_ts == old_ts
+
+
+def test_aqara_dnd_time():
+    device = XDevice(ZIGBEE, "lumi.switch.acn040", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    p = device.decode_lumi([{"piid": 3, "siid": 6, "value": 118030358}])
+    assert p == {"led_dnd_time": "22:00-09:07"}
+
+    p = device.encode({"led_dnd_time": "22:00-09:07"})
+    assert p == {'mi_spec': [{'siid': 6, 'piid': 3, 'value': 118030358}]}
+
+    p = device.encode({"led_dnd_time": "23:59-23:59"})
+    assert p == {'mi_spec': [{'siid': 6, 'piid': 3, 'value': 991378199}]}
+
+    p = device.decode_lumi([{"piid": 3, "siid": 6, "value": 991378199}])
+    assert p == {"led_dnd_time": "23:59-23:59"}
+
