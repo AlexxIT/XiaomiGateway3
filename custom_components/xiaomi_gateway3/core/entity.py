@@ -110,6 +110,25 @@ ENTITY_CATEGORIES = {
     "led_no_disturb": EntityCategory.CONFIG,
     "led_no_disturb_start": EntityCategory.CONFIG,
     "led_no_disturb_end": EntityCategory.CONFIG,
+    # GranwinIoT Mesh Light V5
+    "turn_on_state": EntityCategory.CONFIG,
+    "default_brightness": EntityCategory.CONFIG,
+    "default_temp": EntityCategory.CONFIG,
+    "sleep_aid_minutes": EntityCategory.CONFIG,
+    "sleep_aid_use_custom": EntityCategory.CONFIG,
+    "sleep_aid_custom_init_brightness": EntityCategory.CONFIG,
+    "sleep_aid_custom_init_temp": EntityCategory.CONFIG,
+    "wakeup_minutes": EntityCategory.CONFIG,
+    "wakeup_use_custom": EntityCategory.CONFIG,
+    "wakeup_custom_final_brightness": EntityCategory.CONFIG,
+    "wakeup_custom_final_temp": EntityCategory.CONFIG,
+    "night_light": EntityCategory.CONFIG,
+    "night_light_start": EntityCategory.CONFIG,
+    "night_light_end": EntityCategory.CONFIG,
+    "turn_on_transit_sec": EntityCategory.CONFIG,
+    "turn_off_transit_sec": EntityCategory.CONFIG,
+    "change_transit_sec": EntityCategory.CONFIG,
+    "min_brightness": EntityCategory.CONFIG,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)

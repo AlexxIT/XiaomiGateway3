@@ -518,3 +518,56 @@ LUMI_GLOBALS = {
     "8.0.2102": OnlineConv("online", "binary_sensor"),
     # "8.0.2156": Converter("nwk", "sensor"),
 }
+
+
+class GiotLightV5NightLightPeriodConv(Converter):
+    """
+        Period encoding:
+        8-digit number: HHMMhhmm
+            HH = start hour
+            MM = start minute
+            hh = end hour
+            mm = end minute
+        Example: 
+            Period: 23:59 - 10:44
+            Encoded: 23591044
+    """
+    map = {
+        h*100+m: f"{h:02d}:{m:02d}" for h in range(24) for m in range(60)
+    }
+    reversed_map = {
+         f"{h:02d}:{m:02d}":h*100+m for h in range(24) for m in range(60)
+    }
+    def __init__(self, attr, mi, start_attr, end_attr):
+        super().__init__(attr=attr, domain="select", mi=mi)
+        self.start_attr = start_attr
+        self.end_attr = end_attr
+
+    @property
+    def is_start(self):
+        return self.attr == self.start_attr
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        mapped_value = self.map[self._decode_extract_start(value) if self.is_start else self._decode_extract_end(value)]
+        super().decode(device,payload, mapped_value)
+
+    def encode(self, device: "XDevice", payload: dict, value: Any):
+        start = self.reversed_map[value if self.is_start else device.entities[self.start_attr].state]
+        end = self.reversed_map[value if not self.is_start else device.entities[self.end_attr].state]
+        super().encode(device,payload,self._encode_merge_start_end(start,end))
+
+    def _decode_extract_start(self, encoded):
+        return encoded // 10000
+
+    def _decode_extract_end(self, encoded):
+        return encoded % 10000
+    
+    def _encode_merge_start_end(self,start,end):
+        return start*10000+end
+
+    @classmethod
+    def generate_entities(cls, mi, start_attr, end_attr):
+        return [
+            cls(attr=start_attr, mi=mi, start_attr=start_attr, end_attr=end_attr),
+            cls(attr=end_attr, mi=mi, start_attr=start_attr, end_attr=end_attr)
+        ]
