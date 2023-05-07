@@ -1352,33 +1352,38 @@ DEVICES += [{
 }, {
     6017: ["Xiaomi", "Face Recognition Smart Door Lock", "XMZNMS09LM"],
     "spec": [
-        #sensor action
+        MiBeacon,  # backward support old firmwares
+
+        # sensor action
         EventConv("action", "sensor", mi="2.e.1020"),
         Converter("key_id", mi="2.p.1"),
         Converter("method_id", mi="2.p.5"),
         MapConv("method", mi="2.p.5", map={
             1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 8: "key",
-            9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual", 16: "auto"
+            9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual",
+            16: "auto"
         }),
         Converter("action_id", mi="2.p.3"),
         MapConv("action", mi="2.p.3", map={
             1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside",
-            5: "unlock_inside",6: "enable_child_lock",7: "disable_child_lock", 8: "enable_away", 9: "disable_away"
+            5: "unlock_inside", 6: "enable_child_lock", 7: "disable_child_lock",
+            8: "enable_away", 9: "disable_away"
         }),
-        MapConv("position", mi="2.p.6", map={1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"}),
+        MapConv("position", mi="2.p.6", map={
+            1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"
+        }),
         Converter("timestamp", mi="2.p.2"),  # lock timestamp
+
         # doorbell
         EventConv("action", mi="5.e.1006", value="doorbell"),
         Converter("timestamp", mi="5.p.1"),  # doorbell timestamp
-        
-        #doorbell sensor
-        Converter("doorbell","sensor",mi="5.p.1"),
-        #contact binary_sensor
-        MapConv("contact", "binary_sensor",mi="2.p.3", map={
-            1: False, 2: True}),
-        #lock binary_sensor
-        MapConv("lock", "binary_sensor",mi="2.p.3", map={
-            1: False, 2: True}),
+
+        # doorbell sensor
+        Converter("doorbell", "sensor", mi="5.p.1"),
+        # contact binary_sensor
+        MapConv("contact", "binary_sensor", mi="2.p.3", map={1: False, 2: True}),
+        # lock binary_sensor
+        MapConv("lock", "binary_sensor", mi="2.p.3", map={1: False, 2: True}),
         # battery sensor
         Converter("battery", "sensor", mi="4.p.1003"),
     ],
@@ -1884,7 +1889,7 @@ DEVICES += [{
         MathConv("distance", "sensor", mi="2.p.6"),
 
         Converter("led", "switch", mi="3.p.1", enabled=True),
-        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8,step=0.1),
+        MathConv("detect_range", "number", mi="3.p.2", min=0, max=8, step=0.1),
         Converter("pir", "switch", mi="3.p.3", enabled=True),
 
         MapConv("occupancy_status", "sensor", mi="2.p.1", map={
