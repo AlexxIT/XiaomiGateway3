@@ -1890,11 +1890,12 @@ DEVICES += [{
         MathConv("has_someone_duration", "sensor", mi="2.p.3"),
         MathConv("idle_time", "sensor", mi="2.p.4", multiply=60),
         MathConv("illuminance", "sensor", mi="2.p.5"),
-        MathConv("distance", "sensor", mi="2.p.6"),
+        MathConv("distance", "sensor", mi="2.p.6", multiply=0.01), 
 
         Converter("led", "switch", mi="3.p.1", enabled=True),
         MathConv("detect_range", "number", mi="3.p.2", min=0, max=8, step=0.1),
         Converter("pir", "switch", mi="3.p.3", enabled=True),
+        MathConv("enterin_confirm_time", "number", mi="3.p.5", min=0, max=60),
 
         MapConv("occupancy_status", "sensor", mi="2.p.1", map={
             0: "NoOne", 1: "EnterIn", 2: "SmallMove", 3: "MicroMove", 4: "Approaching",
