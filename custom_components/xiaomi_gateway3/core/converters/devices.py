@@ -1485,6 +1485,22 @@ DEVICES += [{
     ],
     "ttl": "25h"
 }, {
+    # https://home.miot-spec.com/spec/lcrmcr.safe.ms30b
+    1393: ["Xiaomi", "Smart Safe Cayo Anno 30Z", "lcrmcr.safe.ms30b"],
+    "spec": [
+        MiBeacon, BLEAction,
+
+        MapConv("method", mi="2.p.1", map={
+            0: "mobile", 2: "fingerprint", 4: "key",
+        }),
+        Converter("action_id", mi="2.p.2"),
+        MapConv("abnormal_condition", mi="2.p.3", map={
+            1: "wrong_fingerprint", 2: "lockpicking", 4: "timeout_not_locked",
+        }),
+        Converter("battery", "sensor"),
+    ],
+    "ttl": "25h"
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device

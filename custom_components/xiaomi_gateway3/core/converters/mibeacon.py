@@ -33,7 +33,8 @@ BLE_LOCK_ACTION = {
     0b0101: "Lock inside the door",
     0b0110: "Turn on child lock",
     0b0111: "Turn off child lock",
-    0b1111: None,
+    0b1000: "Lock outside the door",
+    0b1111: "Abnormal",
 }
 BLE_LOCK_METHOD = {
     0b0000: "bluetooth",
@@ -47,7 +48,7 @@ BLE_LOCK_METHOD = {
     0b1000: "coercion",
     0b1010: "manual",
     0b1011: "automatic",
-    0b1111: None,
+    0b1111: "abnormal",
 }
 BLE_LOCK_ERROR = {
     0xC0DE0000: "Frequent unlocking with incorrect password",
@@ -72,6 +73,7 @@ BLE_LOCK_ERROR = {
     0xC0DE1002: "The fingerprint sensor is abnormal",
     0xC0DE1003: "The accessory battery is low",
     0xC0DE1004: "Mechanical failure",
+    0xC0DE1005: "the lock sensor is faulty",
 }
 
 BLE_SPEC_LOCK_ACTION = {
