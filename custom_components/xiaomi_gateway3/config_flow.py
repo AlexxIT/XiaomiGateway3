@@ -81,6 +81,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                         {
                             vol.Required("host", default=device["localip"]): str,
                             vol.Required("token", default=device["token"]): str,
+                            vol.Optional("key"): str,
                         }
                     ),
                 )
@@ -131,14 +132,21 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
 
         return form(self, **kwargs)
 
-    async def async_step_token(self, user_input=None, error=None):
+    async def async_step_token(self, user_input: dict = None, error=None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         if user_input is not None:
-            error = await utils.check_gateway(**user_input)
-            if error:
+            # check gateway, key is optional
+            info = await utils.gateway_info(**user_input)
+            if error := info.get("error"):
                 return await self.async_step_token(error=error)
 
-            return self.async_create_entry(title=user_input["host"], data=user_input)
+            # get key if we don't have it
+            if not user_input.get("key"):
+                user_input["key"] = info["key"]
+
+            return self.async_create_entry(
+                title=user_input["host"], data={}, options=user_input
+            )
 
         return self.async_show_form(
             step_id="token",
@@ -146,6 +154,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required("host"): str,
                     vol.Required("token"): str,
+                    vol.Optional("key"): str,
                 }
             ),
             errors={"base": error} if error else None,
@@ -195,8 +204,11 @@ class OptionsFlowHandler(OptionsFlow):
                 )
 
             if device["model"] in utils.SUPPORTED_MODELS:
-                error = await utils.check_gateway(device["localip"], device["token"])
-                device_info += "\nTelnet: " + (error or "open")
+                info = await utils.gateway_info(device["localip"], device["token"])
+                device_info += "\nTelnet: " + info.get("error", "open")
+                if key := info.get("key"):
+                    device_info += "\nKey: " + key
+                    await utils.store_gateway_key(self.hass, info)
             elif device["model"] == "lumi.gateway.v3":
                 device_info += "\nLAN key: " + await utils.get_lan_key(
                     device["localip"], device["token"]
@@ -243,6 +255,7 @@ class OptionsFlowHandler(OptionsFlow):
 
         host = self.entry.options["host"]
         token = self.entry.options["token"]
+        key = self.entry.options.get("key")
         ble = self.entry.options.get("ble", True)
         stats = self.entry.options.get("stats", False)
         debug = self.entry.options.get("debug", [])
@@ -257,6 +270,7 @@ class OptionsFlowHandler(OptionsFlow):
                 {
                     vol.Required("host", default=host): str,
                     vol.Required("token", default=token): str,
+                    vol.Optional("key", default=key): str,
                     vol.Required("ble", default=ble): bool,
                     vol.Optional("stats", default=stats): bool,
                     vol.Optional("debug", default=debug): cv.multi_select(OPT_DEBUG),

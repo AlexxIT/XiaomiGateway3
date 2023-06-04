@@ -266,7 +266,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             pass
         return False
 
-    async def send(self, method: str, params: Union[dict, list] = None):
+    async def send(self, method: str, params: Union[dict, list] = None, tries=3):
         """Send command to miIO device and get result from it. Params can be
         dict or list depend on command.
 
@@ -277,7 +277,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         - {'id':123,'error':...}
         """
         offline = False
-        for times in range(1, 4):
+        for _ in range(0, tries):
             sock = AsyncSocket()
             sock.settimeout(self.timeout)
             try:

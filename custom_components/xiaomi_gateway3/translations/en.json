@@ -29,7 +29,8 @@
         "description": "You can obtain Mi Home token automatically with [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) or [manually](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
         "data": {
           "host": "Host",
-          "token": "Token"
+          "token": "Token",
+          "key": "Key"
         }
       }
     }
@@ -48,6 +49,7 @@
         "data": {
           "host": "Host",
           "token": "Token",
+          "key": "Key",
           "telnet_cmd": "Open Telnet command",
           "ble": "Support Bluetooth devices",
           "stats": "Add statistic sensors",

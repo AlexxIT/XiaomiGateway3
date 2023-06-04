@@ -159,6 +159,11 @@ class ShellMGW(base.ShellMultimode):
         m = re.search(r"did=(\d+)", raw.decode())
         return m[1]
 
+    async def get_miio_info(self) -> dict:
+        raw = await self.read_file("/data/miio/device.conf")
+        m = re.findall(r"(did|key|mac|model)=(\S+)", raw.decode())
+        return {**dict(m), "token": await self.get_token()}
+
     async def get_wlan_mac(self) -> str:
         raw = await self.read_file("/sys/class/net/wlan0/address")
         return raw.decode().rstrip().replace(":", "")

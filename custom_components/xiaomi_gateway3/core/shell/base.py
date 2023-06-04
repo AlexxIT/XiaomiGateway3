@@ -105,6 +105,9 @@ class TelnetShell:
     async def get_token(self) -> str:
         raise NotImplementedError
 
+    async def get_miio_info(self) -> str:
+        raise NotImplementedError
+
     async def prevent_unpair(self):
         raise NotImplementedError
 

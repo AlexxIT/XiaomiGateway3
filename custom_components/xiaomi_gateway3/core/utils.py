@@ -1,5 +1,7 @@
 import asyncio
-import json
+import base64
+import hashlib
+import hmac
 import logging
 import random
 import string
@@ -16,7 +18,7 @@ from . import shell
 from .const import DOMAIN
 from .converters import STAT_GLOBALS
 from .device import XDevice
-from .gateway import XGateway, TELNET_CMD
+from .gateway import XGateway
 from .gateway.lumi import LumiGateway
 from .mini_miio import AsyncMiIO
 from .xiaomi_cloud import MiCloud
@@ -133,45 +135,114 @@ def migrate_options(data):
     return {"data": data, "options": options}
 
 
-async def check_gateway(host: str, token: str, telnet_cmd: str = None) -> Optional[str]:
-    # 1. try connect with telnet (custom firmware)?
+def miio_password(did: str, mac: str, key: str) -> str:
+    secret = hashlib.sha256(f"{did}{mac}{key}".encode()).hexdigest()
+    dig = hmac.new(secret.encode(), msg=key.encode(), digestmod=hashlib.sha256).digest()
+    return base64.b64encode(dig)[-16:].decode()
+
+
+async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:
+    # Strategy:
+    # 1. Get miio info
+    # 2. Send common open telnet cmd if we can't get miio info
+    # 3. Send different telnet cmd based on gateway model and firmware
+    # 4. Return miio info and response on open telnet cmd
+    method = params = None
+
+    miio_info = await miio.info()
+
+    if not miio_info or not miio_info.get("model"):
+        method = "set_ip_info"
+        params = {
+            "ssid": '""',
+            "pswd": "1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd",
+        }
+    elif miio_info["model"] == "lumi.gateway.mgl03":
+        if miio_info["fw_ver"] < "1.4.7":
+            method = "enable_telnet_service"
+        elif miio_info["fw_ver"] < "1.5.5":
+            method = "set_ip_info"
+            params = {
+                "ssid": '""',
+                "pswd": "1; passwd -d $USER; echo enable > /sys/class/tty/tty/enable; telnetd",
+            }
+        elif key:
+            method = "system_command"
+            params = {
+                "password": miio_password(miio.device_id, miio_info["mac"], key),
+                "command": "passwd -d $USER; echo enable > /sys/class/tty/tty/enable; telnetd",
+            }
+    elif miio_info["model"] in SUPPORTED_MODELS:
+        method = "set_ip_info"
+        params = {"ssid": '""', "pswd": "1; passwd -d $USER; riu_w 101e 53 3012"}
+
+    if method:
+        res = await miio.send(method, params, tries=1)
+        if miio_info and res:
+            miio_info["result"] = res.get("result")
+
+    return miio_info
+
+
+async def gateway_info(host: str, token: str = None, key: str = None) -> Optional[dict]:
+    # Strategy:
+    # 1. Check open telnet and return host, did, token, key
+    # 2. Try to enable telnet using host, token and (optionaly) key
+    # 3. Check open telnet again
+    # 4. Return error
     try:
         async with shell.Session(host) as sh:
             if sh.model:
-                # 1.1. check token with telnet
-                return None if await sh.get_token() == token else "wrong_token"
+                info = await sh.get_miio_info()
+                return {"host": host, **info}
     except Exception:
         pass
 
-    # 2. try connect with miio
+    if not token:
+        return None
+
+    # try to enable telnet and return miio info
     miio = AsyncMiIO(host, token)
-    info = await miio.info()
-
-    # if info is None - devise doesn't answer on pings
-    if info is None:
-        return "cant_connect"
-
-    # if empty info - device works but not answer on commands
-    if not info:
-        return "wrong_token"
-
-    # 3. check if right model
-    if info["model"] not in SUPPORTED_MODELS:
-        return "wrong_model"
-
-    raw = json.loads(telnet_cmd or TELNET_CMD)
-    # fw 1.4.6_0043+ won't answer on cmd without cloud, don't check answer
-    await miio.send(raw["method"], raw.get("params"))
+    miio_info = await enable_telnet(miio, key)
 
     # waiting for telnet to start
     await asyncio.sleep(1)
 
-    try:
-        async with shell.Session(host) as sh:
-            if not sh.model:
-                return "wrong_telnet"
-    except Exception:
-        return None
+    # call with empty token so only telnet will check
+    if info := await gateway_info(host):
+        return info
+
+    # if info is None - devise doesn't answer on pings
+    if miio_info is None:
+        return {"error": "cant_connect"}
+
+    # if empty info - device works but not answer on commands
+    if not miio_info:
+        return {"error": "wrong_token"}
+
+    # check if right model
+    if miio_info["model"] not in SUPPORTED_MODELS:
+        return {"error": "wrong_model"}
+
+    return {"error": "wrong_telnet"}
+
+
+async def store_gateway_key(hass: HomeAssistant, info: dict):
+    did = info.get("did")
+    if not did or not info.get("key"):
+        _LOGGER.error(f"can't store gateway key: {info}")
+        return
+
+    store = Store(hass, 1, f"{DOMAIN}/keys.json")
+    data = await store.async_load() or {}
+
+    if data.get(did) == info:
+        _LOGGER.debug(f"gateway key already in storage: {info}")
+        return
+
+    data[did] = info
+
+    await store.async_save(data)
 
 
 async def get_lan_key(host: str, token: str):

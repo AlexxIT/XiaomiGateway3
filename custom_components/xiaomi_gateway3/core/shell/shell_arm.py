@@ -1,4 +1,6 @@
 import asyncio
+import re
+from typing import Dict
 
 from . import base
 
@@ -33,6 +35,20 @@ class ShellARM(base.ShellOpenMiio):
     async def get_did(self):
         raw = await self.exec("agetprop persist.sys.miio_did")
         return raw.rstrip()
+
+    async def get_miio_info(self) -> dict:
+        raw = await self.exec("agetprop | grep persist")
+
+        m = re.findall(r"([a-z_]+)]: \[(.+?)]", raw)
+        props: Dict[str, str] = dict(m)
+
+        return {
+            "did": props["miio_did"],
+            "key": props["miio_key"],
+            "mac": props["miio_mac"],
+            "model": props["model"],
+            "token": props["miio_dtoken"].encode().hex(),
+        }
 
     async def get_wlan_mac(self):
         raw = await self.exec("agetprop persist.sys.miio_mac")

@@ -109,13 +109,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if "servers" in entry.data:
         return await _setup_micloud_entry(hass, entry)
 
-    # migrate data (also after first setup) to options
-    if entry.data:
-        hass.config_entries.async_update_entry(entry, data={}, options=entry.data)
-
+    # check if any entry has debug checkbox if the options
     entries = hass.config_entries.async_entries(DOMAIN)
     if any(e.options.get("debug") for e in entries):
         await system_health.setup_debug(hass, _LOGGER)
+
+    # try to load key from gateway if config don't have it
+    if not entry.options.get("key"):
+        info = await utils.gateway_info(entry.options["host"], entry.options["token"])
+        if key := info.get("key"):
+            options = {**entry.options, "key": key}
+            hass.config_entries.async_update_entry(entry, data={}, options=options)
+            await utils.store_gateway_key(hass, info)
 
     # add options handler
     if not entry.update_listeners:
