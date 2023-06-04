@@ -57,14 +57,7 @@ class GateMGW(
         if self.available is None and self.did is None:
             await self.gw3_read_device(sh)
 
-        if not self.zha_mode and self.options.get("memory"):
-            self.debug("Init Zigbee in memory storage")
-            sh.patch_memory_zigbee()
-
         await self.dispatcher_send(SIGNAL_PREPARE_GW, sh=sh)
-
-        n = await sh.apply_patches(ps)
-        self.debug(f"Applied {n} patches to daemons")
 
         return True
 

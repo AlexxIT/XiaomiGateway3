@@ -51,12 +51,8 @@
           "telnet_cmd": "Komenda do otwarcia protokołu telnet",
           "ble": "Wsparcie dla urządzeń BLE (Bluetoth Low Energy)",
           "stats": "Dane dotyczące wydajności Zigbee i BLE",
-          "debug": "Debugowanie",
-          "buzzer": "[DANGER] Wyłącz głośnik w bramce",
-          "memory": "[DANGER] Use storage in memory",
-          "zha": "[DANGER] Mode ZHA or zigbee2mqtt"
-        },
-        "description": "Jeśli nie wiesz co robisz to NIGDY nie dotykaj ustawień **[DANGER]**"
+          "debug": "Debugowanie"
+        }
       }
     }
   },

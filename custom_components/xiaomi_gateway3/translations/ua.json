@@ -50,12 +50,8 @@
           "token": "Токен",
           "ble": "Підтримка BLE пристроїв",
           "stats": "Деталізація роботи Zigbee і BLE",
-          "debug": "Відлагодження",
-          "buzzer": "[DANGER] Вимкнути спікер",
-          "memory": "[DANGER] Use storage in memory",
-          "zha": "[DANGER] Mode ZHA or zigbee2mqtt"
-        },
-        "description": "Змінюйте **[DANGER]** налаштування ТІЛЬКИ якщо знаєте, що ви робите"
+          "debug": "Відлагодження"
+        }
       }
     }
   },

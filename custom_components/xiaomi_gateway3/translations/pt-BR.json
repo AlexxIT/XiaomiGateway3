@@ -51,12 +51,8 @@
           "telnet_cmd": "Abra o comando Telnet",
           "ble": "Suporta dispositivos Bluetooth",
           "stats": "Adicionar sensores estatísticos",
-          "debug": "Debug",
-          "buzzer": "Desativar campainha [ADV]",
-          "memory": "Usar armazenamento na memória [ADV]",
-          "zha": "Modo ZHA ou zigbee2mqtt [ADV]"
-        },
-        "description": "Altere as opções **ADV** SOMENTE se você souber o que está fazendo"
+          "debug": "Debug"
+        }
       }
     }
   },

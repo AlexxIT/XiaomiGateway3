@@ -53,12 +53,8 @@
           "telnet_cmd": "Open Telnet command",
           "ble": "Support Bluetooth devices",
           "stats": "Add statistic sensors",
-          "debug": "Debug logs",
-          "buzzer": "[DANGER] Disable buzzer",
-          "memory": "[DANGER] Use storage in memory",
-          "zha": "[DANGER] Mode ZHA or zigbee2mqtt"
-        },
-        "description": "Change **[DANGER]** options ONLY if you know what you doing"
+          "debug": "Debug logs"
+        }
       }
     }
   },

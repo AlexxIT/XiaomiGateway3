@@ -259,7 +259,6 @@ class OptionsFlowHandler(OptionsFlow):
         ble = self.entry.options.get("ble", True)
         stats = self.entry.options.get("stats", False)
         debug = self.entry.options.get("debug", [])
-        memory = self.entry.options.get("memory", False)
 
         # filter only supported items
         debug = [k for k in debug if k in OPT_DEBUG]
@@ -274,7 +273,6 @@ class OptionsFlowHandler(OptionsFlow):
                     vol.Required("ble", default=ble): bool,
                     vol.Optional("stats", default=stats): bool,
                     vol.Optional("debug", default=debug): cv.multi_select(OPT_DEBUG),
-                    vol.Optional("memory", default=memory): bool,
                 }
             ),
         )
