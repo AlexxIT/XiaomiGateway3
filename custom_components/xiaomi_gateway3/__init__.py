@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from typing import Sequence
 
 import voluptuous as vol
 from homeassistant.components.system_log import CONF_LOGGER
@@ -221,7 +222,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
     return True
 
 
-def _update_devices(devices: list):
+def _update_devices(devices: Sequence):
     for device in devices:
         did = device["did"]
         XGateway.defaults.setdefault(did, {})

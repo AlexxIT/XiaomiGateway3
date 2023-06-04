@@ -14,7 +14,6 @@ gw3:
 - MeshGateway - init Mesh devices but depends on MIoTGateway for control them
 """
 import asyncio
-import json
 import logging
 import time
 

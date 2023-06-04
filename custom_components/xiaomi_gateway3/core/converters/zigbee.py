@@ -28,6 +28,7 @@ def generate_device(manufacturer: str, model: str) -> Optional[Device]:
     if not quirks:
         return None
 
+    # noinspection PyTypeChecker
     device = Device(None, None, 0)
     device.manufacturer = manufacturer
     device.model = model

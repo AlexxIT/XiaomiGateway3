@@ -506,6 +506,8 @@ class MiBeaconConv(Converter):
                 payload["contact"] = True
                 payload["lock"] = True
                 action = "unlock"
+            else:
+                action = None
 
             if (
                 action_id not in BLE_SPEC_LOCK_ACTION

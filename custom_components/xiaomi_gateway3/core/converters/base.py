@@ -2,11 +2,11 @@ import json
 import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any, List, Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
-from .const import *
 from homeassistant.components.number.const import DEFAULT_STEP
 
+from .const import *
 
 if TYPE_CHECKING:
     from ..device import XDevice

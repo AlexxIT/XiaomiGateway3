@@ -20,6 +20,7 @@ async def async_setup_entry(
     gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
 
 
+# noinspection PyAbstractClass
 class XiaomiText(XEntity, TextEntity):
     _attr_native_value = ""
 

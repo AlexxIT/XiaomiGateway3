@@ -16,6 +16,7 @@ from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
 try:
     from zigpy.zcl.foundation import GeneralCommand as Command
 except Exception:
+    # noinspection PyUnresolvedReferences
     from zigpy.zcl.foundation import Command
 
 _LOGGER = logging.getLogger(__name__)

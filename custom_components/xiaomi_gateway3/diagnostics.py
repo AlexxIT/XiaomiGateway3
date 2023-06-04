@@ -5,7 +5,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from .core.const import DOMAIN, source_hash
-from .core.converters import GATEWAY
 from .core.device import logger
 from .core.gateway import XGateway
 
