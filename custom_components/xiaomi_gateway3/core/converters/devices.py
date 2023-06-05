@@ -529,6 +529,14 @@ DEVICES += [{
                 enabled=False),
     ],
 }, {
+    "lumi.flood.acn001": ["Aqara", "Water Leak Sensor E1", "SJCGQ13LM"],
+    "spec": [
+        Converter("moisture", "binary_sensor", mi="2.p.1"),  # bool
+        BatteryConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
+        MapConv("battery_low", "binary_sensor", mi="3.p.1", map=BATTERY_LOW,
+                enabled=False)
+    ]
+}, {
     "lumi.sensor_ht.agl02": ["Aqara", "TH Sensor T1", "WSDCGQ12LM"],
     "spec": [
         Converter("temperature", "sensor", mi="2.p.1"),  # celsius
