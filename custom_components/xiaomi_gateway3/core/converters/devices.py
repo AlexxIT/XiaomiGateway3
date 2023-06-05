@@ -2144,6 +2144,16 @@ DEVICES += [{
         MapConv("led", "switch", mi="4.p.3", map={1: False, 2: True}),
     ]
 }, {
+    7855: ["Unknown", "Mesh Single Wall Switch", "frfox.switch.bl01"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MapConv("mode", "select", mi="2.p.2", map={
+            0: "off", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Action,
+        ButtonMIConv("button", mi="3.e.1", value=1),
+    ]
+}, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
     "spec": [
