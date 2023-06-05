@@ -1501,6 +1501,15 @@ DEVICES += [{
     ],
     "ttl": "25h"
 }, {
+    # https://home.miot-spec.com/spec/chuangmi.switch.meshb01
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1063
+    10371: ["PTX", "Mesh Multifunction Wireless Switch", "090615.remote.mlsw0a"],
+    "spec": [
+        MiBeacon, BLEAction, Button,  # don't know is it BLE or Mesh
+        EventConv("action", mi="2.e.1", value="click"),
+        EventConv("action", mi="3.e.2", value="hold"),
+    ]
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
