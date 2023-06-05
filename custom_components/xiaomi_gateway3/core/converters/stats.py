@@ -8,7 +8,7 @@ from .const import GATEWAY, ZIGBEE, BLE, MESH
 if TYPE_CHECKING:
     from ..device import XDevice
 
-RE_SERIAL = re.compile(r"(tx|rx|oe|fe|brk):(\d+)")
+RE_SERIAL = re.compile(r"(tx|rx|oe|fe|brk):(-?\d+)")
 
 ZIGBEE_CLUSTERS = {
     0x0000: "Basic",
@@ -67,6 +67,12 @@ BLE_EVENTS = {
 }
 
 
+def uint32(x: int) -> int:
+    if x < 0:
+        return x + 0x100000000
+    return x
+
+
 class GatewayStatsConverter(Converter):
     childs = {
         "network_pan_id",
@@ -117,9 +123,9 @@ class GatewayStatsConverter(Converter):
         if "serial" in value:
             lines = value["serial"].split("\n")
             for k, v in RE_SERIAL.findall(lines[2]):
-                payload[f"bluetooth_{k}"] = int(v)
+                payload[f"bluetooth_{k}"] = uint32(int(v))
             for k, v in RE_SERIAL.findall(lines[3]):
-                payload[f"zigbee_{k}"] = int(v)
+                payload[f"zigbee_{k}"] = uint32(int(v))
 
 
 class ZigbeeStatsConverter(Converter):

@@ -70,6 +70,22 @@ def test_gateway_stats():
         "zigbee_oe": 18,
     }
 
+    p = device.decode(
+        GATEWAY,
+        {
+            "serial": """serinfo:1.0 driver revision:
+0: uart:unknown mmio:0x00000000 irq:33 tx:7783787 rx:0 RTS|CTS|DTR|DSR|CD
+1: uart:unknown mmio:0x00000000 irq:35 tx:294374665 rx:-1937325442 RTS|CTS|DTR|DSR|CD
+2: uart:unknown mmio:0x00000000 irq:34 tx:15307877 rx:69404433 RTS|CTS|DTR|DSR|CD"""
+        },
+    )
+    assert p == {
+        "bluetooth_tx": 294374665,
+        "bluetooth_rx": 2357641854,
+        "zigbee_tx": 15307877,
+        "zigbee_rx": 69404433,
+    }
+
 
 def test_zigbee_stats():
     stats.now = lambda: datetime(2021, 12, 31, 23, 59)
