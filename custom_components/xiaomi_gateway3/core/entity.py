@@ -105,7 +105,7 @@ ENTITY_CATEGORIES = {
     "distance_53_60": EntityCategory.CONFIG,
     "approach_distance": EntityCategory.CONFIG,
     "occupancy_duration": EntityCategory.DIAGNOSTIC,
-    # Aqara Triple Wall Switch E1 (with N) 
+    # Aqara Triple Wall Switch E1 (with N)
     "led_inverted": EntityCategory.CONFIG,
     "led_no_disturb": EntityCategory.CONFIG,
     "led_no_disturb_start": EntityCategory.CONFIG,
@@ -268,11 +268,13 @@ class XEntity(Entity):
         elif self.device.type == MESH:
             assert "mi_spec" in payload, payload
 
-            ok = await self.gw.miot_send(self.device, payload)
-            if not ok or self.attr == "group":
+            if not await self.gw.miot_send(self.device, payload):
                 return
 
-            await self.miot_after_send(value)
+            if self.attr != "group":
+                await self.miot_after_send(value)
+            else:
+                await self.miot_group_after_send(value)
 
     async def miot_after_send(self, value: dict):
         # TODO: rewrite me
@@ -286,6 +288,18 @@ class XEntity(Entity):
             self.async_set_state(data)
             self._async_write_ha_state()
             break
+
+    async def miot_group_after_send(self, value: dict):
+        try:
+            childs = []
+            for did in self.device.extra["childs"]:
+                light = self.gw.devices[did].entities.get("light")
+                childs.append(light.miot_after_send(value))
+            if childs:
+                await asyncio.gather(*childs)
+
+        except Exception as e:
+            self.debug("Can't update child states", exc_info=e)
 
     async def device_read(self, attrs: set):
         payload = self.device.encode_read(attrs)
