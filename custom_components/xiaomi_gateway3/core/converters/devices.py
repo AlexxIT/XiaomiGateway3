@@ -2119,6 +2119,21 @@ DEVICES += [{
         Converter("compatible_mode", "switch", mi="7.p.4"),
     ],
 }, {
+    # https://home.miot-spec.com/spec/chuangmi.switch.mesh
+    1350: ["Chuangmi", "Single Wall Switch K1-A (with N)", "chuangmi.switch.mesh"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MapConv("led", "switch", mi="3.p.3", map={1: False, 2: True}),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/chuangmi.switch.meshb01
+    1490: ["Chuangmi", "Double Wall Switch K1-B (with N)", "chuangmi.switch.meshb01"],
+    "spec": [
+        Converter("left_switch", "switch", mi="2.p.1"),
+        Converter("right_switch", "switch", mi="3.p.1"),
+        MapConv("led", "switch", mi="4.p.3", map={1: False, 2: True}),
+    ]
+}, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
     "spec": [
