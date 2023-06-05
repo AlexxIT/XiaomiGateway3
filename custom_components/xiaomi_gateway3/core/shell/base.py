@@ -13,9 +13,9 @@ OK = 1
 DOWNLOAD = 2
 
 OPENMIIO_CMD = "/data/openmiio_agent miio mqtt cache central z3 --zigbee.tcp=8888 >> /var/log/openmiio.log 2>&1 &"
-OPENMIIO_BASE = "https://github.com/AlexxIT/openmiio_agent/releases/download/v1.1.0/"
-OPENMIIO_MD5_MIPS = "93459b58872eac448a2be81da863950c"
-OPENMIIO_MD5_ARM = "26ae806b2011febc3dad35367fca17d3"
+OPENMIIO_BASE = "https://github.com/AlexxIT/openmiio_agent/releases/download/v1.1.1/"
+OPENMIIO_MD5_MIPS = "082461008ec00b3c9e553e68d35af499"
+OPENMIIO_MD5_ARM = "46c90921eb218809a259d6bbf8539cd3"
 OPENMIIO_URL_MIPS = OPENMIIO_BASE + "openmiio_agent_mips"
 OPENMIIO_URL_ARM = OPENMIIO_BASE + "openmiio_agent_arm"
 
