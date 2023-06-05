@@ -1594,12 +1594,28 @@ DEVICES += [{
     2351: ["LeMesh", "Mesh Downlight", "lemesh.light.wy0c05"],
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
-    3531: ["LeMesh", "Mesh Light", "lemesh.light.wy0c08"],
     7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/lemesh.light.wy0c08
+    3531: ["LeMesh", "Mesh Light", "lemesh.light.wy0c08"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        }),
+        MapConv("power_on_state", "select", mi="4.p.1", map={0: "default", 1: "on"}),
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/971
