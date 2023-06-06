@@ -1974,6 +1974,18 @@ DEVICES += [{
         BoolConv("on", "switch", mi="2.p.9"),
     ],
 }, {
+    10813: ["Yeelink", "Yeelink Smart Curtain Motor C1", "YCCBCI008"],
+    #https://home.miot-spec.com/spec/yeelink.curtain.crc1
+    "spec": [        
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),        
+        Converter("target_position", mi="2.p.2"),
+        CurtainPosConv("position", mi="2.p.3", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.4", enabled=False), 
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "default", 1: "doublmode", 2: "leftmode", 3: "rightmode"
+        }, enabled=False),       
+    ],
+}, {
     10356: ["ZiQing", "IZQ Presence Sensor Lite", "IZQ-24"],
     "spec": [
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
