@@ -65,7 +65,7 @@ ICONS = {
 
 ENTITY_CATEGORIES = {
     BLE: EntityCategory.DIAGNOSTIC,
-    GATEWAY: EntityCategory.DIAGNOSTIC,
+    # GATEWAY: EntityCategory.DIAGNOSTIC,
     MESH: EntityCategory.DIAGNOSTIC,
     ZIGBEE: EntityCategory.DIAGNOSTIC,
     "battery": EntityCategory.DIAGNOSTIC,
