@@ -151,13 +151,8 @@ async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:
 
     miio_info = await miio.info()
 
-    if not miio_info or not miio_info.get("model"):
-        method = "set_ip_info"
-        params = {
-            "ssid": '""',
-            "pswd": "1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd",
-        }
-    elif miio_info["model"] == "lumi.gateway.mgl03":
+    if miio_info and miio_info.get("model") == "lumi.gateway.mgl03":
+        # we know it is Xiaomi Multimode Gateway 1
         if miio_info["fw_ver"] < "1.4.7":
             method = "enable_telnet_service"
         elif miio_info["fw_ver"] < "1.5.5":
@@ -172,9 +167,13 @@ async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:
                 "password": miio_password(miio.device_id, miio_info["mac"], key),
                 "command": "passwd -d $USER; echo enable > /sys/class/tty/tty/enable; telnetd",
             }
-    elif miio_info["model"] in SUPPORTED_MODELS:
+    else:
+        # some universal cmd for all gateways
         method = "set_ip_info"
-        params = {"ssid": '""', "pswd": "1; passwd -d $USER; riu_w 101e 53 3012"}
+        params = {
+            "ssid": '""',
+            "pswd": "1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd",
+        }
 
     if method:
         res = await miio.send(method, params, tries=1)
