@@ -116,10 +116,10 @@ class CommandSelect(XEntity, SelectEntity):
             self.device.update({"command": option, "lock": lock})
         elif option in (CMD_FTP, CMD_REBOOT):
             ok = await self.gw.telnet_send(option)
-            self.device.update({"command": option, "ok": ok})
+            self.device.update({"command": "ok", "value": ok})
         elif option == CMD_PARENTSCAN:
             await self.gw.z3_run_parent_scan()
-            self.device.update({"command": option, "ok": True})
+            self.device.update({"command": "ok", "value": True})
 
 
 OPT_ENABLED = "enabled"
@@ -312,11 +312,5 @@ class DataSelect(XEntity, SelectEntity):
         )
         self.set_end(OPT_OK if ok else OPT_ERROR)
 
-    def step_command_reboot(self, value: dict):
-        self.set_end(OPT_OK if value["ok"] else OPT_ERROR)
-
-    def step_command_ftp(self, value: dict):
-        self.step_command_reboot(value)
-
-    def step_command_parentscan(self, value: dict):
-        self.step_command_reboot(value)
+    def step_command_ok(self, value: dict):
+        self.set_end(OPT_OK if value["value"] else OPT_ERROR)
