@@ -101,6 +101,29 @@ def test_config():
     ]
 
 
+def test_config2():
+    device = XDevice(ZIGBEE, "TS011F", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+
+    gw = type("", (), {"ieee": "0xAABBCC"})
+
+    p = {}
+    for conv in device.converters:
+        if isinstance(conv, ZConverter):
+            conv.config(device, p, gw)
+
+    assert p["commands"] == [
+        {"commandcli": "zcl global send-me-a-report 2820 1285 33 5 3600 {0100}"},
+        {"commandcli": "send 0x12ab 1 1"},
+        {"commandcli": "zcl global send-me-a-report 2820 1288 33 5 3600 {0100}"},
+        {"commandcli": "send 0x12ab 1 1"},
+        {"commandcli": "zcl global send-me-a-report 2820 1291 41 5 3600 {0100}"},
+        {"commandcli": "send 0x12ab 1 1"},
+        {"commandcli": "zcl global send-me-a-report 1794 0 37 5 3600 {010000000000}"},
+        {"commandcli": "send 0x12ab 1 1"},
+    ]
+
+
 def test_():
     device = XDevice(ZIGBEE, "MS01", ZDID, ZMAC, ZNWK)
     assert device.info.name == "Sonoff Motion Sensor"

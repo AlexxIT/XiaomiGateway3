@@ -252,16 +252,16 @@ def get_cluster(cluster: str) -> Cluster:
     )
 
 
-def get_attr(attributes: Dict[int, ZCLAttributeDef], attr) -> int:
+def get_attr(attributes: Dict[int, ZCLAttributeDef], attr: Union[str, int]) -> int:
     if isinstance(attr, int):
         return attr
-    return next(k for k, v in attributes.items() if v.name == attr)
+    return next(v.id for v in attributes.values() if v.name == attr)
 
 
-def get_attr_type(attributes: dict, attr: str) -> (int, int):
-    attr, attr_type = next((k, v[1]) for k, v in attributes.items() if v[0] == attr)
-    type = next(k for k, v in DATA_TYPES.items() if v[1] == attr_type)
-    return attr, type
+def get_attr_type(attributes: Dict[int, ZCLAttributeDef], attr: str) -> (int, int):
+    attr = next(v for v in attributes.values() if v.name == attr)
+    typeid = next(k for k, v in DATA_TYPES.items() if v[1] == attr.type)
+    return attr.id, typeid
 
 
 # noinspection PyProtectedMember
