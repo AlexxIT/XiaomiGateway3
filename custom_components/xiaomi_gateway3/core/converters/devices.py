@@ -2154,6 +2154,18 @@ DEVICES += [{
         ButtonMIConv("button", mi="3.e.1", value=1),
     ]
 }, {
+    # https://home.miot-spec.com/spec/yeelink.curtain.crc1
+    10813: ["Yeelink", "Curtain Motor C1", "YCCBCI008"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        Converter("target_position", mi="2.p.2"),
+        CurtainPosConv("position", mi="2.p.3", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.4", enabled=False),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "default", 1: "doublmode", 2: "leftmode", 3: "rightmode"
+        }, enabled=False),
+    ]
+}, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
     "spec": [
