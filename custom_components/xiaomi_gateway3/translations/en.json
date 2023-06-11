@@ -85,7 +85,8 @@
           "firmwarelock": "Gateway firmware lock",
           "reboot": "Gateway reboot",
           "ftp": "Gateway run FTP",
-          "flashzb": "Zigbee flash EZSP"
+          "flashzb": "Zigbee flash EZSP",
+          "openmiio_reload": "OpenmiIO reload"
         }
       },
       "data": {

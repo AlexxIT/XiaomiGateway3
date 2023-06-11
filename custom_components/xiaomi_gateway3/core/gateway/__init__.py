@@ -216,6 +216,10 @@ class XGateway(GateMGW, GateE1, GateMGW2):
                     return await sh.tar_data()
                 elif command == "reboot":
                     await sh.reboot()
+                elif command == "openmiio_reload":
+                    await sh.exec("killall openmiio_agent")
+                    await asyncio.sleep(1)
+                    await self.openmiio_prepare_gateway(sh)
                 else:
                     await sh.exec(command)
                 return True
