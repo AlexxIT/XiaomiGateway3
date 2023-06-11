@@ -15,14 +15,6 @@ TAR_DATA = "tar -czO /data/miio/mible_local.db* /data/silicon_zigbee_host/*.txt 
 URL_BUSYBOX = "https://busybox.net/downloads/binaries/1.21.1/busybox-mipsel"
 MD5_BUSYBOX = "099137899ece96f311ac5ab554ea6fec"
 
-# `ls -1t` - sort files by change time, `sed q` - leave only first row
-DB_BLUETOOTH = (
-    "`ls -1t /data/miio/mible_local.db /tmp/miio/mible_local.db 2>/dev/null | sed q`"
-)
-
-# `sed...` - remove filename and adds "*.json" on its place
-DB_ZIGBEE = "`ls -1t /data/zigbee_gw/* /tmp/zigbee_gw/* 2>/dev/null | sed -r 's/[^/]+$/*.json/;q'`"
-
 
 class ShellMGW(base.ShellMultimode):
     model = "mgw"
@@ -92,7 +84,7 @@ class ShellMGW(base.ShellMultimode):
 
     @property
     def mesh_db(self) -> str:
-        return DB_BLUETOOTH
+        return "/data/miio/mible_local.db"
 
     @property
     def mesh_group_table(self) -> str:
