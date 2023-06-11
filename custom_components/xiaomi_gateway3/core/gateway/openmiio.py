@@ -18,7 +18,9 @@ class OpenmiioGateway(GatewayBase):
 
     async def openmiio_prepare_gateway(self, sh: shell.ShellOpenMiio):
         if self.log.isEnabledFor(logging.DEBUG):
-            log = await sh.read_file("/var/log/openmiio.log")
+            log = await sh.read_file(
+                "/var/log/openmiio.log", as_base64=True, tail="10k"
+            )
             if log and not log.startswith(b"cat:"):
                 self.debug(f"openmiio: previous log: {log}")
 

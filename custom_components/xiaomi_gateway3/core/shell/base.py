@@ -41,8 +41,10 @@ class TelnetShell:
         raw = await asyncio.wait_for(coro, timeout=timeout)
         return raw[:-2] if as_bytes else raw[:-2].decode()
 
-    async def read_file(self, filename: str, as_base64=False):
-        command = f"cat {filename}|base64" if as_base64 else f"cat {filename}"
+    async def read_file(self, filename: str, as_base64=False, tail=None):
+        command = f"tail -c {tail} {filename}" if tail else f"cat {filename}"
+        if as_base64:
+            command += " | base64"
         try:
             raw = await self.exec(command, as_bytes=True, timeout=60)
             # b"cat: can't open ..."
