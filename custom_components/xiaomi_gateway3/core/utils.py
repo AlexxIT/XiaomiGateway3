@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import logging
 import random
+import socket
 import string
 from typing import Optional
 
@@ -139,6 +140,18 @@ def miio_password(did: str, mac: str, key: str) -> str:
     secret = hashlib.sha256(f"{did}{mac}{key}".encode()).hexdigest()
     dig = hmac.new(secret.encode(), msg=key.encode(), digestmod=hashlib.sha256).digest()
     return base64.b64encode(dig)[-16:].decode()
+
+
+async def check_port(host: str, port: int) -> bool:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
+    try:
+        ok = await asyncio.get_event_loop().run_in_executor(
+            None, s.connect_ex, (host, port)
+        )
+        return ok == 0
+    finally:
+        s.close()
 
 
 async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:

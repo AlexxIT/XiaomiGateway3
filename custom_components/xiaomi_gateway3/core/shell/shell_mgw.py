@@ -33,11 +33,6 @@ class ShellMGW(base.ShellMultimode):
     async def get_running_ps(self) -> str:
         return await self.exec("ps -ww | grep -v ' 0 SW'")
 
-    async def check_openmiio_agent(self) -> int:
-        return await self.check_bin(
-            "openmiio_agent", base.OPENMIIO_MD5_MIPS, base.OPENMIIO_URL_MIPS
-        )
-
     async def run_ftp(self):
         if await self.check_bin("busybox", MD5_BUSYBOX, URL_BUSYBOX):
             await self.exec(RUN_FTP)
@@ -98,3 +93,11 @@ class ShellMGW(base.ShellMultimode):
     @property
     def mesh_device_table(self) -> str:
         return "mesh_device_v3" if self.ver >= "1.4.7_0160" else "mesh_device"
+
+    @property
+    def openmiio_md5(self) -> str:
+        return base.OPENMIIO_MD5_MIPS
+
+    @property
+    def openmiio_url(self) -> str:
+        return base.OPENMIIO_URL_MIPS

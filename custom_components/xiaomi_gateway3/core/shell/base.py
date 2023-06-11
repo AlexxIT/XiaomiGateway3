@@ -12,10 +12,11 @@ ERROR = 0
 OK = 1
 DOWNLOAD = 2
 
-OPENMIIO_CMD = "/data/openmiio_agent miio mqtt cache central z3 --zigbee.tcp=8888 >> /var/log/openmiio.log 2>&1 &"
-OPENMIIO_BASE = "https://github.com/AlexxIT/openmiio_agent/releases/download/v1.1.1/"
-OPENMIIO_MD5_MIPS = "082461008ec00b3c9e553e68d35af499"
-OPENMIIO_MD5_ARM = "46c90921eb218809a259d6bbf8539cd3"
+# rewrite log every time to prevent memory overflow
+OPENMIIO_CMD = "/data/openmiio_agent miio mqtt cache central z3 --zigbee.tcp=8888 > /var/log/openmiio.log 2>&1 &"
+OPENMIIO_BASE = "https://github.com/AlexxIT/openmiio_agent/releases/download/v1.2.0/"
+OPENMIIO_MD5_MIPS = "d3a2cf3272b3ec758fa381de98104900"
+OPENMIIO_MD5_ARM = "711dcec99af495ac3968becc398dbf95"
 OPENMIIO_URL_MIPS = OPENMIIO_BASE + "openmiio_agent_mips"
 OPENMIIO_URL_ARM = OPENMIIO_BASE + "openmiio_agent_arm"
 
@@ -120,28 +121,30 @@ class TelnetShell:
 
 # noinspection PyAbstractClass
 class ShellOpenMiio(TelnetShell):
-    async def check_openmiio_agent(self) -> int:
-        # different binaries for different arch
+    @property
+    def openmiio_md5(self) -> str:
         raise NotImplementedError
 
-    async def run_openmiio_agent(self) -> str:
-        ok = await self.check_openmiio_agent()
-        if ok == OK:
-            # run if not in ps
-            if "openmiio_agent" in await self.get_running_ps():
-                return "The latest version is already running"
+    @property
+    def openmiio_url(self) -> str:
+        raise NotImplementedError
 
-            await self.exec(OPENMIIO_CMD)
-            return "The latest version is launched"
+    async def check_openmiio(self) -> bool:
+        """Check binary exec flag and MD5."""
+        cmd = f"[ -x /data/openmiio_agent ] && md5sum /data/openmiio_agent"
+        return self.openmiio_md5 in await self.exec(cmd)
 
-        if ok == DOWNLOAD:
-            if "openmiio_agent" in await self.get_running_ps():
-                await self.exec(f"killall openmiio_agent")
+    async def download_openmiio(self):
+        """Kill previous binary, download new one, upload it to gw and set exec flag"""
+        await self.exec("killall openmiio_agent")
 
-            await self.exec(OPENMIIO_CMD)
-            return "The latest version is updated and launched"
+        raw = await download(self.openmiio_url)
+        await self.write_file("/data/openmiio_agent", raw)
 
-        return "ERROR: can't download latest version"
+        await self.exec("chmod +x /data/openmiio_agent")
+
+    async def run_openmiio(self):
+        await self.exec(OPENMIIO_CMD)
 
 
 # noinspection PyAbstractClass

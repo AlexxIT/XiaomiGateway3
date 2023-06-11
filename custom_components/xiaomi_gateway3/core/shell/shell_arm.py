@@ -60,7 +60,10 @@ class ShellARM(base.ShellOpenMiio):
     async def prevent_unpair(self):
         await self.exec("killall mha_master")
 
-    async def check_openmiio_agent(self) -> int:
-        return await self.check_bin(
-            "openmiio_agent", base.OPENMIIO_MD5_ARM, base.OPENMIIO_URL_ARM
-        )
+    @property
+    def openmiio_md5(self) -> str:
+        return base.OPENMIIO_MD5_ARM
+
+    @property
+    def openmiio_url(self) -> str:
+        return base.OPENMIIO_URL_ARM

@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -7,8 +6,6 @@ from .const import GATEWAY, ZIGBEE, BLE, MESH
 
 if TYPE_CHECKING:
     from ..device import XDevice
-
-RE_SERIAL = re.compile(r"(tx|rx|oe|fe|brk):(-?\d+)")
 
 ZIGBEE_CLUSTERS = {
     0x0000: "Basic",
@@ -67,12 +64,6 @@ BLE_EVENTS = {
 }
 
 
-def uint32(x: int) -> int:
-    if x < 0:
-        return x + 0x100000000
-    return x
-
-
 class GatewayStatsConverter(Converter):
     childs = {
         "network_pan_id",
@@ -82,18 +73,14 @@ class GatewayStatsConverter(Converter):
         "load_avg",
         "rssi",
         "uptime",
-        "bluetooth_tx",
-        "bluetooth_rx",
-        "bluetooth_oe",
-        "zigbee_tx",
-        "zigbee_rx",
-        "zigbee_oe",
+        "gateway",
+        "miio",
+        "openmiio",
+        "serial",
+        "zigbee",
     }
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        if self.attr in value:
-            payload[self.attr] = value[self.attr]
-
         if "networkUp" in value:
             payload.update(
                 {
@@ -120,12 +107,8 @@ class GatewayStatsConverter(Converter):
                 }
             )
 
-        if "serial" in value:
-            lines = value["serial"].split("\n")
-            for k, v in RE_SERIAL.findall(lines[2]):
-                payload[f"bluetooth_{k}"] = uint32(int(v))
-            for k, v in RE_SERIAL.findall(lines[3]):
-                payload[f"zigbee_{k}"] = uint32(int(v))
+        if "openmiio" in value:
+            payload.update(value)
 
 
 class ZigbeeStatsConverter(Converter):

@@ -83,12 +83,6 @@ class XGateway(GateMGW, GateE1, GateMGW2):
             gw = device.gateways[0]
             device.setup_entitites(gw, gw.stats_enable)
 
-    async def check_port(self, port: int):
-        """Check if gateway port open."""
-        return await asyncio.get_event_loop().run_in_executor(
-            None, shell.check_port, self.host, port
-        )
-
     async def enable_telnet(self):
         """Enable telnet with miio protocol."""
         resp = await utils.enable_telnet(self.miio, self.options.get("key"))
@@ -104,7 +98,10 @@ class XGateway(GateMGW, GateE1, GateMGW2):
         while True:
             try:
                 # if not telnet - enable it
-                if not await self.check_port(23) and not await self.enable_telnet():
+                if (
+                    not await utils.check_port(self.host, 23)
+                    and not await self.enable_telnet()
+                ):
                     await asyncio.sleep(30)
                     continue
 
@@ -168,9 +165,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
             self.debug_tag(f"{msg.topic} {msg.payload}", tag="MQTT")
 
         try:
-            if msg.topic == "miio/command_ack":
-                if ack := self.miio_ack.get(msg.json["id"]):
-                    ack.set_result(msg.json)
+            await self.mqtt_read(msg)
 
             await self.dispatcher_send(SIGNAL_MQTT_PUB, msg=msg)
         except Exception as e:

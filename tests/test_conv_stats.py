@@ -52,40 +52,6 @@ def test_gateway_stats():
         "uptime": "4 days, 06:02:37",
     }
 
-    p = device.decode(
-        GATEWAY,
-        {
-            "serial": """serinfo:1.0 driver revision:
-0: uart:16550A mmio:0x18147000 irq:17 tx:6337952 rx:0 RTS|CTS|DTR
-1: uart:16550A mmio:0x18147400 irq:46 tx:19370 rx:154557484 oe:1684 RTS|DTR
-2: uart:16550A mmio:0x18147800 irq:47 tx:1846359 rx:3845724 oe:18 RTS|DTR"""
-        },
-    )
-    assert p == {
-        "bluetooth_tx": 19370,
-        "bluetooth_rx": 154557484,
-        "bluetooth_oe": 1684,
-        "zigbee_tx": 1846359,
-        "zigbee_rx": 3845724,
-        "zigbee_oe": 18,
-    }
-
-    p = device.decode(
-        GATEWAY,
-        {
-            "serial": """serinfo:1.0 driver revision:
-0: uart:unknown mmio:0x00000000 irq:33 tx:7783787 rx:0 RTS|CTS|DTR|DSR|CD
-1: uart:unknown mmio:0x00000000 irq:35 tx:294374665 rx:-1937325442 RTS|CTS|DTR|DSR|CD
-2: uart:unknown mmio:0x00000000 irq:34 tx:15307877 rx:69404433 RTS|CTS|DTR|DSR|CD"""
-        },
-    )
-    assert p == {
-        "bluetooth_tx": 294374665,
-        "bluetooth_rx": 2357641854,
-        "zigbee_tx": 15307877,
-        "zigbee_rx": 69404433,
-    }
-
 
 def test_zigbee_stats():
     stats.now = lambda: datetime(2021, 12, 31, 23, 59)
@@ -184,24 +150,23 @@ def test_zigbee_stats():
     # assert p == {'new_resets': 5}
 
 
-def test_154_stats():
+def test_openmmio():
     device = XDevice(GATEWAY, "lumi.gateway.mgl03", DID, MAC)
     device.setup_converters()
 
-    p = device.decode(
-        GATEWAY,
-        {
-            "serial": """serinfo:1.0 driver revision:
-0: uart:16550A mmio:0x18147000 irq:17 tx:360643 rx:0 RTS|CTS|DTR
-1: uart:16550A mmio:0x18147400 irq:46 tx:1664 rx:36814303 fe:6 RTS|CTS|DTR
-2: uart:16550A mmio:0x18147800 irq:47 tx:56627 rx:88704 oe:52 RTS|DTR"""
+    payload = {
+        "gateway": {"firmware": "1.5.5_0006", "model": "lumi.gateway.mgl03"},
+        "openmiio": {"uptime": "37s", "version": "1.1.1"},
+        "serial": {
+            "bluetooth_rx": 146603969,
+            "bluetooth_tx": 14753,
+            "zigbee_oe": 372,
+            "zigbee_rx": 1234770,
+            "zigbee_tx": 655714,
         },
-    )
-    assert p == {
-        "bluetooth_tx": 1664,
-        "bluetooth_rx": 36814303,
-        "bluetooth_fe": 6,
-        "zigbee_tx": 56627,
-        "zigbee_rx": 88704,
-        "zigbee_oe": 52,
+        "zigbee": {"z3_starts": 3, "z3_uptime": "0s"},
     }
+
+    p = device.decode(GATEWAY, payload)
+
+    assert p == payload
