@@ -120,7 +120,6 @@ DEVICES = [{
         Converter("command", "select", parent="data"),
         Converter("data", "select"),
 
-        CloudLinkConv("cloud_link", "binary_sensor", mi="8.0.2155", enabled=False),
         BoolConv("led", "switch", mi="6.p.6", enabled=False),
 
         GatewayStats,
