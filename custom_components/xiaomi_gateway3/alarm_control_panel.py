@@ -57,7 +57,11 @@ class XiaomiAlarm(XEntity, AlarmControlPanelEntity):
         await self.device_send({self.attr: "armed_night"})
 
     async def async_alarm_trigger(self, code=None):
-        await self.device_send({"alarm_trigger": True})
+        # example: code="5,3"  # 5 seconds, volume 3
+        if code:
+            await self.gw.alarm(code)
+        else:
+            await self.device_send({"alarm_trigger": True})
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)

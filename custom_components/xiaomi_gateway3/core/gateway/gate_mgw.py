@@ -125,3 +125,14 @@ class GateMGW(
                 return await sh.check_firmware_lock()
         except Exception as e:
             self.error(f"Can't get firmware lock", e)
+
+    async def alarm(self, params: str):
+        """Params = `123,1` (duration in seconds + volume = 1-3)"""
+        params = (
+            "start_alarm," + params
+            if re.match(r"^\d+,[123]$", params)
+            else "stop_alarm"
+        )
+        await self.mqtt.publish(
+            "miio/command", {"_to": 1, "method": "local.status", "params": params}
+        )
