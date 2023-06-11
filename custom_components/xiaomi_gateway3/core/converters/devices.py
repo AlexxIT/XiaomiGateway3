@@ -140,7 +140,7 @@ DEVICES = [{
         Converter("discovered_mac", mi="8.0.2110", parent="data"),
         Converter("pair_command", mi="8.0.2111", parent="data"),
         Converter("added_device", mi="8.0.2084", parent="data"),
-        Converter("remove_did", mi="8.0.2082", parent="data"),
+        RemoveDIDConv("remove_did", mi="8.0.2082", parent="data"),
 
         # also updated from child devices OTAConv
         Converter("ota_progress", parent="data"),
