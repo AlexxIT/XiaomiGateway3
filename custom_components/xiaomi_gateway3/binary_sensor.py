@@ -68,6 +68,10 @@ class XiaomiBinarySensor(XiaomiBinaryBase, RestoreEntity):
 
 class XiaomiGateway(XiaomiBinaryBase):
     @callback
+    def async_set_state(self, data: dict):
+        self._attr_extra_state_attributes.update(data)
+
+    @callback
     def async_update_available(self):
         # sensor state=connected when whole gateway available
         self._attr_is_on = self.gw.available
