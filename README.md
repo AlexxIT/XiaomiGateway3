@@ -56,10 +56,14 @@ Component support original gateway firmware. You do not need to manually open, s
 
 The following versions are confirmed and supported:
 
-- **Home Assistant** from `2022.8.x` to `2023.4.x`
+- **Home Assistant** from `2022.8.x` to `2023.5.x`
 - **Xiaomi Multimode Gateway CN/EU** from `1.5.0_xxxx` to `1.5.4_xxxx`
 - **Xiaomi Multimode Gateway 2 CN/EU** from `1.0.3_xxxx` to `1.0.6_xxxx`
 - **Aqara Hub E1 CN** - `4.0.1_0001`
+
+Limited support for:
+
+- **Xiaomi Multimode Gateway CN/EU** for `1.5.5_0006`, [read more](https://github.com/AlexxIT/Blog/issues/13)
 
 For Xiaomi Multimode Gateway you can:
 
@@ -117,12 +121,14 @@ Or manually copy `xiaomi_gateway3` folder from [latest release](https://github.c
 
 If the integration is not in the list, you need to clear the browser cache.
 
-You need to install integration two times:
+You need to add integration two times:
 
 1. Cloud version. It used ONLY to load tokens and names for your devices from cloud.
 2. Gateway. It adds your gateway and all connected Zigbee, BLE and Mesh devices.
 
 You may skip 1st step if you know token for you Gateway. If you have multiple Gateways - repeat step 2 for each of them.
+
+You need gateway `key` only for Xiaomi Multimode Gateway on fw 1.5.5, [read more](https://github.com/AlexxIT/Blog/issues/13).
 
 **ATTENTION:** If you using two Hass with one gateway - you should use same integration version on both of them! 
 
@@ -201,15 +207,14 @@ If a user has more than one Bluetooth Mesh Gateway on the network - only one wil
 **Gateway binary sensor**
 
 - sensor shows connection to gateway, so you can check the stability of your Wi-Fi
-- **bluetooth_tx/_rx** - amount of bytes read and transmitted via BT serial port
-- **bluetooth_oe** - amount of errors when reading data via BT serial port
-- **zigbee_tx/_rx/_oe** - same for zigbee serial port
 - **radio_tx_power** - zigbee chip power
 - **radio_channel** - zigbee chip channel
 - **free_mem** - gateway free memory in bytes
 - **load_avg** - gateway CPU `/proc/loadavg`
 - **rssi** - gateway Wi-Fi signal strength
 - **uptime** - gateway uptime after reboot
+
+Read more about additional attributes from [openmiio](https://github.com/AlexxIT/openmiio_agent#openmiioreport). 
 
 **Zigbee sensor**
 
@@ -242,20 +247,18 @@ The new version has two drop-down lists (select entities) - command and data.
 
 Available commands:
 
-- **Idle** - reset the command select to the default state
-- **Zigbee Pair** - start the process of adding a new zigbee device
+- **Zigbee pairing** - start the process of adding a new zigbee device
    - you can also start the process by pressing the physical button on the gateway three times
    - you can also start the process from the Mi Home app
-- **Zigbee Bind** - configure the bindings of zigbee devices, only if they support it
+- **Zigbee binding** - configure the bindings of zigbee devices, only if they support it
 - **Zigbee OTA** - try to update the zigbee device if there is firmware for it
-- **Zigbee Config** - start the initial setup process for the device
+- **Zigbee reconfig** - start the initial setup process for the device
    - the battery devices must first be woken up manually
-- **Zigbee Remove** - start the zigbee device removal process
-- **Zigbee Table Update** - update the zigbee stats table manually
-- **Firmware Lock** - block the gateway firmware update ([read more](#supported-firmwares))
-- **Gateway Reboot** - reboot gateway
-- **Gateway Enable FTP** - enable FTP on gateway
-- **Gateway Dump Data** - save all gateway data in the Hass configuration folder
+- **Zigbee parent scan** - update the zigbee stats table manually
+- **Gateway firmware Lock** - block the gateway firmware update ([read more](#supported-firmwares))
+- **Gateway reboot** - reboot gateway
+- **Gateway run FTP** - enable FTP on gateway
+- **OpenmiIO reload** - restart [openmiio](https://github.com/AlexxIT/openmiio_agent) app on gateway
 
 ## Advanced config
 
@@ -265,6 +268,7 @@ Available commands:
 
 - **Host** - gateway IP-address, should be fixed on your Wi-Fi router
 - **Token** - gateway Mi Home token, changed only when you add gateway to Mi Home app
+- **Key** - gateway secret key, [read more](https://github.com/AlexxIT/Blog/issues/13)
 - **Support Bluetooth devices** - enable processing BLE and Mesh devices data from gateway
 - **Add statistic sensors** - [read more](#statistics-table)
 - **Debug logs** - enable different levels of logging ([read more](#debug-mode))
@@ -500,6 +504,22 @@ automation:
 
 Read more in [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki/Handle-BLE-Locks).
 
+## Xiaomi Multimode Gateway beeper
+
+You can run beeper/buzzer with service: 
+
+- duration in seconds
+- volume from 1 to 3
+- send `code: 0` for stop
+
+```yaml
+service: alarm_control_panel.alarm_trigger
+data:
+  code: "10,3"  # 10 seconds, volume 3
+target:
+  entity_id: alarm_control_panel.gateway_alarm
+```
+
 ## Obtain Mi Home device token
 
 **Video DEMO**
@@ -535,6 +555,10 @@ Starting with version 3, the component installs a special daemon application on 
 After rebooting the gateway, all changes will be reset. The component will launch Telnet and daemon every time it detects that they are disabled.
 
 ## Troubleshooting
+
+Put your Gateways and your child bluetooth/zigbee devices far away from **USB 3.0 devices and cables, SSDs, WiFi routers**, etc. USB3 hub can almost completely block the Zigbee signal from your Xiaomi Plug up to 20 centimeters away. 
+
+[![](https://img.youtube.com/vi/tHqZhNcFEvA/mqdefault.jpg)](https://www.youtube.com/watch?v=tHqZhNcFEvA)
 
 **Can't connect to gateway**
 
