@@ -18,8 +18,6 @@ class SilabsGateway(GatewayBase):
     pair_payload2 = None
 
     def silabs_init(self):
-        if self.zha_mode:
-            return
         self.dispatcher_connect(SIGNAL_PREPARE_GW, self.silabs_prepare_gateway)
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.silabs_mqtt_publish)
 

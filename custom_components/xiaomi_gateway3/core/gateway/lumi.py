@@ -16,8 +16,6 @@ class LumiGateway(GatewayBase):
     pair_payload2 = None
 
     def lumi_init(self):
-        if self.zha_mode:
-            return
         self.dispatcher_connect(SIGNAL_PREPARE_GW, self.lumi_prepare_gateway)
         # self.dispatcher_connect(SIGNAL_MQTT_CON, self.lumi_mqtt_connect)
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.lumi_mqtt_publish)

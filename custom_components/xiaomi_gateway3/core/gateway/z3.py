@@ -22,7 +22,7 @@ class Z3Gateway(GatewayBase):
     z3_buffer: dict = None
 
     def z3_init(self):
-        if self.zha_mode or not self.stats_enable:
+        if not self.stats_enable:
             return
         self.dispatcher_connect(SIGNAL_PREPARE_GW, self.z3_prepare_gateway)
         self.dispatcher_connect(SIGNAL_MQTT_CON, self.z3_mqtt_connect)

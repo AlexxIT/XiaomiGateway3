@@ -58,10 +58,6 @@ class GatewayBase:
         return self.options.get("debug", "")
 
     @property
-    def zha_mode(self) -> bool:
-        return self.options.get("zha", False)
-
-    @property
     def stats_enable(self):
         return self.options.get("stats", False)
 
