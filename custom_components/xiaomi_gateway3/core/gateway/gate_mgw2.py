@@ -28,6 +28,7 @@ class GateMGW2(
         self.lumi_init()
         self.mesh_init()
         self.ble_init()
+        self.z3_init()
 
         if self.available is None and self.did is None:
             await self.mgw2_read_device(sh)
