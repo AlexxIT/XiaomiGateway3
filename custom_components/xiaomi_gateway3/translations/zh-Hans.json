@@ -6,7 +6,7 @@
       "cant_connect": "无法连接到网络",
       "wrong_model": "网关型号不支持",
       "wrong_token": "错误的网关Token",
-      "wrong_telnet": "Wrong open telnet command",
+      "wrong_telnet": "错误的打开telnet命令",
       "verify": "点击链接去验证"
     },
     "step": {
@@ -29,7 +29,8 @@
         "description": "可以通过 [添加小米云账号](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自动或 [手动](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 获取网关Token。请阅读 [已支持的网关固件版本](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares)",
         "data": {
           "host": "网关IP",
-          "token": "Token"
+          "token": "Token",
+          "key": "Key"
         }
       }
     }
@@ -82,7 +83,8 @@
           "firmwarelock": "网关固件锁定",
           "reboot": "网关重启",
           "ftp": "网关运行FTP",
-          "flashzb": "Zigbee刷写EZSP"
+          "flashzb": "Zigbee刷写EZSP",
+          "openmiio_reload": "重载OpenmiIO"
         }
       },
       "data": {
