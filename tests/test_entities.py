@@ -9,6 +9,7 @@ from custom_components.xiaomi_gateway3.core.converters import ZIGBEE
 from custom_components.xiaomi_gateway3.core.device import XDevice
 from custom_components.xiaomi_gateway3.core.gateway import XGateway
 from custom_components.xiaomi_gateway3.light import XiaomiZigbeeLight
+from custom_components.xiaomi_gateway3.number import XiaomiNumber
 from custom_components.xiaomi_gateway3.sensor import XiaomiAction
 from custom_components.xiaomi_gateway3.switch import XiaomiSwitch
 
@@ -172,6 +173,16 @@ def test_transition():
     light.hass = Hass()
     light.async_write_ha_state()
 
-    light.hass.loop.run_until_complete(
-        light.async_turn_on(transition=10)
-    )
+    light.hass.loop.run_until_complete(light.async_turn_on(transition=10))
+
+
+def test_number():
+    gw = XGateway("", "")
+    device = XDevice(ZIGBEE, "SML001", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+    device.available = True
+
+    conv = next(conv for conv in device.converters if conv.attr == "occupancy_timeout")
+    number = XiaomiNumber(gw, device, conv)
+    number.hass = Hass()
+    number.async_write_ha_state()

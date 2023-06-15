@@ -36,7 +36,7 @@ class XiaomiNumber(XEntity, NumberEntity):
         if self.attr in UNITS:
             self._attr_native_unit_of_measurement = UNITS[self.attr]
 
-        multiply = getattr(conv, "multiply") or 1
+        multiply = getattr(conv, "multiply", 0) or 1
 
         if hasattr(conv, "min"):
             self._attr_native_min_value = conv.min * multiply
