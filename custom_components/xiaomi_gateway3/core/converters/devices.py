@@ -1904,6 +1904,17 @@ DEVICES += [{
         Converter("channel_3", "switch", mi="4.p.1"),
     ],
 }, {
+    11333: ["PTX", "Mesh Single Wall Switch", "090615.switch.aksk1"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+    ],
+}, {
+    11332: ["PTX", "Mesh Double Wall Switch", "090615.switch.aksk2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+    ],
+}, {
     6379: ["Xiaomi", "Mesh Wall Switch (Neutral Wire)", "XMQBKG01LM"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
