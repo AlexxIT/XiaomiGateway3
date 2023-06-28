@@ -1519,6 +1519,15 @@ DEVICES += [{
         EventConv("action", mi="3.e.2", value="hold"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/090615.remote.btsw1
+    14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
+    "spec": [
+        MiBeacon, BLEAction, Button,
+        EventConv("action", mi="2.e.1012", value="single"),
+        EventConv("action", mi="2.e.1013", value="double"),
+        EventConv("action", mi="2.e.1014", value="hold"),
+    ]
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
