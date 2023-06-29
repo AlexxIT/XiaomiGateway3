@@ -1543,6 +1543,7 @@ DEVICES += [{
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
     2054: ["Xiaomi", "Toothbrush T700", "MES604"],
+    6032: ["Xiaomi", "Toothbrush T700i", "MES604"],
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
