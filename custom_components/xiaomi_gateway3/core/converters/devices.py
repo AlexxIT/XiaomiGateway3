@@ -2238,6 +2238,18 @@ DEVICES += [{
         # MathConv("min_bri_factory", "number", mi="3.p.16", min=1, max=500),
     ]
 }, {
+    # https://home.miot-spec.com/spec/opple.light.barelp
+    3661: ["Opple", "Bare Light Panel", "opple.light.barelp"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=5700),
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "Reception", 1: "Entertainment", 2: "Cinema", 3: "Night", 4: "Wakeup", 5: "Sleep",
+            6: "Sunset", 7: "None", 8: "Invert"
+        }),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
