@@ -1533,8 +1533,10 @@ DEVICES += [{
     10371: ["PTX", "Mesh Multifunction Wireless Switch", "090615.remote.mlsw0a"],
     "spec": [
         MiBeacon, BLEAction, Button,  # don't know is it BLE or Mesh
-        EventConv("action", mi="2.e.1", value="click"),
-        EventConv("action", mi="3.e.2", value="hold"),
+        EventConv("action", mi="2.e.1", value="button_1_single"),
+        EventConv("action", mi="2.e.2", value="button_2_single"),
+        EventConv("action", mi="3.e.2", value="button_1_hold"),
+        EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
 }, {
     # https://home.miot-spec.com/spec/090615.remote.btsw1
