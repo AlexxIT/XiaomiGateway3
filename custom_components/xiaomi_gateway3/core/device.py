@@ -428,9 +428,11 @@ class XDevice:
 
         if self.lazy_setup:
             for attr in self.lazy_setup & attrs:
-                self.lazy_setup.remove(attr)
                 conv = next(c for c in self.converters if c.attr == attr)
                 gateway = self.gateways[0]
+                if conv.domain not in gateway.setups:
+                    return
+                self.lazy_setup.remove(attr)
                 gateway.setups[conv.domain](gateway, self, conv)
 
         for entity in self.entities.values():
