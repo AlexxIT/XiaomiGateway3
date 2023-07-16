@@ -1298,6 +1298,24 @@ DEVICES += [{
         EventConv("motion", mi="2.e.1008", value=True),
         Converter("battery", mi="3.p.1003"),
     ],
+},{
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:huca-wx8:1
+    12382: ["H+", "Wireless Button", "huca-wx8"],
+    "spec": [
+        MiBeacon, BLEAction, Button, BLEBattery,
+        Converter("battery", mi="13.p.1003"),
+        BLEEvent("action", mi="12.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_3_single",
+            4: "button_4_single", 5: "button_5_single", 6: "button_6_single",
+            7: "button_7_single", 8: "button_8_single"
+        }),
+        BLEEvent("action", mi="12.e.1013", map={
+            1: "button_1_double", 2: "button_2_double", 3: "button_3_double",
+            4: "button_4_double", 5: "button_5_double", 6: "button_6_double",
+            7: "button_7_double", 8: "button_8_double"
+        }),
+    ],
+    "ttl": "6h"  # battery every 6 hours
 }]
 
 # Xiaomi BLE MiBeacon only spec
