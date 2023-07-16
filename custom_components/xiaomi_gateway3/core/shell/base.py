@@ -89,8 +89,10 @@ class TelnetShell:
         if md5 in await self.exec(cmd):
             return OK
 
-        # if there is an old version of the file
-        await self.exec("killall " + filename)
+        # better not to kill busybox :)
+        if filename != "busybox":
+            # if there is an old version of the file
+            await self.exec("killall " + filename)
 
         raw = await download(url)
         await self.write_file(filepath, raw)
