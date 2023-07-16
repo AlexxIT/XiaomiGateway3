@@ -2233,6 +2233,16 @@ DEVICES += [{
         ButtonMIConv("button", mi="3.e.1", value=1),
     ]
 }, {
+    10939: ["Linptech", "Sliding Window Driver WD1", "WD1"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={
+            0: "stop", 1: "open", 2: "close"
+        }),
+        Converter("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.2", parent="motor"),
+        Converter("battery", "sensor", mi="3.p.1"),
+    ],
+}, {
     # https://home.miot-spec.com/spec/yeelink.curtain.crc1
     10813: ["Yeelink", "Curtain Motor C1", "YCCBCI008"],
     "spec": [
