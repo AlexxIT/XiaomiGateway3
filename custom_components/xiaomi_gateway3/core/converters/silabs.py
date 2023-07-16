@@ -112,6 +112,11 @@ def decode(data: dict):
                     "ieee": args[1],
                     "nwk": args[2],
                 }
+            elif hdr.command_id == ZDOCmd.Mgmt_Lqi_req:
+                # https://docs.silabs.com/zigbee/6.5/af_v2/group-zdo
+                return {"command": cmd, "start_index": args[0]}
+            elif hdr.command_id == ZDOCmd.Mgmt_Lqi_rsp:
+                return {"command": cmd}
             else:
                 raise NotImplemented
 
