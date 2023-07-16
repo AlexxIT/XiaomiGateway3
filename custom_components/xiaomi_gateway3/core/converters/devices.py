@@ -1298,7 +1298,7 @@ DEVICES += [{
         EventConv("motion", mi="2.e.1008", value=True),
         Converter("battery", mi="3.p.1003"),
     ],
-},{
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:huca-wx8:1
     12382: ["H+", "Wireless Button", "huca-wx8"],
     "spec": [
@@ -2166,6 +2166,46 @@ DEVICES += [{
         Converter("led", "switch", mi="5.p.1"),
 
         Converter("compatible_mode", "switch", mi="7.p.4"),
+    ],
+}, {
+    # https://home.miot-spec.com/s/5045
+    2428: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q3s1"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/s/5045
+    2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.2", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
+    ],
+}, {
+    2274: ["Linptech", "Lingpu Triple Wall Switch", "linp.switch.q3s3"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.2", value=1),
+        ButtonMIConv("button_3", mi="7.e.3", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
     ],
 }, {
     # https://home.miot-spec.com/spec/chuangmi.switch.mesh
