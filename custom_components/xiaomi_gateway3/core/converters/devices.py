@@ -1298,7 +1298,7 @@ DEVICES += [{
         EventConv("motion", mi="2.e.1008", value=True),
         Converter("battery", mi="3.p.1003"),
     ],
-},{
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:huca-wx8:1
     12382: ["H+", "Wireless Button", "huca-wx8"],
     "spec": [
@@ -1533,8 +1533,10 @@ DEVICES += [{
     10371: ["PTX", "Mesh Multifunction Wireless Switch", "090615.remote.mlsw0a"],
     "spec": [
         MiBeacon, BLEAction, Button,  # don't know is it BLE or Mesh
-        EventConv("action", mi="2.e.1", value="click"),
-        EventConv("action", mi="3.e.2", value="hold"),
+        EventConv("action", mi="2.e.1", value="button_1_single"),
+        EventConv("action", mi="2.e.2", value="button_2_single"),
+        EventConv("action", mi="3.e.2", value="button_1_hold"),
+        EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
 }, {
     # https://home.miot-spec.com/spec/090615.remote.btsw1
@@ -1862,7 +1864,7 @@ DEVICES += [{
         Converter("switch", "switch", mi="2.p.1"),  # bool
         Converter("battery", "sensor", mi="3.p.1"),  # percentage 0-100
         Converter("supply", "sensor", mi="4.p.1"),  # percentage 0-100
-        Converter("led", "switch", mi="9.p.1", enabled=False),  # bool
+        MapConv("led", "switch", mi="9.p.1", map=INVERSE_BOOL, enabled=False),  # bool
         MapConv("power_mode", "select", mi="2.p.2", map={
             0: "auto", 1: "battery", 2: "usb"
         }, enabled=False)
@@ -1895,10 +1897,10 @@ DEVICES += [{
         Converter("mode", "switch", mi="2.p.2"),  # int8
         MathConv("chip_temperature", "sensor", mi="2.p.3", round=2,
                  enabled=False),  # float
-        MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.1, round=2),
         MathConv("power", "sensor", mi="3.p.2", round=2),  # float
-        MathConv("voltage", "sensor", mi="3.p.3"),  # float
-        MathConv("current", "sensor", mi="3.p.4"),  # float
+        MathConv("voltage", "sensor", mi="3.p.3", multiply=0.001, round=2),  # float
+        MathConv("current", "sensor", mi="3.p.4", multiply=0.001, round=2),  # float
     ]
 }, {
     3129: ["Xiaomi", "Smart Curtain Motor", "MJSGCLBL01LM"],
@@ -1938,6 +1940,7 @@ DEVICES += [{
     ],
 }, {
     11332: ["PTX", "Mesh Double Wall Switch", "090615.switch.aksk2"],
+    12471: ["PTX", "Mesh Double Wall Switch (no N)", "090615.switch.aksk2"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -2167,6 +2170,46 @@ DEVICES += [{
         Converter("compatible_mode", "switch", mi="7.p.4"),
     ],
 }, {
+    # https://home.miot-spec.com/s/5045
+    2428: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q3s1"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/s/5045
+    2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.2", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
+    ],
+}, {
+    2274: ["Linptech", "Lingpu Triple Wall Switch", "linp.switch.q3s3"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+
+        Converter("action", "sensor", enabled=False),
+
+        ButtonMIConv("button_1", mi="7.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.2", value=1),
+        ButtonMIConv("button_3", mi="7.e.3", value=1),
+
+        Converter("led", "switch", mi="5.p.1"),
+    ],
+}, {
     # https://home.miot-spec.com/spec/chuangmi.switch.mesh
     1350: ["Chuangmi", "Single Wall Switch K1-A (with N)", "chuangmi.switch.mesh"],
     "spec": [
@@ -2192,6 +2235,16 @@ DEVICES += [{
         ButtonMIConv("button", mi="3.e.1", value=1),
     ]
 }, {
+    10939: ["Linptech", "Sliding Window Driver WD1", "WD1"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={
+            0: "stop", 1: "open", 2: "close"
+        }),
+        Converter("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.2", parent="motor"),
+        Converter("battery", "sensor", mi="3.p.1"),
+    ],
+}, {
     # https://home.miot-spec.com/spec/yeelink.curtain.crc1
     10813: ["Yeelink", "Curtain Motor C1", "YCCBCI008"],
     "spec": [
@@ -2203,6 +2256,23 @@ DEVICES += [{
             0: "default", 1: "doublmode", 2: "leftmode", 3: "rightmode"
         }, enabled=False),
     ]
+}, {
+    4722: ["Xiaomi", "Curtain Motor", "MJZNCL02LM"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={
+            0: "stop", 1: "open", 2: "close"
+        }),
+        Converter("target_position", mi="2.p.2"),
+        CurtainPosConv("position", mi="2.p.6", parent="motor"),
+        MapConv("run_state", mi="2.p.3", parent="motor", map={
+            0: "stop", 1: "opening", 2: "closing", 3: "busy"
+        }),
+        Converter("battery", "sensor", mi="5.p.1"),  # percent
+        Converter("motor_reverse", "switch", mi="2.p.5", enabled=False),
+        MapConv("battery_charging", "binary_sensor", mi="5.p.2", map={
+            1: True, 2: False, 3: False,
+        }, enabled=False),
+    ],
 }, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
@@ -2255,6 +2325,18 @@ DEVICES += [{
         # Converter("fill_light_switch", "switch", mi="3.p.21"),
         # MathConv("min_bri_factory", "number", mi="3.p.16", min=1, max=500),
     ]
+}, {
+    # https://home.miot-spec.com/spec/opple.light.barelp
+    3661: ["Opple", "Bare Light Panel", "opple.light.barelp"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=5700),
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "Reception", 1: "Entertainment", 2: "Cinema", 3: "Night", 4: "Wakeup", 5: "Sleep",
+            6: "Sunset", 7: "None", 8: "Invert"
+        }),
+    ],
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [

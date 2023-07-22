@@ -1,6 +1,7 @@
 from homeassistant.components.sensor import DOMAIN
 
 from custom_components.xiaomi_gateway3.core.device import XDevice, BLE
+from custom_components.xiaomi_gateway3.core.gateway.base import GatewayBase
 
 assert DOMAIN  # fix circular import
 
@@ -296,3 +297,18 @@ def test_10249():
         ]
     )
     assert p == {"action": "doorbell", "timestamp": 1681029598}
+
+
+def test_lazy_setup():
+    device = XDevice(BLE, 9538, DID, MAC)
+    assert device.info.name == "Xiaomi TH Clock Pro"
+    device.setup_converters()
+
+    gw = GatewayBase()
+    gw.options = {}
+    gw.setups = {}
+    gw.add_device(device.did, device)
+
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1095
+    payload = device.decode("mibeacon", {"eid": 18435, "edata": "64"})
+    device.update(payload)

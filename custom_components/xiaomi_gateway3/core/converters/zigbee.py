@@ -462,7 +462,7 @@ class ZXiaomiBrightnessConv(Converter):
     """
 
     def decode(self, device: "XDevice", payload: dict, value: Any):
-        payload[self.attr] = value / 100.0 * 255.0
+        payload[self.attr] = max (0, min(255, round(value / 100.0 * 255.0)))
 
     def encode(self, device: "XDevice", payload: dict, value: Any):
         # brightness and transition in seconds

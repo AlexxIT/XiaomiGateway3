@@ -104,7 +104,8 @@ async def read_firmware(host: str) -> Optional[str]:
         # noinspection PyProtectedMember
         await asyncio.wait_for(ezsp._probe(), timeout=10)
         _, _, version = await ezsp.get_board_info()
-    except asyncio.TimeoutError:
+    except Exception as e:
+        _LOGGER.debug(f"{host} [FWUP] Read firmware error: {e}")
         return None
     finally:
         ezsp.close()

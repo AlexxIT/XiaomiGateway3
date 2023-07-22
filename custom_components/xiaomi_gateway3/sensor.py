@@ -133,7 +133,7 @@ class XiaomiStats(XiaomiBaseSensor):
     @callback
     def async_update_available(self):
         super().async_update_available()
-        self._attr_extra_state_attributes["available"] = self.available
+        self._attr_extra_state_attributes["available"] = self._attr_available
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
