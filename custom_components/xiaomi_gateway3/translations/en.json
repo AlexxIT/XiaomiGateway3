@@ -86,7 +86,8 @@
           "reboot": "Gateway reboot",
           "ftp": "Gateway run FTP",
           "flashzb": "Zigbee flash EZSP",
-          "openmiio_reload": "OpenmiIO reload"
+          "openmiio_reload": "OpenmiIO reload",
+          "z3_reload": "Z3 reload"
         }
       },
       "data": {

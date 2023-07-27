@@ -88,6 +88,7 @@ class CommandSelect(XEntity, SelectEntity):
                 CMD_REBOOT,
                 CMD_FTP,
                 CMD_OPENMIIO_RELOAD,
+                "z3_reload",
             ]
         else:
             self._attr_options = [
@@ -117,7 +118,7 @@ class CommandSelect(XEntity, SelectEntity):
         elif option == CMD_FWLOCK:
             lock = await self.gw.gw3_read_lock()
             self.device.update({"command": option, "lock": lock})
-        elif option in (CMD_FTP, CMD_REBOOT, CMD_OPENMIIO_RELOAD):
+        elif option in (CMD_FTP, CMD_REBOOT, CMD_OPENMIIO_RELOAD, "z3_reload"):
             ok = await self.gw.telnet_send(option)
             self.device.update({"command": "ok", "value": ok})
         elif option == CMD_PARENTSCAN:

@@ -215,6 +215,8 @@ class XGateway(GateMGW, GateE1, GateMGW2):
                     await sh.exec("killall openmiio_agent")
                     await asyncio.sleep(1)
                     await self.openmiio_prepare_gateway(sh)
+                elif command == "z3_reload":
+                    await sh.exec("killall Lumi_Z3GatewayHost_MQTT")
                 else:
                     await sh.exec(command)
                 return True
