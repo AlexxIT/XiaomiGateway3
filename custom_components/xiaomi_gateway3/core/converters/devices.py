@@ -1316,6 +1316,26 @@ DEVICES += [{
         }),
     ],
     "ttl": "6h"  # battery every 6 hours
+}, {
+    6742: ["Le", "Wireless Button", "lemesh.remote.ts1"],
+    "spec": [
+        MiBeacon, BLEAction, Button,
+        BLEEvent("action", mi="2.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_3_single",
+            4: "button_4_single", 5: "button_5_single", 6: "button_6_single",
+            7: "button_7_single", 8: "button_8_single"
+        }),
+        BLEEvent("action", mi="2.e.1013", map={
+            1: "button_1_double", 2: "button_2_double", 3: "button_3_double",
+            4: "button_4_double", 5: "button_5_double", 6: "button_6_double",
+            7: "button_7_double", 8: "button_8_double"
+        }),
+        BLEEvent("action", mi="2.e.1014", map={
+            1: "button_1_hold", 2: "button_2_hold", 3: "button_3_hold",
+            4: "button_4_hold", 5: "button_5_hold", 6: "button_6_hold",
+            7: "button_7_hold", 8: "button_8_hold"
+        }),
+    ]
 }]
 
 # Xiaomi BLE MiBeacon only spec
