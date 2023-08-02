@@ -1394,6 +1394,15 @@ DEVICES += [{
         Converter("idle_time", "sensor", enabled=False),
     ],
 }, {
+    13617: ["Xiaomi", "Motion Sensor 2S", "XMPIR02SXS"],
+    "spec": [
+        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
+        EventConv("motion", mi="2.e.1008", value=True),
+        Converter("illuminance", mi="2.p.1005"),
+        Converter("idle_time", "sensor", mi="2.p.1024", enabled=False),
+        Converter("battery", mi="3.p.1003", enabled=None),
+    ],
+}, {
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     "spec": [
         MiBeacon, BLEMotion, BLELight, BLEIlluminance, BLEBattery,
