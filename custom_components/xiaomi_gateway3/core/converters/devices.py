@@ -1402,6 +1402,7 @@ DEVICES += [{
         Converter("idle_time", "sensor", mi="2.p.1024", enabled=False),
         Converter("battery", mi="3.p.1003", enabled=None),
     ],
+    "ttl": "12h",  # battery every 12 hours
 }, {
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     "spec": [
