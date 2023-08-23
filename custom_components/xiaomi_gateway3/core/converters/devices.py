@@ -1696,6 +1696,19 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/jymc.light.falmp
+    10729: ["Unknown", "Mesh Light", "jymc.light.falmp"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6500),
+        BoolConv("flex_switch", "switch", mi="2.p.4", enabled=False),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "Warmth", 1: "TV", 2: "Reading", 3: "Night",
+            4: "Hospitality", 5: "Leisure", 6: "Office", 255: "Normal"
+        }),
+    ],
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/971
     # https://home.miot-spec.com/spec/yeelink.light.ml9
     11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
