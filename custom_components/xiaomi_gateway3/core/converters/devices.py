@@ -1402,6 +1402,7 @@ DEVICES += [{
         Converter("idle_time", "sensor", mi="2.p.1024", enabled=False),
         Converter("battery", mi="3.p.1003", enabled=None),
     ],
+    "ttl": "12h",  # battery every 12 hours
 }, {
     2691: ["Xiaomi", "Qingping Motion Sensor", "CGPR1"],
     "spec": [
@@ -1694,6 +1695,19 @@ DEVICES += [{
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
+}, {
+    # https://home.miot-spec.com/spec/jymc.light.falmp
+    10729: ["Unknown", "Mesh Light", "jymc.light.falmp"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6500),
+        BoolConv("flex_switch", "switch", mi="2.p.4", enabled=False),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "Warmth", 1: "TV", 2: "Reading", 3: "Night",
+            4: "Hospitality", 5: "Leisure", 6: "Office", 255: "Normal"
+        }),
+    ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/971
     # https://home.miot-spec.com/spec/yeelink.light.ml9
