@@ -2381,6 +2381,15 @@ DEVICES += [{
         }),
     ],
 }, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw0a04
+    13586: ["LeMesh", "Mesh Switch Controller V2S", "lemesh.switch.sw0a04"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"), # Tested
+        MapConv("power_on_state", "select", mi="2.p.2", map={0:"previous",1:"on",2:"off"},
+                enabled=False), # Tested
+        BoolConv("flex_switch", "switch", mi="3.p.4", enabled=False),  # uint8 # Tested
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
