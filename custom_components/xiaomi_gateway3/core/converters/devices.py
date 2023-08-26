@@ -2316,6 +2316,7 @@ DEVICES += [{
         MapConv("fault", "sensor", mi="2.p.7", map={
             0: "No faults", 1: "Faults"}, enabled=False),
     ],
+    "ttl": "15m",  
 }, {    
     4722: ["Xiaomi", "Curtain Motor", "MJZNCL02LM"],
     "spec": [
