@@ -2298,7 +2298,8 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.5", map={
             0: "default", 1: "doublmode", 2: "leftmode", 3: "rightmode"
         }, enabled=False),
-    ]
+    ],
+    "ttl": "7d",  
 }, {
     # https://home.miot-spec.com/spec/090615.curtain.crus6
     15069: ["PTX", "Curtain Motor", "crus6"],
@@ -2316,7 +2317,7 @@ DEVICES += [{
         MapConv("fault", "sensor", mi="2.p.7", map={
             0: "No faults", 1: "Faults"}, enabled=False),
     ],
-    "ttl": "15m",  
+    "ttl": "7d",  
 }, {    
     4722: ["Xiaomi", "Curtain Motor", "MJZNCL02LM"],
     "spec": [
