@@ -2109,6 +2109,17 @@ DEVICES += [{
         Converter("led", "switch", mi="4.p.1"),
     ],
 }, {
+    # https://home.miot-spec.com/s/ainice.sensor_occupy.rd
+    13156: ["AInice", "AInice Dual Presence Sensor", "ainice-dual-presence-sensor"],
+    "spec": [
+        BoolConv("radar_group_occupancy", "binary_sensor", mi="3.p.2"),
+        BoolConv("radar_occupancy", "binary_sensor", mi="3.p.4"),
+        BoolConv("radar_enter_edge", "binary_sensor", mi="3.p.6"),
+        BoolConv("bluetooth_group_online_status", "binary_sensor", mi="4.p.2"),
+        BoolConv("bluetooth_group_enter_area", "binary_sensor", mi="4.p.5"),
+        MathConv("illuminance", "sensor", mi="5.p.2"),
+    ]
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/835
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lemesh-sw1a02:1:0000C808
     3001: ["LeMesh", "Switch Sensor", "lemesh.switch.sw1a02"],
