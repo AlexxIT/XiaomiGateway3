@@ -2347,6 +2347,17 @@ DEVICES += [{
         }, enabled=False),
     ],
 }, {
+    # https://home.miot-spec.com/spec/giot.curtain.v5icm
+    13804: ["giot", "Curtain Motor", "v5icm"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        Converter("target_position", mi="2.p.7"),
+        CurtainPosConv("position", mi="2.p.6", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.8", enabled=False),
+        Converter("battery", "sensor", mi="3.p.3"),
+    ],
+    "ttl": "7d",
+}, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
     "spec": [
