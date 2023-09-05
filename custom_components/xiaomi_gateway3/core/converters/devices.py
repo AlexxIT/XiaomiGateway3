@@ -2354,7 +2354,7 @@ DEVICES += [{
         Converter("target_position", mi="2.p.7"),
         CurtainPosConv("position", mi="2.p.6", parent="motor"),
         Converter("motor_reverse", "switch", mi="2.p.8", enabled=False),
-        Converter("battery", "sensor", mi="3.p.3"),
+        Converter("battery", "sensor", mi="3.p.1"),
     ],
     "ttl": "7d",
 }, {
