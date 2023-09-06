@@ -1980,13 +1980,41 @@ DEVICES += [{
     11333: ["PTX", "Mesh Single Wall Switch", "090615.switch.aksk1"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button", mi="8.e.1", value=1),  # single
     ],
 }, {
     11332: ["PTX", "Mesh Double Wall Switch", "090615.switch.aksk2"],
-    12471: ["PTX", "Mesh Double Wall Switch (no N)", "090615.switch.aksk2"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
         Converter("channel_2", "switch", mi="3.p.1"),
+        BoolConv("wireless", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),
+        ButtonMIConv("button_1", mi="8.e.2", value=2), 
+    ],
+}, {
+    12471: ["PTX", "Mesh Double Wall Switch (No N)", "aidh2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        BoolConv("wireless", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="6.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="7.e.1", value=1),  # single 
+        BoolConv("led", "switch", mi="9.p.1", enabled=False),
+    ],
+}, {
+    12470: ["PTX", "Mesh Single Wall Switch(No N)", "aidh1"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button", mi="6.e.1", value=1),  # single
+        BoolConv("led", "switch", mi="9.p.1", enabled=False),
     ],
 }, {
     6379: ["Xiaomi", "Mesh Wall Switch (Neutral Wire)", "XMQBKG01LM"],
