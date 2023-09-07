@@ -2408,6 +2408,14 @@ DEVICES += [{
                 enabled=False), # Tested
         BoolConv("flex_switch", "switch", mi="3.p.4", enabled=False),  # uint8 # Tested
     ],
+},{    
+    6461: ["PTX", "Smart Curtain Motor", "090615.curtain.s2mesh"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        Converter("target_position", mi="2.p.2"),
+        CurtainPosConv("position", mi="2.p.3", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.4", enabled=False),
+    ],
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [
