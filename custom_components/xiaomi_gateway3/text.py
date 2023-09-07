@@ -22,11 +22,10 @@ async def async_setup_entry(
 
 # noinspection PyAbstractClass
 class XiaomiText(XEntity, TextEntity):
-    _attr_native_value = ""
+    _attr_native_value = None # Avoid pattern error when calling self.state if self._attr_pattern is not None
 
     def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
         super().__init__(gateway, device, conv)
-
         self._attr_pattern = getattr(conv, "pattern")  # None is ok
 
     @callback

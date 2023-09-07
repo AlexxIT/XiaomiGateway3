@@ -1,5 +1,6 @@
 import json
 import time
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, TYPE_CHECKING
@@ -348,7 +349,7 @@ class GasSensitivityWriteConv(Converter):
 class AqaraTimePatternConv(Converter):
     """
     Encoding format:
-        Period: <START_HOUR>:<START_MINUTE> - <END_HOUR>:<END_MINUTE>
+        Period: <START_HOUR>:<START_MINUTE>-<END_HOUR>:<END_MINUTE>
         Encoded: AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD
             (Each character represents 1 bit)
             AAAAAAAA = binary number of <END_MINUTE>
@@ -357,21 +358,23 @@ class AqaraTimePatternConv(Converter):
             DDDDDDDD = binary number of <START_HOUR>
 
     Example:
-        Period: 23:59 - 10:44
+        Period: 23:59-10:44
         Encoded: 00101100 00001010 00111011 00010111
             00101100 = 44 <END_MINUTE>
             00001010 = 10 <END_HOUR>
             00111011 = 59 <START_MIN>
             00010111 = 23 <START_HOUR>
     """
-
     pattern = "^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$"
+    decoded_pattern_cmp = re.compile(pattern)
 
     def decode(self, device: "XDevice", payload: dict, v: int):
         payload[self.attr] = (
             f"{v & 0xFF:02d}:{(v >> 8) & 0xFF:02d}-"
             f"{(v >> 16) & 0xFF:02d}:{(v >> 24) & 0xFF:02d}"
         )
+        if not self.decoded_pattern_cmp.match(payload[self.attr]):
+            payload[self.attr] = "21:00-09:00" # Fallback to device default value
 
     def encode(self, device: "XDevice", payload: dict, v: str):
         v = int(v[:2]) | int(v[3:5]) << 8 | int(v[6:8]) << 16 | int(v[9:11]) << 24
@@ -390,15 +393,19 @@ class GiotTimePatternConv(Converter):
         Period: 23:59 - 10:44
         Encoded: 23591044
     """
-
     pattern = "^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$"
+    encoded_pattern_cmp = re.compile("^[0-2][0-9][0-5][0-9][0-2][0-9][0-5][0-9]$")
 
     def decode(self, device: "XDevice", payload: dict, v: int):
-        payload[self.attr] = f"{v[:2]}:{v[2:4]}-{v[4:6]}:{v[6:]}"
+        v_str = str(v)
+        if self.encoded_pattern_cmp.match(v_str):
+            payload[self.attr] = f"{v_str[:2]}:{v_str[2:4]}-{v_str[4:6]}:{v_str[6:]}"
+        else:
+            payload[self.attr] = "22:00-06:00" # Fallback to device default value
 
     def encode(self, device: "XDevice", payload: dict, v: str):
         v = v.replace(":", "").replace("-", "")
-        super().encode(device, payload, v)
+        super().encode(device, payload, int(v))
 
 
 class ParentConv(Converter):
