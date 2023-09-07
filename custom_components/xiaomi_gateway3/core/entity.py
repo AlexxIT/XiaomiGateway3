@@ -129,6 +129,8 @@ ENTITY_CATEGORIES = {
     "turn_off_transit_sec": EntityCategory.CONFIG,
     "change_transit_sec": EntityCategory.CONFIG,
     "min_brightness": EntityCategory.CONFIG,
+    # Linptech Mesh Triple Wall Switch (no N)
+    "compatible_mode": EntityCategory.CONFIG,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)
