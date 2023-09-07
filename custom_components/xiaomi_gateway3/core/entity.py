@@ -107,9 +107,8 @@ ENTITY_CATEGORIES = {
     "occupancy_duration": EntityCategory.DIAGNOSTIC,
     # Aqara Triple Wall Switch E1 (with N)
     "led_inverted": EntityCategory.CONFIG,
-    "led_no_disturb": EntityCategory.CONFIG,
-    "led_no_disturb_start": EntityCategory.CONFIG,
-    "led_no_disturb_end": EntityCategory.CONFIG,
+    "led_dnd": EntityCategory.CONFIG,
+    "led_dnd_time": EntityCategory.CONFIG,
     # GranwinIoT Mesh Light V5
     "turn_on_state": EntityCategory.CONFIG,
     "default_brightness": EntityCategory.CONFIG,
