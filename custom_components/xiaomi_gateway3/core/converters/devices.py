@@ -2409,6 +2409,28 @@ DEVICES += [{
         BoolConv("flex_switch", "switch", mi="3.p.4", enabled=False),  # uint8 # Tested
     ],
 }, {
+    # https://home.miot-spec.com/spec/yeelink.light.stripf
+    # Following attributes are copied from lemesh.light.wy0c08 because they are similar
+    4896: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),  # bool
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        }),
+        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="2.p.7", map= {0: "default", 1: "on"},
+                enabled=False),
+
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
+        # And more...
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
