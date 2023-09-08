@@ -365,16 +365,17 @@ class AqaraTimePatternConv(Converter):
             00111011 = 59 <START_MIN>
             00010111 = 23 <START_HOUR>
     """
-    pattern = "^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$"
-    decoded_pattern_cmp = re.compile(pattern)
+    pattern = "^([01][0-9]|2[0-3]):[0-5][0-9]-([01][0-9]|2[0-3]):[0-5][0-9]$"
+    _decoded_pattern_cmp = re.compile(pattern)
+    _fallback_value =  "21:00-09:00"
 
     def decode(self, device: "XDevice", payload: dict, v: int):
         payload[self.attr] = (
             f"{v & 0xFF:02d}:{(v >> 8) & 0xFF:02d}-"
             f"{(v >> 16) & 0xFF:02d}:{(v >> 24) & 0xFF:02d}"
         )
-        if not self.decoded_pattern_cmp.match(payload[self.attr]):
-            payload[self.attr] = "21:00-09:00" # Fallback to device default value
+        if not self._decoded_pattern_cmp.match(payload[self.attr]):
+            payload[self.attr] = self._fallback_value  # Fallback to device default value
 
     def encode(self, device: "XDevice", payload: dict, v: str):
         v = int(v[:2]) | int(v[3:5]) << 8 | int(v[6:8]) << 16 | int(v[9:11]) << 24
@@ -393,15 +394,19 @@ class GiotTimePatternConv(Converter):
         Period: 23:59 - 10:44
         Encoded: 23591044
     """
-    pattern = "^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$"
-    encoded_pattern_cmp = re.compile("^[0-2][0-9][0-5][0-9][0-2][0-9][0-5][0-9]$")
+    pattern = "^([01][0-9]|2[0-3]):[0-5][0-9]-([01][0-9]|2[0-3]):[0-5][0-9]$"
+    _decoded_pattern_cmp = re.compile(pattern)
+    _fallback_value = "22:00-06:00"
 
     def decode(self, device: "XDevice", payload: dict, v: int):
         v_str = str(v)
-        if self.encoded_pattern_cmp.match(v_str):
-            payload[self.attr] = f"{v_str[:2]}:{v_str[2:4]}-{v_str[4:6]}:{v_str[6:]}"
-        else:
-            payload[self.attr] = "22:00-06:00" # Fallback to device default value
+        if len(v_str) != 8:
+            payload[self.attr] = self._fallback_value # Fallback to device default value
+            return
+
+        payload[self.attr] = f"{v_str[:2]}:{v_str[2:4]}-{v_str[4:6]}:{v_str[6:]}"
+        if not self._decoded_pattern_cmp.match(payload[self.attr]):
+            payload[self.attr] = self._fallback_value # Fallback to device default value
 
     def encode(self, device: "XDevice", payload: dict, v: str):
         v = v.replace(":", "").replace("-", "")
