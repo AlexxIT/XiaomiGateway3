@@ -1727,7 +1727,7 @@ DEVICES += [{
         })
     ]
 }, {
-    12455: ["Yeelight", "K Series Single Wall Switch", "YLYKG"],
+    12455: ["Yeelight", "K Series Single Wall Switch", "YLYKG-0025/0020"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         MapConv("power-on-state", "select", mi="2.p.2", map={
@@ -1742,6 +1742,67 @@ DEVICES += [{
         ButtonMIConv("button", mi="14.e.1", value=1),
         ButtonMIConv("button", mi="14.e.2", value=2),
         ButtonMIConv("button", mi="14.e.3", value=16),
+    ],
+}, {
+    12456: ["Yeelight", "K Series Double Wall Switch", "YLYKG-0026/0021"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        MapConv("power-on-state_1", "select", mi="2.p.2", map={
+            1: "On", 2: "Off", 3: "Default" }, enabled=False),
+        MapConv("wireless_1", "select", mi="2.p.3", map={
+            0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
+        }, enabled=False),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        MapConv("power-on-state_2", "select", mi="3.p.2", map={
+            1: "On", 2: "Off", 3: "Default" }, enabled=False),
+        MapConv("wireless_2", "select", mi="3.p.3", map={
+            0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
+        }, enabled=False),
+        Converter("indicator-light", "switch", mi="5.p.1", enabled=False),
+        MapConv("operatingmode", "select", mi="8.p.1", map={
+            1: "Top Speed Mode", 2: "Standard Mode" }, enabled=False),      
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="14.e.1", value=1),
+        ButtonMIConv("button_1", mi="14.e.2", value=2),
+        ButtonMIConv("button_1", mi="14.e.3", value=16),
+        ButtonMIConv("button_2", mi="15.e.1", value=1),
+        ButtonMIConv("button_2", mi="15.e.2", value=2),
+        ButtonMIConv("button_2", mi="15.e.3", value=16),
+    ],
+}, {
+    12457: ["Yeelight", "K Series Triple Wall Switch", "YLYKG-0026/0021"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        MapConv("power-on-state_1", "select", mi="2.p.2", map={
+            1: "On", 2: "Off", 3: "Default" }, enabled=False),
+        MapConv("wireless_1", "select", mi="2.p.3", map={
+            0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
+        }, enabled=False),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        MapConv("power-on-state_2", "select", mi="3.p.2", map={
+            1: "On", 2: "Off", 3: "Default" }, enabled=False),
+        MapConv("wireless_2", "select", mi="3.p.3", map={
+            0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
+        }, enabled=False),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        MapConv("power-on-state_3", "select", mi="4.p.2", map={
+            1: "On", 2: "Off", 3: "Default" }, enabled=False),
+        MapConv("wireless_3", "select", mi="4.p.3", map={
+            0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
+        }, enabled=False),
+        Converter("indicator-light", "switch", mi="5.p.1", enabled=False),
+        MapConv("operatingmode", "select", mi="8.p.1", map={
+            1: "Top Speed Mode", 2: "Standard Mode" }, enabled=False),      
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="14.e.1", value=1),
+        ButtonMIConv("button_1", mi="14.e.2", value=2),
+        ButtonMIConv("button_1", mi="14.e.3", value=16),
+        ButtonMIConv("button_2", mi="15.e.1", value=1),
+        ButtonMIConv("button_2", mi="15.e.2", value=2),
+        ButtonMIConv("button_2", mi="15.e.3", value=16),
+        ButtonMIConv("button_3", mi="16.e.1", value=1),
+        ButtonMIConv("button_3", mi="16.e.2", value=2),
+        ButtonMIConv("button_3", mi="16.e.3", value=16),
     ],
 }, {
     1945: ["Xiaomi", "Mesh Wall Switch", "DHKG01ZM"],
