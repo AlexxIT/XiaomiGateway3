@@ -2333,7 +2333,7 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/s/5045
-    5045: ["Linptech", "Mesh Triple Wall Switch (no L)", "QE1SB-W3(MI)"],
+    5045: ["Linptech", "Mesh Triple Wall Switch (no N)", "QE1SB-W3(MI)"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -2346,6 +2346,11 @@ DEVICES += [{
         Converter("led", "switch", mi="5.p.1"),
 
         Converter("compatible_mode", "switch", mi="7.p.4"),
+
+        Action,
+        ButtonMIConv("button_1", mi="7.e.1", value=1), # button_1_single
+        ButtonMIConv("button_2", mi="7.e.2", value=1), # button_2_single
+        ButtonMIConv("button_3", mi="7.e.3", value=1), # button_3_single
     ],
 }, {
     # https://home.miot-spec.com/s/5045
