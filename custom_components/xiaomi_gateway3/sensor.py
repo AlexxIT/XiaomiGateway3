@@ -72,6 +72,7 @@ UNITS = {
     "distance": LENGTH_METERS,
     "occupancy_duration": TIME_SECONDS,
     "occupancy_distance": LENGTH_METERS,
+    "formaldehyde": CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
     # "link_quality": "lqi",
     # "rssi": "dBm",
     # "msg_received": "msg",
