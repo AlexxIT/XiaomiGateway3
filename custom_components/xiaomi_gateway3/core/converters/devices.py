@@ -2272,6 +2272,17 @@ DEVICES += [{
         Converter("led", "switch", mi="4.p.1"),
     ],
 }, {
+    # https://home.miot-spec.com/s/ainice.sensor_occupy.rd
+    13156: ["AInice", "AInice Dual Presence Sensor", "ainice-dual-presence-sensor"],
+    "spec": [
+        BoolConv("radar_group_occupancy", "binary_sensor", mi="3.p.2"),
+        BoolConv("radar_occupancy", "binary_sensor", mi="3.p.4"),
+        BoolConv("radar_enter_edge", "binary_sensor", mi="3.p.6"),
+        BoolConv("bluetooth_group_online_status", "binary_sensor", mi="4.p.2"),
+        BoolConv("bluetooth_group_enter_area", "binary_sensor", mi="4.p.5"),
+        MathConv("illuminance", "sensor", mi="5.p.2"),
+    ]
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/835
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:lemesh-sw1a02:1:0000C808
     3001: ["LeMesh", "Switch Sensor", "lemesh.switch.sw1a02"],
@@ -2544,6 +2555,17 @@ DEVICES += [{
             1: True, 2: False, 3: False,
         }, enabled=False),
     ],
+}, {
+    # https://home.miot-spec.com/spec/giot.curtain.v5icm
+    13804: ["giot", "Curtain Motor", "v5icm"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        Converter("target_position", mi="2.p.7"),
+        CurtainPosConv("position", mi="2.p.6", parent="motor"),
+        Converter("motor_reverse", "switch", mi="2.p.8", enabled=False),
+        Converter("battery", "sensor", mi="3.p.1"),
+    ],
+    "ttl": "7d",
 }, {
     # https://home.miot-spec.com/spec/giot.light.v5ssm
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
