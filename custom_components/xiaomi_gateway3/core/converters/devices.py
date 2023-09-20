@@ -1569,6 +1569,19 @@ DEVICES += [{
         EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
 }, {
+    11273: ["PTX", "BLE Wireless situation knob switch", "PTX-X6-QMIMB"],
+    "spec": [
+        Action,
+        ButtonMIConv("button_1", mi="2.e.1012", value=1),  # single
+        ButtonMIConv("button_2", mi="2.e.1013", value=1),
+        ButtonMIConv("button_3", mi="2.e.1014", value=1),
+        ButtonMIConv("button_4", mi="2.e.1028", value=1),
+        EventConv("action", mi="3.e.1012", value="knob_increasing"),
+        EventConv("action", mi="3.e.1013", value="knob_reduced"),
+        EventConv("action", mi="3.e.1014", value="knob_press"),
+    ],
+    "ttl": "7d"
+}, {
     # https://home.miot-spec.com/spec/090615.remote.btsw1
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
     "spec": [
