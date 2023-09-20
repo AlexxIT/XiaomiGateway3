@@ -2115,13 +2115,41 @@ DEVICES += [{
     11333: ["PTX", "Mesh Single Wall Switch", "090615.switch.aksk1"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button", mi="8.e.1", value=1),  # single
     ],
 }, {
     11332: ["PTX", "Mesh Double Wall Switch", "090615.switch.aksk2"],
-    12471: ["PTX", "Mesh Double Wall Switch (no N)", "090615.switch.aksk2"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
         Converter("channel_2", "switch", mi="3.p.1"),
+        BoolConv("wireless", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="8.e.1", value=1),
+        ButtonMIConv("button_1", mi="8.e.2", value=2), 
+    ],
+}, {
+    12471: ["PTX", "Mesh Double Wall Switch (No N)", "aidh2"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        BoolConv("wireless", "switch", mi="3.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="6.e.1", value=1),  # single
+        ButtonMIConv("button_2", mi="7.e.1", value=1),  # single 
+        BoolConv("led", "switch", mi="9.p.1", enabled=False),
+    ],
+}, {
+    12470: ["PTX", "Mesh Single Wall Switch(No N)", "aidh1"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2", enabled=False),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button", mi="6.e.1", value=1),  # single
+        BoolConv("led", "switch", mi="9.p.1", enabled=False),
     ],
 }, {
     6379: ["Xiaomi", "Mesh Wall Switch (Neutral Wire)", "XMQBKG01LM"],
@@ -2408,7 +2436,7 @@ DEVICES += [{
         MapConv("led", "switch", mi="4.p.3", map={1: False, 2: True}),
     ]
 }, {
-    7855: ["Unknown", "Mesh Single Wall Switch", "frfox.switch.bl01"],
+    7855: ["Unknown", "Mesh Single Wall Switch (No N)", "frfox.switch.bl01"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
         MapConv("mode", "select", mi="2.p.2", map={
@@ -2416,6 +2444,47 @@ DEVICES += [{
         }),
         Action,
         ButtonMIConv("button", mi="3.e.1", value=1),
+        Converter("backlight", "switch", mi="4.p.1"),
+        Converter("led", "switch", mi="4.p.2"),
+    ]
+}, {
+    7856: ["Unknown", "Mesh Double Wall Switch (No N)", "frfox.switch.bl02"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "default", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "default", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Action,
+        ButtonMIConv("button_1", mi="4.e.1", value=1),
+        ButtonMIConv("button_2", mi="5.e.1", value=1),
+        Converter("backlight", "switch", mi="6.p.1"),
+        Converter("led", "switch", mi="6.p.2"),
+    ]
+}, {
+    7857: ["Unknown", "Mesh Triple Wall Switch (No N)", "frfox.switch.bl03"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "default", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "default", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        MapConv("mode_3", "select", mi="4.p.2", map={
+            0: "default", 1: "wireless", 2: "flex", 3: "scene",
+        }),
+        Action,
+        ButtonMIConv("button_1", mi="5.e.1", value=1),
+        ButtonMIConv("button_2", mi="6.e.1", value=1),
+        ButtonMIConv("button_3", mi="7.e.1", value=1),
+        Converter("backlight", "switch", mi="8.p.1"),
+        Converter("led", "switch", mi="8.p.2"),
     ]
 }, {
     10939: ["Linptech", "Sliding Window Driver WD1", "WD1"],
