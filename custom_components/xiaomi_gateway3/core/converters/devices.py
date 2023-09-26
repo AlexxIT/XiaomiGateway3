@@ -1760,7 +1760,9 @@ DEVICES += [{
     12455: ["Yeelight", "K Series Single Wall Switch", "YLYKG-0025/0020"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
-        MapConv("power_on_state", "select", mi="2.p.2", map=POWERON, enabled=False),
+        MapConv("power_on_state", "select", mi="2.p.2", map={
+            1: "On", 2: "Off", 3: "Default"
+        }, enabled=False),
         MapConv("wireless", "select", mi="2.p.3", map={
             0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"
         }, enabled=False),
