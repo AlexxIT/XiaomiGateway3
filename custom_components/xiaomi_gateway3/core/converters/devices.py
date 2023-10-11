@@ -1558,7 +1558,6 @@ DEVICES += [{
     ],
     "ttl": "25h"
 }, {
-    # https://home.miot-spec.com/spec/chuangmi.switch.meshb01
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1063
     10371: ["PTX", "Mesh Multifunction Wireless Switch", "090615.remote.mlsw0a"],
     "spec": [
@@ -2577,6 +2576,15 @@ DEVICES += [{
         Converter("left_switch", "switch", mi="2.p.1"),
         Converter("right_switch", "switch", mi="3.p.1"),
         MapConv("led", "switch", mi="4.p.3", map={1: False, 2: True}),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/chuangmi.switch.meshc01
+    1489: ["Chuangmi", "Triple Wall Switch K1-C (with N)", "chuangmi.switch.meshc01"],
+    "spec": [
+        Converter("left_switch", "switch", mi="2.p.1"),
+        Converter("middle_switch", "switch", mi="3.p.1"),
+        Converter("right_switch", "switch", mi="4.p.1"),
+        MapConv("led", "switch", mi="5.p.3", map={1: False, 2: True}),
     ]
 }, {
     7855: ["Unknown", "Mesh Single Wall Switch (No N)", "frfox.switch.bl01"],
