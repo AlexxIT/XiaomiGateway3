@@ -1568,6 +1568,19 @@ DEVICES += [{
         EventConv("action", mi="3.e.2", value="button_1_hold"),
         EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
+},  {
+    # https://home.miot-spec.com/spec/giot.switch.v52ksm
+    13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],  
+    "spec":[
+        Converter("left_switch", "switch", mi="2.p.1"),
+        Converter("right_switch", "switch", mi="3.p.1"),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "button_switch"
+        }),
+        MapConv("right_switch_mode", "select", mi="3.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "button_switch"
+        }),
+    ]
 }, {
     11273: ["PTX", "BLE Wireless situation knob switch", "PTX-X6-QMIMB"],
     "spec": [
