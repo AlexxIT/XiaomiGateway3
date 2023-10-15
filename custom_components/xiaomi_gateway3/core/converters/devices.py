@@ -1567,10 +1567,10 @@ DEVICES += [{
         EventConv("action", mi="3.e.2", value="button_1_hold"),
         EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
-},  {
+}, {
     # https://home.miot-spec.com/spec/giot.switch.v52ksm
-    13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],  
-    "spec":[
+    13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
+    "spec": [
         Converter("left_switch", "switch", mi="2.p.1"),
         Converter("right_switch", "switch", mi="3.p.1"),
         MapConv("left_switch_mode", "select", mi="2.p.2", map={
@@ -2023,7 +2023,7 @@ DEVICES += [{
         }, enabled=False),
         Converter("action", "sensor", enabled=False),
         ButtonMIConv("button", mi="6.e.2", value=1),
-    ],    
+    ],
 }, {
     12055: ["ZNSN", "Mesh Double Wall Switch", "zg2m"],
     "spec": [
@@ -2839,6 +2839,51 @@ DEVICES += [{
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
         BoolConv("night_light", "switch", mi="4.p.5"),
         # And more...
+    ]
+}, {
+    # https://home.miot-spec.com/spec/giot.switch.v53ksm
+    13140: ["GranwinIoT", "Smart three-Button Switch (Mesh) V5", "giot.switch.v53ksm"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("switch_status_1", "switch", mi="11.p.1"),
+        Converter("switch_status_2", "switch", mi="12.p.1"),
+        Converter("switch_status_3", "switch", mi="13.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_3", "select", mi="4.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/giot.switch.v54ksm
+    13141: ["GranwinIoT", "Smart four-Button Switch (Mesh) V5", "giot.switch.v54ksm"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("channel_4", "switch", mi="5.p.1"),
+        Converter("switch_status_1", "switch", mi="11.p.1"),
+        Converter("switch_status_2", "switch", mi="12.p.1"),
+        Converter("switch_status_3", "switch", mi="13.p.1"),
+        Converter("switch_status_4", "switch", mi="14.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_3", "select", mi="4.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_4", "select", mi="5.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
     ]
 }, {
     "default": "mesh",  # default Mesh device
