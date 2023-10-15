@@ -2968,6 +2968,39 @@ DEVICES += [{
         }),
     ]
 }, {
+    9612: ["Unkown", "Mesh Singel Wall Switch", "bean.switch.bl01"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="3.e.1", value=1),
+    ]
+}, {
+    9613: ["Unkown", "Mesh Double Wall Switch", "bean.switch.bl02"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="4.e.1", value=1),
+        ButtonMIConv("button_2", mi="5.e.1", value=1),
+    ]
+}, {
+    9614: ["Unkown", "Mesh Triple Wall Switch", "bean.switch.bl03"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="5.e.1", value=1),
+        ButtonMIConv("button_2", mi="6.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.1", value=1),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
