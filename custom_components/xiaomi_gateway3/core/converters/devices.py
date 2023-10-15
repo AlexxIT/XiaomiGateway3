@@ -2672,6 +2672,9 @@ DEVICES += [{
         Converter("target_position", mi="2.p.3"),
         CurtainPosConv("position", mi="2.p.2", parent="motor"),
         Converter("battery", "sensor", mi="3.p.1"),
+        Converter("security_mode", "switch", mi="4.p.6"),
+        Converter("power_replenishment", "sensor", mi="7.p.1", enabled=None),
+        Converter("realtime_current_in", "sensor", mi="7.p.2", enabled=None),
     ],
 }, {
     # https://home.miot-spec.com/spec/yeelink.curtain.crc1

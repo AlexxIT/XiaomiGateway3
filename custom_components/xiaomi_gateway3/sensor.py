@@ -78,6 +78,9 @@ UNITS = {
     # "msg_received": "msg",
     # "msg_missed": "msg",
     # "unresponsive": "times"
+    "power_replenishment": "mAh",
+    # Deprecated: please use UnitOfElectricCurrent.MILLIAMPERE.
+    "realtime_current_in": ELECTRIC_CURRENT_MILLIAMPERE,
 }
 
 # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
