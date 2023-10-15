@@ -3001,6 +3001,55 @@ DEVICES += [{
         ButtonMIConv("button_2", mi="7.e.1", value=1),
     ]
 }, {
+    14431: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (1 Gang)", "XMQBKG04LM"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="3.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="4.p.2", round=1),
+        Converter("led", "light", mi="5.p.1"),
+    ],
+}, {
+    14432: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (2 Gang)", "XMQBKG05LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="4.e.1", value=1),
+        ButtonMIConv("button_2", mi="5.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="6.p.2", round=1),
+        Converter("led", "light", mi="7.p.1"),
+    ],
+}, {
+    14433: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (3 Gang)", "XMQBKG06LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="5.e.1", value=1),
+        ButtonMIConv("button_2", mi="6.e.1", value=1),
+        ButtonMIConv("button_3", mi="7.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="8.p.2", round=1),
+        Converter("led", "light", mi="9.p.1"),
+    ],
+}, {
+    13521: ["Xiaomi", "Xiaomi Smart Wall Outlet Pro", "XMZNCZ01LM"],
+    "spec": [
+        Converter("outlet", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "switch", mi="2.p.2", map={0: True, 1: False}),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="3.p.6", round=1),
+        Converter("led", "light", mi="4.p.1"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
