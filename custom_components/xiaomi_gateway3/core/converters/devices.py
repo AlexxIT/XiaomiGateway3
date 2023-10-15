@@ -1288,6 +1288,8 @@ DEVICES += [{
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
+    5860: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t8
     9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
@@ -1373,8 +1375,6 @@ DEVICES += [{
     1647: ["Xiaomi", "Qingping TH Lite", "CGDK2"],
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
-    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
-    5860: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     "spec": [
         MiBeacon, BLETemperature, BLEHumidity,
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
