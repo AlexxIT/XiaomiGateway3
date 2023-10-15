@@ -1685,6 +1685,7 @@ DEVICES += [{
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
     4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
+    15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
@@ -1766,6 +1767,18 @@ DEVICES += [{
             0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
             11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
             15: "sleep"
+        })
+    ]
+}, {
+    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"],  # justbin95
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6000),
+        MapConv("mode", "select", mi="2.p.7", map={
+            0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer",
+            11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk",
+            15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"
         })
     ]
 }, {
