@@ -974,6 +974,16 @@ DEVICES += [{
         ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
         ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
     ],
+}, {
+    "lumi.remote.b1acn02": ["Aqara", "Button", "WXKG13LM"],
+    "spec": [
+        Action,
+        ButtonMIConv("button", mi="3.e.1", value=1),  # single
+        ButtonMIConv("button", mi="3.e.2", value=2),  # double
+        ButtonMIConv("button", mi="3.e.3", value=16),  # long
+        BatteryConv("battery", "sensor", mi="2.p.1"),  # voltage
+        MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW, enabled=False)
+    ]
 }]
 
 ########################################################################################
