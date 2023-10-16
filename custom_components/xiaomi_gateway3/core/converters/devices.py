@@ -1695,6 +1695,8 @@ DEVICES += [{
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
     4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
+    4945: ["PTX", "Mesh Lightstrip", "090615.light.mdd02"],
+    7057: ["PTX", "Mesh Light", "090615.light.cxlg01"],
     15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
@@ -1780,7 +1782,7 @@ DEVICES += [{
         })
     ]
 }, {
-    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"],  # justbin95
+    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"], 
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
