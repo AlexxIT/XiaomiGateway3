@@ -1695,8 +1695,6 @@ DEVICES += [{
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
     4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
-    4945: ["PTX", "Mesh Lightstrip", "090615.light.mdd02"],
-    7057: ["PTX", "Mesh Light", "090615.light.cxlg01"],
     15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
@@ -1782,7 +1780,7 @@ DEVICES += [{
         })
     ]
 }, {
-    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"], 
+    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"],  # justbin95
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
@@ -3052,6 +3050,21 @@ DEVICES += [{
         Converter("led", "light", mi="4.p.1"),
     ],
 }, {
+    14335: ["Yeelight", "Yeelight Smart Light", "yeelink.light.wy0a03"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        }),
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        BoolConv("night_light", "switch", mi="4.p.5"),
+    ],
+}, {    
     # https://home.miot-spec.com/spec/lemesh.light.wy0c14
     13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14 "],
     "spec": [
