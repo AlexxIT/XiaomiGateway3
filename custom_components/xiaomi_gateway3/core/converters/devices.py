@@ -974,6 +974,16 @@ DEVICES += [{
         ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
         ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
     ],
+}, {
+    "lumi.remote.b1acn02": ["Aqara", "Button", "WXKG13LM"],
+    "spec": [
+        Action,
+        ButtonMIConv("button", mi="3.e.1", value=1),  # single
+        ButtonMIConv("button", mi="3.e.2", value=2),  # double
+        ButtonMIConv("button", mi="3.e.3", value=16),  # long
+        BatteryConv("battery", "sensor", mi="2.p.1"),  # voltage
+        MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW, enabled=False)
+    ]
 }]
 
 ########################################################################################
@@ -1278,6 +1288,8 @@ DEVICES += [{
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
+    5860: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t8
     9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC"],
     # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
@@ -1363,8 +1375,6 @@ DEVICES += [{
     1647: ["Xiaomi", "Qingping TH Lite", "CGDK2"],
     1747: ["Xiaomi", "ZenMeasure Clock", "MHO-C303"],
     2888: ["Xiaomi", "Qingping TH Sensor", "CGG1"],  # same model as 839?!
-    # https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
-    5860: ["Xiaomi", "TH Clock", "LYWSD02MMC"],
     "spec": [
         MiBeacon, BLETemperature, BLEHumidity,
         Converter("battery", "sensor", enabled=None),  # no in new firmwares
@@ -1567,10 +1577,10 @@ DEVICES += [{
         EventConv("action", mi="3.e.2", value="button_1_hold"),
         EventConv("action", mi="3.e.3", value="button_2_hold"),
     ]
-},  {
+}, {
     # https://home.miot-spec.com/spec/giot.switch.v52ksm
-    13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],  
-    "spec":[
+    13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
+    "spec": [
         Converter("left_switch", "switch", mi="2.p.1"),
         Converter("right_switch", "switch", mi="3.p.1"),
         MapConv("left_switch_mode", "select", mi="2.p.2", map={
@@ -2023,7 +2033,7 @@ DEVICES += [{
         }, enabled=False),
         Converter("action", "sensor", enabled=False),
         ButtonMIConv("button", mi="6.e.2", value=1),
-    ],    
+    ],
 }, {
     12055: ["ZNSN", "Mesh Double Wall Switch", "zg2m"],
     "spec": [
@@ -2628,18 +2638,90 @@ DEVICES += [{
     7856: ["Unknown", "Mesh Double Wall Switch (No N)", "frfox.switch.bl02"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
-        MapConv("mode_1", "select", mi="2.p.2", map={
-            0: "default", 1: "wireless", 2: "flex", 3: "scene",
-        }),
         Converter("channel_2", "switch", mi="3.p.1"),
-        MapConv("mode_2", "select", mi="3.p.2", map={
-            0: "default", 1: "wireless", 2: "flex", 3: "scene",
-        }),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "default", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "default", 1: "wireless", 2: "flex", 3: "scene"}),
         Action,
         ButtonMIConv("button_1", mi="4.e.1", value=1),
         ButtonMIConv("button_2", mi="5.e.1", value=1),
         Converter("backlight", "switch", mi="6.p.1"),
         Converter("led", "switch", mi="6.p.2"),
+    ]
+}, {
+    11253: ["LianXun", "Smart Switch Four-key Mesh", "lxun.switch.lxswm4"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        Converter("switch_4", "switch", mi="12.p.1"),
+        MapConv("backlight", "select", mi="5.p.1", map={0: "off", 1: "on"}),
+        MapConv("backlight_1", "select", mi="9.p.1", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_2", "select", mi="9.p.2", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_3", "select", mi="9.p.3", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_4", "select", mi="9.p.4", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("mode_1", "select", mi="10.p.1", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_2", "select", mi="10.p.2", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_3", "select", mi="10.p.3", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_4", "select", mi="10.p.4", map={1: "normal", 2: "scene", 3: "flex"}),
+        Action,
+        ButtonMIConv("button_1", mi="11.e.1", value=1),
+        ButtonMIConv("button_2", mi="11.e.2", value=1),
+        ButtonMIConv("button_3", mi="11.e.3", value=1),
+        ButtonMIConv("button_4", mi="11.e.4", value=1),
+        ButtonMIConv("button_1", mi="11.e.5", value=2),
+        ButtonMIConv("button_2", mi="11.e.6", value=2),
+        ButtonMIConv("button_3", mi="11.e.7", value=2),
+        ButtonMIConv("button_4", mi="11.e.8", value=2),
+        ButtonMIConv("button_1", mi="11.e.9", value=16),
+        ButtonMIConv("button_2", mi="11.e.10", value=16),
+        ButtonMIConv("button_3", mi="11.e.11", value=16),
+        ButtonMIConv("button_4", mi="11.e.12", value=16),
+    ]
+}, {
+    12987: ["LianXun", "Smart Switch 8-key Mesh", "lxun.switch.sw08"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        Converter("switch_4", "switch", mi="12.p.1"),
+        MapConv("backlight", "select", mi="5.p.1", map={0: "off", 1: "on"}),
+        MapConv("backlight_1", "select", mi="9.p.1", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_2", "select", mi="9.p.2", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_3", "select", mi="9.p.3", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_4", "select", mi="9.p.4", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_5", "select", mi="9.p.5", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_6", "select", mi="9.p.6", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_7", "select", mi="9.p.7", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("backlight_8", "select", mi="9.p.8", map={1: "reverse", 2: "open", 3: "close", 4: "flash"}),
+        MapConv("mode_1", "select", mi="10.p.1", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_2", "select", mi="10.p.2", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_3", "select", mi="10.p.3", map={1: "normal", 2: "scene", 3: "flex"}),
+        MapConv("mode_4", "select", mi="10.p.4", map={1: "normal", 2: "scene", 3: "flex"}),
+        Action,
+        ButtonMIConv("button_1", mi="11.e.1", value=1),
+        ButtonMIConv("button_2", mi="11.e.2", value=1),
+        ButtonMIConv("button_3", mi="11.e.3", value=1),
+        ButtonMIConv("button_4", mi="11.e.4", value=1),
+        ButtonMIConv("button_1", mi="11.e.5", value=2),
+        ButtonMIConv("button_2", mi="11.e.6", value=2),
+        ButtonMIConv("button_3", mi="11.e.7", value=2),
+        ButtonMIConv("button_4", mi="11.e.8", value=2),
+        ButtonMIConv("button_1", mi="11.e.9", value=16),
+        ButtonMIConv("button_2", mi="11.e.10", value=16),
+        ButtonMIConv("button_3", mi="11.e.11", value=16),
+        ButtonMIConv("button_4", mi="11.e.12", value=16),
+        ButtonMIConv("button_5", mi="11.e.13", value=1),
+        ButtonMIConv("button_6", mi="11.e.14", value=1),
+        ButtonMIConv("button_7", mi="11.e.15", value=1),
+        ButtonMIConv("button_8", mi="11.e.16", value=1),
+        ButtonMIConv("button_5", mi="11.e.17", value=2),
+        ButtonMIConv("button_6", mi="11.e.18", value=2),
+        ButtonMIConv("button_7", mi="11.e.19", value=2),
+        ButtonMIConv("button_8", mi="11.e.20", value=2),
+        ButtonMIConv("button_5", mi="11.e.21", value=16),
+        ButtonMIConv("button_6", mi="11.e.22", value=16),
+        ButtonMIConv("button_7", mi="11.e.23", value=16),
+        ButtonMIConv("button_8", mi="11.e.24", value=16),
     ]
 }, {
     7857: ["Unknown", "Mesh Triple Wall Switch (No N)", "frfox.switch.bl03"],
@@ -2672,6 +2754,9 @@ DEVICES += [{
         Converter("target_position", mi="2.p.3"),
         CurtainPosConv("position", mi="2.p.2", parent="motor"),
         Converter("battery", "sensor", mi="3.p.1"),
+        Converter("security_mode", "switch", mi="4.p.6"),
+        Converter("power_replenishment", "sensor", mi="7.p.1", enabled=None),
+        Converter("realtime_current_in", "sensor", mi="7.p.2", enabled=None),
     ],
 }, {
     # https://home.miot-spec.com/spec/yeelink.curtain.crc1
@@ -2836,6 +2921,150 @@ DEVICES += [{
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
         BoolConv("night_light", "switch", mi="4.p.5"),
         # And more...
+    ]
+}, {
+    # https://home.miot-spec.com/spec/giot.switch.v53ksm
+    13140: ["GranwinIoT", "Smart three-Button Switch (Mesh) V5", "giot.switch.v53ksm"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("switch_status_1", "switch", mi="11.p.1"),
+        Converter("switch_status_2", "switch", mi="12.p.1"),
+        Converter("switch_status_3", "switch", mi="13.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_3", "select", mi="4.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/giot.switch.v54ksm
+    13141: ["GranwinIoT", "Smart four-Button Switch (Mesh) V5", "giot.switch.v54ksm"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("channel_4", "switch", mi="5.p.1"),
+        Converter("switch_status_1", "switch", mi="11.p.1"),
+        Converter("switch_status_2", "switch", mi="12.p.1"),
+        Converter("switch_status_3", "switch", mi="13.p.1"),
+        Converter("switch_status_4", "switch", mi="14.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_2", "select", mi="3.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_3", "select", mi="4.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+        MapConv("mode_4", "select", mi="5.p.2", map={
+            0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"
+        }),
+    ]
+}, {
+    9612: ["Unkown", "Mesh Singel Wall Switch", "bean.switch.bl01"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="3.e.1", value=1),
+    ]
+}, {
+    9613: ["Unkown", "Mesh Double Wall Switch", "bean.switch.bl02"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="4.e.1", value=1),
+        ButtonMIConv("button_2", mi="5.e.1", value=1),
+    ]
+}, {
+    9614: ["Unkown", "Mesh Triple Wall Switch", "bean.switch.bl03"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="5.e.1", value=1),
+        ButtonMIConv("button_2", mi="6.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.1", value=1),
+    ]
+}, {
+    14431: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (1 Gang)", "XMQBKG04LM"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="3.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="4.p.2", round=1),
+        Converter("led", "light", mi="5.p.1"),
+    ],
+}, {
+    14432: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (2 Gang)", "XMQBKG05LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="4.e.1", value=1),
+        ButtonMIConv("button_2", mi="5.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="6.p.2", round=1),
+        Converter("led", "light", mi="7.p.1"),
+    ],
+}, {
+    14433: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (3 Gang)", "XMQBKG06LM"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("action", "sensor", enabled=False),
+        ButtonMIConv("button_1", mi="5.e.1", value=1),
+        ButtonMIConv("button_2", mi="6.e.1", value=1),
+        ButtonMIConv("button_3", mi="7.e.1", value=1),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="8.p.2", round=1),
+        Converter("led", "light", mi="9.p.1"),
+    ],
+}, {
+    13521: ["Xiaomi", "Xiaomi Smart Wall Outlet Pro", "XMZNCZ01LM"],
+    "spec": [
+        Converter("outlet", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "switch", mi="2.p.2", map={0: True, 1: False}),
+        MapConv("fault", "sensor", mi="2.p.3",
+                map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("power", "sensor", mi="3.p.6", round=1),
+        Converter("led", "light", mi="4.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/lemesh.light.wy0c14
+    13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14 "],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        }),
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
     "default": "mesh",  # default Mesh device
