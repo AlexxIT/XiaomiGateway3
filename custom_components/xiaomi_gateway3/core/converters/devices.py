@@ -3073,4 +3073,16 @@ DEVICES += [{
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
     ],
+}, {
+    16143: ["Linptech", "Submersion Sensor", "linp.flood.rs1bb"],
+    "spec": [
+        Converter("moisture", "binary_sensor", mi="2.p.1006"),  # bool
+        Converter("battery", "sensor", mi="3.p.1003"),
+    ],
+}, {
+    16204: ["Linptech", "Pressure Sensor", "linp.senpres.ps1bb"],
+    "spec": [
+        Converter("pressure", "binary_sensor", mi="2.p.1060"),  # bool
+        Converter("battery", "sensor", mi="3.p.1003"),
+    ],
 }]
