@@ -274,7 +274,10 @@ class MiBeaconConv(Converter):
             payload["opening"] = bool(data[0] == 0)
 
         elif eid == 0x1010 and len(data) == 2:  # 4112
-            payload["formaldehyde"] = int.from_bytes(data, "little") / 1000.0
+            if device.model == 1809:
+                payload["formaldehyde"] = int.from_bytes(data, "little") / 1000.0
+            else:
+                payload["formaldehyde"] = int.from_bytes(data, "little") / 100.0
 
         elif eid == 0x1012 and len(data) == 1:  # 4114
             # hass: On means open, Off means closed
