@@ -2332,6 +2332,7 @@ DEVICES += [{
             0: "nofaults", 1: "overtemperature", 2: "overload",
             3: "overtemperature-overload"
         }),
+        MathConv("power", "sensor", mi="5.p.6", round=1),
     ],
 }, {
     6380: ["Xiaomi", "Mesh Double Wall Switch (Neutral Wire)", "XMQBKG02LM"],
@@ -2352,6 +2353,7 @@ DEVICES += [{
             0: "nofaults", 1: "overtemperature", 2: "overload",
             3: "overtemperature-overload"
         }),
+        MathConv("power", "sensor", mi="4.p.6", round=1),
     ],
 }, {
     6381: ["Xiaomi", "Mesh Triple Wall Switch (Neutral Wire)", "XMQBKG03LM"],
@@ -2379,6 +2381,7 @@ DEVICES += [{
             0: "nofaults", 1: "overtemperature", 2: "overload",
             3: "overtemperature-overload"
         }),
+        MathConv("power", "sensor", mi="5.p.6", round=1),
     ],
 }, {
     5195: ["YKGC", "LS Smart Curtain Motor", "LSCL"],
