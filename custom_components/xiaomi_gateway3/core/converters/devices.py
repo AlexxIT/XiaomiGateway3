@@ -1348,6 +1348,14 @@ DEVICES += [{
             7: "button_7_hold", 8: "button_8_hold"
         }),
     ]
+}, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:timer:0000A0BD:hoto-kt:1
+    9385: ["Mijia", "Smart Timer", "hoto.timer.kt"],
+    "spec": [
+        BLEAction,
+        EventConv("action", mi="2.e.1025", value="timer1"),
+        EventConv("action", mi="3.e.1025", value="timer2"),
+    ],
 }]
 
 # Xiaomi BLE MiBeacon only spec

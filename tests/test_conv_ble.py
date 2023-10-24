@@ -226,6 +226,23 @@ def test_6473():
     assert p == {"action": "button_both_single"}
 
 
+def test_9385():
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1169
+    device = XDevice(BLE, 9385, DID, MAC)
+    assert device.info.name == "Mijia Smart Timer"
+    device.setup_converters()
+
+    p = device.decode_miot(
+        [{"did": DID, "siid": 2, "eiid": 1025, "arguments": []}]
+    )
+    assert p == {"action": "timer1"}
+
+    p = device.decode_miot(
+        [{"did": DID, "siid": 3, "eiid": 1025, "arguments": []}]
+    )
+    assert p == {"action": "timer2"}
+
+
 def test_10249():
     device = XDevice(BLE, 10249, DID, MAC)
     assert device.info.name == "Xiaomi Door Lock E10"
