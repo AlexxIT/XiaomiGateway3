@@ -1356,6 +1356,13 @@ DEVICES += [{
         EventConv("action", mi="2.e.1025", value="timer1"),
         EventConv("action", mi="3.e.1025", value="timer2"),
     ],
+}, {
+    16143: ["Linptech", "Submersion Sensor", "RS1BB"],
+    "spec": [
+        MiBeacon, BLEWaterLeak, BLEBattery,
+        Converter("water_leak", mi="2.p.1006"),
+        Converter("battery", mi="3.p.1003"),
+    ],
 }]
 
 # Xiaomi BLE MiBeacon only spec
@@ -3084,12 +3091,6 @@ DEVICES += [{
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
-    ],
-}, {
-    16143: ["Linptech", "Submersion Sensor", "linp.flood.rs1bb"],
-    "spec": [
-        Converter("moisture", "binary_sensor", mi="2.p.1006"),  # bool
-        Converter("battery", "sensor", mi="3.p.1003"),
     ],
 }, {
     16204: ["Linptech", "Pressure Sensor", "linp.senpres.ps1bb"],
