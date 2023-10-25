@@ -1719,6 +1719,7 @@ DEVICES += [{
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
     7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
+    9439: ["GDDS", "Mesh Light", "gdds.light.wy0a01"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
@@ -3083,5 +3084,17 @@ DEVICES += [{
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
+    ],
+}, {
+    16143: ["Linptech", "Submersion Sensor", "linp.flood.rs1bb"],
+    "spec": [
+        Converter("moisture", "binary_sensor", mi="2.p.1006"),  # bool
+        Converter("battery", "sensor", mi="3.p.1003"),
+    ],
+}, {
+    16204: ["Linptech", "Pressure Sensor", "linp.senpres.ps1bb"],
+    "spec": [
+        Converter("pressure", "binary_sensor", mi="2.p.1060"),  # bool
+        Converter("battery", "sensor", mi="3.p.1003"),
     ],
 }]
