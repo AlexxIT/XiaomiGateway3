@@ -174,6 +174,7 @@ DEVICES += [{
     "spec": [
         Plug, Power, Voltage, Energy, ChipTemp,
         BoolConv("plug_detection", "binary_sensor", mi="8.0.2044"),
+        MapConv("power_on_state", "select", mi="8.0.2030", map=POWEROFF_MEMORY, enabled=False),
     ],
 }, {
     "lumi.ctrl_86plug.aq1": ["Aqara", "Wall Outlet", "QBCZ11LM"],
@@ -664,8 +665,7 @@ DEVICES += [{
         MathConv("energy", "sensor", mi="3.p.1", multiply=0.001, round=2),
         MathConv("power", "sensor", mi="3.p.2", round=2),
         BoolConv("led", "switch", mi="4.p.1", enabled=False),  # uint8
-        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY,
-                enabled=False),
+        MapConv("power_on_state", "select", mi="5.p.1", map=POWEROFF_MEMORY, enabled=False),
     ],
 }, {
     "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1 (no N)", "QBKG38LM"],
@@ -1791,7 +1791,7 @@ DEVICES += [{
         })
     ]
 }, {
-    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"], 
+    15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
