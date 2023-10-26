@@ -3012,8 +3012,25 @@ DEVICES += [{
         Action,
         ButtonMIConv("button_1", mi="5.e.1", value=1),
         ButtonMIConv("button_2", mi="6.e.1", value=1),
-        ButtonMIConv("button_2", mi="7.e.1", value=1),
+        ButtonMIConv("button_3", mi="7.e.1", value=1),
     ]
+}, {
+    10147: ["Unkown", "Mesh Four-Key Wall Switch", "bean.switch.bln04"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        Converter("switch_4", "switch", mi="5.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        Action,
+        ButtonMIConv("button_1", mi="6.e.1", value=1),
+        ButtonMIConv("button_2", mi="7.e.1", value=1),
+        ButtonMIConv("button_3", mi="8.e.1", value=1),
+        ButtonMIConv("button_4", mi="9.e.1", value=1),
+    ],
 }, {
     14431: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (1 Gang)", "XMQBKG04LM"],
     "spec": [
