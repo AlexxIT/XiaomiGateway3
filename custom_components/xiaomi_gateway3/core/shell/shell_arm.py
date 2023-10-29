@@ -12,7 +12,7 @@ class ShellARM(base.ShellOpenMiio):
         await asyncio.sleep(0.1)
         self.writer.write(b"\n")  # empty password
 
-        coro = self.reader.readuntil(b"/ # ")
+        coro = self.reader.readuntil(b" # ")
         await asyncio.wait_for(coro, timeout=3)
 
     async def prepare(self):
