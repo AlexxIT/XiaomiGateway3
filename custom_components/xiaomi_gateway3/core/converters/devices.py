@@ -1363,6 +1363,13 @@ DEVICES += [{
         Converter("water_leak", mi="2.p.1006"),
         Converter("battery", mi="3.p.1003"),
     ],
+}, {
+    # https://home.miot-spec.com/spec/linp.senpres.ps1bb
+    16204: ["Linptech", "Pressure Sensor", "PS1BB"],
+    "spec": [
+        BoolConv("pressure_state", "binary_sensor", mi="2.p.1060"),  # bool
+        Converter("battery", "sensor", mi="3.p.1003"),
+    ],
 }]
 
 # Xiaomi BLE MiBeacon only spec
@@ -3108,11 +3115,5 @@ DEVICES += [{
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
-    ],
-}, {
-    16204: ["Linptech", "Pressure Sensor", "linp.senpres.ps1bb"],
-    "spec": [
-        Converter("pressure", "binary_sensor", mi="2.p.1060"),  # bool
-        Converter("battery", "sensor", mi="3.p.1003"),
     ],
 }]
