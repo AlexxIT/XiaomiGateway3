@@ -1783,6 +1783,8 @@ DEVICES += [{
     13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14"],
     # https://home.miot-spec.com/spec/lemesh.light.wy0c15
     13525: ["LeMesh", "Mesh Light", "lemesh.light.wy0c15"],
+    # https://home.miot-spec.com/spec/yeelink.light.wy0a03
+    14335: ["Yeelight", "Yeelight Smart Light", "yeelink.light.wy0a03"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
