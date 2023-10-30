@@ -1757,8 +1757,32 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/yeelink.light.stripf
+    4896: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
+    # https://home.miot-spec.com/spec/yeelink.light.ml9
+    11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep"
+        }),
+
+        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}, enabled=False),
+
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/lemesh.light.wy0c14
+    13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14"],
     # https://home.miot-spec.com/spec/lemesh.light.wy0c15
-    13525: ["LeMesh", "Mesh Light", "lemesh.light.wy0c15 "],
+    13525: ["LeMesh", "Mesh Light", "lemesh.light.wy0c15"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
@@ -1768,7 +1792,10 @@ DEVICES += [{
             11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
             15: "sleep"
         }),
+
+        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
+
         BoolConv("save_state", "switch", mi="4.p.2"),
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
         BoolConv("night_light", "switch", mi="4.p.5"),
@@ -1786,24 +1813,6 @@ DEVICES += [{
             4: "Hospitality", 5: "Leisure", 6: "Office", 255: "Normal"
         }),
     ],
-}, {
-    # https://github.com/AlexxIT/XiaomiGateway3/issues/971
-    # https://home.miot-spec.com/spec/yeelink.light.ml9
-    11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
-    "spec": [
-        Converter("light", "light", mi="2.p.1"),
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
-        Converter("flex_switch", "switch", mi="3.p.6", enabled=False),  # bool
-        MapConv("power_on_state", "select", mi="3.p.7", enabled=False, map={
-            0: "default", 1: "on"
-        }),
-        MapConv("mode", "select", mi="2.p.5", map={
-            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
-            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
-            15: "sleep"
-        })
-    ]
 }, {
     15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001"],
     "spec": [
@@ -2929,28 +2938,6 @@ DEVICES += [{
         Converter("motor_reverse", "switch", mi="2.p.4", enabled=False),
     ],
 }, {
-    # https://home.miot-spec.com/spec/yeelink.light.stripf
-    # Following attributes are copied from lemesh.light.wy0c08 because they are similar
-    4896: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
-    "spec": [
-        Converter("switch", "switch", mi="2.p.1"),  # bool
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
-        MapConv("mode", "select", mi="2.p.5", map={
-            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
-            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
-            15: "sleep"
-        }),
-        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
-        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"},
-                enabled=False),
-
-        BoolConv("save_state", "switch", mi="4.p.2"),
-        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
-        BoolConv("night_light", "switch", mi="4.p.5"),
-        # And more...
-    ]
-}, {
     # https://home.miot-spec.com/spec/giot.switch.v53ksm
     13140: ["GranwinIoT", "Smart three-Button Switch (Mesh) V5", "giot.switch.v53ksm"],
     "spec": [
@@ -3094,23 +3081,6 @@ DEVICES += [{
         MathConv("power", "sensor", mi="3.p.6", round=1),
         Converter("led", "light", mi="4.p.1"),
     ],
-}, {
-    # https://home.miot-spec.com/spec/lemesh.light.wy0c14
-    13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14 "],
-    "spec": [
-        Converter("light", "light", mi="2.p.1"),
-        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
-        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
-        MapConv("mode", "select", mi="2.p.5", map={
-            0: "WY", 4: "day", 5: "night", 8: "TV", 9: "reading", 10: "computer",
-            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
-            15: "sleep"
-        }),
-        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
-        BoolConv("save_state", "switch", mi="4.p.2"),
-        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
-        BoolConv("night_light", "switch", mi="4.p.5"),
-    ]
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [
