@@ -2006,55 +2006,7 @@ DEVICES += [{
     ],
 }, {
     12055: ["ZNSN", "Mesh Double Wall Switch", "zg2m"],
-    "spec": [
-        Converter("channel_1", "switch", mi="2.p.1"),
-        MapConv("wireless_1", "select", mi="2.p.2", map={
-            0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
-        }, enabled=False),
-        MapConv("power_on_state_1", "select", mi="2.p.3", map={
-            0: "Default", 1: "Off", 2: "On"
-        }, enabled=False),
-        Converter("channel_2", "switch", mi="3.p.1"),
-        MapConv("wireless_2", "select", mi="3.p.2", map={
-            0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
-        }, enabled=False),
-        MapConv("power_on_state_2", "select", mi="3.p.3", map={
-            0: "Default", 1: "Off", 2: "On"
-        }, enabled=False),
-        Converter("action", "sensor", enabled=None),
-        ButtonMIConv("button_1", mi="6.e.1", value=1),
-        ButtonMIConv("button_2", mi="6.e.3", value=1),
-    ],
-}, {
     12058: ["ZNSN", "Mesh Triple Wall Switch", "zg3m"],
-    "spec": [
-        Converter("channel_1", "switch", mi="2.p.1"),
-        MapConv("wireless_1", "select", mi="2.p.2", map={
-            0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
-        }, enabled=False),
-        MapConv("power_on_state_1", "select", mi="2.p.3", map={
-            0: "Default", 1: "Off", 2: "On"
-        }, enabled=False),
-        Converter("channel_2", "switch", mi="3.p.1"),
-        MapConv("wireless_2", "select", mi="3.p.2", map={
-            0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
-        }, enabled=False),
-        MapConv("power_on_state_2", "select", mi="3.p.3", map={
-            0: "Default", 1: "Off", 2: "On"
-        }, enabled=False),
-        Converter("channel_3", "switch", mi="4.p.1"),
-        MapConv("wireless_3", "select", mi="4.p.2", map={
-            0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
-        }, enabled=False),
-        MapConv("power_on_state_3", "select", mi="4.p.3", map={
-            0: "Default", 1: "Off", 2: "On"
-        }, enabled=False),
-        Converter("action", "sensor", enabled=None),
-        ButtonMIConv("button_1", mi="6.e.1", value=1),
-        ButtonMIConv("button_2", mi="6.e.2", value=1),
-        ButtonMIConv("button_3", mi="6.e.3", value=1),
-    ],
-}, {
     12059: ["ZNSN", "Mesh Four-Key Wall Switch", "zg4m"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
@@ -2071,14 +2023,14 @@ DEVICES += [{
         MapConv("power_on_state_2", "select", mi="3.p.3", map={
             0: "Default", 1: "Off", 2: "On"
         }, enabled=False),
-        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1", enabled=None),
         MapConv("wireless_3", "select", mi="4.p.2", map={
             0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
         }, enabled=False),
         MapConv("power_on_state_3", "select", mi="4.p.3", map={
             0: "Default", 1: "Off", 2: "On"
         }, enabled=False),
-        Converter("channel_4", "switch", mi="5.p.1"),
+        Converter("channel_4", "switch", mi="5.p.1", enabled=None),
         MapConv("wireless_4", "select", mi="5.p.2", map={
             0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"
         }, enabled=False),
