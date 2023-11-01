@@ -1311,6 +1311,15 @@ DEVICES += [{
         Converter("battery", mi="3.p.1003"),
     ],
 }, {
+    13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS"],
+    "spec": [
+        MiBeacon, BLEMotion, BLEIlluminance, BLEBattery,
+        Converter("idle_time", "sensor", enabled=False),
+        Converter("illuminance", mi="2.p.1005"),
+        EventConv("motion", mi="2.e.1008", value=True),
+        Converter("battery", mi="3.p.1003"),
+    ],
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:huca-wx8:1
     12382: ["H+", "Wireless Button", "huca-wx8"],
     "spec": [
