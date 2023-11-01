@@ -39,6 +39,7 @@ DEVICE_CLASSES = {
     "reverse": BinarySensorDeviceClass.LOCK,
     "square": BinarySensorDeviceClass.LOCK,
     "water_leak": BinarySensorDeviceClass.MOISTURE,
+    "realtime_current_in": SensorDeviceClass.CURRENT,
 }
 
 ICONS = {
@@ -129,6 +130,12 @@ ENTITY_CATEGORIES = {
     "turn_off_transit_sec": EntityCategory.CONFIG,
     "change_transit_sec": EntityCategory.CONFIG,
     "min_brightness": EntityCategory.CONFIG,
+    # Linptech Mesh Triple Wall Switch (no N)
+    "compatible_mode": EntityCategory.CONFIG,
+    # Linptech Sliding Window Driver WD1
+    "security_mode": EntityCategory.CONFIG,
+    "power_replenishment": EntityCategory.DIAGNOSTIC,
+    "realtime_current_in": EntityCategory.DIAGNOSTIC,
 }
 
 STATE_TIMEOUT = timedelta(minutes=10)

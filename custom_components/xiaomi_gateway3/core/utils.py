@@ -154,39 +154,47 @@ async def check_port(host: str, port: int) -> bool:
         s.close()
 
 
+# universal command for open telnet on all models
+TELNET_CMD = "passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"
+# firmware with support telnet ONLY with key
+TELNET_KEY = {
+    "lumi.gateway.mgl03": "1.5.5",
+    "lumi.gateway.aqcn02": "4.0.4",
+    "lumi.gateway.aqcn03": "4.0.4",
+    "lumi.gateway.mcn001": "1.0.7",
+    "lumi.gateway.mgl001": "1.0.7",
+}
+
+
 async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:
     # Strategy:
     # 1. Get miio info
     # 2. Send common open telnet cmd if we can't get miio info
     # 3. Send different telnet cmd based on gateway model and firmware
     # 4. Return miio info and response on open telnet cmd
-    method = params = None
-
+    method = None
     miio_info = await miio.info()
 
-    if miio_info and miio_info.get("model") == "lumi.gateway.mgl03":
-        # we know it is Xiaomi Multimode Gateway 1
-        if miio_info["fw_ver"] < "1.4.7":
+    if miio_info and "model" in miio_info and "fw_ver" in miio_info:
+        if miio_info["model"] == "lumi.gateway.mgl03" and miio_info["fw_ver"] < "1.4.7":
             method = "enable_telnet_service"
-        elif miio_info["fw_ver"] < "1.5.5":
+        elif miio_info["fw_ver"] < TELNET_KEY.get(miio_info["model"], "999"):
             method = "set_ip_info"
-            params = {
-                "ssid": '""',
-                "pswd": "1; passwd -d $USER; echo enable > /sys/class/tty/tty/enable; telnetd",
-            }
         elif key:
             method = "system_command"
-            params = {
-                "password": miio_password(miio.device_id, miio_info["mac"], key),
-                "command": "passwd -d $USER; echo enable > /sys/class/tty/tty/enable; telnetd",
-            }
     else:
         # some universal cmd for all gateways
         method = "set_ip_info"
+
+    if method == "set_ip_info":
+        params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
+    elif method == "system_command":
         params = {
-            "ssid": '""',
-            "pswd": "1; passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd",
+            "password": miio_password(miio.device_id, miio_info["mac"], key),
+            "command": TELNET_CMD,
         }
+    else:
+        params = None
 
     if method:
         res = await miio.send(method, params, tries=1)
