@@ -1591,14 +1591,24 @@ DEVICES += [{
     "ttl": "25h"
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1063
-    10371: ["PTX", "Mesh Multifunction Wireless Switch", "090615.remote.mlsw0a"],
+    10371: ["PTX", "Mesh Multifunction Wireless Switch", "PTX-AK3-QMIMB"],
     "spec": [
         MiBeacon, BLEAction, Button,  # don't know is it BLE or Mesh
         EventConv("action", mi="2.e.1", value="button_1_single"),
         EventConv("action", mi="2.e.2", value="button_2_single"),
+        EventConv("action", mi="2.e.3", value="button_3_single"),
+        EventConv("action", mi="2.e.4", value="button_4_single"),
+        EventConv("action", mi="2.e.5", value="button_5_single"),
+        EventConv("action", mi="3.e.1", value="button_6_single"),
         EventConv("action", mi="3.e.2", value="button_1_hold"),
         EventConv("action", mi="3.e.3", value="button_2_hold"),
-    ]
+        EventConv("action", mi="3.e.4", value="button_3_hold"),
+        EventConv("action", mi="3.e.5", value="button_4_hold"),
+        EventConv("action", mi="3.e.6", value="button_5_hold"),
+        EventConv("action", mi="3.e.7", value="button_6_hold"),
+        Converter("battery", "sensor", mi="4.p.1"),
+    ],
+    "ttl": "25h"
 }, {
     # https://home.miot-spec.com/spec/giot.switch.v52ksm
     13139: ["GranwinIoT", "Smart Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
