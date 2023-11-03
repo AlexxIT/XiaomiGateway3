@@ -1359,9 +1359,8 @@ DEVICES += [{
 }, {
     16143: ["Linptech", "Submersion Sensor", "RS1BB"],
     "spec": [
-        MiBeacon, BLEWaterLeak, BLEBattery,
-        Converter("water_leak", mi="2.p.1006"),
-        Converter("battery", mi="3.p.1003"),
+        Converter("moisture", "binary_sensor", mi="2.p.1006"),
+        Converter("battery", "sensor", mi="3.p.1003"),
     ],
 }, {
     # https://home.miot-spec.com/spec/linp.senpres.ps1bb
