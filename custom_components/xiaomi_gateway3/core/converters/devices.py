@@ -3094,6 +3094,19 @@ DEVICES += [{
         Converter("led", "light", mi="4.p.1"),
     ],
 }, {
+    7082: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx340"],
+    6857: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx341"],
+    # https://home.miot-spec.com/s/pmfbj.light.xsx340
+    # https://home.miot-spec.com/s/pmfbj.light.xsx341
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "default", 1: "daily", 2: "leisure", 3: "comfortable", 4: "night", 5: "SY"
+        })
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
