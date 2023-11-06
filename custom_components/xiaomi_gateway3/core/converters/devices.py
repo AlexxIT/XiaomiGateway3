@@ -1768,7 +1768,7 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/spec/yeelink.light.stripf
-    4896: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
+    11901: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
     # https://home.miot-spec.com/spec/yeelink.light.ml9
     11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
     "spec": [
