@@ -3102,8 +3102,8 @@ DEVICES += [{
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
-        MapConv("mode", "select", mi="2.p.4", map={
-            0: "default", 1: "daily", 2: "leisure", 3: "comfortable", 4: "night", 5: "SY"
+        MapConv("effect", mi="2.p.4", parent="light", map={
+            0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"
         })
     ]
 }, {
