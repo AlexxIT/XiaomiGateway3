@@ -3107,6 +3107,19 @@ DEVICES += [{
         })
     ]
 }, {
+    6435: ["PTX", "PTX Smart Quadruple Switch", "sk4k"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        Converter("switch_4", "switch", mi="5.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        Converter("backlight", "switch", mi="8.p.1"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
