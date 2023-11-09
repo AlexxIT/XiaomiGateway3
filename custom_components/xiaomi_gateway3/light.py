@@ -46,8 +46,8 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
-                    self._attr_min_mireds = int(1000000 / conv.maxk)
-                    self._attr_max_mireds = int(1000000 / conv.mink)
+                    self._attr_min_mireds = round(1000000 / conv.maxk)
+                    self._attr_max_mireds = round(1000000 / conv.mink)
             elif conv.attr == ATTR_EFFECT:
                 self._attr_supported_features |= LightEntityFeature.EFFECT
                 self._attr_effect_list = list(conv.map.values())
