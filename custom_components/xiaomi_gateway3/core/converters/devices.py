@@ -256,13 +256,6 @@ DEVICES += [{
                 enabled=False),
     ],
 }, {
-    "lumi.light.acn003": ["Aqara", "L1-350 Ceiling Light", "ZNXDD01LM"],
-    "spec": [
-        BoolConv("light", "light", mi="2.p.1"),
-        ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
-        ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
-    ],
-}, {
     # light with brightness
     "ikea.light.led1623g12": ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
     "ikea.light.led1650r5": ["IKEA", "Bulb GU10 400 lm", "LED1650R5"],
@@ -984,6 +977,18 @@ DEVICES += [{
         BatteryConv("battery", "sensor", mi="2.p.1"),  # voltage
         MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW, enabled=False)
     ]
+}, {
+    # https://home.miot-spec.com/spec/lumi.light.acn003
+    "lumi.light.acn003": ["Aqara", "L1-350 Ceiling Light", "ZNXDD01LM"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light"),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "day", 1: "reading", 2: "warm", 3: "tv", 4: "night"
+        }),
+        Converter("power_on_state", "switch", mi="3.p.2", enabled=False),  # bool
+    ],
 }]
 
 ########################################################################################
