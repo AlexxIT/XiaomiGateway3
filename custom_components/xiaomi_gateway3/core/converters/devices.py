@@ -3125,6 +3125,35 @@ DEVICES += [{
         Converter("backlight", "switch", mi="8.p.1"),
     ],
 }, {
+    # https://home.miot-spec.com/s/giot.plug.v3oodm
+    10944: ["Unknown", "Mesh Smart Switch V3", "giot.switch.v3oodm"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "select", mi="2.p.3", map={
+            0: "off", 1: "on", 2: "previous"
+        }),
+
+        # Inching mode
+        BoolConv("inching_mode", "switch", mi="2.p.2"),
+        MapConv("inching_state", "select", mi="3.p.1", map={False: "off", True: "on"}),
+        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200,
+                 step=1, round=1),
+
+        # LED
+        MapConv("led", "select", mi="4.p.1", map={
+            0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"
+        })
+    ]
+}, {
+    14050: ["Scdvb", "Air Conditioner", "scdvb.aircondition.acm"],
+    "spec": [
+        Converter("climate", "climate", mi="2.p.1"),
+        MapConv("hvac_mode", mi="2.p.2", map={0: "cool", 1: "heat", 2: "fan_only", 3: "dry"}, parent="climate"),
+        MapConv("fan_mode", mi="3.p.1", map={0: "auto", 1: "low", 2: "medium", 3: "high"}, parent="climate"),
+        Converter("current_temp", mi="4.p.1", parent="climate"),
+        Converter("target_temp", mi="2.p.3", parent="climate"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
