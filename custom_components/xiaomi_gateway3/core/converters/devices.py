@@ -1729,6 +1729,13 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/crzm.light.w00a01
+    2292: ["crzm", "Mesh Light", "crzm.light.w00a01"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+    ]
+},{
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
     4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
@@ -1788,6 +1795,26 @@ DEVICES += [{
 
         Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}, enabled=False),
+
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/symi.light.wy0a01
+    10055: ["Symi", "Mesh Light", "symi.light.wy0a01"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 7: "Warmth", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep", 16: "Respiration", 17: "Loop Jump"
+        }),
+
+        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
 
         BoolConv("save_state", "switch", mi="4.p.2"),
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
@@ -1997,20 +2024,20 @@ DEVICES += [{
         Converter("switch", "switch", mi="2.p.1"),
     ],
 }, {
-	# https://home.miot-spec.com/spec/lemesh.switch.sw4a02
+    # https://home.miot-spec.com/spec/lemesh.switch.sw4a02
     8194: ["LeMesh", "Mesh Switch", "lemesh.switch.sw4a02"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
-		Converter("channel_3", "switch", mi="4.p.1"),
-		Converter("channel_4", "switch", mi="12.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("channel_4", "switch", mi="12.p.1"),
     ],
 }, {
-	# https://home.miot-spec.com/spec/bean.switch.bl01
+    # https://home.miot-spec.com/spec/bean.switch.bl01
     9609: ["Bean", "Mesh Switch", "bean.switch.bl01"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
-		Converter("action", "sensor", enabled=False),
+        Converter("action", "sensor", enabled=False),
     ],
 }, {
     2258: ["PTX", "Mesh Single Wall Switch", "PTX-SK1M"],
@@ -2643,7 +2670,7 @@ DEVICES += [{
     ],
 }, {
     # https://home.miot-spec.com/spec/linp.switch.q3s2
-	2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
     # https://home.miot-spec.com/spec/linp.switch.q4s2
     5044: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q4s2"],
     "spec": [
