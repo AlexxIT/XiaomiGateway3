@@ -1997,6 +1997,22 @@ DEVICES += [{
         Converter("switch", "switch", mi="2.p.1"),
     ],
 }, {
+	# https://home.miot-spec.com/spec/lemesh.switch.sw4a02
+    8194: ["LeMesh", "Mesh Switch", "lemesh.switch.sw4a02"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+		Converter("channel_3", "switch", mi="4.p.1"),
+		Converter("channel_4", "switch", mi="12.p.1"),
+    ],
+}, {
+	# https://home.miot-spec.com/spec/bean.switch.bl01
+    9609: ["Bean", "Mesh Switch", "bean.switch.bl01"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+		Converter("action", "sensor", enabled=False),
+    ],
+}, {
     2258: ["PTX", "Mesh Single Wall Switch", "PTX-SK1M"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
@@ -2613,8 +2629,10 @@ DEVICES += [{
         ButtonMIConv("button_3", mi="7.e.3", value=1),  # button_3_single
     ],
 }, {
-    # https://home.miot-spec.com/s/5045
+    # https://home.miot-spec.com/s/2428
     2428: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q3s1"],
+    # https://home.miot-spec.com/spec/linp.switch.q4s1
+    5043: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q4s1"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("action", "sensor", enabled=False),
@@ -2624,8 +2642,10 @@ DEVICES += [{
         Converter("led", "switch", mi="5.p.1"),
     ],
 }, {
-    # https://home.miot-spec.com/s/5045
-    2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    # https://home.miot-spec.com/spec/linp.switch.q3s2
+	2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    # https://home.miot-spec.com/spec/linp.switch.q4s2
+    5044: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q4s2"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
