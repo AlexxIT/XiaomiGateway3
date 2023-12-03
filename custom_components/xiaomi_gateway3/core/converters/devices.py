@@ -1282,6 +1282,12 @@ DEVICES += [{
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    15895: ["Linptech", "Wireless Button KS1Pro", "KS1PBB"],
+    "spec": [
+        MiBeacon, BLEAction, BLEHumidity, BLETemperature, BLEBattery
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
     # lumi.remote.mcn001
     9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
     "spec": [
