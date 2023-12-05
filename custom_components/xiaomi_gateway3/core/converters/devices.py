@@ -1282,9 +1282,22 @@ DEVICES += [{
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:linp-ks1bp:1
     15895: ["Linptech", "Wireless Button KS1Pro", "KS1PBB"],
     "spec": [
-        MiBeacon, BLEAction, BLEHumidity, BLETemperature, BLEBattery
+        MiBeacon, BLEAction, BLEHumidity, BLETemperature, BLEBattery,
+        MathConv("temperature", mi="2.p.1001", min=-30, max=100, round=1),
+        MathConv("humidity", mi="2.p.1008", min=0, max=100, round=1),
+        Converter("battery", mi="4.p.1003"),
+        BLEEvent("action", mi="5.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_3_single", 4: "button_4_single"
+        }),
+        BLEEvent("action", mi="5.e.1013", map={
+            1: "button_1_double", 2: "button_2_double", 3: "button_3_double", 4: "button_4_double"
+        }),
+        BLEEvent("action", mi="5.e.1014", map={
+            1: "button_1_hold", 2: "button_2_hold", 3: "button_3_hold", 4: "button_4_hold"
+        }),
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
