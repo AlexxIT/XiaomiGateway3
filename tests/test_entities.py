@@ -1,7 +1,8 @@
 import asyncio
 
 from homeassistant.components.sensor import DOMAIN
-from homeassistant.core import HomeAssistant
+from homeassistant.config import DATA_CUSTOMIZE
+from homeassistant.core import HomeAssistant, EventBus
 
 from custom_components.xiaomi_gateway3.binary_sensor import XiaomiBinarySensor
 from custom_components.xiaomi_gateway3.climate import AqaraE1
@@ -21,10 +22,13 @@ ZNWK = "0x12ab"
 
 
 class Hass(HomeAssistant):
+    def __new__(cls):
+        return HomeAssistant.__new__(cls, "")
+
     def __init__(self):
         asyncio.get_running_loop = lambda: asyncio.new_event_loop()
-        HomeAssistant.__init__(self)
-        self.bus.async_fire = self.async_fire
+        EventBus.async_fire = self.async_fire
+        HomeAssistant.__init__(self, "")
         self.events = []
 
     def async_fire(self, *args, **kwargs):
@@ -186,3 +190,42 @@ def test_number():
     number = XiaomiNumber(gw, device, conv)
     number.hass = Hass()
     number.async_write_ha_state()
+
+
+def test_celling():
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1209
+    gw = XGateway("", "")
+    device = XDevice(ZIGBEE, "lumi.light.acn003", ZDID, ZMAC, ZNWK)
+    device.setup_converters()
+    device.available = True
+
+    conv = next(conv for conv in device.converters if conv.attr == "light")
+    light = XiaomiZigbeeLight(gw, device, conv)
+    light.hass = Hass()
+    light.async_write_ha_state()
+
+    light.hass.data[DATA_CUSTOMIZE] = {light.entity_id: {}}
+
+    light.hass.loop.run_until_complete(light.async_turn_on())
+
+    assert gw.mqtt.pub_buffer[0] == [
+        "zigbee/recv",
+        {
+            "cmd": "write",
+            "did": "lumi.112233aabbcc",
+            "mi_spec": [{"piid": 1, "siid": 2, "value": True}],
+        },
+        False,
+    ]
+
+    light.hass.loop.run_until_complete(light.async_turn_on(brightness=100))
+
+    assert gw.mqtt.pub_buffer[1] == [
+        "zigbee/recv",
+        {
+            "cmd": "write",
+            "did": "lumi.112233aabbcc",
+            "mi_spec": [{"piid": 2, "siid": 2, "value": 39}],
+        },
+        False,
+    ]

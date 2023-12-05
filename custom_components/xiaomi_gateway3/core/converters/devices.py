@@ -256,13 +256,6 @@ DEVICES += [{
                 enabled=False),
     ],
 }, {
-    "lumi.light.acn003": ["Aqara", "L1-350 Ceiling Light", "ZNXDD01LM"],
-    "spec": [
-        BoolConv("light", "light", mi="2.p.1"),
-        ZXiaomiBrightnessConv("brightness", mi="2.p.2", parent="light"),
-        ZXiaomiColorTempConv("color_temp", mi="2.p.3", parent="light"),
-    ],
-}, {
     # light with brightness
     "ikea.light.led1623g12": ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
     "ikea.light.led1650r5": ["IKEA", "Bulb GU10 400 lm", "LED1650R5"],
@@ -984,6 +977,18 @@ DEVICES += [{
         BatteryConv("battery", "sensor", mi="2.p.1"),  # voltage
         MapConv("battery_low", "binary_sensor", mi="4.p.1", map=BATTERY_LOW, enabled=False)
     ]
+}, {
+    # https://home.miot-spec.com/spec/lumi.light.acn003
+    "lumi.light.acn003": ["Aqara", "L1-350 Ceiling Light", "ZNXDD01LM"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light"),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
+        MapConv("mode", "select", mi="2.p.4", map={
+            0: "day", 1: "reading", 2: "warm", 3: "tv", 4: "night"
+        }),
+        Converter("power_on_state", "switch", mi="3.p.2", enabled=False),  # bool
+    ],
 }]
 
 ########################################################################################
@@ -1274,6 +1279,12 @@ DEVICES += [{
         MiBeacon, BLEAction, Button, BLEBattery,
         Converter("battery", mi="2.p.1003"),
         BLEEvent("action", mi="3.e.1012", map={1: SINGLE, 8: HOLD, 15: DOUBLE}),
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
+    15895: ["Linptech", "Wireless Button KS1Pro", "KS1PBB"],
+    "spec": [
+        MiBeacon, BLEAction, BLEHumidity, BLETemperature, BLEBattery
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
@@ -1733,6 +1744,13 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/crzm.light.w00a01
+    2292: ["crzm", "Mesh Light", "crzm.light.w00a01"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+    ]
+},{
     # brightness 1..100, color_temp 2700..6500
     3416: ["PTX", "Mesh Downlight", "090615.light.mlig01"],
     4924: ["PTX", "Mesh Downlight", "090615.light.mlig02"],
@@ -1777,7 +1795,7 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/spec/yeelink.light.stripf
-    4896: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
+    11901: ["Yeelight", "Mesh Light Strip C1", "yeelink.light.stripf"],
     # https://home.miot-spec.com/spec/yeelink.light.ml9
     11667: ["Yeelight", "Mesh Downlight C1", "YCCBC1019/YCCBC1020"],  # flex
     "spec": [
@@ -1792,6 +1810,26 @@ DEVICES += [{
 
         Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
         MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}, enabled=False),
+
+        BoolConv("save_state", "switch", mi="4.p.2"),
+        MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("night_light", "switch", mi="4.p.5"),
+    ]
+}, {
+    # https://home.miot-spec.com/spec/symi.light.wy0a01
+    10055: ["Symi", "Mesh Light", "symi.light.wy0a01"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.5", map={
+            0: "WY", 4: "day", 5: "night", 7: "Warmth", 8: "TV", 9: "reading", 10: "computer",
+            11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk",
+            15: "sleep", 16: "Respiration", 17: "Loop Jump"
+        }),
+
+        Converter("flex_switch", "switch", mi="2.p.6", enabled=False),  # uint8
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 1: "on"}),
 
         BoolConv("save_state", "switch", mi="4.p.2"),
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
@@ -1999,6 +2037,22 @@ DEVICES += [{
     4252: ["Unknown", "Mesh Switch", "dwdz.switch.sw0a01"],
     "spec": [
         Converter("switch", "switch", mi="2.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw4a02
+    8194: ["LeMesh", "Mesh Switch", "lemesh.switch.sw4a02"],
+    "spec": [
+        Converter("channel_1", "switch", mi="2.p.1"),
+        Converter("channel_2", "switch", mi="3.p.1"),
+        Converter("channel_3", "switch", mi="4.p.1"),
+        Converter("channel_4", "switch", mi="12.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/bean.switch.bl01
+    9609: ["Bean", "Mesh Switch", "bean.switch.bl01"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        Converter("action", "sensor", enabled=False),
     ],
 }, {
     2258: ["PTX", "Mesh Single Wall Switch", "PTX-SK1M"],
@@ -2617,8 +2671,10 @@ DEVICES += [{
         ButtonMIConv("button_3", mi="7.e.3", value=1),  # button_3_single
     ],
 }, {
-    # https://home.miot-spec.com/s/5045
+    # https://home.miot-spec.com/s/2428
     2428: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q3s1"],
+    # https://home.miot-spec.com/spec/linp.switch.q4s1
+    5043: ["Linptech", "Lingpu Single Wall Switch", "linp.switch.q4s1"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("action", "sensor", enabled=False),
@@ -2628,8 +2684,10 @@ DEVICES += [{
         Converter("led", "switch", mi="5.p.1"),
     ],
 }, {
-    # https://home.miot-spec.com/s/5045
+    # https://home.miot-spec.com/spec/linp.switch.q3s2
     2429: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q3s2"],
+    # https://home.miot-spec.com/spec/linp.switch.q4s2
+    5044: ["Linptech", "Lingpu Double Wall Switch", "linp.switch.q4s2"],
     "spec": [
         Converter("channel_1", "switch", mi="2.p.1"),
         Converter("channel_2", "switch", mi="3.p.1"),
@@ -3102,6 +3160,52 @@ DEVICES += [{
         MathConv("power", "sensor", mi="3.p.6", round=1),
         Converter("led", "light", mi="4.p.1"),
     ],
+}, {
+    7082: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx340"],
+    6857: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx341"],
+    # https://home.miot-spec.com/s/pmfbj.light.xsx340
+    # https://home.miot-spec.com/s/pmfbj.light.xsx341
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        MapConv("effect", mi="2.p.4", parent="light", map={
+            0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"
+        })
+    ]
+}, {
+    6435: ["PTX", "PTX Smart Quadruple Switch", "sk4k"],
+    "spec": [
+        Converter("switch_1", "switch", mi="2.p.1"),
+        Converter("switch_2", "switch", mi="3.p.1"),
+        Converter("switch_3", "switch", mi="4.p.1"),
+        Converter("switch_4", "switch", mi="5.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        Converter("backlight", "switch", mi="8.p.1"),
+    ],
+}, {
+    # https://home.miot-spec.com/s/giot.plug.v3oodm
+    10944: ["Unknown", "Mesh Smart Switch V3", "giot.switch.v3oodm"],
+    "spec": [
+        Converter("switch", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "select", mi="2.p.3", map={
+            0: "off", 1: "on", 2: "previous"
+        }),
+
+        # Inching mode
+        BoolConv("inching_mode", "switch", mi="2.p.2"),
+        MapConv("inching_state", "select", mi="3.p.1", map={False: "off", True: "on"}),
+        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200,
+                 step=1, round=1),
+
+        # LED
+        MapConv("led", "select", mi="4.p.1", map={
+            0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"
+        })
+    ]
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [
