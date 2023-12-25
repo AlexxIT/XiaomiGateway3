@@ -506,6 +506,7 @@ DEVICES += [{
 DEVICES += [{
     "lumi.sen_ill.mgl01": ["Xiaomi", "Light Sensor EU", "GZCGQ01LM"],
     # "support": 5,  # @AlexxIT bug with gw fw 1.5.1
+    "lumi.sen_ill.agl01": ["Aqara", "Light Sensor CN", "GZCGQ11LM"],
     "spec": [
         Converter("illuminance", "sensor", mi="2.p.1"),
         BatteryConv("battery", "sensor", mi="3.p.1"),  # voltage, mV
