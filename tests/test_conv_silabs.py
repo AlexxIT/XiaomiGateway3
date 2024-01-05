@@ -210,7 +210,8 @@ def test_ias_zone():
             "APSPlayload": "0x096700210000000000",
         }
     )
-    p["value"] = list(p["value"])
+    p["command"] = p["command"].name
+    p["value"] = [int(i) for i in p["value"]]
     assert p == {
         "endpoint": 1,
         "seq": 103,
