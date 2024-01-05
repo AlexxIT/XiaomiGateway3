@@ -1,7 +1,7 @@
 from homeassistant.components.number import NumberEntity
 from homeassistant.components.number.const import DEFAULT_STEP
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import LENGTH_METERS, TIME_SECONDS
+from homeassistant.const import UnitOfLength, UnitOfTime
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -23,8 +23,8 @@ async def async_setup_entry(
 
 
 UNITS = {
-    "approach_distance": LENGTH_METERS,
-    "occupancy_timeout": TIME_SECONDS,
+    "approach_distance": UnitOfLength.METERS,
+    "occupancy_timeout": UnitOfTime.SECONDS,
 }
 
 
