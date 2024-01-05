@@ -7,7 +7,6 @@ from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config import DATA_CUSTOMIZE
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import *
 from homeassistant.core import callback, State, HomeAssistant
 from homeassistant.helpers import device_registry
 from homeassistant.helpers.device_registry import (

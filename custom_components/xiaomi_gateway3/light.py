@@ -1,8 +1,16 @@
 import asyncio
 
-from homeassistant.components.light import *
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_TEMP,
+    ATTR_EFFECT,
+    LightEntity,
+    LightEntityFeature,
+    ATTR_TRANSITION,
+)
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
@@ -39,9 +47,8 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
 
         for conv in device.converters:
             if conv.attr == ATTR_BRIGHTNESS:
-                self._attr_supported_features |= SUPPORT_BRIGHTNESS | SUPPORT_TRANSITION
+                self._attr_supported_features |= LightEntityFeature.TRANSITION
             elif conv.attr == ATTR_COLOR_TEMP:
-                self._attr_supported_features |= SUPPORT_COLOR_TEMP
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
