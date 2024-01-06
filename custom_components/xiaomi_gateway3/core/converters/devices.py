@@ -3229,6 +3229,15 @@ DEVICES += [{
         })
     ]
 }, {
+    14050: ["Scdvb", "Air Conditioner", "scdvb.aircondition.acm"],
+    "spec": [
+        Converter("climate", "climate", mi="2.p.1"),
+        MapConv("hvac_mode", mi="2.p.2", map={0: "cool", 1: "heat", 2: "fan_only", 3: "dry"}, parent="climate"),
+        MapConv("fan_mode", mi="3.p.1", map={0: "auto", 1: "low", 2: "medium", 3: "high"}, parent="climate"),
+        Converter("current_temp", mi="4.p.1", parent="climate"),
+        Converter("target_temp", mi="2.p.3", parent="climate"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         Converter("switch", "switch", mi="2.p.1", enabled=None),  # bool
