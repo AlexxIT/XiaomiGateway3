@@ -56,7 +56,7 @@ Component support original gateway firmware. You do not need to manually open, s
 
 The following versions are confirmed and supported:
 
-- **Home Assistant** from `2022.8.x` to `2023.5.x`
+- **Home Assistant** from `2022.8.x` to `2024.1.x`
 - **Xiaomi Multimode Gateway CN/EU** from `1.5.0_xxxx` to `1.5.4_xxxx`
 - **Xiaomi Multimode Gateway 2 CN/EU** from `1.0.3_xxxx` to `1.0.6_xxxx`
 - **Aqara Hub E1 CN** - `4.0.1_0001`
