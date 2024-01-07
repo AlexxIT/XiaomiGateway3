@@ -56,8 +56,7 @@ def init(logger_name: str, config: dict, config_dir: str = None):
     logger.propagate = config["propagate"]
     logger.setLevel(level)
 
-    filename = config.get(CONF_FILENAME)
-    if filename:
+    if filename := config.get(CONF_FILENAME):
         if config_dir:
             filename = os.path.join(config_dir, filename)
 

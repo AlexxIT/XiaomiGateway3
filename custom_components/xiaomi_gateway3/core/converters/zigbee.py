@@ -345,7 +345,7 @@ class ZTuyaButtonConv(ZConverter):
 
         try:
             payload[self.attr] = value = self.map.get(value["value"][0])
-            payload["action"] = self.attr + "_" + value
+            payload["action"] = f"{self.attr}_{value}"
         except Exception:
             pass
 

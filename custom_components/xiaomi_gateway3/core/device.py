@@ -191,16 +191,13 @@ class XDevice:
 
     def attr_name(self, attr: str):
         # this words always uppercase
-        if attr in ("ble", "led", "rssi", "usb"):
-            return self.info.name + " " + attr.upper()
+        if attr in {"ble", "led", "rssi", "usb"}:
+            return f"{self.info.name} {attr.upper()}"
 
         attr = attr.replace("_", " ").title()
 
         # skip second attr in name if exists
-        if attr in self.info.name:
-            return self.info.name
-
-        return self.info.name + " " + attr
+        return self.info.name if attr in self.info.name else f"{self.info.name} {attr}"
 
     def entity_id(self, conv: Converter):
         name = self.extra.get("entity_name", self.mac)
@@ -343,21 +340,18 @@ class XDevice:
             else:
                 v = param["arguments"]
                 if v and "siid" in param:
-                    # add siid to every argument
-                    for item in param["arguments"]:
+                    for item in v:
                         if "piid" in item or "eiid" in item and "siid" not in item:
                             item["siid"] = param["siid"]
 
             # res_name is Lumi format
             if "res_name" in param:
                 prop = param["res_name"]
-                conv: Converter = LUMI_GLOBALS.get(prop)
-                if conv:
+                if conv := LUMI_GLOBALS.get(prop):
                     conv.decode(self, payload, v)
                     if conv.attr == "online":
                         return payload
 
-            # piid or eiid is MIoT format
             elif "piid" in param:
                 prop = f"{param['siid']}.p.{param['piid']}"
             elif "eiid" in param:
@@ -463,12 +457,12 @@ def update(orig_dict: dict, new_dict: dict):
 
 def logger_wrapper(func, log: deque, name: str = None):
     def wrap(*args):
-        if not (name is None and args[0] == "ble"):
+        if name is not None or args[0] != "ble":
             ts = datetime.now().isoformat(timespec="milliseconds")
             log.append(
                 {"ts": ts, "type": name, "value": args[0]}
                 if name
-                else {"ts": ts, "type": "decode_" + args[0], "value": args[1]}
+                else {"ts": ts, "type": f"decode_{args[0]}", "value": args[1]}
             )
         return func(*args)
 

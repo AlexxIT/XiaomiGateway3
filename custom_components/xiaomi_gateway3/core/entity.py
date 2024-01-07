@@ -174,9 +174,7 @@ class XEntity(Entity):
 
     @property
     def customize(self) -> dict:
-        if not self.hass:
-            return {}
-        return self.hass.data[DATA_CUSTOMIZE].get(self.entity_id)
+        return self.hass.data[DATA_CUSTOMIZE].get(self.entity_id) if self.hass else {}
 
     @property
     def hass_state(self):

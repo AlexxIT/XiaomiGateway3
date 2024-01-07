@@ -18,7 +18,6 @@ import logging
 import time
 
 from .base import (
-    SIGNAL_PREPARE_GW,
     SIGNAL_MQTT_CON,
     SIGNAL_MQTT_DIS,
     SIGNAL_MQTT_PUB,
@@ -87,7 +86,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
         """Enable telnet with miio protocol."""
         resp = await utils.enable_telnet(self.miio, self.options.get("key"))
         if not resp or resp.get("result") != ["ok"]:
-            self.debug(f"Can't enable telnet")
+            self.debug("Can't enable telnet")
             return False
         return True
 
@@ -118,7 +117,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
                         # noinspection PyTypeChecker
                         asyncio.create_task(self.mqtt_message(msg))
                 except Exception as e:
-                    self.debug(f"MQTT connection issue", exc_info=e)
+                    self.debug("MQTT connection issue", exc_info=e)
                 finally:
                     await self.mqtt.disconnect()
                     await self.mqtt.close()
@@ -192,7 +191,7 @@ class XGateway(GateMGW, GateE1, GateMGW2):
                     return await self.mgw2_prepare_gateway(sh)
 
         except Exception as e:
-            self.error(f"Can't prepare gateway", e)
+            self.error("Can't prepare gateway", e)
             return False
 
     def update_available(self, value: bool):

@@ -172,8 +172,9 @@ class DataSelect(XEntity, SelectEntity):
 
     def set_devices(self, feature: str):
         """Set options list with devices list."""
-        devices = [f"{d.mac}: {d.name}" for d in self.gw.filter_devices(feature)]
-        if devices:
+        if devices := [
+            f"{d.mac}: {d.name}" for d in self.gw.filter_devices(feature)
+        ]:
             self.set_options(None, devices)
         else:
             self.set_options(OPT_NO_DEVICES)
@@ -203,8 +204,7 @@ class DataSelect(XEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Can process user step, done by user from this select"""
-        coro = getattr(self, f"step_user_{self.step_id}", None)
-        if coro:
+        if coro := getattr(self, f"step_user_{self.step_id}", None):
             await coro(option)
 
     ###########################################################################

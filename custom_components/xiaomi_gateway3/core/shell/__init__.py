@@ -2,7 +2,7 @@ import asyncio
 from typing import Union
 
 from . import base
-from .base import TelnetShell, ShellOpenMiio, ShellMultimode
+from .base import TelnetShell
 from .shell_e1 import ShellE1
 from .shell_mgw import ShellMGW
 from .shell_mgw2 import ShellMGW2
@@ -61,4 +61,4 @@ class Session:
 def openmiio_setup(config: dict):
     """Custom config for OPENMIIO_CMD, OPENMIIO_VER, OPENMIIO_MIPS..."""
     for k, v in config.items():
-        setattr(base, "OPENMIIO_" + k.upper(), v)
+        setattr(base, f"OPENMIIO_{k.upper()}", v)

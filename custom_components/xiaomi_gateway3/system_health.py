@@ -41,7 +41,7 @@ async def setup_debug(hass: HomeAssistant, logger: Logger):
 
     integration = hass.data["integrations"][DOMAIN]
     info = await hass.helpers.system_info.async_get_system_info()
-    info[DOMAIN + "_version"] = f"{integration.version} ({source_hash()})"
+    info[f"{DOMAIN}_version"] = f"{integration.version} ({source_hash()})"
     logger.debug(f"SysInfo: {info}")
 
     integration.manifest["issue_tracker"] = view.url

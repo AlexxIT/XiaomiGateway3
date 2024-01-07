@@ -34,7 +34,7 @@ class MeshGateway(GatewayBase):
             # load Mesh groups
             rows = sh.db.read_table(sh.mesh_group_table)
             for row in rows:
-                did = "group." + row[0]
+                did = f"group.{row[0]}"
                 device = self.devices.get(did)
                 if not device:
                     # don't know if 8 bytes enougth

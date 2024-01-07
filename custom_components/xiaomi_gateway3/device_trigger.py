@@ -59,19 +59,18 @@ async def async_attach_trigger(hass, config, action, automation_info):
 async def async_get_triggers(hass, device_id):
     device_registry = dr.async_get(hass)
     device: dr.DeviceEntry = device_registry.async_get(device_id)
-    buttons = converters.get_buttons(device.model)
-    if not buttons:
+    if buttons := converters.get_buttons(device.model):
+        return [
+            {
+                CONF_PLATFORM: CONF_DEVICE,
+                CONF_DEVICE_ID: device_id,
+                CONF_DOMAIN: DOMAIN,
+                CONF_TYPE: button,
+            }
+            for button in buttons
+        ]
+    else:
         return None
-
-    return [
-        {
-            CONF_PLATFORM: CONF_DEVICE,
-            CONF_DEVICE_ID: device_id,
-            CONF_DOMAIN: DOMAIN,
-            CONF_TYPE: button,
-        }
-        for button in buttons
-    ]
 
 
 # noinspection PyUnusedLocal

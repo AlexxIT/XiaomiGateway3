@@ -118,7 +118,7 @@ def decode(data: dict):
             elif hdr.command_id == ZDOCmd.Mgmt_Lqi_rsp:
                 return {"command": cmd}
             else:
-                raise NotImplemented
+                raise NotImplementedError
 
         # decode ZCL
         cluster_id = int(data["clusterId"], 0)
@@ -150,10 +150,10 @@ def decode(data: dict):
         if hdr.frame_control.is_general:
             payload["command"] = Command(hdr.command_id).name
 
-            if (
-                hdr.command_id == Command.Report_Attributes
-                or hdr.command_id == Command.Write_Attributes
-            ):
+            if hdr.command_id in [
+                Command.Report_Attributes,
+                Command.Write_Attributes,
+            ]:
                 (attrs,) = args
                 for attr in attrs:
                     assert isinstance(attr, Attribute)
@@ -164,7 +164,7 @@ def decode(data: dict):
 
                     value = attr.value.value
                     if isinstance(value, bytes) and value:
-                        payload[name] = "0x" + value.hex()
+                        payload[name] = f"0x{value.hex()}"
                     elif isinstance(value, list) and not isinstance(value, EUI64):
                         payload[name] = [v.value for v in value]
                     elif isinstance(value, int):
@@ -184,7 +184,7 @@ def decode(data: dict):
                     if attr.value is not None:
                         value = attr.value.value
                         if isinstance(value, bytes) and value:
-                            payload[name] = "0x" + value.hex()
+                            payload[name] = f"0x{value.hex()}"
                         elif isinstance(value, list):
                             payload[name] = [v.value for v in value]
                         elif isinstance(value, int):
@@ -206,10 +206,10 @@ def decode(data: dict):
                         attr.reportable_change = None
                 payload["value"] = attrs
 
-            elif (
-                hdr.command_id == Command.Write_Attributes_rsp
-                or hdr.command_id == Command.Configure_Reporting_rsp
-            ):
+            elif hdr.command_id in [
+                Command.Write_Attributes_rsp,
+                Command.Configure_Reporting_rsp,
+            ]:
                 (resp,) = args
                 payload["status"] = [str(attr.status) for attr in resp]
 
@@ -223,7 +223,7 @@ def decode(data: dict):
 
             else:
                 if isinstance(args, bytes) and args:
-                    args = "0x" + args.hex()
+                    args = f"0x{args.hex()}"
                 payload["command_id"] = int(hdr.command_id)
                 payload["value"] = args
 
@@ -239,7 +239,7 @@ def decode(data: dict):
 
         else:
             if isinstance(args, bytes) and args:
-                args = "0x" + args.hex()
+                args = f"0x{args.hex()}"
 
             payload.update({"command_id": hdr.command_id, "value": args})
 

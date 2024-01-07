@@ -83,7 +83,7 @@ class EventConv(Converter):
 
     def decode(self, device: "XDevice", payload: dict, value: list):
         payload[self.attr] = self.value
-        if len(value) > 0:
+        if value:
             payload.update(device.decode_lumi(value))
 
 
@@ -160,10 +160,8 @@ class ColorTempKelvin(Converter):
 
     def encode(self, device: "XDevice", payload: dict, value: int):
         value = int(1000000.0 / value)
-        if value < self.mink:
-            value = self.mink
-        if value > self.maxk:
-            value = self.maxk
+        value = max(value, self.mink)
+        value = min(value, self.maxk)
         super().encode(device, payload, value)
 
 
@@ -191,10 +189,10 @@ class ButtonConv(Converter):
             payload["action"] = BUTTON.get(value, UNKNOWN)
         elif self.attr.startswith("button_both"):
             both = BUTTON_BOTH.get(value, UNKNOWN)
-            payload["action"] = self.attr + "_" + both
+            payload["action"] = f"{self.attr}_{both}"
 
         elif self.attr.startswith("button"):
-            payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
+            payload["action"] = f"{self.attr}_{BUTTON.get(value, UNKNOWN)}"
 
 
 @dataclass

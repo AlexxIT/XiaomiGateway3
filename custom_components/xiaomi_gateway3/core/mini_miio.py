@@ -171,9 +171,8 @@ class SyncMiIO(BasemiIO):
 
         if "result" in data:
             return data["result"]
-        else:
-            _LOGGER.debug(f"{self.addr[0]} | {data}")
-            return None
+        _LOGGER.debug(f"{self.addr[0]} | {data}")
+        return None
 
     def send_bulk(self, method: str, params: list):
         """Sends a command with a large number of parameters. Splits into

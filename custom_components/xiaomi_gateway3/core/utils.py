@@ -39,8 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 def remove_device(hass: HomeAssistant, device: XDevice):
     """Remove device by did from Hass"""
     registry = dr.async_get(hass)
-    device = registry.async_get_device({(DOMAIN, device.unique_id)}, None)
-    if device:
+    if device := registry.async_get_device({(DOMAIN, device.unique_id)}, None):
         registry.async_remove_device(device.id)
 
 
@@ -74,10 +73,9 @@ async def remove_zigbee(unique_id: str):
 @callback
 def update_device_info(hass: HomeAssistant, did: str, **kwargs):
     # lumi.1234567890 => 0x1234567890
-    mac = "0x" + did[5:]
+    mac = f"0x{did[5:]}"
     registry = dr.async_get(hass)
-    device = registry.async_get_device({("xiaomi_gateway3", mac)}, None)
-    if device:
+    if device := registry.async_get_device({("xiaomi_gateway3", mac)}, None):
         registry.async_update_device(device.id, **kwargs)
 
 
@@ -187,7 +185,7 @@ async def enable_telnet(miio: AsyncMiIO, key: str = None) -> dict:
         method = "set_ip_info"
 
     if method == "set_ip_info":
-        params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
+        params = {"ssid": '""', "pswd": f"1; {TELNET_CMD}"}
     elif method == "system_command":
         params = {
             "password": miio_password(miio.device_id, miio_info["mac"], key),
@@ -279,9 +277,7 @@ async def get_lan_key(host: str, token: str):
         random.choice(string.ascii_lowercase + string.digits) for _ in range(16)
     )
     resp = await device.send("set_lumi_dpf_aes_key", [key])
-    if resp.get("result") == ["ok"]:
-        return key
-    return "Can't update gateway key"
+    return key if resp.get("result") == ["ok"] else "Can't update gateway key"
 
 
 async def get_room_mapping(cloud: MiCloud, host: str, token: str):
@@ -303,11 +299,7 @@ async def get_room_mapping(cloud: MiCloud, host: str, token: str):
 
 async def get_bindkey(cloud: MiCloud, did: str):
     bindkey = await cloud.get_bindkey(did)
-    if bindkey is None:
-        return "Can't get from cloud"
-    # if bindkey.endswith('FFFFFFFF'):
-    #     return "Not needed"
-    return bindkey
+    return "Can't get from cloud" if bindkey is None else bindkey
 
 
 async def enable_bslamp2_lan(host: str, token: str):
@@ -318,9 +310,7 @@ async def enable_bslamp2_lan(host: str, token: str):
     if resp.get("result") == ["1"]:
         return "Already enabled"
     resp = await device.send("set_ps", ["cfg_lan_ctrl", "1"])
-    if resp.get("result") == ["ok"]:
-        return "Enabled"
-    return "Can't enable LAN"
+    return "Enabled" if resp.get("result") == ["ok"] else "Can't enable LAN"
 
 
 async def get_ble_remotes(host: str, token: str):
@@ -329,7 +319,7 @@ async def get_ble_remotes(host: str, token: str):
     if not resp:
         return "Can't connect to lamp"
     if "result" not in resp:
-        return f"Wrong response"
+        return "Wrong response"
     return "\n".join(
         [f"{p['beaconkey']} ({format_mac(p['mac'])})" for p in resp["result"]]
     )
@@ -350,7 +340,7 @@ async def get_ota_link(hass: HomeAssistant, device: "XDevice"):
             + "images/Xiaomi/LM15_SP_mi_V1.3.30_20170929_v30_withCRC.20180514181348.ota"
         )
 
-    r = await async_get_clientsession(hass).get(url + "index.json")
+    r = await async_get_clientsession(hass).get(f"{url}index.json")
     items = await r.json(content_type=None)
     for item in items:
         if item.get("modelId") == device.model:
