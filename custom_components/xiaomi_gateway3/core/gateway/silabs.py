@@ -86,10 +86,16 @@ class SilabsGateway(GatewayBase):
     async def silabs_process_send(self, data: dict):
         if "zigbee" not in self.debug_mode:
             return
-        did = "lumi." + data["eui64"].lstrip("0x").lower()
-        if did not in self.devices:
+        if "eui64" in data:
+            did = "lumi." + data["eui64"].lstrip("0x").lower()
+            device = self.devices.get(did)
+        elif "shortId" in data:
+            nwk = data["shortId"].lower()
+            device = next((d for d in self.devices.values() if d.nwk == nwk), None)
+        else:
             return
-        device = self.devices[did]
+        if not device:
+            return
         zb_msg = silabs.decode(data)
         self.debug_tag(f"{device.mac} {device.nwk} send {zb_msg}", tag="ZIGB")
 

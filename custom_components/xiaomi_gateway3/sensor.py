@@ -4,7 +4,22 @@ from datetime import datetime, timedelta, timezone
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import *
+from homeassistant.const import (
+    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
+    CONCENTRATION_PARTS_PER_BILLION,
+    CONDUCTIVITY,
+    LIGHT_LUX,
+    PERCENTAGE,
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    UnitOfElectricPotential,
+    UnitOfElectricCurrent,
+    UnitOfEnergy,
+    UnitOfLength,
+    UnitOfPower,
+    UnitOfPressure,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -38,27 +53,18 @@ UNITS = {
     "humidity": PERCENTAGE,
     # zb light and motion and ble flower - lux
     "illuminance": LIGHT_LUX,
-    # Deprecated: please use UnitOfPower.WATT.
-    "power": POWER_WATT,
-    # Deprecated: please use UnitOfElectricPotential.VOLT.
-    "voltage": ELECTRIC_POTENTIAL_VOLT,
-    # Deprecated: please use UnitOfElectricCurrent.AMPERE.
-    "current": ELECTRIC_CURRENT_AMPERE,
-    # Deprecated: please use UnitOfPressure.HPA
-    "pressure": PRESSURE_HPA,
-    # Deprecated: please use UnitOfTemperature.CELSIUS
-    "temperature": TEMP_CELSIUS,
-    # Deprecated: please use UnitOfEnergy.KILO_WATT_HOUR.
-    "energy": ENERGY_KILO_WATT_HOUR,
-    # Deprecated: please use UnitOfTemperature.CELSIUS
-    "chip_temperature": TEMP_CELSIUS,
+    "power": UnitOfPower.WATT,
+    "voltage": UnitOfElectricPotential.VOLT,
+    "current": UnitOfElectricCurrent.AMPERE,
+    "pressure": UnitOfPressure.HPA,
+    "temperature": UnitOfTemperature.CELSIUS,
+    "energy": UnitOfEnergy.KILO_WATT_HOUR,
+    "chip_temperature": UnitOfTemperature.CELSIUS,
     "conductivity": CONDUCTIVITY,
     "gas_density": "% LEL",
-    # Deprecated: please use UnitOfTime.SECONDS.
-    "idle_time": TIME_SECONDS,
+    "idle_time": UnitOfTime.SECONDS,
     "linkquality": "lqi",
-    # Deprecated: please use UnitOfPower.WATT.
-    "max_power": POWER_WATT,
+    "max_power": UnitOfPower.WATT,
     "moisture": PERCENTAGE,
     "msg_received": "msg",
     "msg_missed": "msg",
@@ -68,10 +74,9 @@ UNITS = {
     "smoke_density": "% obs/ft",
     "supply": PERCENTAGE,
     "tvoc": CONCENTRATION_PARTS_PER_BILLION,
-    # Deprecated: please use UnitOfLength.METERS.
-    "distance": LENGTH_METERS,
-    "occupancy_duration": TIME_SECONDS,
-    "occupancy_distance": LENGTH_METERS,
+    "distance": UnitOfLength.METERS,
+    "occupancy_duration": UnitOfTime.SECONDS,
+    "occupancy_distance": UnitOfLength.METERS,
     "formaldehyde": CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
     # "link_quality": "lqi",
     # "rssi": "dBm",
@@ -79,8 +84,7 @@ UNITS = {
     # "msg_missed": "msg",
     # "unresponsive": "times"
     "power_replenishment": "mAh",
-    # Deprecated: please use UnitOfElectricCurrent.MILLIAMPERE.
-    "realtime_current_in": ELECTRIC_CURRENT_MILLIAMPERE,
+    "realtime_current_in": UnitOfElectricCurrent.MILLIAMPERE,
 }
 
 # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics

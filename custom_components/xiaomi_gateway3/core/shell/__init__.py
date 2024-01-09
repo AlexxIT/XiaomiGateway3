@@ -1,5 +1,4 @@
 import asyncio
-import socket
 from typing import Union
 
 from . import base
@@ -46,7 +45,7 @@ class Session:
 
         if b"rlxlinux" in resp:
             shell = ShellMGW(self.reader, self.writer)
-        elif b"Aqara-Hub-E1" in resp:
+        elif b"Aqara-Hub-E1" in resp or b"Aqara_Hub_E1" in resp:
             shell = ShellE1(self.reader, self.writer)
         elif b"Mijia_Hub_V2" in resp:
             shell = ShellMGW2(self.reader, self.writer)

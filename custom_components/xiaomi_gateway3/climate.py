@@ -1,7 +1,16 @@
-from homeassistant.components.climate import *
-from homeassistant.components.climate.const import *
-from homeassistant.const import TEMP_CELSIUS
-from homeassistant.core import callback
+from homeassistant.components.climate import (
+    ClimateEntity,
+    ClimateEntityFeature,
+    FAN_LOW,
+    FAN_MEDIUM,
+    FAN_HIGH,
+    FAN_AUTO,
+    HVACAction,
+    HVACMode,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DOMAIN
@@ -11,9 +20,9 @@ from .core.entity import XEntity, setup_entity
 from .core.gateway import XGateway
 
 ACTIONS = {
-    HVAC_MODE_OFF: CURRENT_HVAC_OFF,
-    HVAC_MODE_COOL: CURRENT_HVAC_COOL,
-    HVAC_MODE_HEAT: CURRENT_HVAC_HEAT,
+    HVACMode.OFF: HVACAction.OFF,
+    HVACMode.COOL: HVACAction.COOLING,
+    HVACMode.HEAT: HVACAction.HEATING,
 }
 
 
@@ -35,10 +44,12 @@ class XiaomiClimate(XEntity, ClimateEntity):
     _attr_fan_mode = None
     _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
     _attr_hvac_mode = None
-    _attr_hvac_modes = [HVAC_MODE_OFF, HVAC_MODE_COOL, HVAC_MODE_HEAT]
+    _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
-    _attr_temperature_unit = TEMP_CELSIUS
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE_RANGE | ClimateEntityFeature.FAN_MODE
+    )
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
     _attr_min_temp = 17
@@ -77,9 +88,9 @@ class XiaomiClimate(XEntity, ClimateEntity):
 # noinspection PyAbstractClass
 class AqaraE1(XEntity, ClimateEntity):
     _attr_hvac_mode = None
-    _attr_hvac_modes = [HVAC_MODE_OFF, HVAC_MODE_HEAT, HVAC_MODE_AUTO]
-    _attr_supported_features = SUPPORT_TARGET_TEMPERATURE
-    _attr_temperature_unit = TEMP_CELSIUS
+    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 30
     _attr_min_temp = 5
     _attr_target_temperature_step = 0.5
@@ -101,7 +112,7 @@ class AqaraE1(XEntity, ClimateEntity):
         if self._enabled is None or self._mode is None:
             return
 
-        self._attr_hvac_mode = self._mode if self._enabled else HVAC_MODE_OFF
+        self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)
@@ -110,9 +121,9 @@ class AqaraE1(XEntity, ClimateEntity):
         await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
-        if hvac_mode in (HVAC_MODE_HEAT, HVAC_MODE_AUTO):
+        if hvac_mode in (HVACMode.HEAT, HVACMode.AUTO):
             payload = {"mode": hvac_mode}
-        elif hvac_mode == HVAC_MODE_OFF:
+        elif hvac_mode == HVACMode.OFF:
             payload = {"climate": False}
         else:
             return

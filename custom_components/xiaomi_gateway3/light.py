@@ -1,8 +1,16 @@
 import asyncio
 
-from homeassistant.components.light import *
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_TEMP,
+    ATTR_EFFECT,
+    LightEntity,
+    LightEntityFeature,
+    ATTR_TRANSITION,
+)
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
@@ -39,15 +47,17 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
 
         for conv in device.converters:
             if conv.attr == ATTR_BRIGHTNESS:
-                self._attr_supported_features |= SUPPORT_BRIGHTNESS | SUPPORT_TRANSITION
+                self._attr_supported_features |= LightEntityFeature.TRANSITION
             elif conv.attr == ATTR_COLOR_TEMP:
-                self._attr_supported_features |= SUPPORT_COLOR_TEMP
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
                     self._attr_min_mireds = int(1000000 / conv.maxk)
                     self._attr_max_mireds = int(1000000 / conv.mink)
+            elif conv.attr == ATTR_EFFECT:
+                self._attr_supported_features |= LightEntityFeature.EFFECT
+                self._attr_effect_list = list(conv.map.values())
 
     @callback
     def async_set_state(self, data: dict):
@@ -58,12 +68,15 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
             self._attr_color_temp = data[ATTR_COLOR_TEMP]
+        if ATTR_EFFECT in data:
+            self._attr_effect = data[ATTR_EFFECT]
 
     @callback
     def async_restore_last_state(self, state: str, attrs: dict):
         self._attr_is_on = state == STATE_ON
         self._attr_brightness = attrs.get(ATTR_BRIGHTNESS)
         self._attr_color_temp = attrs.get(ATTR_COLOR_TEMP)
+        self._attr_effect = attrs.get(ATTR_EFFECT)
 
     async def async_update(self):
         await self.device_read(self.subscribed_attrs)

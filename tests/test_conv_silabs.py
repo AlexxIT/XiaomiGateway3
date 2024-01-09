@@ -1,9 +1,13 @@
+import asyncio
+import json
+
 from homeassistant.components.sensor import DOMAIN
 from zigpy.types import EUI64
 
 from custom_components.xiaomi_gateway3.core.converters import silabs, ZIGBEE
 from custom_components.xiaomi_gateway3.core.converters.zigbee import ZConverter
 from custom_components.xiaomi_gateway3.core.device import XDevice
+from custom_components.xiaomi_gateway3.core.gateway.silabs import SilabsGateway
 
 assert DOMAIN  # fix circular import
 
@@ -206,7 +210,8 @@ def test_ias_zone():
             "APSPlayload": "0x096700210000000000",
         }
     )
-    p["value"] = list(p["value"])
+    p["command"] = p["command"].name
+    p["value"] = [int(i) for i in p["value"]]
     assert p == {
         "endpoint": 1,
         "seq": 103,
@@ -244,3 +249,22 @@ def test_hass2023_4():
             {"commandcli": "send 0x12ab 1 1"},
         ]
     }
+
+
+def test_message_pre_sent_callback():
+    gw = SilabsGateway()
+    gw.options = {"debug": ["zigbee"]}
+
+    # Xiaomi Multimode 1 and 2
+    raw = json.loads(
+        b'{"eui64":"0xAABBCCDDEEFF1122","destinationEndpoint":"0x01","clusterId":"0x0006","profileId":"0x0104","sourceEndpoint":"0x01","APSCounter":"0x00","APSPlayload":"0x1001000000"}'
+    )
+    coro = gw.silabs_process_send(raw)
+    asyncio.get_event_loop().run_until_complete(coro)
+
+    # Xiaomi Multimode fw 1.0.7_0019+
+    raw = json.loads(
+        b'{"msgTick":"0x0000000000000721","type":"0x00","shortId":"0xDDCB","destinationEndpoint":"0x01","clusterId":"0x000A","profileId":"0x0104","sourceEndpoint":"0x01","APSCounter":"0x00","APSPlayload":"0x189F01000000E2407DF42C"}'
+    )
+    coro = gw.silabs_process_send(raw)
+    asyncio.get_event_loop().run_until_complete(coro)

@@ -1,8 +1,5 @@
 from homeassistant.components.alarm_control_panel import (
-    SUPPORT_ALARM_ARM_AWAY,
-    SUPPORT_ALARM_ARM_HOME,
-    SUPPORT_ALARM_ARM_NIGHT,
-    SUPPORT_ALARM_TRIGGER,
+    AlarmControlPanelEntityFeature,
     AlarmControlPanelEntity,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -31,10 +28,10 @@ async def async_setup_entry(
 class XiaomiAlarm(XEntity, AlarmControlPanelEntity):
     _attr_code_arm_required = False
     _attr_supported_features = (
-        SUPPORT_ALARM_ARM_HOME
-        | SUPPORT_ALARM_ARM_AWAY
-        | SUPPORT_ALARM_ARM_NIGHT
-        | SUPPORT_ALARM_TRIGGER
+        AlarmControlPanelEntityFeature.ARM_HOME
+        | AlarmControlPanelEntityFeature.ARM_AWAY
+        | AlarmControlPanelEntityFeature.ARM_NIGHT
+        | AlarmControlPanelEntityFeature.TRIGGER
     )
 
     @callback
