@@ -88,7 +88,7 @@ class GatewayBase:
     def debug_device(self, device: XDevice, msg: str, payload=None, tag: str = "BASE"):
         """Debug message with device. Passed only if default debug enabled."""
         if "true" in self.debug_mode:
-            adv = device.nwk if device.nwk else device.model
+            adv = device.nwk or device.model
             self.log.debug(
                 f"{self.host} [{tag}] {device.mac} ({adv}) {msg} {payload}"
                 if payload

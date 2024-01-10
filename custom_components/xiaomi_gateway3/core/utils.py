@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import contextlib
 import hashlib
 import hmac
 import logging
@@ -208,14 +209,11 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> Optiona
     # 2. Try to enable telnet using host, token and (optionaly) key
     # 3. Check open telnet again
     # 4. Return error
-    try:
+    with contextlib.suppress(Exception):
         async with shell.Session(host) as sh:
             if sh.model:
                 info = await sh.get_miio_info()
                 return {"host": host, **info}
-    except Exception:
-        pass
-
     if not token:
         return None
 

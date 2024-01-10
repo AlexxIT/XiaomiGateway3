@@ -23,9 +23,7 @@ class MeshGateway(GatewayBase):
             for row in rows:
                 did = row[0]
                 mac = row[1].replace(":", "").lower()
-                device = self.devices.get(did)
-                if not device:
-                    device = XDevice(MESH, row[2], did, mac)
+                device = self.devices.get(did) or XDevice(MESH, row[2], did, mac)
                 self.add_device(did, device)
 
                 # add bulb to group address

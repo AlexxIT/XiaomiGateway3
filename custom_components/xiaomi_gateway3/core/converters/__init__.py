@@ -2,7 +2,6 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import List, Optional
-
 from .base import Converter, parse_time
 from .const import ZIGBEE
 from .devices import DEVICES

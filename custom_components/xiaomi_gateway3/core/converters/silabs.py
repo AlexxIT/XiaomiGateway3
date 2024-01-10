@@ -241,7 +241,7 @@ def decode(data: dict):
             if isinstance(args, bytes) and args:
                 args = f"0x{args.hex()}"
 
-            payload.update({"command_id": hdr.command_id, "value": args})
+            payload |= {"command_id": hdr.command_id, "value": args}
 
         return payload
 

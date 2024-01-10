@@ -1,3 +1,4 @@
+import contextlib
 import json
 import time
 from dataclasses import dataclass
@@ -84,7 +85,7 @@ class EventConv(Converter):
     def decode(self, device: "XDevice", payload: dict, value: list):
         payload[self.attr] = self.value
         if value:
-            payload.update(device.decode_lumi(value))
+            payload |= device.decode_lumi(value)
 
 
 @dataclass
@@ -414,10 +415,8 @@ class BLEEvent(Converter):
     map: dict = None
 
     def decode(self, device: "XDevice", payload: dict, value: list):
-        try:
+        with contextlib.suppress(Exception):
             payload[self.attr] = self.map.get(value[0]["value"])
-        except:
-            pass
 
 
 class OTAConv(Converter):
@@ -425,11 +424,9 @@ class OTAConv(Converter):
         super().decode(device, payload, value)
 
         # forward update percents to gateway, so it can show it in GUI
-        try:
+        with contextlib.suppress(Exception):
             # noinspection PyUnresolvedReferences
             device.gateways[0].device.update(payload)
-        except Exception:
-            pass
 
 
 class OnlineConv(Converter):

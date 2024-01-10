@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import hashlib
 import json
 import logging
@@ -95,15 +96,13 @@ class SyncMiIO(BasemiIO):
         """Returns `true` if the connection to the miio device is working. The
         token is not verified at this stage.
         """
-        try:
+        with contextlib.suppress(Exception):
             sock.sendto(HELLO, self.addr)
             raw = sock.recv(1024)
             if raw[:2] == b"\x21\x31":
                 self.device_id = int.from_bytes(raw[8:12], "big")
                 self.delta_ts = time.time() - int.from_bytes(raw[12:16], "big")
                 return True
-        except Exception:
-            pass
         return False
 
     def send(self, method: str, params: Union[dict, list] = None):
@@ -254,15 +253,13 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         """Returns `true` if the connection to the miio device is working. The
         token is not verified at this stage.
         """
-        try:
+        with contextlib.suppress(Exception):
             sock.sendto(HELLO)
             raw = await sock.recv(1024)
             if raw[:2] == b"\x21\x31":
                 self.device_id = int.from_bytes(raw[8:12], "big")
                 self.delta_ts = time.time() - int.from_bytes(raw[12:16], "big")
                 return True
-        except Exception:
-            pass
         return False
 
     async def send(self, method: str, params: Union[dict, list] = None, tries=3):
