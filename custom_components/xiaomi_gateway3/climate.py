@@ -50,7 +50,7 @@ class XiaomiClimate(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = ClimateEntityFeature.FAN_MODE
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
@@ -137,7 +137,7 @@ class ScdvbHAVC(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT, HVACMode.AUTO, HVACMode.DRY, HVACMode.FAN_ONLY]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = ClimateEntityFeature.FAN_MODE
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 32
     _attr_min_temp = 16
