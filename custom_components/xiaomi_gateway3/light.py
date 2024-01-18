@@ -4,9 +4,10 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
     ATTR_EFFECT,
+    ATTR_TRANSITION,
     LightEntity,
     LightEntityFeature,
-    ATTR_TRANSITION,
+    ColorMode,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON
@@ -49,6 +50,7 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
             if conv.attr == ATTR_BRIGHTNESS:
                 self._attr_supported_features |= LightEntityFeature.TRANSITION
             elif conv.attr == ATTR_COLOR_TEMP:
+                self._attr_supported_color_modes = {ColorMode.COLOR_TEMP}
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
@@ -58,6 +60,13 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
             elif conv.attr == ATTR_EFFECT:
                 self._attr_supported_features |= LightEntityFeature.EFFECT
                 self._attr_effect_list = list(conv.map.values())
+
+        if self._attr_supported_color_modes is None:
+            self._attr_supported_color_modes = {
+                ColorMode.BRIGHTNESS
+                if self._attr_supported_features & LightEntityFeature.TRANSITION
+                else ColorMode.ONOFF
+            }
 
     @callback
     def async_set_state(self, data: dict):
