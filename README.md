@@ -52,18 +52,22 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 
 ## Supported Firmwares
 
-Component support original gateway firmware. You do not need to manually open, solder and flash the devices.
+Component support original gateway firmwares. It's important to obtain and secure save the **Gateway Key**.
 
-The following versions are confirmed and supported:
+- Integration can easily get the key on older firmwares
+- Integration can get a key if you connected the gateway to it on old firmware and accidentally upgraded to the new firmware
+- You need to use UART if you have a new gateway with new firmware
 
-- **Home Assistant** from `2022.8.x` to `2023.5.x`
+For this gateway firmwares you needs only Gateway IP and MiHome token:
+
 - **Xiaomi Multimode Gateway CN/EU** from `1.5.0_xxxx` to `1.5.4_xxxx`
 - **Xiaomi Multimode Gateway 2 CN/EU** from `1.0.3_xxxx` to `1.0.6_xxxx`
 - **Aqara Hub E1 CN** - `4.0.1_0001`
 
-Limited support for:
+For this gateway firmwares you needs Gateway IP, MiHome token and **Gateway Key**:
 
-- **Xiaomi Multimode Gateway CN/EU** for `1.5.5_0006`, [read more](https://github.com/AlexxIT/Blog/issues/13)
+- **Xiaomi Multimode Gateway CN/EU** from `1.5.5_xxxx` to `1.5.6_xxxx`, [read more](https://github.com/AlexxIT/Blog/issues/13)
+- **Xiaomi Multimode Gateway 2 CN/EU** - `1.0.7_xxxx`, [read more](https://github.com/AlexxIT/XiaomiGateway3/issues/1166#issuecomment-1896071291)
 
 For Xiaomi Multimode Gateway you can:
 
