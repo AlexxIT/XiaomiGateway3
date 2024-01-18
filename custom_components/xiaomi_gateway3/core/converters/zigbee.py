@@ -1,3 +1,4 @@
+import contextlib
 from dataclasses import dataclass
 from typing import Any, TYPE_CHECKING, Optional
 
@@ -71,20 +72,24 @@ class ZConverter(Converter):
             payload.setdefault("commands", []).extend(cmd)
 
         if self.report:
-            mint, maxt, change = self.report.split(" ")
-            mint = int(parse_time(mint))
-            maxt = int(parse_time(maxt))
-            change = int(change)
-            cmd = zdb_report(
-                device.nwk,
-                self.ep,
-                self.zigbee,
-                self.zattr,
-                mint,
-                maxt,
-                change,
-            )
-            payload.setdefault("commands", []).extend(cmd)
+            self._extracted_from_config_9(device, payload)
+
+    # TODO Rename this here and in `config`
+    def _extracted_from_config_9(self, device, payload):
+        mint, maxt, change = self.report.split(" ")
+        mint = int(parse_time(mint))
+        maxt = int(parse_time(maxt))
+        change = int(change)
+        cmd = zdb_report(
+            device.nwk,
+            self.ep,
+            self.zigbee,
+            self.zattr,
+            mint,
+            maxt,
+            change,
+        )
+        payload.setdefault("commands", []).extend(cmd)
 
 
 class ZBoolConv(ZConverter):
@@ -222,10 +227,8 @@ class ZIASZoneConv(ZConverter):
     zigbee = "ias_zone"
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        try:
+        with contextlib.suppress(Exception):
             payload[self.attr] = (value["value"][0] & 1) > 0
-        except Exception:
-            pass
 
     def read(self, device: "XDevice", payload: dict):
         pass
@@ -343,11 +346,9 @@ class ZTuyaButtonConv(ZConverter):
 
         device.extra["seq"] = value["seq"]
 
-        try:
+        with contextlib.suppress(Exception):
             payload[self.attr] = value = self.map.get(value["value"][0])
-            payload["action"] = self.attr + "_" + value
-        except Exception:
-            pass
+            payload["action"] = f"{self.attr}_{value}"
 
 
 # Thanks to zigbee2mqtt:
@@ -375,19 +376,17 @@ class ZAqaraCubeMain(Converter):
         elif value == 3:
             payload["action"] = "fall"
         elif value & 0x200:
-            payload.update({"action": "tap", "side": value & 0b111})
+            payload |= {"action": "tap", "side": value & 0b111}
         elif value & 0x100:
-            payload.update({"action": "slide", "side": value & 0b111})
+            payload |= {"action": "slide", "side": value & 0b111}
         elif value & 0x80:
-            payload.update({"action": "flip180", "side": value & 0b111})
+            payload |= {"action": "flip180", "side": value & 0b111}
         elif value & 0x40:
-            payload.update(
-                {
-                    "action": "flip90",
-                    "from_side": (value >> 3) & 0b111,
-                    "to_side": value & 0b111,
-                }
-            )
+            payload |= {
+                "action": "flip90",
+                "from_side": (value >> 3) & 0b111,
+                "to_side": value & 0b111,
+            }
 
 
 class ZAqaraCubeRotate(Converter):
@@ -396,13 +395,11 @@ class ZAqaraCubeRotate(Converter):
     childs = {"duration"}
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
-        payload.update(
-            {
-                "action": "rotate",
-                "angle": round(value["present_value"]),
-                "duration": round(value[65285] * 0.001, 2),
-            }
-        )
+        payload |= {
+            "action": "rotate",
+            "angle": round(value["present_value"]),
+            "duration": round(value[65285] * 0.001, 2),
+        }
 
 
 class ZSonoffButtonConv(ZConverter):

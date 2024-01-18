@@ -130,10 +130,7 @@ class XiaomiMotionSensor(XEntity, BinarySensorEntity):
         )
         self._last_on = ts
 
-        # if customize of any entity will be changed from GUI - default value
-        # for all motion sensors will be erased
-        timeout = self.customize.get(CONF_OCCUPANCY_TIMEOUT, 90)
-        if timeout:
+        if timeout := self.customize.get(CONF_OCCUPANCY_TIMEOUT, 90):
             if isinstance(timeout, list):
                 pos = min(self._timeout_pos, len(timeout) - 1)
                 delay = timeout[pos]

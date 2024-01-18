@@ -57,7 +57,7 @@ class GateMGW(
                 locked = await sh.check_firmware_lock()
                 return enable == locked
         except Exception as e:
-            self.error(f"Can't set firmware lock", e)
+            self.error("Can't set firmware lock", e)
             return False
 
     async def gw3_read_lock(self) -> Optional[bool]:
@@ -65,12 +65,12 @@ class GateMGW(
             async with shell.Session(self.host) as sh:
                 return await sh.check_firmware_lock()
         except Exception as e:
-            self.error(f"Can't get firmware lock", e)
+            self.error("Can't get firmware lock", e)
 
     async def alarm(self, params: str):
         """Params = `123,1` (duration in seconds + volume = 1-3)"""
         params = (
-            "start_alarm," + params
+            f"start_alarm,{params}"
             if re.match(r"^\d+,[123]$", params)
             else "stop_alarm"
         )

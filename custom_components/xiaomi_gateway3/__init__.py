@@ -19,7 +19,6 @@ from . import system_health
 from .core import logger, shell, utils
 from .core.const import DOMAIN, TITLE
 from .core.entity import XEntity
-from .core.ezsp import update_zigbee_firmware
 from .core.gateway import XGateway
 from .core.xiaomi_cloud import MiCloud
 
@@ -183,7 +182,7 @@ async def _setup_micloud_entry(hass: HomeAssistant, config_entry):
         _LOGGER.debug(f"Login to MiCloud for {config_entry.title}")
         if await cloud.login(data["username"], data["password"]):
             # update MiCloud auth in .storage
-            data.update(cloud.auth)
+            data |= cloud.auth
             hass.config_entries.async_update_entry(config_entry, data=data)
 
             devices = await cloud.get_devices()

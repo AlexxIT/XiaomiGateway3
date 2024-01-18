@@ -2,11 +2,9 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import List, Optional
-
-from .base import Converter, LUMI_GLOBALS, parse_time
-from .const import GATEWAY, ZIGBEE, BLE, MESH, MESH_GROUP_MODEL
+from .base import Converter, parse_time
+from .const import ZIGBEE
 from .devices import DEVICES
-from .stats import STAT_GLOBALS
 
 try:
     # loading external converters
@@ -45,7 +43,7 @@ def get_device_info(model: str, type: str) -> Optional[XDeviceInfo]:
 
         if type == ZIGBEE and not is_mihome_zigbee(model):
             url = (
-                "https://www.zigbee2mqtt.io/supported-devices/#s=" + market
+                f"https://www.zigbee2mqtt.io/supported-devices/#s={market}"
                 if market
                 else None
             )

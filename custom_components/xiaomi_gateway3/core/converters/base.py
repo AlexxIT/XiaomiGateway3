@@ -1,3 +1,4 @@
+import contextlib
 import json
 import time
 from dataclasses import dataclass
@@ -83,8 +84,8 @@ class EventConv(Converter):
 
     def decode(self, device: "XDevice", payload: dict, value: list):
         payload[self.attr] = self.value
-        if len(value) > 0:
-            payload.update(device.decode_lumi(value))
+        if value:
+            payload |= device.decode_lumi(value)
 
 
 @dataclass
@@ -160,10 +161,8 @@ class ColorTempKelvin(Converter):
 
     def encode(self, device: "XDevice", payload: dict, value: int):
         value = int(1000000.0 / value)
-        if value < self.mink:
-            value = self.mink
-        if value > self.maxk:
-            value = self.maxk
+        value = max(value, self.mink)
+        value = min(value, self.maxk)
         super().encode(device, payload, value)
 
 
@@ -191,10 +190,10 @@ class ButtonConv(Converter):
             payload["action"] = BUTTON.get(value, UNKNOWN)
         elif self.attr.startswith("button_both"):
             both = BUTTON_BOTH.get(value, UNKNOWN)
-            payload["action"] = self.attr + "_" + both
+            payload["action"] = f"{self.attr}_{both}"
 
         elif self.attr.startswith("button"):
-            payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
+            payload["action"] = f"{self.attr}_{BUTTON.get(value, UNKNOWN)}"
 
 
 @dataclass
@@ -416,10 +415,8 @@ class BLEEvent(Converter):
     map: dict = None
 
     def decode(self, device: "XDevice", payload: dict, value: list):
-        try:
+        with contextlib.suppress(Exception):
             payload[self.attr] = self.map.get(value[0]["value"])
-        except:
-            pass
 
 
 class OTAConv(Converter):
@@ -427,11 +424,9 @@ class OTAConv(Converter):
         super().decode(device, payload, value)
 
         # forward update percents to gateway, so it can show it in GUI
-        try:
+        with contextlib.suppress(Exception):
             # noinspection PyUnresolvedReferences
             device.gateways[0].device.update(payload)
-        except Exception:
-            pass
 
 
 class OnlineConv(Converter):

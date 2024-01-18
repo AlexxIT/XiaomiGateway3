@@ -1,3 +1,4 @@
+import contextlib
 from .base import GatewayBase, SIGNAL_PREPARE_GW, SIGNAL_MQTT_PUB
 from .. import shell
 from ..device import XDevice, BLE
@@ -13,7 +14,7 @@ class BLEGateway(GatewayBase):
         self.dispatcher_connect(SIGNAL_MQTT_PUB, self.ble_mqtt_publish)
 
     async def ble_read_devices(self, sh: shell.ShellMGW):
-        try:
+        with contextlib.suppress(Exception):
             # prevent read database two times
             db = await sh.read_db_bluetooth()
 
@@ -23,12 +24,8 @@ class BLEGateway(GatewayBase):
                 mac = reverse_mac(row[1])
                 model = row[2]
                 did = row[4]
-                device = self.devices.get(did)
-                if not device:
-                    device = XDevice(BLE, model, did, mac)
+                device = self.devices.get(did) or XDevice(BLE, model, did, mac)
                 self.add_device(did, device)
-        except Exception:
-            pass
 
     async def ble_prepare_gateway(self, sh: shell.ShellMGW):
         if self.available is None:

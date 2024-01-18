@@ -1,3 +1,4 @@
+import contextlib
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -82,13 +83,11 @@ class GatewayStatsConverter(Converter):
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
         if "networkUp" in value:
-            payload.update(
-                {
-                    "network_pan_id": value.get("networkPanId"),
-                    "radio_tx_power": value.get("radioTxPower"),
-                    "radio_channel": value.get("radioChannel"),
-                }
-            )
+            payload |= {
+                "network_pan_id": value.get("networkPanId"),
+                "radio_tx_power": value.get("radioTxPower"),
+                "radio_channel": value.get("radioChannel"),
+            }
 
         if "free_mem" in value:
             s = value["run_time"]
@@ -98,17 +97,15 @@ class GatewayStatsConverter(Converter):
             s = s % 60
             # fw 1.5.4 has negative (right rssi), lower fw - don't
             rssi = value["rssi"] if value["rssi"] <= 0 else value["rssi"] - 100
-            payload.update(
-                {
-                    "free_mem": value["free_mem"],
-                    "load_avg": value["load_avg"],
-                    "rssi": rssi,
-                    "uptime": f"{d} days, {h:02}:{m:02}:{s:02}",
-                }
-            )
+            payload |= {
+                "free_mem": value["free_mem"],
+                "load_avg": value["load_avg"],
+                "rssi": rssi,
+                "uptime": f"{d} days, {h:02}:{m:02}:{s:02}",
+            }
 
         if "openmiio" in value:
-            payload.update(value)
+            payload |= value
 
 
 class ZigbeeStatsConverter(Converter):
@@ -136,39 +133,18 @@ class ZigbeeStatsConverter(Converter):
 
             # For some devices better works APSCounter, for other - sequence
             # number in payload. Sometimes broken messages arrived.
-            try:
-                raw = value["APSPlayload"]
-                manufact_spec = int(raw[2:4], 16) & 4
-                new_seq1 = int(value["APSCounter"], 0)
-                new_seq2 = int(raw[8:10] if manufact_spec else raw[4:6], 16)
-                # new_seq2 == 0 -> probably device reset
-                if "last_seq1" in device.extra and new_seq2 != 0:
-                    miss = min(
-                        (new_seq1 - device.extra["last_seq1"] - 1) & 0xFF,
-                        (new_seq2 - device.extra["last_seq2"] - 1) & 0xFF,
-                    )
-                    # sometimes device repeat message, skip this situation:
-                    # 0xF6 > 0xF7 > 0xF8 > 0xF7 > 0xF8 > 0xF9
-                    if 0 < miss < 240:
-                        device.extra["msg_missed"] += miss
-
-                device.extra["last_seq1"] = new_seq1
-                device.extra["last_seq2"] = new_seq2
-            except Exception:
-                pass
-
-            payload.update(
-                {
-                    ZIGBEE: datetime.now(timezone.utc),
-                    # 'ieee': value['eui64'],
-                    # 'nwk': value['sourceAddress'],
-                    "msg_received": device.extra["msg_received"],
-                    "msg_missed": device.extra["msg_missed"],
-                    "linkquality": value["linkQuality"],
-                    "rssi": value["rssi"],
-                    "last_msg": ZIGBEE_CLUSTERS.get(cid, cid),
-                }
-            )
+            with contextlib.suppress(Exception):
+                self._extracted_from_decode_(value, device)
+            payload |= {
+                ZIGBEE: datetime.now(timezone.utc),
+                # 'ieee': value['eui64'],
+                # 'nwk': value['sourceAddress'],
+                "msg_received": device.extra["msg_received"],
+                "msg_missed": device.extra["msg_missed"],
+                "linkquality": value["linkQuality"],
+                "rssi": value["rssi"],
+                "last_msg": ZIGBEE_CLUSTERS.get(cid, cid),
+            }
 
         # if 'ago' in value:
         #     payload.update({
@@ -178,6 +154,26 @@ class ZigbeeStatsConverter(Converter):
 
         if "parent" in value:
             payload["parent"] = value["parent"]
+
+    # TODO Rename this here and in `decode`
+    def _extracted_from_decode_(self, value, device):
+        raw = value["APSPlayload"]
+        manufact_spec = int(raw[2:4], 16) & 4
+        new_seq1 = int(value["APSCounter"], 0)
+        new_seq2 = int(raw[8:10] if manufact_spec else raw[4:6], 16)
+        # new_seq2 == 0 -> probably device reset
+        if "last_seq1" in device.extra and new_seq2 != 0:
+            miss = min(
+                (new_seq1 - device.extra["last_seq1"] - 1) & 0xFF,
+                (new_seq2 - device.extra["last_seq2"] - 1) & 0xFF,
+            )
+            # sometimes device repeat message, skip this situation:
+            # 0xF6 > 0xF7 > 0xF8 > 0xF7 > 0xF8 > 0xF9
+            if 0 < miss < 240:
+                device.extra["msg_missed"] += miss
+
+        device.extra["last_seq1"] = new_seq1
+        device.extra["last_seq2"] = new_seq2
 
         # if 'resets' in value:
         #     if 'resets0' not in device.extra:
@@ -196,14 +192,12 @@ class BLEStatsConv(Converter):
 
         eid = value.get("eid")
 
-        payload.update(
-            {
-                BLE: datetime.now(timezone.utc),
-                "mac": device.mac,
-                "msg_received": device.extra["msg_received"],
-                "last_msg": BLE_EVENTS.get(eid, eid),
-            }
-        )
+        payload |= {
+            BLE: datetime.now(timezone.utc),
+            "mac": device.mac,
+            "msg_received": device.extra["msg_received"],
+            "last_msg": BLE_EVENTS.get(eid, eid),
+        }
 
 
 class MeshStatsConv(Converter):
@@ -223,14 +217,12 @@ class MeshStatsConv(Converter):
         else:
             raise NotImplementedError
 
-        payload.update(
-            {
-                MESH: datetime.now(timezone.utc),
-                "mac": device.mac,
-                "msg_received": device.extra["msg_received"],
-                "last_msg": prop,
-            }
-        )
+        payload |= {
+            MESH: datetime.now(timezone.utc),
+            "mac": device.mac,
+            "msg_received": device.extra["msg_received"],
+            "last_msg": prop,
+        }
 
 
 GatewayStats = GatewayStatsConverter(GATEWAY, "binary_sensor")

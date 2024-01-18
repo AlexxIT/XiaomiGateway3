@@ -83,7 +83,7 @@ class MiCloud:
             params={"sid": "xiaomiio", "_json": "true"},
         )
         raw = await r.read()
-        _LOGGER.debug(f"MiCloud step1")
+        _LOGGER.debug("MiCloud step1")
         resp: dict = json.loads(raw[11:])
         return {
             k: v for k, v in resp.items() if k in ("sid", "qs", "callback", "_sign")
@@ -101,14 +101,13 @@ class MiCloud:
             params={"_json": "true"},
         )
         raw = await r.read()
-        _LOGGER.debug(f"MiCloud step2")
-        resp = json.loads(raw[11:])
-        return resp
+        _LOGGER.debug("MiCloud step2")
+        return json.loads(raw[11:])
 
     async def _login_step3(self, location):
         r = await self.session.get(location, headers={"User-Agent": UA})
         service_token = r.cookies["serviceToken"].value
-        _LOGGER.debug(f"MiCloud step3")
+        _LOGGER.debug("MiCloud step3")
         return service_token
 
     async def get_devices(self):
@@ -148,7 +147,7 @@ class MiCloud:
         return None
 
     async def request(self, server: str, url: str, payload: dict):
-        assert server in SERVERS, "Wrong server: " + server
+        assert server in SERVERS, f"Wrong server: {server}"
         baseurl = (
             "https://api.io.mi.com/app"
             if server == "cn"

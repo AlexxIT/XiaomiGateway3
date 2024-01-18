@@ -49,17 +49,15 @@ class Unqlite:
         key_len = self.read_int(4)
         data_len = self.read_int(8)
         next_offset = self.read_int(2)
-        overflow_page = self.read_int(8)
-        if overflow_page:
+        if overflow_page := self.read_int(8):
             self.pos = overflow_page * 0x1000 + 8
             data_page = self.read_int(8)
             data_offset = self.read_int(2)
             name = self.read(key_len)
             self.pos = data_page * 0x1000 + data_offset
-            value = self.read(data_len)
         else:
             name = self.read(key_len)
-            value = self.read(data_len)
+        value = self.read(data_len)
         return name, value, next_offset
 
     def read_all(self) -> dict:
@@ -126,7 +124,7 @@ class SQLite:
         elif page_type == b"\x05":
             return self._read_interior_table(page_num)
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     def _read_leaf_table(self, page_num: int):
         first_block = self.read_int(2)

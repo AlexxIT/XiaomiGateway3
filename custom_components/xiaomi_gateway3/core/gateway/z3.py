@@ -106,26 +106,21 @@ class Z3Gateway(GatewayBase):
                 if state == "LEAVE_SENT":
                     continue
 
-                if ieee in ct:
+                if ieee in ct or ieee not in rt and nwk in pt:
                     type_ = "device"
                 elif ieee in rt:
                     type_ = "router"
-                elif nwk in pt:
-                    type_ = "device"
                 else:
                     type_ = "?"
 
-                if nwk in pt:
-                    if len(pt[nwk]) > 1:
-                        parent = "0x" + pt[nwk][0].lower()
-                    else:
-                        parent = "-"
-                elif ieee in ct:
+                if nwk in pt and len(pt[nwk]) > 1:
+                    parent = f"0x{pt[nwk][0].lower()}"
+                elif nwk in pt or ieee in ct:
                     parent = "-"
                 else:
                     parent = "?"
 
-                nwk = "0x" + nwk.lower()  # 0xffff
+                nwk = f"0x{nwk.lower()}"
 
                 payload = {
                     # 'eui64': '0x' + ieee,
@@ -138,7 +133,7 @@ class Z3Gateway(GatewayBase):
                 did = "lumi." + ieee.lstrip("0").lower()
                 device = self.devices.get(did)
                 if not device:
-                    mac = "0x" + ieee.lower()
+                    mac = f"0x{ieee.lower()}"
                     device = XDevice(ZIGBEE, None, did, mac, nwk)
                     self.add_device(did, device)
                     self.debug_device(device, "new unknown device", tag=" Z3 ")
@@ -159,4 +154,4 @@ class Z3Gateway(GatewayBase):
             self.z3_parent_scan = time.time() + 3600
 
         except Exception as e:
-            self.debug(f"Can't update parents", exc_info=e)
+            self.debug("Can't update parents", exc_info=e)
