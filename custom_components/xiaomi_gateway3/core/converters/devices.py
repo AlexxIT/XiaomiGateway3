@@ -1879,7 +1879,9 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/spec/jymc.light.falmp
+    # https://home.miot-spec.com/spec/ftd.light.ftdlmp
     10729: ["Unknown", "Mesh Light", "jymc.light.falmp"],
+    12066: ["Unknown", "Mesh Light", "ftd.light.ftdlmp"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
