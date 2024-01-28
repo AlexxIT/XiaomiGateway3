@@ -1789,6 +1789,7 @@ DEVICES += [{
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
     7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
     9439: ["GDDS", "Mesh Light", "gdds.light.wy0a01"],
+    12757: ["KOEY", "Mesh Downlight", "koey.light.wy0a01"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
