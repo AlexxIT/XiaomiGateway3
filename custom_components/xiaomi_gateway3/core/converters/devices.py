@@ -463,8 +463,8 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/issues/101
     "lumi.airrtc.tcpecn02": ["Aqara", "Thermostat S2 CN", "KTWKQ03ES"],
     "spec": [
-        # BoolConv("power", mi="3.1.85", xiaomi="power_status"),
         ClimateConv("climate", "climate", mi="14.2.85"),
+        BoolConv("power", mi="3.1.85"),
         Converter("current_temp", mi="3.2.85"),
         MapConv("hvac_mode", mi="14.8.85", map={0: "heat", 1: "cool", 15: "off"}),
         MapConv("fan_mode", mi="14.10.85", map={
