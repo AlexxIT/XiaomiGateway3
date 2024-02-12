@@ -1374,11 +1374,12 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
         MapConv("light_mode", "select", mi="2.p.4", parent="light", map={
             0: "Reading", 1: "Office", 2: "Night", 3: "Leisure", 4: "W", 5: "WY", 6: "Night Light", 7: "Y", 8: "None"}),
-        Converter("fan", "fan", mi="3.p.1"),
-        Converter("horizontal_swing", mi="3.p.3", parent="fan"),
-        Converter("wind_reverse", mi="3.p.12", parent="fan"),
-        BoolConv("natural_wind", mi="3.p.7", parent="fan"),
-        Converter("fan_level", mi="3.p.2", parent="fan"),
+        Converter("fan", "switch", mi="3.p.1"),
+        Converter("horizontal_swing", "switch", mi="3.p.3"),
+        Converter("wind_reverse", "switch", mi="3.p.12"),
+        BoolConv("natural_wind", "switch", mi="3.p.7"),
+        MapConv("fan_level", "select", mi="3.p.2", map={
+            1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6"}),
     ]
 }, {
     6742: ["Le", "Wireless Button", "lemesh.remote.ts1"],
