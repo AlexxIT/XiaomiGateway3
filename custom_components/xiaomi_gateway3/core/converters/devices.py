@@ -1366,6 +1366,21 @@ DEVICES += [{
         }),
     ],
     "ttl": "6h"  # battery every 6 hours
+}, { # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:light:0000A001:xingh-fsd2:1:0000C802
+    12385: ["Unknown", "Mesh Ceiling Fan Light", "xingh.light.fsd2"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=2700, maxk=6500),
+        MapConv("light_mode", "select", mi="2.p.4", parent="light", map={
+            0: "Reading", 1: "Office", 2: "Night", 3: "Leisure", 4: "W", 5: "WY", 6: "Night Light", 7: "Y", 8: "None"}),
+        Converter("fan", "switch", mi="3.p.1"),
+        Converter("horizontal_swing", "switch", mi="3.p.3"),
+        Converter("wind_reverse", "switch", mi="3.p.12"),
+        BoolConv("natural_wind", "switch", mi="3.p.7"),
+        MapConv("fan_level", "select", mi="3.p.2", map={
+            1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6"}),
+    ]
 }, {
     6742: ["Le", "Wireless Button", "lemesh.remote.ts1"],
     "spec": [
