@@ -1240,7 +1240,8 @@ DEVICES += [{
     "FYRTUR block-out roller blind": ["IKEA", "FYRTUR roller blind", "E1757"],
     "spec": [
         IKEACover("motor", "cover", bind=True),
-        IKEACoverPos("position", parent="motor", report="1s 5h 1")
+        IKEACoverPos("position", parent="motor", report="1s 5h 1"),
+        ZBatteryConv("battery", "sensor", bind=True, report="1h 12h 0"),
     ],
 }, {
     "default": "zigbee",  # default zigbee device
