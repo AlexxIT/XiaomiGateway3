@@ -548,6 +548,35 @@ class ZAqaraOppleMode(ZConverter):
         pass
 
 
+class IKEACover(ZConverter):
+    zigbee = "window_covering"  # 258
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        if value == "open":
+            cmd = zcl_command(device.nwk, self.ep, 258, 0)
+        elif value == "close":
+            cmd = zcl_command(device.nwk, self.ep, 258, 1)
+        else:
+            cmd = zcl_command(device.nwk, self.ep, 258, 2)
+
+        payload.setdefault("commands", []).extend(cmd)
+
+
+class IKEACoverPos(ZConverter):
+    zigbee = "window_covering"  # 258
+    zattr = "current_position_lift_percentage"
+
+    def encode(self, device: "XDevice", payload: dict, value: int):
+        value = 100 - value
+        # goToLiftPercentage
+        cmd = zcl_command(device.nwk, self.ep, 258, 5, value)
+        payload.setdefault("commands", []).extend(cmd)
+
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        if value["endpoint"] == self.ep and self.zattr in value:
+            payload[self.attr] = 100 - value[self.zattr]
+
+
 ###############################################################################
 # Final converter classes
 ###############################################################################

@@ -304,6 +304,17 @@ def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
     ]
 
 
+# https://docs.silabs.com/zigbee/6.3/af_v2/group-window-covering
+def zcl_command(nwk: str, ep: int, cid: int, cmd: int, arg: int = None) -> list[dict]:
+    raw = f"1100{cmd:02x}"
+    if arg is not None:
+        raw += f"{arg:02x}"
+    return [
+        {"commandcli": f"raw {cid} {{{raw}}}"},
+        {"commandcli": f"send {nwk} 1 {ep}"},
+    ]
+
+
 # zcl global read [cluster:2] [attributeId:2]
 def zcl_read(nwk: str, ep: int, cluster: Union[str, int], *attrs) -> list:
     """Generate Silabs Z3 read attribute command. Support multiple attrs."""

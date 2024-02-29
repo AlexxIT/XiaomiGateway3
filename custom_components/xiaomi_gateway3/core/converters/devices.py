@@ -1237,6 +1237,12 @@ DEVICES += [{
         IKEARemoteConv2("action"),
     ],
 }, {
+    "FYRTUR block-out roller blind": ["IKEA", "FYRTUR roller blind", "E1757"],
+    "spec": [
+        IKEACover("motor", "cover", bind=True),
+        IKEACoverPos("position", parent="motor", report="1s 5h 1")
+    ],
+}, {
     "default": "zigbee",  # default zigbee device
     "spec": [
         ZOnOffConv("switch", "switch", ep=1, enabled=None, bind=True),
