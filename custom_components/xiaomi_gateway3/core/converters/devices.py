@@ -1595,6 +1595,16 @@ DEVICES += [{
     ],
     "ttl": "3d"  # battery every 1? day
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1156
+    3899: ["Xiaomi", "Door Lock", "XMZNMSTO3YD"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("battery", "sensor"),
+        Converter("contact", "binary_sensor"),
+        Converter("opening", "binary_sensor"),
+    ],
+}, {
     # https://home.miot-spec.com/spec/oms.lock.dl01
     # https://github.com/AlexxIT/XiaomiGateway3/issues/973
     10249: ["Xiaomi", "Door Lock E10", "XMZNMS01OD"],
