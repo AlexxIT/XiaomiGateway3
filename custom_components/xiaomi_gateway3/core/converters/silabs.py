@@ -272,7 +272,7 @@ def get_attr(attributes: Dict[int, ZCLAttributeDef], attr: Union[str, int]) -> i
 
 def get_attr_type(attributes: Dict[int, ZCLAttributeDef], attr: str) -> (int, int):
     attr = next(v for v in attributes.values() if v.name == attr)
-    typeid = next(k for k, v in DATA_TYPES.items() if v[1] == attr.type)
+    typeid = next(k for k, v in DATA_TYPES.items() if issubclass(attr.type, v[1]))
     return attr.id, typeid
 
 
