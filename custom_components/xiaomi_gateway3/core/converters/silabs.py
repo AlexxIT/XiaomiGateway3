@@ -360,7 +360,7 @@ class XCluster:
             manufacturer=None,
             tsn=0,  # will be owerwriten by silabs software
             disable_default_response=True,  # silabs uses this value by default
-            direction=Direction.Server_to_Client,
+            direction=0,  # can't use const, because it is wrong on old Hass
             args=args,  # command args
             kwargs=kwargs,  # command kwargs
         )
