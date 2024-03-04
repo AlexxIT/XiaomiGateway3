@@ -1313,6 +1313,23 @@ DEVICES += [{
     ],
     "ttl": "6h"  # battery every 6 hours
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:linp-ks1:1
+    14945: ["Linptech", "Wireless Button KS1", "KS1"],
+    "spec": [
+        MiBeacon, BLEAction, BLEBattery, 
+        Converter("battery", mi="4.p.1003"),
+        BLEEvent("action", mi="5.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_3_single", 4: "button_4_single"
+        }),
+        BLEEvent("action", mi="5.e.1013", map={
+            1: "button_1_double", 2: "button_2_double", 3: "button_3_double", 4: "button_4_double"
+        }),
+        BLEEvent("action", mi="5.e.1014", map={
+            1: "button_1_hold", 2: "button_2_hold", 3: "button_3_hold", 4: "button_4_hold"
+        }),
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
     # lumi.remote.mcn001
     9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM"],
     "spec": [
