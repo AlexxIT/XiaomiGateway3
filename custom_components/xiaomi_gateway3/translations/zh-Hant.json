@@ -51,7 +51,7 @@
           "telnet_cmd": "開啟 Telnet 指令",
           "ble": "支援藍芽裝置",
           "stats": "新增統計資料感測器",
-          "debug": "Debug logs"
+          "debug": "偵錯日誌"
         }
       }
     }
