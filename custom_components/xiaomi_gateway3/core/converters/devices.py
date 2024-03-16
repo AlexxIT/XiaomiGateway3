@@ -1430,6 +1430,43 @@ DEVICES += [{
         BoolConv("pressure_state", "binary_sensor", mi="2.p.1060"),  # bool
         Converter("battery", "sensor", mi="3.p.1003"),
     ],
+}, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:cxw-ble006:1
+    17825: ["cxw", "Eight scene knob switch", "ble006"],
+    "spec": [
+        MiBeacon, BLEAction, BLEBattery,
+        Converter("battery", mi="7.p.1003"),
+        BLEEvent("action", mi="5.e.1012", map={
+            1: "button_1_single", 2: "button_2_single", 3: "button_3_single",
+            4: "button_4_single", 5: "button_5_single", 6: "button_6_single",
+            7: "button_7_single", 8: "button_8_single"
+        }),
+        BLEEvent("action", mi="5.e.1013", map={
+            1: "button_1_double", 2: "button_2_double", 3: "button_3_double",
+            4: "button_4_double", 5: "button_5_double", 6: "button_6_double",
+            7: "button_7_double", 8: "button_8_double"
+        }),
+        BLEEvent("action", mi="5.e.1014", map={
+            1: "button_1_hold", 2: "button_2_hold", 3: "button_3_hold",
+            4: "button_4_hold", 5: "button_5_hold", 6: "button_6_hold",
+            7: "button_7_hold", 8: "button_8_hold"
+        }),
+        BLEEvent("action", mi="5.e.1036", map={
+            -11: "knob_reduced_1", -12: "knob_reduced_2", -13: "knob_reduced_3",
+            -14: "knob_reduced_4", -15: "knob_reduced_5", -16: "knob_reduced_6",
+            -17: "knob_reduced_7", -18: "knob_reduced_8", 
+            12: "knob_increasing_1", 12: "knob_increasing_2", 13: "knob_increasing_3",
+            14: "knob_increasing_4", 15: "knob_increasing_5", 16: "knob_increasing_6",
+            17: "knob_increasing_7", 18: "knob_increasing_8", 
+            -21: "knob_reduced_middle_1", -22: "knob_reduced_middle_2", -23: "knob_reduced_middle_3",
+            -24: "knob_reduced_middle_4", -25: "knob_reduced_middle_5", -26: "knob_reduced_middle_6",
+            -27: "knob_reduced_middle_7", -28: "knob_reduced_middle_8", 
+            22: "knob_increasing_middle_1", 22: "knob_increasing_middle_2", 23: "knob_increasing_middle_3",
+            24: "knob_increasing_middle_4", 25: "knob_increasing_middle_5", 26: "knob_increasing_middle_6",
+            27: "knob_increasing_middle_7", 28: "knob_increasing_middle_8",
+        }),
+    ],
+    "ttl": "6h"  # battery every 6 hours
 }]
 
 # Xiaomi BLE MiBeacon only spec
