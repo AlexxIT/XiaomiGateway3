@@ -6,13 +6,12 @@
   ],
   "config_flow": true,
   "dependencies": [
-    "http"
+    "zha"
   ],
   "documentation": "https://github.com/AlexxIT/XiaomiGateway3",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/AlexxIT/XiaomiGateway3/issues",
   "requirements": [
-    "zigpy>=0.44.1"
   ],
-  "version": "3.3.6"
+  "version": "4.0.0"
 }

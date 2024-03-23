@@ -14,7 +14,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__package__ + ".miio")
 
 HELLO = bytes.fromhex(
     "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
@@ -233,7 +233,7 @@ class AsyncSocket(DatagramProtocol):
         except Exception:
             _LOGGER.exception("Error when closing async socket")
 
-    async def connect(self, addr: tuple):
+    async def connect(self, addr: tuple[str, int]):
         coro = asyncio.get_event_loop().create_datagram_endpoint(
             lambda: self, remote_addr=addr
         )
@@ -344,7 +344,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         except Exception:
             return None
 
-    async def info(self):
+    async def info(self) -> dict:
         """Get info about miIO device."""
         resp = await self.send("miIO.info")
         return resp.get("result") if resp else resp

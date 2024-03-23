@@ -8,7 +8,7 @@ import random
 from asyncio import StreamReader, StreamWriter
 from typing import Optional
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__package__ + ".mqtt")
 
 CONNECT = 1
 CONNACK = 2
@@ -159,7 +159,7 @@ class MiniMQTT:
                 break
         return var
 
-    async def _connect(self, host: str):
+    async def _connect(self, host: str) -> bool:
         self.reader, self.writer = await asyncio.open_connection(host, 1883)
 
         # keepalive can't be 0 for mosquitto v2
@@ -174,13 +174,13 @@ class MiniMQTT:
         assert raw[1] == 2
         return raw[3] == 0
 
-    async def connect(self, host: str):
+    async def connect(self, host: str) -> bool:
         try:
             resp = await asyncio.wait_for(self._connect(host), self.timeout)
             if resp and self.pub_buffer:
-                asyncio.create_task(self.empty_buffer())
+                _ = asyncio.create_task(self.empty_buffer())
             return resp
-        except Exception:
+        except:
             return False
 
     async def disconnect(self):
@@ -188,8 +188,8 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except Exception:
-            _LOGGER.debug("Can't disconnect from gateway")
+        except:
+            _LOGGER.debug("Can't disconnect")
 
     async def subscribe(self, topic: str):
         self.msg_id += 1
@@ -197,10 +197,10 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except Exception:
+        except:
             _LOGGER.debug(f"Can't subscribe to {topic}")
 
-    async def publish(self, topic: str, payload, retain=False):
+    async def publish(self, topic: str, payload: bytes | dict | str, retain=False):
         if self.writer is None:
             self.pub_buffer.append([topic, payload, retain])
             return
@@ -214,7 +214,7 @@ class MiniMQTT:
         try:
             self.writer.write(msg)
             await asyncio.wait_for(self.writer.drain(), self.timeout)
-        except Exception:
+        except:
             _LOGGER.debug(f"Can't publish {payload} to {topic}")
 
     async def read(self) -> Optional[MQTTMessage]:
@@ -256,7 +256,7 @@ class MiniMQTT:
         try:
             self.writer.close()
             await asyncio.wait_for(self.writer.wait_closed(), self.timeout)
-        except Exception:
+        except:
             _LOGGER.debug("Can't close connection")
 
     async def empty_buffer(self):

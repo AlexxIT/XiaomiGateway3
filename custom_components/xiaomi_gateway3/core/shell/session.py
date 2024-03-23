@@ -1,24 +1,11 @@
 import asyncio
-from typing import Union
 
-from . import base
-from .base import TelnetShell, ShellOpenMiio, ShellMultimode
 from .shell_e1 import ShellE1
 from .shell_mgw import ShellMGW
 from .shell_mgw2 import ShellMGW2
 
 
 class Session:
-    """Support automatic closing session in case of trouble. Example of usage:
-
-    try:
-        async with shell.Session(host) as session:
-            sh = await session.login()
-            return True
-    except Exception:
-        return False
-    """
-
     reader: asyncio.StreamReader
     writer: asyncio.StreamWriter
 
@@ -39,7 +26,7 @@ class Session:
         self.writer.close()
         await self.writer.wait_closed()
 
-    async def login(self) -> Union[TelnetShell, ShellMGW, ShellE1, ShellMGW2]:
+    async def login(self) -> ShellMGW | ShellE1 | ShellMGW2:
         coro = self.reader.readuntil(b"login: ")
         resp: bytes = await asyncio.wait_for(coro, 3)
 
@@ -56,9 +43,3 @@ class Session:
         await shell.prepare()
 
         return shell
-
-
-def openmiio_setup(config: dict):
-    """Custom config for OPENMIIO_CMD, OPENMIIO_VER, OPENMIIO_MIPS..."""
-    for k, v in config.items():
-        setattr(base, "OPENMIIO_" + k.upper(), v)

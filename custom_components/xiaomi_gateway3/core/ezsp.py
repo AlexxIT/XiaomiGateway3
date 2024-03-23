@@ -9,9 +9,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.requirements import async_process_requirements
 
-from . import shell
 from .const import DOMAIN
-from .shell.base import OPENMIIO_CMD
+from .shell.const import OPENMIIO_CMD
+from .shell.session import Session
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
     _LOGGER.debug(f"{host} [FWUP] Target zigbee firmware v{tar_fw}")
 
-    session = shell.Session(host)
+    session = Session(host)
 
     try:
         await session.connect()

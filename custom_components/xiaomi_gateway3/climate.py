@@ -5,19 +5,18 @@ from homeassistant.components.climate import (
     FAN_MEDIUM,
     FAN_HIGH,
     FAN_AUTO,
-    HVACAction,
     HVACMode,
+    HVACAction,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
-from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.const import PRECISION_WHOLE, UnitOfTemperature
 
-from . import DOMAIN
-from .core.converters import Converter
-from .core.device import XDevice
-from .core.entity import XEntity, setup_entity
-from .core.gateway import XGateway
+from .hass.entity import XEntity
+
+
+# noinspection PyUnusedLocal
+async def async_setup_entry(hass, entry, async_add_entities) -> None:
+    XEntity.ADD[entry.entry_id + "climate"] = async_add_entities
+
 
 ACTIONS = {
     HVACMode.OFF: HVACAction.OFF,
@@ -26,21 +25,7 @@ ACTIONS = {
 }
 
 
-async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, add_entities: AddEntitiesCallback
-) -> None:
-    def new_entity(gateway: XGateway, device: XDevice, conv: Converter) -> XEntity:
-        if conv.mi == "4.21.85":
-            return AqaraE1(gateway, device, conv)
-        else:
-            return XiaomiClimate(gateway, device, conv)
-
-    gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
-    gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
-
-
-# noinspection PyAbstractClass
-class XiaomiClimate(XEntity, ClimateEntity):
+class XAqaraS2(XEntity, ClimateEntity):
     _attr_fan_mode = None
     _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
     _attr_hvac_mode = None
@@ -55,8 +40,7 @@ class XiaomiClimate(XEntity, ClimateEntity):
     _attr_min_temp = 17
     _attr_target_temperature_step = 1
 
-    @callback
-    def async_set_state(self, data: dict):
+    def set_state(self, data: dict):
         self._attr_current_temperature = data.get("current_temp")
         self._attr_fan_mode = data.get("fan_mode")
         self._attr_hvac_mode = data.get("hvac_mode")
@@ -67,26 +51,18 @@ class XiaomiClimate(XEntity, ClimateEntity):
         # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
         self._attr_target_temperature = data.get("target_temp", 0)
 
-    async def async_update(self):
-        await self.device_read(self.subscribed_attrs)
-
-    async def async_set_temperature(self, **kwargs) -> None:
-        if kwargs[ATTR_TEMPERATURE] == 0:
-            return
-        payload = {"target_temp": kwargs[ATTR_TEMPERATURE]}
-        await self.device_send({self.attr: payload})
+    async def async_set_temperature(self, temperature: int, **kwargs) -> None:
+        if temperature:
+            self.device.write({self.attr: {"target_temp": temperature}})
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
-        payload = {"fan_mode": fan_mode}
-        await self.device_send({self.attr: payload})
+        self.device.write({self.attr: {"fan_mode": fan_mode}})
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
-        payload = {"hvac_mode": hvac_mode}
-        await self.device_send({self.attr: payload})
+        self.device.write({self.attr: {"hvac_mode": hvac_mode}})
 
 
-# noinspection PyAbstractClass
-class AqaraE1(XEntity, ClimateEntity):
+class XAqaraE1(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
     _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
@@ -98,8 +74,10 @@ class AqaraE1(XEntity, ClimateEntity):
     _enabled = None
     _mode = None
 
-    @callback
-    def async_set_state(self, data: dict):
+    def on_init(self):
+        self.listen_attrs = {"climate", "mode", "current_temp", "target_temp"}
+
+    def set_state(self, data: dict):
         if "climate" in data:
             self._enabled = data["climate"]
         if "mode" in data:
@@ -114,11 +92,8 @@ class AqaraE1(XEntity, ClimateEntity):
 
         self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
 
-    async def async_update(self):
-        await self.device_read(self.subscribed_attrs)
-
-    async def async_set_temperature(self, **kwargs) -> None:
-        await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
+    async def async_set_temperature(self, temperature: int, **kwargs) -> None:
+        self.device.write({"target_temp": temperature})
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         if hvac_mode in (HVACMode.HEAT, HVACMode.AUTO):
@@ -127,4 +102,8 @@ class AqaraE1(XEntity, ClimateEntity):
             payload = {"climate": False}
         else:
             return
-        await self.device_send(payload)
+        self.device.write(payload)
+
+
+XEntity.NEW["climate.model.lumi.airrtc.tcpecn02"] = XAqaraS2
+XEntity.NEW["climate.model.lumi.airrtc.agl001"] = XAqaraE1

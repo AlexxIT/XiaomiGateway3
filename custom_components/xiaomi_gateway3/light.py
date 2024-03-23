@@ -1,78 +1,56 @@
 import asyncio
+from functools import cached_property
 
 from homeassistant.components.light import (
+    ColorMode,
+    LightEntity,
+    LightEntityFeature,
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
     ATTR_EFFECT,
     ATTR_TRANSITION,
-    LightEntity,
-    LightEntityFeature,
-    ColorMode,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON
-from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from . import DOMAIN
-from .core.converters import ZIGBEE, MESH_GROUP_MODEL, Converter
-from .core.device import XDevice
-from .core.entity import XEntity, setup_entity
-from .core.gateway import XGateway
-
-CONF_DEFAULT_TRANSITION = "default_transition"
+from .core.gate.base import XGateway
+from .hass.entity import XEntity
 
 
-async def async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, add_entities: AddEntitiesCallback
-) -> None:
-    def new_entity(gateway: XGateway, device: XDevice, conv: Converter) -> XEntity:
-        if device.type == ZIGBEE:
-            return XiaomiZigbeeLight(gateway, device, conv)
-        elif device.model == MESH_GROUP_MODEL:
-            return XiaomiMeshGroup(gateway, device, conv)
-        else:
-            return XiaomiMeshLight(gateway, device, conv)
-
-    gw: XGateway = hass.data[DOMAIN][config_entry.entry_id]
-    gw.add_setup(__name__, setup_entity(hass, config_entry, add_entities, new_entity))
+# noinspection PyUnusedLocal
+async def async_setup_entry(hass, entry, async_add_entities) -> None:
+    XEntity.ADD[entry.entry_id + "light"] = async_add_entities
 
 
-# noinspection PyAbstractClass
-class XiaomiLight(XEntity, LightEntity, RestoreEntity):
-    _attr_is_on = None
+class XLight(XEntity, LightEntity, RestoreEntity):
+    _attr_color_mode = ColorMode.ONOFF
+    _attr_supported_color_modes = {ColorMode.ONOFF}
 
-    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
-        super().__init__(gateway, device, conv)
+    def on_init(self):
+        self._attr_color_mode = ColorMode.ONOFF
 
-        for conv in device.converters:
+        for conv in self.device.converters:
             if conv.attr == ATTR_BRIGHTNESS:
-                self._attr_supported_features |= LightEntityFeature.TRANSITION
+                self.listen_attrs.add(conv.attr)
+                self._attr_color_mode = ColorMode.BRIGHTNESS
             elif conv.attr == ATTR_COLOR_TEMP:
-                self._attr_supported_color_modes = {ColorMode.COLOR_TEMP}
+                self.listen_attrs.add(conv.attr)
+                self._attr_color_mode = ColorMode.COLOR_TEMP
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
                     self._attr_min_mireds = int(1000000 / conv.maxk)
                     self._attr_max_mireds = int(1000000 / conv.mink)
-            elif conv.attr == ATTR_EFFECT:
+            elif conv.attr == ATTR_EFFECT and hasattr(conv, "map"):
+                self.listen_attrs.add(conv.attr)
                 self._attr_supported_features |= LightEntityFeature.EFFECT
                 self._attr_effect_list = list(conv.map.values())
 
-        if self._attr_supported_color_modes is None:
-            self._attr_supported_color_modes = {
-                ColorMode.BRIGHTNESS
-                if self._attr_supported_features & LightEntityFeature.TRANSITION
-                else ColorMode.ONOFF
-            }
+        self._attr_supported_color_modes = {self._attr_color_mode}
 
-    @callback
-    def async_set_state(self, data: dict):
+    def set_state(self, data: dict):
         if self.attr in data:
-            self._attr_is_on = data[self.attr]
-        # sometimes brightness and color_temp stored as string in Xiaomi DB
+            self._attr_is_on = bool(data[self.attr])
         if ATTR_BRIGHTNESS in data:
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
@@ -80,117 +58,98 @@ class XiaomiLight(XEntity, LightEntity, RestoreEntity):
         if ATTR_EFFECT in data:
             self._attr_effect = data[ATTR_EFFECT]
 
-    @callback
-    def async_restore_last_state(self, state: str, attrs: dict):
-        self._attr_is_on = state == STATE_ON
-        self._attr_brightness = attrs.get(ATTR_BRIGHTNESS)
-        self._attr_color_temp = attrs.get(ATTR_COLOR_TEMP)
-        self._attr_effect = attrs.get(ATTR_EFFECT)
+    def get_state(self) -> dict:
+        return {
+            self.attr: self._attr_is_on,
+            ATTR_BRIGHTNESS: self._attr_brightness,
+            ATTR_COLOR_TEMP: self._attr_color_temp,
+        }
 
-    async def async_update(self):
-        await self.device_read(self.subscribed_attrs)
-
-
-# noinspection PyAbstractClass
-class XiaomiZigbeeLight(XiaomiLight):
     async def async_turn_on(self, **kwargs):
-        if ATTR_TRANSITION in kwargs:
-            tr = kwargs.pop(ATTR_TRANSITION)
-        elif CONF_DEFAULT_TRANSITION in self.customize:
-            tr = self.customize[CONF_DEFAULT_TRANSITION]
-        else:
-            tr = None
-
-        if tr is not None:
-            if kwargs:
-                # For the Aqara bulb, it is important that the brightness
-                # parameter comes before the color_temp parameter. Only this
-                # way transition will work. So we use `kwargs.pop` func to set
-                # the exact order of parameters.
-                for k in (ATTR_BRIGHTNESS, ATTR_COLOR_TEMP):
-                    if k in kwargs:
-                        kwargs[k] = (kwargs.pop(k), tr)
-            else:
-                kwargs[ATTR_BRIGHTNESS] = (255, tr)
-
-        if not kwargs:
-            kwargs[self.attr] = True
-
-        await self.device_send(kwargs)
+        self.device.write(kwargs if kwargs else {self.attr: True})
 
     async def async_turn_off(self, **kwargs):
-        if ATTR_TRANSITION in kwargs:
-            tr = kwargs[ATTR_TRANSITION]
-        elif CONF_DEFAULT_TRANSITION in self.customize:
-            tr = self.customize[CONF_DEFAULT_TRANSITION]
-        else:
-            tr = None
-
-        if tr is not None:
-            await self.device_send({ATTR_BRIGHTNESS: (0, tr)})
-        else:
-            await self.device_send({self.attr: False})
+        self.device.write({self.attr: False})
 
 
-# noinspection PyAbstractClass
-class XiaomiMeshBase(XiaomiLight):
+class XZigbeeLight(XLight):
+    def on_init(self):
+        super().on_init()
+
+        for conv in self.device.converters:
+            if conv.attr == ATTR_TRANSITION:
+                self._attr_supported_features |= LightEntityFeature.TRANSITION
+
+    @cached_property
+    def default_transition(self) -> float | None:
+        return self.device.extra.get("default_transition")
+
     async def async_turn_on(self, **kwargs):
-        kwargs[self.attr] = True
-        await self.device_send(kwargs)
+        if self.default_transition is not None:
+            kwargs.setdefault(ATTR_TRANSITION, self.default_transition)
+
+        if ATTR_TRANSITION in kwargs:
+            # important to sort args in right order, transition should be last
+            kwargs = {
+                k: kwargs[k]
+                for k in (ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, ATTR_TRANSITION)
+                if k in kwargs
+            }
+
+        self.device.write(kwargs if kwargs else {self.attr: True})
 
     async def async_turn_off(self, **kwargs):
-        kwargs[self.attr] = False
-        await self.device_send(kwargs)
+        if self.default_transition is not None:
+            kwargs.setdefault(ATTR_TRANSITION, self.default_transition)
+
+        if ATTR_TRANSITION in kwargs:
+            kwargs.setdefault(ATTR_BRIGHTNESS, 0)
+
+        self.device.write(kwargs if kwargs else {self.attr: False})
 
 
-# noinspection PyAbstractClass
-class XiaomiMeshLight(XiaomiMeshBase):
-    @callback
-    def async_set_state(self, data: dict):
-        super().async_set_state(data)
+class XLightGroup(XLight):
+    update_event: asyncio.Event
 
-        if "group" not in self.device.entities:
-            return
-        # convert light attr to group attr
-        if self.attr in data:
-            data["group"] = data.pop(self.attr)
-        group = self.device.entities["group"]
-        group.async_set_state(data)
-        group.async_write_ha_state()
+    def childs(self):
+        return [
+            XGateway.devices[did]
+            for did in self.device.extra.get("childs", [])
+            if did in XGateway.devices
+        ]
 
-
-# noinspection PyAbstractClass
-class XiaomiMeshGroup(XiaomiMeshBase):
-    def __init__(self, gateway: "XGateway", device: XDevice, conv: Converter):
-        super().__init__(gateway, device, conv)
-
-        if not device.extra["childs"]:
-            device.available = False
-            return
-
-        for did in device.extra["childs"]:
-            child = gateway.devices[did]
-            child.entities[self.attr] = self
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.update_event = asyncio.Event()
+        for child in self.childs():
+            child.add_listener(self.forward_child_update)
 
     async def async_will_remove_from_hass(self) -> None:
         await super().async_will_remove_from_hass()
-        if not self.device.extra["childs"]:
-            return
-        for did in self.device.extra["childs"]:
-            child = self.gw.devices[did]
-            # None - fix https://github.com/AlexxIT/XiaomiGateway3/issues/905
-            child.entities.pop(self.attr, None)
+        for child in self.childs():
+            child.remove_listener(self.forward_child_update)
 
-    async def async_update(self):
-        # To update a group - request an update of its children
-        # update_ha_state for all child light entities
+    def forward_child_update(self, data: dict):
+        self.update_event.set()
+        self.device.dispatch(data)
+
+    async def wait_for_update(self, delay=10):
         try:
-            childs = []
-            for did in self.device.extra["childs"]:
-                light = self.gw.devices[did].entities.get("light")
-                childs.append(light.async_update_ha_state(True))
-            if childs:
-                await asyncio.gather(*childs)
+            self.update_event.clear()
+            async with asyncio.timeout(delay):
+                await self.update_event.wait()
+        except TimeoutError:
+            pass
 
-        except Exception as e:
-            self.debug("Can't update child states", exc_info=e)
+    async def async_turn_on(self, **kwargs):
+        await super().async_turn_on(**kwargs)
+        await self.wait_for_update()
+
+    async def async_turn_off(self, **kwargs):
+        await super().async_turn_off(**kwargs)
+        await self.wait_for_update()
+
+
+XEntity.NEW["light"] = XLight
+XEntity.NEW["light.type.zigbee"] = XZigbeeLight
+XEntity.NEW["light.type.group"] = XLightGroup
