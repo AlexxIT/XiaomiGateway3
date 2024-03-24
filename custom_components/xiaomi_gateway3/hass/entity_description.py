@@ -137,7 +137,7 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
         "enabled": False,
     },
     "sensor.battery_voltage": {
-        "class": SENSOR.BATTERY,
+        "class": SENSOR.VOLTAGE,
         "units": UnitOfElectricPotential.MILLIVOLT,
         "category": DIAGNOSTIC,
     },
