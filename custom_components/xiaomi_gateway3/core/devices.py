@@ -1304,6 +1304,12 @@ DEVICES += [{
         ZBatteryConv("battery", "sensor", ep=1, bind=True, report="1h 12h 0"),
     ],
 }, {
+    "Leak_Sensor": ["LifeControl", "Water Leak Sensor", "MCLH-07"],
+    "spec": [
+        ZIASZoneConv("moisture", "binary_sensor", ep=1),
+        ZBatteryConv("battery", "sensor", ep=1),
+    ],
+}, {
     "default": "zigbee",  # default zigbee device
     "spec": [
         ZOnOffConv("switch", "switch", ep=1, bind=True, entity=ENTITY_LAZY),
