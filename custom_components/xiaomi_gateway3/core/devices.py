@@ -1699,6 +1699,19 @@ DEVICES += [{
         ConstConv("action", mi="2.e.1014", value=BUTTON_HOLD),
     ]
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
+    17825: ["Unknown", "Eight scene knob switch", "cxw.remote.ble006"],
+    "spec": [
+        BaseConv("battery", mi="7.p.1003"),  # uint8
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
+        ConstConv("action", mi="5.e.1036", value="rotate"),
+        BaseConv("rotate", mi="5.e.1036.p.2"),
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
