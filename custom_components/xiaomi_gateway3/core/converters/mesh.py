@@ -24,3 +24,31 @@ class InductionRange(BaseConv):
             if v in "+xv":
                 mask |= 1 << i
         super().encode(device, payload, mask)
+
+
+class GiotTimePatternConv(BaseConv):
+    """
+    Period encoding:
+    8-digit number: HHMMhhmm
+        HH = start hour
+        MM = start minute
+        hh = end hour
+        mm = end minute
+    Example:
+        Period: 23:59 - 10:44
+        Encoded: 23591044
+    """
+
+    pattern = "^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$"
+
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        value = str(value)
+        if len(value) != 8:
+            return
+        payload[self.attr] = f"{value[:2]}:{value[2:4]}-{value[4:6]}:{value[6:]}"
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        value = value.replace(":", "").replace("-", "")
+        if len(value) != 8:
+            return
+        super().encode(device, payload, int(value))

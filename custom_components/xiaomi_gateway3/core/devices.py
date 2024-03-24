@@ -2777,7 +2777,7 @@ DEVICES += [{
         MathConv("turn_off_transit_sec", "number", mi="3.p.18", multiply=0.001, min=100, max=30000, step=100, round=1, entity=ENTITY_CONFIG),
         MathConv("change_transit_sec", "number", mi="3.p.19", multiply=0.001, min=100, max=30000, step=100, round=1, entity=ENTITY_CONFIG),
         MathConv("min_brightness", "number", mi="3.p.23", multiply=0.1, min=1, max=500, step=1, round=1, entity=ENTITY_CONFIG),
-        # TODO GiotTimePatternConv("night_light_time", "text", mi="3.p.16")
+        GiotTimePatternConv("night_light_time", "text", mi="3.p.16", entity=ENTITY_CONFIG)
         # Converter("fill_light_detection", "sensor", mi="3.p.20"),
         # Converter("fill_light_switch", "switch", mi="3.p.21"),
         # MathConv("min_bri_factory", "number", mi="3.p.16", min=1, max=500),
