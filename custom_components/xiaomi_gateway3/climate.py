@@ -22,6 +22,8 @@ ACTIONS = {
     HVACMode.OFF: HVACAction.OFF,
     HVACMode.COOL: HVACAction.COOLING,
     HVACMode.HEAT: HVACAction.HEATING,
+    HVACMode.DRY: HVACAction.DRYING,
+    HVACMode.FAN_ONLY: HVACAction.FAN,
 }
 
 
@@ -31,25 +33,28 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = (
-        ClimateEntityFeature.TARGET_TEMPERATURE_RANGE | ClimateEntityFeature.FAN_MODE
-    )
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
     _attr_min_temp = 17
     _attr_target_temperature_step = 1
+    _enabled = None
+    _mode = None
 
     def set_state(self, data: dict):
+        self._enabled = data.get("power")
         self._attr_current_temperature = data.get("current_temp")
         self._attr_fan_mode = data.get("fan_mode")
         self._attr_hvac_mode = data.get("hvac_mode")
+        self._mode = data.get("hvac_mode")
         # better support HomeKit
         # https://github.com/AlexxIT/XiaomiGateway3/issues/707#issuecomment-1099109552
         self._attr_hvac_action = ACTIONS.get(self._attr_hvac_mode)
         # fix scenes with turned off climate
         # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
         self._attr_target_temperature = data.get("target_temp", 0)
+        self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
 
     async def async_set_temperature(self, temperature: int, **kwargs) -> None:
         if temperature:
@@ -104,6 +109,61 @@ class XAqaraE1(XEntity, ClimateEntity):
             return
         self.device.write(payload)
 
+class ScdvbHAVC(XEntity, ClimateEntity):
+    _attr_fan_mode = None
+    _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
+    _attr_hvac_mode = None
+    _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT, HVACMode.AUTO, HVACMode.DRY, HVACMode.FAN_ONLY]
+    _attr_precision = PRECISION_WHOLE
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_max_temp = 32
+    _attr_min_temp = 16
+    _attr_target_temperature_step = 1
+
+    _enabled = None
+    _mode = None
+    @callback
+    def async_set_state(self, data: dict):
+        if "climate" in data:
+            self._enabled = data["climate"]
+        if "hvac_mode" in data:
+            self._mode = data["hvac_mode"]
+        if "fan_mode" in data:
+            self._attr_fan_mode = data["fan_mode"]
+        if "current_temp" in data:
+            self._attr_current_temperature = data["current_temp"]
+        if "target_temp" in data:
+            self._attr_target_temperature = data["target_temp"]
+
+        if self._enabled is None or self._mode is None:
+            return
+
+        self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
+    async def async_update(self):
+        await self.device_read(self.subscribed_attrs)
+
+    async def async_set_temperature(self, **kwargs) -> None:
+        if kwargs[ATTR_TEMPERATURE] == 0:
+            return
+        await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
+
+    async def async_set_fan_mode(self, fan_mode: str) -> None:
+        if not self._enabled:
+            await self.device_send({"climate": True})
+            self._attr_hvac_mode = self._mode
+        await self.device_send({"fan_mode": fan_mode})
+
+    async def async_set_hvac_mode(self, hvac_mode: str) -> None:
+        if hvac_mode == HVACMode.OFF:
+            await self.device_send({"climate": False})
+        else:
+            if not self._enabled:
+                await self.device_send({"climate": True})
+			 # better support HomeKit
+            if hvac_mode == HVACMode.AUTO:
+                hvac_mode = self._mode
+            await self.device_send({"hvac_mode": hvac_mode})
 
 XEntity.NEW["climate.model.lumi.airrtc.tcpecn02"] = XAqaraS2
 XEntity.NEW["climate.model.lumi.airrtc.agl001"] = XAqaraE1
