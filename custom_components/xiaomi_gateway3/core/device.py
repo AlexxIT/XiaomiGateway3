@@ -396,9 +396,10 @@ class XDevice:
                 # update available and state with one step
                 self.available = payload["available"] = True
 
-            self.dispatch(payload)
-
+            # log before dispatch
             gw.debug("on_report", device=self, data=payload)
+
+            self.dispatch(payload)
 
         return payload
 
