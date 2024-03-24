@@ -58,3 +58,8 @@ UNIT_SECONDS = "s"
 UNIT_MINUTES = "min"
 
 UNIT_METERS = "m"
+
+# door: On means open, Off means closed
+# lock: On means open (unlocked), Off means closed (locked)
+STATE_UNLOCK = True
+STATE_LOCKED = False
