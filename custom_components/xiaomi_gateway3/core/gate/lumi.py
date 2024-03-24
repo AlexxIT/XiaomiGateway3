@@ -48,11 +48,12 @@ class LumiGateway(XGateway):
             items = data.get("params") or data.get("mi_spec")
         elif cmd == "read_rsp":
             # {"cmd":"read_rsp","did":"lumi","results":[{"res_name":"8.0.2022","value":68,"error_code":0}]}
-            items = data.get("results")
+            # {"cmd":"read_rsp","did":"lumi","mi_spec":[{"siid":5,"piid":2,"value":0,"code":0}]}
+            items = data.get("results") or data.get("mi_spec")
         elif cmd == "write_rsp" and data["did"] == "lumi.0":
             # process write response only from Gateway
             # {"cmd":"write_rsp","did":"lumi.0","results":[{"res_name":"8.0.2109","value":60,"error_code":0}]}
-            items = data.get("results")
+            items = data.get("results") or data.get("mi_spec")
         else:
             return
 
