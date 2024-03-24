@@ -101,8 +101,8 @@ async def read_firmware(host: str) -> Optional[str]:
 
     ezsp = EZSP({"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None})
     try:
-        # noinspection PyProtectedMember
-        await asyncio.wait_for(ezsp._probe(), timeout=10)
+        await ezsp.connect(use_thread=False)
+        await ezsp.startup_reset()
         _, _, version = await ezsp.get_board_info()
     except Exception as e:
         _LOGGER.debug(f"{host} [FWUP] Read firmware error: {e}")
