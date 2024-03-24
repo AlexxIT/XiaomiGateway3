@@ -255,3 +255,21 @@ def test_zcl_write():
         {"commandcli": "zcl global write 6 0 16 {01}"},
         {"commandcli": "send 0x1234 1 1"},
     ]
+
+
+def test_zdo():
+    # {"commands":[{"commandcli":"zdo ieee 0xe984"}]}
+    p = silabs.decode(
+        {
+            "clusterId": "0x8001",
+            "sourceEndpoint": "0x00",
+            "APSPlayload": "0x2E00888888881044EF5484E9",
+        }
+    )
+    s = [f"{k}: {v}" for k, v in p.items()]
+    assert s == [
+        "zdo_command: IEEE_addr_rsp",
+        "status: <Status.SUCCESS: 0>",
+        "ieee: 54:ef:44:10:88:88:88:88",
+        "nwk: 0xE984",
+    ]
