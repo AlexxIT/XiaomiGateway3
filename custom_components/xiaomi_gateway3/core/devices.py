@@ -1699,6 +1699,17 @@ DEVICES += [{
         ConstConv("action", mi="2.e.1014", value=BUTTON_HOLD),
     ]
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/pull/1294
+    14945: ["Linptech", "Wireless Button KS1", "linp.remote.ks1"],
+    "spec": [
+        BaseConv("battery", mi="4.p.1003"),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+    ],
+    "ttl": "6h"  # battery every 6 hours
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
     17825: ["Unknown", "Eight scene knob switch", "cxw.remote.ble006"],
     "spec": [
