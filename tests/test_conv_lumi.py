@@ -214,6 +214,7 @@ def test_climate():
         "hvac_mode": "off",
         "target_temp": 0,
         "current_temp": 63,
+        "power": False,
     }
 
     params = [
@@ -231,6 +232,7 @@ def test_climate():
         "target_temp": 30,
         "fan_mode": "auto",
         "current_temp": 29,
+        "power": True,
     }
 
     x = params[0]["value"]
