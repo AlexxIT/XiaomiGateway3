@@ -60,7 +60,7 @@
   },
   "device_automation": {
     "trigger_type": {
-      "action": "Action"
+      "action": "Действие"
     }
   },
   "entity": {
@@ -75,7 +75,7 @@
             "ota": "Zigbee OTA",
             "config": "Переконфигурация Zigbee",
             "parentscan": "Сканирование родительских устройств Zigbee",
-            "firmwarelock": "Блокировка прошивки шлюза",
+            "firmware_lock": "Блокировка прошивки шлюза",
             "reboot": "Перезагрузка шлюза",
             "run_ftp": "Запуск FTP на шлюзе",
             "flash_ezsp": "Прошивка EZSP Zigbee",
