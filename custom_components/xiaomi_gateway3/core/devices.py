@@ -1356,6 +1356,7 @@ DEVICES += [{
     131: ["Xiaomi", "Kettle", "YM-K1501", "yunmi.kettle.v1"],  # CH, HK, RU version
     275: ["Xiaomi", "Kettle", "YM-K1501", "yunmi.kettle.v2"],  # international
     1116: ["Xiaomi", "Viomi Kettle", "V-SK152", "yunmi.kettle.v7"],  # international
+    2528: ["Xiaomi", "Kettle Pro", "MJHWSHO2YM", "yunmi.kettle.v12"],  # RU
     "spec": [
         BLEKettle("power", "binary_sensor", mi=4101),  # power+state+temperature
         BaseConv("temperature", "sensor"),
