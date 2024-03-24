@@ -184,7 +184,7 @@ LUMI_GLOBALS: dict[str, BaseConv] = {
     "8.0.2036": BaseConv("parent"),
     "8.0.2041": BaseConv("8.0.2041"),  # =55
     "8.0.2091": BaseConv("8.0.2091"),  # ota_progress?
-    "8.0.2156": BaseConv("8.0.2156"),  # nwk?
+    "8.0.2156": BaseConv("nwk"),
     "8.0.2228": BaseConv("8.0.2228"),  # =4367
     "8.0.2231": BaseConv("8.0.2231"),  # =0
     # skip online state
