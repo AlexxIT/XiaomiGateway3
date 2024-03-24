@@ -33,7 +33,9 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+    )
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
@@ -41,6 +43,9 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_target_temperature_step = 1
     _enabled = None
     _mode = None
+
+    def on_init(self):
+        self.listen_attrs |= {"power", "current_temp", "hvac_mode", "target_temp"}
 
     def set_state(self, data: dict):
         self._enabled = data.get("power")
@@ -109,13 +114,23 @@ class XAqaraE1(XEntity, ClimateEntity):
             return
         self.device.write(payload)
 
-class ScdvbHAVC(XEntity, ClimateEntity):
+
+class XScdvbHAVC(XEntity, ClimateEntity):
     _attr_fan_mode = None
     _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
     _attr_hvac_mode = None
-    _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT, HVACMode.AUTO, HVACMode.DRY, HVACMode.FAN_ONLY]
+    _attr_hvac_modes = [
+        HVACMode.OFF,
+        HVACMode.COOL,
+        HVACMode.HEAT,
+        HVACMode.AUTO,
+        HVACMode.DRY,
+        HVACMode.FAN_ONLY,
+    ]
     _attr_precision = PRECISION_WHOLE
-    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+    )
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 32
     _attr_min_temp = 16
@@ -123,8 +138,11 @@ class ScdvbHAVC(XEntity, ClimateEntity):
 
     _enabled = None
     _mode = None
-    @callback
-    def async_set_state(self, data: dict):
+
+    def on_init(self):
+        self.listen_attrs |= {"current_temp", "fan_mode", "hvac_mode", "target_temp"}
+
+    def set_state(self, data: dict):
         if "climate" in data:
             self._enabled = data["climate"]
         if "hvac_mode" in data:
@@ -140,30 +158,29 @@ class ScdvbHAVC(XEntity, ClimateEntity):
             return
 
         self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
-    async def async_update(self):
-        await self.device_read(self.subscribed_attrs)
 
-    async def async_set_temperature(self, **kwargs) -> None:
-        if kwargs[ATTR_TEMPERATURE] == 0:
-            return
-        await self.device_send({"target_temp": kwargs[ATTR_TEMPERATURE]})
+    async def async_set_temperature(self, temperature: int, **kwargs) -> None:
+        if temperature:
+            self.device.write({"target_temp": temperature})
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         if not self._enabled:
-            await self.device_send({"climate": True})
+            self.device.write({"climate": True})
             self._attr_hvac_mode = self._mode
-        await self.device_send({"fan_mode": fan_mode})
+        self.device.write({"fan_mode": fan_mode})
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         if hvac_mode == HVACMode.OFF:
-            await self.device_send({"climate": False})
+            self.device.write({"climate": False})
         else:
             if not self._enabled:
-                await self.device_send({"climate": True})
-			 # better support HomeKit
+                self.device.write({"climate": True})
+            # better support HomeKit
             if hvac_mode == HVACMode.AUTO:
                 hvac_mode = self._mode
-            await self.device_send({"hvac_mode": hvac_mode})
+            self.device.write({"hvac_mode": hvac_mode})
+
 
 XEntity.NEW["climate.model.lumi.airrtc.tcpecn02"] = XAqaraS2
 XEntity.NEW["climate.model.lumi.airrtc.agl001"] = XAqaraE1
+XEntity.NEW["climate.model.14050"] = XScdvbHAVC

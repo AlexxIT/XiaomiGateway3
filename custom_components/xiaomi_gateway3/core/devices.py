@@ -574,8 +574,8 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/issues/101
     "lumi.airrtc.tcpecn02": ["Aqara", "Thermostat S2 CN", "KTWKQ03ES"],
     "spec": [
-        # BoolConv("power", mi="3.1.85", xiaomi="power_status"),
         ClimateConv("climate", "climate", mi="14.2.85"),
+        BoolConv("power", mi="3.1.85"),
         BaseConv("current_temp", mi="3.2.85"),
         MapConv("hvac_mode", mi="14.8.85", map={0: "heat", 1: "cool", 15: "off"}),
         MapConv("fan_mode", mi="14.10.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
@@ -3004,6 +3004,15 @@ DEVICES += [{
         BoolConv("natural_wind", "switch", mi="3.p.7"),
         MapConv("fan_level", "select", mi="3.p.2", map={1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6"}),
     ]
+}, {
+    14050: ["Scdvb", "Air Conditioner", "scdvb.aircondition.acm"],
+    "spec": [
+        BaseConv("climate", "climate", mi="2.p.1"),
+        MapConv("hvac_mode", mi="2.p.2", map={0: "cool", 1: "heat", 2: "fan_only", 3: "dry"}),
+        MapConv("fan_mode", mi="3.p.1", map={0: "auto", 1: "low", 2: "medium", 3: "high"}),
+        BaseConv("current_temp", mi="4.p.1"),
+        BaseConv("target_temp", mi="2.p.3"),
+    ],
 }, {
     "default": "mesh",  # default Mesh device
     "spec": [
