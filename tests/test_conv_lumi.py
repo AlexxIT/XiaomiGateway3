@@ -249,6 +249,9 @@ def test_mi_spec():
     p = device.decode([{"siid": 3, "piid": 1, "value": 3100}])
     assert p == {"battery": 80, "battery_voltage": 3100}
 
+    p = device.decode([{"piid": 1, "siid": 2, "value": 33}])
+    assert p == {"illuminance": 33}
+
     device = XDevice("lumi.motion.agl04")
     assert device.market_name == "Aqara Precision Motion Sensor EU"
 

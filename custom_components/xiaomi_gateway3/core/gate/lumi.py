@@ -45,15 +45,15 @@ class LumiGateway(XGateway):
             items = data.get("res_list")
         elif cmd == "report":
             # {"cmd":"report","did":"lumi","params":[{"res_name":"0.3.85","value":129}],"mi_spec":[{"siid":2,"piid":1,"value":129}]}
-            items = data.get("params") or data.get("mi_spec")
+            items = data_params_mi_spec(data)
         elif cmd == "read_rsp":
             # {"cmd":"read_rsp","did":"lumi","results":[{"res_name":"8.0.2022","value":68,"error_code":0}]}
             # {"cmd":"read_rsp","did":"lumi","mi_spec":[{"siid":5,"piid":2,"value":0,"code":0}]}
-            items = data.get("results") or data.get("mi_spec")
+            items = data_params_mi_spec(data)
         elif cmd == "write_rsp" and data["did"] == "lumi.0":
             # process write response only from Gateway
             # {"cmd":"write_rsp","did":"lumi.0","results":[{"res_name":"8.0.2109","value":60,"error_code":0}]}
-            items = data.get("results") or data.get("mi_spec")
+            items = data_params_mi_spec(data)
         else:
             return
 
@@ -75,6 +75,16 @@ class LumiGateway(XGateway):
         #         "zigbee/recv", {"cmd": command, "did": did, key: [item]}
         #     )
         await self.mqtt.publish("zigbee/recv", {"cmd": command, "did": did, **data})
+
+
+def data_params_mi_spec(data: dict) -> list | None:
+    if "params" in data:
+        if "mi_spec" in data:
+            return data["params"] + data["mi_spec"]
+        return data["params"]
+    if "mi_spec" in data:
+        return data["mi_spec"]
+    return None
 
 
 def as_ieee(s: str):
