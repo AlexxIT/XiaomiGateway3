@@ -12,3 +12,6 @@ class ShellMGW2(ShellE1):
             )
             self.db = SQLite(raw)
         return self.db
+
+    async def read_silabs_devices(self) -> bytes:
+        return await self.read_file("/data/zigbee_host/devices.txt")

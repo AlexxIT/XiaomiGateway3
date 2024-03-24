@@ -69,3 +69,6 @@ class ShellE1(ShellBase):
 
     async def run_ftp(self):
         await self.exec("tcpsvd -E 0.0.0.0 21 ftpd -w &")
+
+    async def read_silabs_devices(self) -> bytes:
+        return await self.read_file("/data/devices.txt")

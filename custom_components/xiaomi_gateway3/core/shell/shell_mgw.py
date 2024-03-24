@@ -109,3 +109,6 @@ class ShellMGW(ShellBase):
     async def lock_firmware(self, enable: bool):
         if await self.check_busybox():
             await self.exec(LOCK_FIRMWARE if enable else UNLOCK_FIRMWARE)
+
+    async def read_silabs_devices(self) -> bytes:
+        return await self.read_file("/data/silicon_zigbee_host/devices.txt")

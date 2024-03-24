@@ -3,6 +3,7 @@ import json
 
 from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
+from ..converters import silabs
 from ..converters.zigbee import ZConverter
 from ..device import XDevice
 from ..mini_mqtt import MQTTMessage
@@ -25,6 +26,24 @@ class SilabsGateway(XGateway):
         # version 1.3.33 on all gateways
         # version 1.6.5 on lumi.gateway.mcn001 fw 1.0.7
         self.new_sdk = info["sdkVer"] > "1.3.33"
+
+        # if hasattr(sh, "read_silabs_devices"):
+        #     raw = await sh.read_silabs_devices()
+        #     words = raw.decode().split(" ")
+        #     for i in range(0, len(words) - 1, 32):
+        #         w = words[i:]
+        #         ieee = ":".join(
+        #             i if len(i) == 2 else "0" + i for i in reversed(w[3:11])
+        #         )
+        #         did = "lumi." + ieee.replace(":", "").lstrip("0")
+        #         device = self.devices.get(did)
+        #         if not device:
+        #             nwk = f"0x{w[0]:04}"
+        #             device = XDevice(
+        #                 "unknown", did=did, type=ZIGBEE, ieee=ieee, nwk=nwk
+        #             )
+        #
+        #         self.add_device(device)
 
     def silabs_on_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic.endswith("/MessageReceived"):
@@ -49,7 +68,6 @@ class SilabsGateway(XGateway):
     def silabs_process_recv(self, data: dict):
         ieee = data["eui64"].lower()
         nwk = data["sourceAddress"].lower()
-        zb_msg = None
 
         # skip message from coordinator
         if ieee == "0x0000000000000000" or nwk == "0x0000":
@@ -58,10 +76,7 @@ class SilabsGateway(XGateway):
         did = "lumi." + ieee.lstrip("0x")
         device: XDevice = self.devices.get(did)
         if not device:
-            # we need to save device to know its NWK in future
-            # device = XDevice(did, ZIGBEE, None, mac=mac, nwk=nwk)
-            # self.add_device(device)
-            # self.debug_device(device, "new unknown device", tag="SLBS")
+            self.debug("message from unknown device")
             return
 
         device.extra["lqi"] = data["linkQuality"]
@@ -73,15 +88,7 @@ class SilabsGateway(XGateway):
 
         # process raw zigbee if device supports it
         if device.has_silabs():
-            # if not zb_msg:
-            #     zb_msg = silabs.decode(data)
-            # if zb_msg and "cluster" in zb_msg:
             device.on_report(data, self)
-
-        # process device stats if enabled, also works for LumiGateway
-        # if device and ZIGBEE in device.entities:
-        #     payload = device.decode(ZIGBEE, data)
-        #     device.update(payload)
 
     async def silabs_process_join(self, data: dict):
         self.debug("Process join", data=data)
@@ -118,18 +125,22 @@ class SilabsGateway(XGateway):
         """Emulate first join of device."""
         self.debug("rejoin", device=device)
         payload = {
-            "nodeId": device.nwk.upper(),
+            "nodeId": "0x" + device.nwk[2:].upper(),
             "deviceState": 16,
             "deviceType": "0x00FF",
             "timeSinceLastMessage": 0,
             "deviceEndpoint": {
-                "eui64": device.uid.upper(),
+                "eui64": "0x" + device.uid[2:].upper(),
                 "endpoint": 0,
                 "clusterInfo": [],
             },
             "firstjoined": 1,
         }
         await self.mqtt.publish(f"gw/{self.ieee}/devicejoined", payload)
+
+    async def silabs_leave(self, device: XDevice):
+        cmd = silabs.zdo_leave(device.nwk)
+        await self.mqtt.publish(f"gw/{self.ieee}/commands", {"commands": cmd})
 
     async def silabs_send(self, device: XDevice, payload: dict):
         assert "commands" in payload, payload
