@@ -75,7 +75,7 @@
           "ota": "Zigbee OTA",
           "config": "Zigbee reconfig",
           "parentscan": "Zigbee parent scan",
-          "firmwarelock": "Gateway firmware lock",
+          "firmware_lock": "Gateway firmware lock",
           "reboot": "Gateway reboot",
           "run_ftp": "Gateway run FTP",
           "flash_ezsp": "Zigbee flash EZSP",
