@@ -3,7 +3,9 @@ import time
 from functools import cached_property
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.script import ATTR_LAST_TRIGGERED
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util import utcnow
 
 from .hass.entity import XEntity, XStatsEntity
 
@@ -52,12 +54,16 @@ class XBinaryStatsSensor(XStatsEntity, BinarySensorEntity):
 
 class XMotionSensor(XEntity, BinarySensorEntity):
     """Smart motion sensor with custom occupancy_timeout."""
+    _unrecorded_attributes = {ATTR_LAST_TRIGGERED}
 
     _attr_is_on: bool = False
     _last_on: float = 0
     _last_off: float = 0
     _timeout_pos: int = 0
     _clear_task: asyncio.Task = None
+
+    def on_init(self):
+        self._attr_extra_state_attributes = {}
 
     @cached_property
     def occupancy_timeout(self) -> list[float] | float:
@@ -79,6 +85,7 @@ class XMotionSensor(XEntity, BinarySensorEntity):
             self._clear_task.cancel()
 
         self._attr_is_on = True
+        self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = utcnow()
         self._last_on = ts
 
         if timeout := self.occupancy_timeout:
