@@ -3035,6 +3035,31 @@ DEVICES += [{
         BaseConv("target_temp", mi="2.p.3"),
     ],
 }, {
+    11971: ["Unknown", "Mesh Light", "shhf.light.slcwb3"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.4", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "Reading", 5: "Tv", 6: "Computer"}),
+        BoolConv("flex_switch", "switch", mi="2.p.5"),
+        MapConv("power_on_state", "select", mi="2.p.6", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("wake_up_mode", "switch", mi="2.p.7", entity=ENTITY_CONFIG),
+        BoolConv("sleep_aid_mode", "switch", mi="2.p.8", entity=ENTITY_CONFIG),
+        MapConv("flow", "select", mi="2.p.9", map={0: "Auto", 1: "Immediately"}, entity=ENTITY_CONFIG),
+    ]
+}, {
+    5741: ["Yeelight", "Mesh Light", "yeelink.light.spot2"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("power_on_state", "select", mi="2.p.4", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("mode", "select", mi="2.p.5", map={0: "Dummy", 1: "Lighting", 2: "Night Light", 3: "Tv", 4: "Reading", 5: "Hospitality", 6: "Warmth"}),
+        BoolConv("flex_switch", "switch", mi="2.p.6"),
+        MathConv("light_off_gradient_time", "number", mi="2.p.7", multiply=0.5, min=0, max=10, entity=ENTITY_CONFIG),
+        MathConv("light_on_gradient_time", "number", mi="2.p.8", multiply=0.5, min=0, max=10, entity=ENTITY_CONFIG),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
