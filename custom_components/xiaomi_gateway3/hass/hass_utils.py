@@ -206,6 +206,10 @@ def check_entity_unique_id(registry_entry: RegistryEntry) -> str | None:
         # spaces in attr was by mistake
         attr = attr.replace(" ", "_")
         has_update = True
+    elif attr == "pressure_state":
+        attr = "pressure"
+    elif attr == "occupancy_distance":
+        attr = "distance"
 
     return f"{uid}_{attr}" if has_update else None
 
