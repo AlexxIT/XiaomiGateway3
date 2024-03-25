@@ -14,7 +14,7 @@ from ..shell.shell_mgw2 import ShellMGW2
 
 class OpenMiioGateway(XGateway):
     miio_ack: dict[int, asyncio.Future] = {}  # TODO: init in constructor
-    openmiio_ts: float = 0
+    openmiio_last_ts: float = 0
 
     async def openmiio_prepare_gateway(self, sh: ShellMGW | ShellMGW2):
         latest = await sh.check_openmiio()
@@ -38,7 +38,7 @@ class OpenMiioGateway(XGateway):
                 await asyncio.sleep(2)
 
         # let openmiio boot
-        self.openmiio_ts = time.time() + 60
+        self.openmiio_last_ts = time.time()
 
     async def openmiio_send(
         self, method: str, params: dict | list = None, timeout: int = 5
@@ -62,7 +62,7 @@ class OpenMiioGateway(XGateway):
 
     def openmiio_on_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic == "openmiio/report":
-            self.openmiio_ts = time.time() + 60
+            self.openmiio_last_ts = time.time()
             self.device.dispatch({GATEWAY: msg.json})
 
         elif msg.topic == "miio/command_ack":
@@ -73,22 +73,19 @@ class OpenMiioGateway(XGateway):
             if b'"event.gw.heartbeat"' in msg.payload:
                 self.openmiio_process_gw_heartbeat(msg.json["params"][0])
 
-    async def openmiio_on_timer(self, ts: float):
-        if ts < self.openmiio_ts:
+    def openmiio_on_timer(self, ts: float):
+        if ts - self.openmiio_last_ts < 60:
             return
 
         self.debug("openmiio: WARNING report timeout")
-
         self.device.dispatch({GATEWAY: {"openmiio": {"uptime": None}}})
+        asyncio.create_task(self.openmiio_restart())
 
+    async def openmiio_restart(self):
         try:
             async with Session(self.host) as sh:
-                if not await sh.only_one():
-                    self.debug("Connection from a second Hass detected")
-                    return
-
-                await self.openmiio_prepare_gateway(sh)
-
+                if await sh.only_one():
+                    await self.openmiio_prepare_gateway(sh)
         except Exception as e:
             self.warning("Can't restart openmiio", exc_info=e)
 

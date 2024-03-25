@@ -154,7 +154,7 @@ class XGateway:
         self.debug("MQTT disconnected")
         self.available = False
         self.timer_task.cancel()
-        self.update_devices()
+        self.update_devices(time.time())
 
     def on_mqtt_message(self, msg: MQTTMessage):
         if msg.topic == "broker/ping":
@@ -167,12 +167,12 @@ class XGateway:
 
     async def timer(self):
         while True:
-            self.update_devices()
-            self.dispatch_event(EVENT_TIMER)
+            ts = time.time()
+            self.update_devices(ts)
+            self.dispatch_event(EVENT_TIMER, ts)
             await asyncio.sleep(30)
 
-    def update_devices(self):
-        ts = time.time()
+    def update_devices(self, ts: float):
         for device in self.devices.values():
             if self in device.gateways:
                 device.update(ts)
