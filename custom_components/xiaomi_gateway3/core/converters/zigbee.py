@@ -252,15 +252,20 @@ class ZHumidityConv(ZMathConv):
     multiply: float = 0.01
 
 
+@dataclass
 class ZBatteryConv(ZConverter):
     cluster_id = PowerConfiguration.cluster_id
     attr_id1 = PowerConfiguration.AttributeDefs.battery_percentage_remaining.id
     attr_id2 = PowerConfiguration.AttributeDefs.battery_voltage.id
     childs = {"battery_voltage"}
+    multiply: float = 0.5
 
     def decode(self, device: "XDevice", payload: dict, value: dict):
         if isinstance(value.get(self.attr_id1), int):
-            payload[self.attr] = int(value[self.attr_id1] / 2)
+            value = int(value[self.attr_id1])
+            if self.multiply != 1.0:
+                value *= self.multiply
+            payload[self.attr] = value
         elif isinstance(value.get(self.attr_id2), int):
             payload["battery_voltage"] = value[self.attr_id2] * 100
 

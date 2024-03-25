@@ -1307,7 +1307,7 @@ DEVICES += [{
     "Leak_Sensor": ["LifeControl", "Water Leak Sensor", "MCLH-07"],
     "spec": [
         ZIASZoneConv("moisture", "binary_sensor", ep=1),
-        ZBatteryConv("battery", "sensor", ep=1),
+        ZBatteryConv("battery", "sensor", ep=1, multiply=1.0),
     ],
 }, {
     "default": "zigbee",  # default zigbee device
