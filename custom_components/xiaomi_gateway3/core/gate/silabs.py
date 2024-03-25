@@ -159,7 +159,8 @@ class SilabsGateway(XGateway):
         await self.mqtt.publish(f"gw/{self.ieee}/commands", payload)
 
     def silabs_on_timer(self, ts: float):
-        if ts - self.silabs_neighbors_start_ts > 3600:
+        # periodic scanning only when the stats sensors are enabled
+        if self.stats_domain and ts - self.silabs_neighbors_start_ts > 3600:
             asyncio.create_task(self.silabs_neighbors_scan())
 
     silabs_neighbors_start_ts: float = 0
