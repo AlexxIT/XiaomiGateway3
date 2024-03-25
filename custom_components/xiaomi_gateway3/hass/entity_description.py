@@ -187,7 +187,7 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     },
     "fault": {"category": DIAGNOSTIC},
     "sensor.idle_time": {
-        "class": SENSOR.TEMPERATURE,
+        "class": SENSOR.DURATION,
         "icon": "mdi:timer",
         "units": UnitOfTime.SECONDS,
         "category": DIAGNOSTIC,
