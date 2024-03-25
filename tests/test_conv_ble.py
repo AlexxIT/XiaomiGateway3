@@ -36,6 +36,12 @@ def test_kettle():
     assert p == {"power": True, "state": "heat", "temperature": 84}
 
 
+def test_839():
+    device = XDevice(839)
+    p = device.decode({"eid": 4109, "edata": "EC003901"})
+    assert p == {"humidity": 31.3, "temperature": 23.6}
+
+
 def test_2443():
     device = XDevice(2443)
     assert device.market_name == "Xiaomi Door/Window Sensor 2"

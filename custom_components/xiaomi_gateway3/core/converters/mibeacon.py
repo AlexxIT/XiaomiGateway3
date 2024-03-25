@@ -275,7 +275,7 @@ class BLETempHumi(BaseConv):
     def decode(self, device: "XDevice", payload: dict, data: str):
         data = bytes.fromhex(data)
         payload["temperature"] = int.from_bytes(data[:2], "little", signed=True) / 10.0
-        payload["humidity"] = (int.from_bytes(data[2:], "little") / 10.0,)
+        payload["humidity"] = int.from_bytes(data[2:], "little") / 10.0
 
 
 class BLEToothbrush(BaseConv):
