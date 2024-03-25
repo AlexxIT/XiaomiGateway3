@@ -81,9 +81,12 @@ class XGateway:
         listeners.append(handler)
 
     def dispatch_event(self, event: str, *args, **kwargs):
-        if listeners := self.listeners.get(event):
-            for handler in listeners:
-                handler(*args, **kwargs)
+        try:
+            if listeners := self.listeners.get(event):
+                for handler in listeners:
+                    handler(*args, **kwargs)
+        except Exception as e:
+            self.error("dispatch_event", exc_info=e)
 
     def remove_all_event_listners(self):
         self.listeners.clear()
@@ -160,10 +163,7 @@ class XGateway:
         if self.mqtt_log.isEnabledFor(DEBUG):
             self.mqtt_log.debug({"topic": msg.topic, "data": msg.payload})
 
-        try:
-            self.dispatch_event(EVENT_MQTT_PUBLISH, msg)
-        except Exception as e:
-            self.debug(f"MQTT processing issue", exc_info=e)
+        self.dispatch_event(EVENT_MQTT_PUBLISH, msg)
 
     async def timer(self):
         while True:
