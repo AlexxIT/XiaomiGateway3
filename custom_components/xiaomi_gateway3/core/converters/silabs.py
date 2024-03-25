@@ -2,15 +2,21 @@ import logging
 
 from zigpy.zcl import Cluster
 from zigpy.zcl.foundation import (
-    CommandSchema,
     DATA_TYPES,
     GENERAL_COMMANDS,
+    CommandSchema,
     TypeValue,
     ZCLCommandDef,
 )
 from zigpy.zcl.foundation import GeneralCommand
 from zigpy.zdo import ZDO
-from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
+from zigpy.zdo.types import (
+    ZDOCmd,
+    Neighbors,
+    NodeDescriptor,
+    SizePrefixedSimpleDescriptor,
+    Status as ZDOStatus,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -118,7 +124,31 @@ def zdo_deserialize(cluster_id: int, payload: bytes):
         # https://docs.silabs.com/zigbee/6.5/af_v2/group-zdo
         return {"zdo_command": hdr.command_id.name, "start_index": args[0]}
     elif hdr.command_id == ZDOCmd.Mgmt_Lqi_rsp:
-        return {"zdo_command": hdr.command_id.name}
+        assert args[0] == ZDOStatus.SUCCESS, args  # status
+        neighbors: Neighbors = args[1]
+        items = [
+            {
+                "ieee": str(i.ieee),
+                "nwk": str(i.nwk).lower(),
+                "device_type": i.device_type.name,
+                "relationship": i.relationship.name,
+                "depth": int(i.depth),
+                "lqi": int(i.lqi),
+            }
+            for i in neighbors.NeighborTableList
+        ]
+        return {
+            "zdo_command": hdr.command_id.name,
+            "entries": int(neighbors.Entries),
+            "start_index": int(neighbors.StartIndex),
+            "neighbors": items,
+        }
+    elif hdr.command_id == ZDOCmd.Mgmt_Rtg_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": args[0],
+            "routes": args[1],
+        }
     else:
         raise NotImplemented
 
@@ -386,3 +416,13 @@ def zdb_report(
 # zdo leave [target:2] [removeChildren:1] [rejoin:1]
 def zdo_leave(nwk: str):
     return [{"commandcli": f"zdo leave {nwk} 0 0"}]
+
+
+# zdo mgmt-lqi [target:2] [startIndex:1]
+def zdo_mgmt_lqi(nwk: str, index: int = 0):
+    return [{"commandcli": f"zdo mgmt-lqi {nwk} {index}"}]
+
+
+# 	zdo route [target:2] [index:1]
+def zdo_route(nwk: str, index: int = 0):
+    return [{"commandcli": f"zdo route {nwk} {index}"}]
