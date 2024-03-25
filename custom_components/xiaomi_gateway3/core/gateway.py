@@ -21,14 +21,14 @@ class MultiGateway(
     def start(self):
         if self.main_task:
             return
-        self.debug("Start")
+        self.debug("start")
         self.main_task = asyncio.create_task(self.run_forever())
 
     async def stop(self):
         if not self.main_task:
             return
 
-        self.debug("Stop")
+        self.debug("stop")
         # wait main task for finished: mqtt disconnect and gateway available false
         # updated for all devices
         while not self.main_task.cancelled():
@@ -136,6 +136,7 @@ class MultiGateway(
             await self.miot_send(device, "get_properties", data)
 
     async def telnet_command(self, cmd: str) -> bool | None:
+        self.debug("telnet_command", data=cmd)
         try:
             async with Session(self.host) as sh:
                 if cmd == "run_ftp":
