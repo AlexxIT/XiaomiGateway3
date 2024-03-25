@@ -74,7 +74,7 @@
             "bind": "Привязка Zigbee",
             "ota": "Zigbee OTA",
             "config": "Переконфигурация Zigbee",
-            "parentscan": "Сканирование родительских устройств Zigbee",
+            "parent_scan": "Сканирование родительских устройств Zigbee",
             "firmware_lock": "Блокировка прошивки шлюза",
             "reboot": "Перезагрузка шлюза",
             "run_ftp": "Запуск FTP на шлюзе",

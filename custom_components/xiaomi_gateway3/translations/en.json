@@ -74,7 +74,7 @@
           "bind": "Zigbee binding",
           "ota": "Zigbee OTA",
           "config": "Zigbee reconfig",
-          "parentscan": "Zigbee parent scan",
+          "parent_scan": "Zigbee parent scan",
           "firmware_lock": "Gateway firmware lock",
           "reboot": "Gateway reboot",
           "run_ftp": "Gateway run FTP",
