@@ -42,6 +42,7 @@ class XDeviceExtra(TypedDict, total=False):
     mac2: str  # lan mac for Xiaomi Multimode Gateway 2
     ieee: str  # for ZIGBEE (lowercase hex with colons, EUI64)
     nwk: str  # for ZIGBEE
+    nwk_parent: str  # for ZIGBEE, NWK of parent device
     fw_ver: int  # firmware version for GATEWAY and ZIGBEE
     hw_ver: int  # hardware version for ZIGBEE
     childs: list[str]  # for mesh GROUP
@@ -131,7 +132,7 @@ class XDevice:
 
     @cached_property
     def nwk(self) -> str:
-        return self.extra["nwk"]
+        return self.extra.get("nwk") or "0x0000"  # 0 - for GATEWAY
 
     @cached_property
     def ieee(self) -> str:

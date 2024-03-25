@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 
 from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
@@ -26,6 +27,9 @@ class SilabsGateway(XGateway):
         # version 1.3.33 on all gateways
         # version 1.6.5 on lumi.gateway.mcn001 fw 1.0.7
         self.new_sdk = info["sdkVer"] > "1.3.33"
+
+        # little delay before neighbors scan
+        self.silabs_neighbors_start_ts = time.time() - 3600 + 30
 
         # if hasattr(sh, "read_silabs_devices"):
         #     raw = await sh.read_silabs_devices()
@@ -66,13 +70,13 @@ class SilabsGateway(XGateway):
         self.device.dispatch({GATEWAY: payload})
 
     def silabs_process_recv(self, data: dict):
-        ieee = data["eui64"].lower()
-        nwk = data["sourceAddress"].lower()
-
-        # skip message from coordinator
-        if ieee == "0x0000000000000000" or nwk == "0x0000":
+        if data["sourceEndpoint"] == "0x00":
+            if data["clusterId"] == "0x8031":
+                coro = self.silabs_process_neighbors(data)
+                asyncio.create_task(coro)
             return
 
+        ieee = data["eui64"].lower()
         did = "lumi." + ieee.lstrip("0x")
         device: XDevice = self.devices.get(did)
         if not device:
@@ -153,3 +157,74 @@ class SilabsGateway(XGateway):
                     item["commandcli"] += " 65535 {0000000000000000}"
 
         await self.mqtt.publish(f"gw/{self.ieee}/commands", payload)
+
+    def silabs_on_timer(self, ts: float):
+        if ts - self.silabs_neighbors_start_ts > 3600:
+            asyncio.create_task(self.silabs_neighbors_scan())
+
+    silabs_neighbors_start_ts: float = 0
+    silabs_neighbors_requests: list[str] | None = None
+
+    async def silabs_neighbors_scan(self):
+        self.debug("silabs_neighbors_scan")
+        self.silabs_neighbors_start_ts = time.time()
+        self.silabs_neighbors_requests = []
+        await self.silabs_neighbors_read("0x0000", 0)
+
+    async def silabs_neighbors_read(self, nwk: str, index: int):
+        # process reading requests only 30 second after start
+        # protection from multiple Hass requests
+        if time.time() - self.silabs_neighbors_start_ts > 30:
+            return
+
+        if index == 0:
+            # protect from multiple requests to same nwk
+            if nwk in self.silabs_neighbors_requests:
+                return
+            self.silabs_neighbors_requests.append(nwk)
+
+        payload = {"commands": silabs.zdo_mgmt_lqi(nwk, index)}
+        await self.silabs_send(self.device, payload)
+
+    async def silabs_process_neighbors(self, data: dict):
+        if data["eui64"] != "0x0000000000000000":
+            ieee = data["eui64"].lower()
+            did = "lumi." + ieee.lstrip("0x")
+            device: XDevice = self.devices.get(did)
+            if not device:
+                return  # skip unknown device
+        else:
+            device = self.device
+
+        payload = silabs.decode(data)
+        self.debug("on_neighbors", device, data=payload)
+
+        for neighbor in payload["neighbors"]:
+            rel = neighbor["relationship"]
+            if rel == "Child" or (device.nwk == "0x0000" and rel == "Sibling"):
+                # search child device
+                ieee: str = neighbor["ieee"]
+                did = "lumi." + ieee.replace(":", "").lstrip("0")
+                if child_device := self.devices.get(did):
+                    # update child parent
+                    if child_device.extra.get("nwk_parent") != device.nwk:
+                        child_device.extra["nwk_parent"] = device.nwk
+                        # update stats sensor without increasing msg counter
+                        if self.stats_domain:
+                            child_device.dispatch({ZIGBEE: False})
+
+            elif rel == "Parent":
+                if device.extra.get("nwk_parent") != neighbor["nwk"]:
+                    device.extra["nwk_parent"] = neighbor["nwk"]
+                    # update stats sensor without increasing msg counter
+                    if self.stats_domain:
+                        device.dispatch({ZIGBEE: False})
+
+            # request neighbors search for child router
+            if neighbor["device_type"] == "Router":
+                await self.silabs_neighbors_read(neighbor["nwk"], 0)
+
+        # send next request
+        index = payload["start_index"] + len(payload["neighbors"])
+        if index < payload["entries"]:
+            await self.silabs_neighbors_read(device.nwk, index)

@@ -98,6 +98,7 @@ class MultiGateway(
                 self.add_event_listner(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
 
             self.add_event_listner(EVENT_TIMER, self.openmiio_on_timer)
+            self.add_event_listner(EVENT_TIMER, self.silabs_on_timer)
 
             return True
         except Exception as e:

@@ -51,6 +51,7 @@ CMD_REBOOT = "reboot"
 # ZIGBEE
 CMD_REJOIN = "rejoin"
 CMD_REMOVE = "remove"
+CMD_PARENT_SCAN = "parent_scan"
 
 
 class XCommandSelect(XEntity, SelectEntity):
@@ -69,6 +70,7 @@ class XCommandSelect(XEntity, SelectEntity):
                 CMD_UPDATE,
                 CMD_PAIR,
                 CMD_FORCE_PAIR,
+                CMD_PARENT_SCAN,
                 CMD_RUN_FTP,
                 CMD_REBOOT,
                 CMD_OPENMIIO_RELOAD,
@@ -132,6 +134,8 @@ class XCommandSelect(XEntity, SelectEntity):
                 self.device.dispatch({"data": OPT_ERROR})
         elif option == CMD_FLASH_EZSP:
             self.device.dispatch({"data": None, "options": [OPT_ORIGINAL, OPT_CUSTOM]})
+        elif option == CMD_PARENT_SCAN:
+            await self.gw.silabs_neighbors_scan()
 
         # self._attr_current_option = option
         # self._async_write_ha_state()
