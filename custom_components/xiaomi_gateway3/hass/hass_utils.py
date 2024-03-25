@@ -23,12 +23,14 @@ from ..core.xiaomi_cloud import MiCloud
 _LOGGER = logging.getLogger(__package__)
 
 
-def fix_yaml_dicts(value):
-    if isinstance(value, dict):
-        for k, v in value.items():
-            if isinstance(value, dict):
-                value[k] = fix_yaml_dicts(v)
-        return dict(value)
+def fix_yaml_devices_config(value: dict):
+    for uid, config in list(value.items()):
+        new_uid = f"0x{uid:016x}" if isinstance(uid, int) else uid.lower()
+        if uid != new_uid:
+            value[new_uid] = value.pop(uid)
+        for k, v in config.items():
+            if isinstance(v, dict):
+                config[k] = dict(v)  # fix NodeDictClass
     return value
 
 

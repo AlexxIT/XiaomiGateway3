@@ -42,9 +42,6 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema(
             {
-                vol.Optional(CONF_DEVICES): {
-                    cv.string: vol.Schema({}, extra=vol.ALLOW_EXTRA),
-                },
                 CONF_LOGGER: logger.CONFIG_SCHEMA,
                 vol.Optional(CONF_ATTRIBUTES_TEMPLATE): cv.template,
             },
@@ -65,7 +62,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     if config := config.get(DOMAIN):
         if devices_config := config.get(CONF_DEVICES):
-            XDevice.configs = hass_utils.fix_yaml_dicts(devices_config)
+            XDevice.configs = hass_utils.fix_yaml_devices_config(devices_config)
 
         if logger_config := config.get(CONF_LOGGER):
             logger.init(__name__, logger_config, hass.config.config_dir)
