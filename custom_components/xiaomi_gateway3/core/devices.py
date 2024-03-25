@@ -3087,5 +3087,6 @@ DEVICES += [{
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),  # uint8
         BaseConv("target_position", mi="2.p.2"),  # percentage, 0..100
+        CurtainPosConv("position"),
     ],
 }]

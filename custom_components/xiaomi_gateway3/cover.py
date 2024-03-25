@@ -2,6 +2,7 @@ from homeassistant.components.cover import CoverEntity
 from homeassistant.const import STATE_OPENING, STATE_CLOSING
 from homeassistant.helpers.restore_state import RestoreEntity
 
+from .core.gate.base import XGateway
 from .hass.entity import XEntity
 
 
@@ -47,4 +48,24 @@ class XCover(XEntity, CoverEntity, RestoreEntity):
         self.device.write({"position": position})
 
 
+class XCoverGroup(XCover):
+    def childs(self):
+        return [
+            XGateway.devices[did]
+            for did in self.device.extra.get("childs", [])
+            if did in XGateway.devices
+        ]
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        for child in self.childs():
+            child.add_listener(self.device.dispatch)
+
+    async def async_will_remove_from_hass(self) -> None:
+        await super().async_will_remove_from_hass()
+        for child in self.childs():
+            child.remove_listener(self.device.dispatch)
+
+
 XEntity.NEW["cover"] = XCover
+XEntity.NEW["cover.type.group"] = XCoverGroup
