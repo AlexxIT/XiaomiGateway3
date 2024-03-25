@@ -188,12 +188,10 @@ class XStatsEntity(XEntity):
 
         if "available" in data:
             self._attr_is_on = data["available"]
-            self._attr_extra_state_attributes["device"]["available"] = data["available"]
             state_change = True
 
-        if self.attr in data:
+        if on_message := data.get(self.attr):
             self._attr_native_value = utcnow()
-            self._attr_extra_state_attributes["device"] = self.device.as_dict()
 
             if "msg_received" in self._attr_extra_state_attributes:
                 self._attr_extra_state_attributes["msg_received"] += 1
@@ -211,5 +209,9 @@ class XStatsEntity(XEntity):
 
             state_change = True
 
+        elif on_message is False:
+            state_change = True
+
         if state_change and self.hass:
+            self._attr_extra_state_attributes["device"] = self.device.as_dict()
             self._async_write_ha_state()
