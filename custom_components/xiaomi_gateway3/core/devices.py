@@ -1114,7 +1114,7 @@ DEVICES += [{
         ZTuyaButtonConv("button_2", ep=2, bind=True),
         ZTuyaButtonConv("button_3", ep=3, bind=True),
         ZTuyaButtonConv("button_4", ep=4, bind=True),
-        ZBatteryConv("battery", "sensor", bind=True),
+        ZBatteryPercConv("battery", "sensor", bind=True),
         ZTuyaButtonModeConv("mode", "select"),  # config
     ],
 }, {
@@ -1131,8 +1131,8 @@ DEVICES += [{
     "TS0012": ["Tuya", "Double Switch", "TS0012"],
     "support": 5,
     "spec": [
-        ZOnOffConv("channel_1", "light", ep=1, bind=True),
-        ZOnOffConv("channel_2", "light", ep=2, bind=True),
+        ZOnOffConv("channel_1", "switch", ep=1, bind=True),
+        ZOnOffConv("channel_2", "switch", ep=2, bind=True),
         ZTuyaPowerOnConv("power_on_state", "select"),
         ZTuyaPlugModeConv("mode", "select"),
     ],
@@ -1152,7 +1152,7 @@ DEVICES += [{
     "ttl": 6 * 60 * 60,
     "spec": [
         ZIASZoneConv("occupancy", "binary_sensor"),
-        ZBatteryConv("battery", "sensor", report="1h 12h 0"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0"),
     ],
 }, {
     "TS0202": ["Tuya", "Motion Sensor", "IH012-RT01"],
@@ -1181,14 +1181,14 @@ DEVICES += [{
     "support": 5,  # @AlexxIT
     "spec": [
         ZSonoffButtonConv("action", "sensor", bind=True),
-        ZBatteryConv("battery", "sensor"),
+        ZBatteryPercConv("battery", "sensor"),
     ],
 }, {
     "MS01": ["Sonoff", "Motion Sensor", "SNZB-03"],
     "support": 5,  # @AlexxIT
     "spec": [
         ZIASZoneConv("occupancy", "binary_sensor"),
-        ZBatteryConv("battery", "sensor"),
+        ZBatteryPercConv("battery", "sensor"),
     ],
 }, {
     "TH01": ["Sonoff", "TH Sensor", "SNZB-02"],
@@ -1197,7 +1197,7 @@ DEVICES += [{
         # report config for battery_voltage also by default
         ZTemperatureConv("temperature", "sensor", report="10s 1h 100"),
         ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
-        ZBatteryConv("battery", "sensor", report="1h 12h 0"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0"),
     ],
 }, {
     # wrong zigbee model, some devices have model TH01 (ewelink bug)
@@ -1205,7 +1205,7 @@ DEVICES += [{
     "support": 5,
     "spec": [
         ZIASZoneConv("contact", "binary_sensor"),
-        ZBatteryConv("battery", "sensor"),
+        ZBatteryPercConv("battery", "sensor"),
     ],
 }, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
@@ -1214,7 +1214,7 @@ DEVICES += [{
         ZOccupancyConv("occupancy", "binary_sensor", ep=2, bind=True, report="0s 1h 0"),
         ZIlluminanceConv("illuminance", "sensor", ep=2, bind=True, report="10s 1h 5"),
         ZTemperatureConv("temperature", "sensor", ep=2, bind=True, report="10s 1h 100"),
-        ZBatteryConv("battery", "sensor", ep=2, bind=True, report="1h 12h 0"),
+        ZBatteryPercConv("battery", "sensor", ep=2, bind=True, report="1h 12h 0"),
         ZOccupancyTimeoutConv("occupancy_timeout", "number", ep=2, entity=ENTITY_CONFIG),
     ],
 }, {
@@ -1229,9 +1229,11 @@ DEVICES += [{
     "LCT001": ["Philips", "Hue Color 600 lm", "9290012573A"],
     "support": 2,  # TODO: state change, effect?
     "spec": [
-        ZOnOffConv("light", "light", ep=11),
+        ZOnOffConv("light", "light", ep=11, entity={"poll": True}),
         ZBrightnessConv("brightness", ep=11),
         ZColorTempConv("color_temp", ep=11),
+        ZColorHSConv("hs_color", ep=11),
+        ZColorModeConv("color_mode", ep=11),
         ZTransitionConv("transition"),
     ],
 }, {
@@ -1273,15 +1275,15 @@ DEVICES += [{
 }, {
     "FYRTUR block-out roller blind": ["IKEA", "FYRTUR roller blind", "E1757"],
     "spec": [
-        ZCoverCmd("motor", "cover", ep=1, bind=True),
-        ZCoverPos("position", ep=1, report="1s 5h 1"),
-        ZBatteryConv("battery", "sensor", ep=1, bind=True, report="1h 12h 0"),
+        ZCoverCmd("motor", "cover", bind=True),
+        ZCoverPos("position", report="1s 5h 1"),
+        ZBatteryPercConv("battery", "sensor", bind=True, report="1h 12h 0"),
     ],
 }, {
     "Leak_Sensor": ["LifeControl", "Water Leak Sensor", "MCLH-07"],
     "spec": [
-        ZIASZoneConv("moisture", "binary_sensor", ep=1),
-        ZBatteryConv("battery", "sensor", ep=1, multiply=1.0),
+        ZIASZoneConv("moisture", "binary_sensor"),
+        ZBatteryPercConv("battery", "sensor", multiply=1.0),
     ],
 }, {
     "default": "zigbee",  # default zigbee device
@@ -1290,6 +1292,25 @@ DEVICES += [{
         ZOnOffConv("channel_2", "switch", ep=2, entity=ENTITY_LAZY),
         ZOnOffConv("channel_3", "switch", ep=3, entity=ENTITY_LAZY),
         ZOnOffConv("channel_4", "switch", ep=4, entity=ENTITY_LAZY),
+
+        ZBrightnessConv("brightness", "number", entity={"lazy": True, "mode": "slider"}),
+        ZColorTempConv("color_temp", "number", entity={"lazy": True, "mode": "slider"}),
+        ZColorHSConv("hs_color"),
+        ZCoverPos("position", "number", entity={"lazy": True, "mode": "slider"}),
+
+        ZAnalogInput("analog", "sensor", round=2, entity=ENTITY_LAZY),
+        ZBatteryPercConv("battery", "sensor", entity=ENTITY_LAZY),
+        ZBatteryVoltConv("battery_voltage", "sensor", entity=ENTITY_LAZY),
+        ZIASZoneConv("binary", "binary_sensor", entity=ENTITY_LAZY),
+        ZCurrentConv("current", "sensor", entity=ENTITY_LAZY),
+        ZEnergyConv("energy", "sensor", entity=ENTITY_LAZY),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100", entity=ENTITY_LAZY),
+        ZIlluminanceConv("illuminance", "sensor", report="10s 1h 100", entity=ENTITY_LAZY),
+        ZMultistateInput("multistate", "sensor", entity=ENTITY_LAZY),
+        ZOccupancyConv("occupancy", "binary_sensor", entity=ENTITY_LAZY),
+        ZPowerConv("power", "sensor", entity=ENTITY_LAZY),
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 100", entity=ENTITY_LAZY),
+        ZVoltageConv("voltage", "sensor", entity=ENTITY_LAZY),
     ],
 }]
 

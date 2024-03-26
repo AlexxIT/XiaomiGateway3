@@ -35,32 +35,44 @@ TYPE_UINT32 = 0x23  # t.uint32_t
 TYPE_ENUM8 = 0x30  # t.enum8
 
 
+def conv(value: int, src1: int, src2: int, dst1: int, dst2: int) -> int:
+    value = round((value - src1) / (src2 - src1) * (dst2 - dst1) + dst1)
+    if value < min(dst1, dst2):
+        value = min(dst1, dst2)
+    if value > max(dst1, dst2):
+        value = max(dst1, dst2)
+    return value
+
+
 @dataclass
 class ZConverter(BaseConv):
     """Basic zigbee converter."""
 
     cluster_id = None  # zigbee cluster ID
     attr_id = None  # zigbee attribute ID
-    ep: int = 1  # zigbee endpoint number
+    ep: int = None  # zigbee endpoint number (None will decode all endpoints)
     bind: bool = None
     report: str = None
 
     def decode(self, device: "XDevice", payload: dict, data: dict):
-        if self.attr_id in data:
-            payload[self.attr] = data[self.attr_id]
+        # important to check value, because reading unsupported value will return None
+        if (value := data.get(self.attr_id)) is not None:
+            payload[self.attr] = value
 
     def encode(self, device: "XDevice", payload: dict, value):
         pass
 
     def encode_read(self, device: "XDevice", payload: dict):
         if self.attr_id is not None:
-            cmd = zcl_read(device.nwk, self.ep, self.cluster_id, self.attr_id)
+            cmd = zcl_read(device.nwk, self.ep or 1, self.cluster_id, self.attr_id)
             payload.setdefault("commands", []).extend(cmd)
 
-    def config(self, device: "XDevice", payload: dict, gateway):
+    def config(self, device: "XDevice", payload: dict):
         if self.bind:
+            # noinspection PyUnresolvedReferences
+            gw_ieee = device.gateways[0].ieee
             cmd = zdo_bind(
-                device.nwk, self.ep, self.cluster_id, device.uid[2:], gateway.ieee
+                device.nwk, self.ep or 1, self.cluster_id, device.uid[2:], gw_ieee
             )
             payload.setdefault("commands", []).extend(cmd)
 
@@ -68,7 +80,7 @@ class ZConverter(BaseConv):
             mint, maxt, change = self.report.split(" ")
             cmd = zdb_report(
                 device.nwk,
-                self.ep,
+                self.ep or 1,
                 self.cluster_id,
                 self.attr_id,
                 int(decode_time(mint)),
@@ -81,14 +93,18 @@ class ZConverter(BaseConv):
 class ZBoolConv(ZConverter):
     """Basic zigbee bool converter."""
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if self.attr_id in value:
-            payload[self.attr] = bool(value[self.attr_id])
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            payload[self.attr] = bool(value)
 
     def encode(self, device: "XDevice", payload: dict, value: bool):
-        v = int(value)  # t.Bool
         cmd = zcl_write(
-            device.nwk, self.ep, self.cluster_id, self.attr_id, v, type_id=TYPE_BOOL
+            device.nwk,
+            self.ep or 1,
+            self.cluster_id,
+            self.attr_id,
+            int(value),
+            type_id=TYPE_BOOL,
         )
         payload.setdefault("commands", []).extend(cmd)
 
@@ -96,25 +112,36 @@ class ZBoolConv(ZConverter):
 class ZMapConv(ZConverter):
     map: dict
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if self.attr_id in value:
-            payload[self.attr] = self.map.get(value[self.attr_id])
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            payload[self.attr] = self.map.get(value)
 
     def encode(self, device: "XDevice", payload: dict, value: str):
         v = next(k for k, v in self.map.items() if v == value)
         cmd = zcl_write(
-            device.nwk, self.ep, self.cluster_id, self.attr_id, v, type_id=TYPE_ENUM8
+            device.nwk,
+            self.ep or 1,
+            self.cluster_id,
+            self.attr_id,
+            v,
+            type_id=TYPE_ENUM8,
         )
         payload.setdefault("commands", []).extend(cmd)
 
 
 @dataclass
 class ZMathConv(ZConverter):
-    multiply: float = 1
+    multiply: float = 1.0
+    round: int = None
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if self.attr_id in value:
-            payload[self.attr] = value[self.attr_id] * self.multiply
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            if self.multiply != 1.0:
+                value *= self.multiply
+            if self.round is not None:
+                # convert to int when round is zero
+                value = round(value, self.round or None)
+            payload[self.attr] = value
 
 
 class ZOnOffConv(ZBoolConv):
@@ -122,7 +149,7 @@ class ZOnOffConv(ZBoolConv):
     attr_id = OnOff.AttributeDefs.on_off.id
 
     def encode(self, device: "XDevice", payload: dict, value: bool):
-        cmd = zcl_on_off(device.nwk, self.ep, value)
+        cmd = zcl_on_off(device.nwk, self.ep or 1, value)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -130,8 +157,14 @@ class ZBrightnessConv(ZConverter):
     cluster_id = LevelControl.cluster_id
     attr_id = LevelControl.AttributeDefs.current_level.id
 
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            # zigbee - 0..254, hass - 1..255
+            payload[self.attr] = conv(value, 0, 254, 1, 255)
+
     def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_level(device.nwk, self.ep, value, 0)
+        value = conv(value, 1, 255, 0, 254)
+        cmd = zcl_level(device.nwk, self.ep or 1, value, 0)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -144,8 +177,52 @@ class ZColorTempConv(ZConverter):
     max: int = 500
 
     def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_color(device.nwk, self.ep, value, 0)
+        cmd = zcl_color_temp(device.nwk, self.ep or 1, round(value), 0)
         payload.setdefault("commands", []).extend(cmd)
+
+
+class ZColorHSConv(ZConverter):
+    cluster_id = Color.cluster_id
+    attr_id1 = Color.AttributeDefs.current_hue.id
+    attr_id2 = Color.AttributeDefs.current_saturation.id
+
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if self.attr_id1 in data and self.attr_id2 in data:
+            hue = conv(data[self.attr_id1], 0, 254, 0, 360)
+            sat = conv(data[self.attr_id2], 0, 254, 0, 100)
+            payload[self.attr] = (hue, sat)
+
+    def encode(self, device: "XDevice", payload: dict, value: tuple[int]):
+        hue = conv(value[0], 0, 360, 0, 254)
+        sat = conv(value[1], 0, 100, 0, 254)
+        cmd = zcl_color_hs(device.nwk, self.ep or 1, hue, sat, 0)
+        payload.setdefault("commands", []).extend(cmd)
+
+
+class ZColorModeConv(ZConverter):
+    cluster_id = Color.cluster_id
+    attr_id = Color.AttributeDefs.color_mode.id
+    map = {0: "hs", 1: "xy", 2: "color_temp"}
+
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            payload[self.attr] = self.map[value]
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        for item in payload.get("commands", []):
+            if item["commandcli"] != "zcl global read 768 7":
+                continue
+            cmd = zcl_read(
+                device.nwk,
+                self.ep or 1,
+                self.cluster_id,
+                ZColorHSConv.attr_id1,
+                ZColorHSConv.attr_id2,
+                ZColorTempConv.attr_id,
+                self.attr_id,
+            )
+            item["commandcli"] = cmd[0]["commandcli"]
+            return
 
 
 class ZTransitionConv(BaseConv):
@@ -154,7 +231,8 @@ class ZTransitionConv(BaseConv):
             cli: str = item["commandcli"]
             if cli.startswith(("zcl level", "zcl color")):
                 words = cli.split(" ")
-                words[4] = str(int(value * 10.0))
+                i = 5 if words[2] == "movetohueandsat" else 4
+                words[i] = str(int(value * 10.0))
                 item["commandcli"] = " ".join(words)
 
 
@@ -165,7 +243,7 @@ class ZElectricalBase(ZMathConv):
         # we can read three attrs from one cluster with single call
         cmd = zcl_read(
             device.nwk,
-            self.ep,
+            self.ep or 1,
             self.cluster_id,
             ElectricalMeasurement.AttributeDefs.rms_voltage.id,
             ElectricalMeasurement.AttributeDefs.rms_current.id,
@@ -178,17 +256,21 @@ class ZVoltageConv(ZElectricalBase):
     attr_id = ElectricalMeasurement.AttributeDefs.rms_voltage.id
 
 
+@dataclass
 class ZCurrentConv(ZElectricalBase):
     attr_id = ElectricalMeasurement.AttributeDefs.rms_current.id
+    multiply: float = 0.001
 
 
 class ZPowerConv(ZElectricalBase):
     attr_id = ElectricalMeasurement.AttributeDefs.active_power.id
 
 
+@dataclass
 class ZEnergyConv(ZMathConv):
     cluster_id = Metering.cluster_id
     attr_id = Metering.AttributeDefs.current_summ_delivered.id
+    multiply: float = 0.01
 
 
 class ZOccupancyConv(ZBoolConv):
@@ -205,37 +287,38 @@ class ZOccupancyTimeoutConv(ZConverter):
     max: int = 65535
 
     def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_write(device.nwk, self.ep, self.cluster_id, self.attr_id, value)
+        cmd = zcl_write(device.nwk, self.ep or 1, self.cluster_id, self.attr_id, value)
         payload.setdefault("commands", []).extend(cmd)
         # we need to read new value after write
         self.encode_read(device, payload)
 
 
-# class ZAnalogInput(Converter):
-#     zigbee = "analog_input"
-#
-#     def decode(self, device: 'XDevice', payload: dict, value: dict):
-#         if isinstance(value.get("present_value"), float):
-#             payload[self.attr] = round(value['present_value'], 2)
+class ZAnalogInput(ZMathConv):
+    cluster_id = AnalogInput.cluster_id
+    attr_id = AnalogInput.AttributeDefs.present_value.id
+
+
+class ZMultistateInput(ZConverter):
+    cluster_id = MultistateInput.cluster_id
+    attr_id = MultistateInput.AttributeDefs.present_value.id
 
 
 class ZIASZoneConv(ZConverter):
     cluster_id = IasZone.cluster_id
     command_id = IasZone.ClientCommandDefs.status_change_notification.id
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if value.get("cluster_command_id") == self.command_id:
-            payload[self.attr] = (value["value"]["zone_status"] & 1) > 0
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if data.get("cluster_command_id") == self.command_id:
+            payload[self.attr] = (data["value"]["zone_status"] & 1) > 0
 
     def encode_read(self, device: "XDevice", payload: dict):
         pass
 
 
 @dataclass
-class ZIlluminanceConv(ZMathConv):
+class ZIlluminanceConv(ZConverter):
     cluster_id = IlluminanceMeasurement.cluster_id
     attr_id = IlluminanceMeasurement.AttributeDefs.measured_value.id
-    multiply: float = 0.01
 
 
 @dataclass
@@ -253,27 +336,16 @@ class ZHumidityConv(ZMathConv):
 
 
 @dataclass
-class ZBatteryConv(ZConverter):
+class ZBatteryPercConv(ZMathConv):
     cluster_id = PowerConfiguration.cluster_id
-    attr_id1 = PowerConfiguration.AttributeDefs.battery_percentage_remaining.id
-    attr_id2 = PowerConfiguration.AttributeDefs.battery_voltage.id
-    childs = {"battery_voltage"}
-    multiply: float = 0.5
+    attr_id = PowerConfiguration.AttributeDefs.battery_percentage_remaining.id
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if isinstance(value.get(self.attr_id1), int):
-            value = int(value[self.attr_id1])
-            if self.multiply != 1.0:
-                value *= self.multiply
-            payload[self.attr] = value
-        elif isinstance(value.get(self.attr_id2), int):
-            payload["battery_voltage"] = value[self.attr_id2] * 100
 
-    def encode_read(self, device: "XDevice", payload: dict):
-        cmd = zcl_read(
-            device.nwk, self.ep, self.cluster_id, self.attr_id1, self.attr_id2
-        )
-        payload.setdefault("commands", []).extend(cmd)
+@dataclass
+class ZBatteryVoltConv(ZMathConv):
+    cluster_id = PowerConfiguration.cluster_id
+    attr_id = PowerConfiguration.AttributeDefs.battery_voltage.id
+    multiply: float = 100
 
 
 # useful for reporting description
@@ -315,7 +387,7 @@ class ZTuyaButtonModeConv(ZMapConv):
     attr_id = 0x8004
     map = {0: "command", 1: "event"}
 
-    def config(self, device: "XDevice", payload: dict, gateway):
+    def config(self, device: "XDevice", payload: dict):
         # set default mode
         self.encode(device, payload, "event")
 
@@ -330,10 +402,12 @@ class ZTuyaPlugModeConv(ZMapConv):
 
 
 class ZTuyaButtonConfig(ZConverter):
-    def config(self, device: "XDevice", payload: dict, gateway):
+    def config(self, device: "XDevice", payload: dict):
         # some stupid but necessary magic from zigbee2mqtt
-        cmd = zcl_read(device.nwk, self.ep, 6, 0x04, 0x00, 0x01, 0x05, 0x07, 0xFFFE)
-        cmd += zcl_read(device.nwk, self.ep, 0xE001, 0xD011)
+        cmd = zcl_read(
+            device.nwk, self.ep or 1, 6, 0x04, 0x00, 0x01, 0x05, 0x07, 0xFFFE
+        )
+        cmd += zcl_read(device.nwk, self.ep or 1, 0xE001, 0xD011)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -342,15 +416,15 @@ class ZTuyaButtonConv(ZConverter):
     attr_id = OnOff.AttributeDefs.on_off.id
     map = {0: BUTTON_SINGLE, 1: BUTTON_DOUBLE, 2: BUTTON_HOLD}
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, data: dict):
         # TS004F sends click three times with same seq number
-        if device.extra.get("seq") == value["seq"] or value["endpoint"] != self.ep:
+        if device.extra.get("seq") == data["seq"]:
             return
 
-        device.extra["seq"] = value["seq"]
+        device.extra["seq"] = data["seq"]
 
         try:
-            payload[self.attr] = value = self.map.get(value["value"][0])
+            payload[self.attr] = value = self.map.get(data["value"][0])
             payload["action"] = self.attr + "_" + value
         except:
             pass
@@ -370,10 +444,11 @@ class ZLumiCubeMain(ZConverter):
     attr_id = MultistateInput.AttributeDefs.present_value.id
     childs = {"side", "from_side", "to_side"}
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, data: dict):
         # Thanks to zigbee2mqtt:
         # https://github.com/Koenkk/zigbee-herdsman-converters/blob/4a74caad6361e606e0e995d74e7f9ca2f6bdce3e/converters/fromZigbee.js#L5490
-        value = value[self.attr_id]
+        if (value := data.get(self.attr_id)) is None:
+            return
         if value == 0:
             payload["action"] = "shake"
         elif value == 2:
@@ -401,12 +476,14 @@ class ZLumiCubeRotate(ZConverter):
     attr_id = AnalogInput.AttributeDefs.present_value.id
     childs = {"duration"}
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is None:
+            return
         payload.update(
             {
                 "action": "rotate",
-                "angle": round(value[self.attr_id]),
-                "duration": round(value[0xFF05] * 0.001, 2),
+                "angle": round(value),
+                "duration": round(data[0xFF05] * 0.001, 2),
             }
         )
 
@@ -429,14 +506,14 @@ class ZLumiSensConv(ZConverter):
     write_map = {"low": 0x04010000, "medium": 0x04020000, "high": 0x04030000}
 
     def decode(self, device: "XDevice", payload: dict, data: dict):
-        if self.attr_id in data:
-            v = hex(data[self.attr_id])[4]  # '0x203000038010008'
+        if value := data.get(self.attr_id):
+            v = hex(value)[4]  # '0x203000038010008'
             payload[self.attr] = self.map[v]
 
     def encode(self, device: "XDevice", payload: dict, value: str):
         cmd = zcl_write(
             device.nwk,
-            self.ep,
+            self.ep or 1,
             self.cluster_id,
             0xFFF1,  # write attr
             self.write_map[value],
@@ -448,7 +525,7 @@ class ZLumiSensConv(ZConverter):
     def encode_read(self, device: "XDevice", payload: dict):
         if self.attr_id is not None:
             cmd = zcl_read(
-                device.nwk, self.ep, self.cluster_id, self.attr_id, mfg=0x115F
+                device.nwk, self.ep or 1, self.cluster_id, self.attr_id, mfg=0x115F
             )
             payload.setdefault("commands", []).extend(cmd)
 
@@ -476,8 +553,8 @@ class ZHueDimmerOnConv(ZConverter):
     def encode_read(self, device: "XDevice", payload: dict):
         pass
 
-    def config(self, device: "XDevice", payload: dict, gateway):
-        super().config(device, payload, gateway)
+    def config(self, device: "XDevice", payload: dict):
+        super().config(device, payload)
 
         # Thanks to zigbee2mqtt and ZHA (some unknown magic)
         cmd = zcl_write(device.nwk, 2, 0, 0x31, 0x0B, type_id=0x19, mfg=0x100B)
@@ -530,7 +607,7 @@ class ZLumiColorTemp(BaseConv):
             payload[self.attr] = value
 
     def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_color(device.nwk, 1, value, self.transition)
+        cmd = zcl_color_temp(device.nwk, 1, value, self.transition)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -572,7 +649,7 @@ class ZLumiOppleMode(ZConverter):
     def encode(self, device: "XDevice", payload: dict, value: str):
         v = next(k for k, v in self.map.items() if v == value)
         cmd = zcl_write(
-            device.nwk, self.ep, 0xFCC0, 9, v, type_id=TYPE_UINT8, mfg=0x115F
+            device.nwk, self.ep or 1, 0xFCC0, 9, v, type_id=TYPE_UINT8, mfg=0x115F
         )
         payload.setdefault("commands", []).extend(cmd)
 
@@ -587,20 +664,22 @@ class ZCoverCmd(ZConverter):
 
     def encode(self, device: "XDevice", payload: dict, value: str):
         command_id = self.map[value]
-        cmd = zcl_command(device.nwk, self.ep, self.cluster_id, command_id)
+        cmd = zcl_command(device.nwk, self.ep or 1, self.cluster_id, command_id)
         payload.setdefault("commands", []).extend(cmd)
 
 
 class ZCoverPos(ZConverter):
     cluster_id = WindowCovering.cluster_id  # 258
-    command_id = WindowCovering.ServerCommandDefs.go_to_tilt_percentage.id
+    command_id = WindowCovering.ServerCommandDefs.go_to_lift_percentage.id
     attr_id = WindowCovering.AttributeDefs.current_position_lift_percentage.id
 
-    def decode(self, device: "XDevice", payload: dict, value: dict):
-        if self.attr_id in value:
-            payload[self.attr] = 100 - value[self.attr_id]
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if (value := data.get(self.attr_id)) is not None:
+            payload[self.attr] = 100 - value
 
     def encode(self, device: "XDevice", payload: dict, value: int):
         value = 100 - value
-        cmd = zcl_command(device.nwk, self.ep, self.cluster_id, self.command_id, value)
+        cmd = zcl_command(
+            device.nwk, self.ep or 1, self.cluster_id, self.command_id, int(value)
+        )
         payload.setdefault("commands", []).extend(cmd)

@@ -278,11 +278,20 @@ def zcl_level(nwk: str, ep: int, br: int, tr: float) -> list:
     ]
 
 
-def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
+def zcl_color_temp(nwk: str, ep: int, ct: int, tr: float) -> list:
     """Generate Silabs Z3 command (cluster 0x0300)."""
     tr = int(tr * 10.0)  # zcl format - tenths of a seconds
     return [
         {"commandcli": f"zcl color-control movetocolortemp {ct} {tr} 0 0"},
+        {"commandcli": f"send {nwk} 1 {ep}"},
+    ]
+
+
+def zcl_color_hs(nwk: str, ep: int, h: int, s: int, tr: float) -> list:
+    """Generate Silabs Z3 command (cluster 0x0300)."""
+    tr = int(tr * 10.0)  # zcl format - tenths of a seconds
+    return [
+        {"commandcli": f"zcl color-control movetohueandsat {h} {s} {tr} 0 0"},
         {"commandcli": f"send {nwk} 1 {ep}"},
     ]
 

@@ -147,7 +147,8 @@ class XDevice:
         """Get device model for Xiaomi MiOT cloud."""
         if isinstance(self.model, str) and self.model.startswith("lumi."):
             return self.model  # for GATEWAY and ZIGBEE
-        if m := re.search(r"[a-z0-9]+\.[a-z0-9_.]+", self.extra["market_model"]):
+        model = self.extra.get("market_model") or str(self.model)
+        if m := re.search(r"[a-z0-9]+\.[a-z0-9_.]+", model):
             return m[0]
 
     @property
@@ -155,15 +156,19 @@ class XDevice:
         return (
             self.extra.get("name")  # from yaml
             or self.extra.get("cloud_name")  # from cloud
-            or self.extra["market_name"]  # from DEVICES
+            or self.extra.get("market_name")  # from DEVICES
+            or "Unknown " + self.type
         )
 
     @property
     def human_model(self) -> str:
         s = self.type.upper() if self.type == BLE else self.type.capitalize()
-        s += ": " + self.extra["market_model"]
-        if isinstance(self.model, str) and self.model not in s:
-            s += ", " + self.model  # for GATEWAY and ZIGBEE
+        if "market_model" in self.extra:
+            s += ": " + self.extra["market_model"]
+            if isinstance(self.model, str):
+                s += ", " + self.model  # for GATEWAY and ZIGBEE
+        else:
+            s += f": {self.model}"
         return s
 
     @cached_property
@@ -268,8 +273,6 @@ class XDevice:
                 break
             # if this spec for current type
             if self.type == desc.get("default"):
-                self.extra["market_name"] = "Unknown " + self.type
-                self.extra["market_model"] = str(model)
                 break
         else:
             self.converters = []
@@ -357,15 +360,15 @@ class XDevice:
 
     def decode_silabs(self, payload: dict, value: dict):
         """Internal func for unpack Silabs MQTT message."""
-        cluster = int(value["clusterId"], 0)
-        ep = int(value["sourceEndpoint"], 0)
+        cluster_id = int(value["clusterId"], 0)
+        endpoint = int(value["sourceEndpoint"], 0)
         v = None  # decode payload on demand
 
         for conv in self.converters:
             if (
                 isinstance(conv, ZConverter)
-                and conv.cluster_id == cluster
-                and conv.ep == ep
+                and conv.cluster_id == cluster_id
+                and (conv.ep is None or conv.ep == endpoint)
             ):
                 if v is None and not (v := silabs.decode(value)):
                     return

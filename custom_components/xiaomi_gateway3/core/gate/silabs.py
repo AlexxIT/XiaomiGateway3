@@ -117,7 +117,7 @@ class SilabsGateway(XGateway):
         payload = {}
         for conv in device.converters:
             if isinstance(conv, ZConverter):
-                conv.config(device, payload, self)
+                conv.config(device, payload)
 
         if not payload:
             return

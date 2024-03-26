@@ -1,5 +1,11 @@
 from custom_components.xiaomi_gateway3 import XDevice
+from custom_components.xiaomi_gateway3.core.const import ZIGBEE
 from custom_components.xiaomi_gateway3.core.converters import silabs
+
+
+def decode(device: XDevice, data: dict) -> dict:
+    data.setdefault("sourceEndpoint", "0x01")
+    return device.decode(data)
 
 
 def test_zigbee_plug():
@@ -132,5 +138,53 @@ def test_aqara_bulb():
         "commands": [
             {"commandcli": "zcl level-control o-mv-to-level 50 50"},
             {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+
+
+def test_unknown_device():
+    device = XDevice("dummy", type=ZIGBEE)
+    p = decode(device, {"clusterId": "0x0400", "APSPlayload": "0x18610A0000211F00"})
+    assert p == {"illuminance": 31}
+    p = decode(device, {"clusterId": "0x0402", "APSPlayload": "0x18020A0000298C07"})
+    assert p == {"temperature": 19.32}
+    p = decode(device, {"clusterId": "0x0405", "APSPlayload": "0x18030A000021CC0F"})
+    assert p == {"humidity": 40.44}
+    p = decode(device, {"clusterId": "0x000C", "APSPlayload": "0x18630A5500398FC23541"})
+    assert p == {"analog": 11.36}
+    p = decode(device, {"clusterId": "0x0001", "APSPlayload": "0x189B0A2000201E"})
+    assert p == {"battery_voltage": 3000}
+    p = decode(device, {"clusterId": "0x0001", "APSPlayload": "0x08660A200020FF"})
+    assert p == {"battery_voltage": 25500}
+    p = decode(device, {"clusterId": "0x0406", "APSPlayload": "0x18620A00001801"})
+    assert p == {"occupancy": True}
+    p = decode(device, {"clusterId": "0x0500", "APSPlayload": "0x195300010000FF0000"})
+    assert p == {"binary": True}
+    p = decode(device, {"clusterId": "0x0300", "APSPlayload": "0x18280107000021C700"})
+    assert p == {"color_temp": 199}
+
+
+def test_error():
+    payload = {"clusterId": "0x0001", "APSPlayload": "0x182701210086"}
+    p = silabs.decode(payload)
+    assert p == {"cluster": "power", "general_command_id": 1, 33: None}
+
+    device = XDevice("dummy", type=ZIGBEE)
+    p = decode(device, payload)
+    assert p == {}
+
+
+def test_philips_hue():
+    device = XDevice("LCT001")
+    attrs = {i.attr for i in device.converters}
+    p = device.encode_read(attrs)
+    assert p == {
+        "commands": [
+            {"commandcli": "zcl global read 6 0"},
+            {"commandcli": "send 0x0000 1 11"},
+            {"commandcli": "zcl global read 8 0"},
+            {"commandcli": "send 0x0000 1 11"},
+            {"commandcli": "raw 768 {1000000000010007000800}"},
+            {"commandcli": "send 0x0000 1 11"},
         ]
     }
