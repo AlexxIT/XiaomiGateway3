@@ -85,7 +85,31 @@ async def setup_cloud(hass: HomeAssistant, config_entry: ConfigEntry):
         if fw := cloud_device["extra"].get("fw_version"):
             store_device["cloud_fw"] = fw
 
+        await update_device_name(hass, cloud_device)
+
     return bool(cloud.auth)
+
+
+async def update_device_name(hass: HomeAssistant, cloud_device: dict):
+    for device in XGateway.devices.values():
+        # search device
+        if device.cloud_did != cloud_device["did"]:
+            continue
+
+        # check if cloud name changed
+        if device.extra.get("cloud_name") == cloud_device["name"]:
+            return
+
+        # update cloud_name
+        device.extra["cloud_name"] = cloud_device["name"]
+
+        registry = device_registry.async_get(hass)
+        device_entry = registry.async_get_device({(DOMAIN, device.uid)})
+
+        # check if device_entry.name changed
+        if device_entry and device_entry.name != device.human_name:
+            registry.async_update_device(device_entry.id, name=device.human_name)
+        return
 
 
 async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
