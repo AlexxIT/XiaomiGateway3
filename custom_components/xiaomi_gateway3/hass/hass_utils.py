@@ -246,8 +246,10 @@ def check_entity_unique_id(registry_entry: RegistryEntry) -> str | None:
         has_update = True
     elif attr == "pressure_state":
         attr = "pressure"
+        has_update = True
     elif attr == "occupancy_distance":
         attr = "distance"
+        has_update = True
 
     return f"{uid}_{attr}" if has_update else None
 
