@@ -98,8 +98,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     if not config_entry.update_listeners:
         config_entry.add_update_listener(async_update_options)
 
+    async def hass_stop(event):
+        await gw.stop()
+
     config_entry.async_on_unload(
-        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, lambda *args: gw.stop())
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, hass_stop)
     )
 
     return True
