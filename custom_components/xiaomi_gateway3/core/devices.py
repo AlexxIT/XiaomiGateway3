@@ -1682,7 +1682,7 @@ DEVICES += [{
         BaseConv("key_id", mi="2.e.1020.p.4"),
         BaseConv("timestamp", mi="2.e.1020.p.5"),
         MapConv("action", mi="2.e.1020.p.3", map={1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside", 5: "unlock_inside", 6: "child_lock", 7: "child_unlock", 8: "enable_away", 9: "disable_away"}),
-        MapConv("method", mi="2.e.1020.p.2", map={1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 8: "key", 9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual",16: "auto"}),
+        MapConv("method", mi="2.e.1020.p.2", map={1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 8: "key", 9: "one_time_password", 10: "periodic_password", 12: "coerce", 15: "manual", 16: "auto"}),
         # door state, On means open, Off means closed
         MapConv("door", "binary_sensor", mi="3.p.1021", map={16: STATE_LOCKED, 20: STATE_LOCKED, 24: STATE_LOCKED, 28: STATE_LOCKED, 32: STATE_UNLOCK, 36: STATE_UNLOCK, 40: STATE_UNLOCK, 44: STATE_UNLOCK}),
         # doorbell action

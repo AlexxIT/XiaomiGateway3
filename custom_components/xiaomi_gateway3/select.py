@@ -1,8 +1,5 @@
-import time
-
 from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.util import utcnow
 
 from .core import ezsp
 from .core.const import GATEWAY, ZIGBEE, MESH
