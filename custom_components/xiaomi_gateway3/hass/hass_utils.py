@@ -130,11 +130,18 @@ async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
     await store.async_save(data)
 
 
+class InfoDumper(yaml.SafeDumper):
+    allow_unicode = True
+
+    def ignore_aliases(self, data):
+        return True
+
+
 async def show_device_info(
     hass: HomeAssistant, device: XDevice, title: str, notification_id: str
 ):
     info = device.as_dict()
-    msg = f"```{yaml.safe_dump(info, allow_unicode=True)}```\n"
+    msg = f"```{yaml.dump(info, Dumper=InfoDumper)}```\n"
 
     # 2. link to XiaomiGateway3
     query = {"q": f"repo:AlexxIT/XiaomiGateway3 {device.model}", "type": "code"}
