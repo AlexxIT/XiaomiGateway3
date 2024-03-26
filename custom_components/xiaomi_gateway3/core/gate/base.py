@@ -54,6 +54,7 @@ class XGateway:
         return {
             "host": self.host,
             "mac": self.device.extra["mac"],
+            "name": self.device.human_name,
             "model": self.device.model,
             "fw_ver": self.device.extra["fw_ver"],
         }
