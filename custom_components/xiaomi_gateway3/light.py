@@ -6,8 +6,10 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityFeature,
     ATTR_BRIGHTNESS,
+    ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_EFFECT,
+    ATTR_HS_COLOR,
     ATTR_TRANSITION,
 )
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -22,11 +24,9 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
 
 
 class XLight(XEntity, LightEntity, RestoreEntity):
-    _attr_color_mode = ColorMode.ONOFF
-    _attr_supported_color_modes = {ColorMode.ONOFF}
-
     def on_init(self):
         self._attr_color_mode = ColorMode.ONOFF
+        modes = set()
 
         for conv in self.device.converters:
             if conv.attr == ATTR_BRIGHTNESS:
@@ -35,18 +35,24 @@ class XLight(XEntity, LightEntity, RestoreEntity):
             elif conv.attr == ATTR_COLOR_TEMP:
                 self.listen_attrs.add(conv.attr)
                 self._attr_color_mode = ColorMode.COLOR_TEMP
+                modes.add(ColorMode.COLOR_TEMP)
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_min_mireds = conv.minm
                     self._attr_max_mireds = conv.maxm
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
                     self._attr_min_mireds = int(1000000 / conv.maxk)
                     self._attr_max_mireds = int(1000000 / conv.mink)
+            elif conv.attr == ATTR_HS_COLOR:
+                self.listen_attrs.add(conv.attr)
+                modes.add(ColorMode.HS)
+            elif conv.attr == ATTR_COLOR_MODE:
+                self.listen_attrs.add(conv.attr)
             elif conv.attr == ATTR_EFFECT and hasattr(conv, "map"):
                 self.listen_attrs.add(conv.attr)
                 self._attr_supported_features |= LightEntityFeature.EFFECT
                 self._attr_effect_list = list(conv.map.values())
 
-        self._attr_supported_color_modes = {self._attr_color_mode}
+        self._attr_supported_color_modes = modes if modes else {self._attr_color_mode}
 
     def set_state(self, data: dict):
         if self.attr in data:
@@ -55,6 +61,12 @@ class XLight(XEntity, LightEntity, RestoreEntity):
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
             self._attr_color_temp = data[ATTR_COLOR_TEMP]
+            self._attr_color_mode = ColorMode.COLOR_TEMP
+        if ATTR_HS_COLOR in data:
+            self._attr_hs_color = data[ATTR_HS_COLOR]
+            self._attr_color_mode = ColorMode.HS
+        if ATTR_COLOR_MODE in data:
+            self._attr_color_mode = ColorMode(data[ATTR_COLOR_MODE])
         if ATTR_EFFECT in data:
             self._attr_effect = data[ATTR_EFFECT]
 
@@ -92,7 +104,12 @@ class XZigbeeLight(XLight):
             # important to sort args in right order, transition should be last
             kwargs = {
                 k: kwargs[k]
-                for k in (ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, ATTR_TRANSITION)
+                for k in (
+                    ATTR_BRIGHTNESS,
+                    ATTR_COLOR_TEMP,
+                    ATTR_HS_COLOR,
+                    ATTR_TRANSITION,
+                )
                 if k in kwargs
             }
 
