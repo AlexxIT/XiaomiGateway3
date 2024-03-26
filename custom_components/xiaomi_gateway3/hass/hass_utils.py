@@ -174,6 +174,20 @@ def migrate_legacy_entitites_unique_id(hass: HomeAssistant):
             registry.async_update_entity(entity.entity_id, new_unique_id=new_unique_id)
 
 
+def migrate_devices_store():
+    for k, v in list(XDevice.restore.items()):
+        # check old storing format
+        if "decode_ts" not in v:
+            continue
+
+        # we can restore only zigbee uid to xiaomi did (not cloud did)
+        if k.startswith("0x"):
+            did = "lumi." + k.lstrip("0x")
+            XDevice.restore[did] = {"last_decode_ts": v["decode_ts"]}
+
+        XDevice.restore.pop(k)
+
+
 def check_entity_unique_id(registry_entry: RegistryEntry) -> str | None:
     has_update = False
 
