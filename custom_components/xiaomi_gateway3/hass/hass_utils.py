@@ -193,9 +193,12 @@ def migrate_legacy_entitites_unique_id(hass: HomeAssistant):
         if entity.platform != DOMAIN:
             continue
 
-        if new_unique_id := check_entity_unique_id(entity):
-            _LOGGER.info(f"Migrate entity: {entity.entity_id} new uid: {new_unique_id}")
-            registry.async_update_entity(entity.entity_id, new_unique_id=new_unique_id)
+        try:
+            if new_uid := check_entity_unique_id(entity):
+                _LOGGER.info(f"Migrate {entity.entity_id} to unique_id: {new_uid}")
+                registry.async_update_entity(entity.entity_id, new_unique_id=new_uid)
+        except Exception as e:
+            _LOGGER.warning(f"Migration error for {entity}: {repr(e)}")
 
 
 def migrate_devices_store():
