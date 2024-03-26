@@ -17,67 +17,41 @@ Each converter has:
 
 - attribute - required, entity or attribute name in Hass
 - domain - optional, hass entity type (`sensor`, `switch`, `binary_sensor`...)
-- mi - optional, item name in Lumi spec (`8.0.2012`) or MIoT spec (`2.p.1`)
-- enabled - optional, default True:
-   - True - entity will be enabled on first setup
-   - False - entity and converter! will be disabled on first setup
-   - None - converter will be enabled, but entity will be setup with first data
+- mi - optional, item name in:
+   - Lumi spec `mi="8.0.2012"`
+   - MIoT spec `mi="2.p.1"` or `mi="2.e.1"` or `mi="3.e.1012.p.1"`
+   - MiBeacon spec `mi=4100`
 
 Old Zigbee devices uses Lumi format, new Zigbee 3 and Mesh devices uses MIoT format.
-MIoT can be `siid.property.piid` or `siid.event.piid`.
 
 Converter may have different types:
 
-- Converter - default, don't change/convert value
+- BaseConv - default, don't change/convert value
 - BoolConv - converts int to bool on decode and bool to int on encode
 - MapConv - translate value using mapping: `{0: "disarmed", 1: "armed_home"}`
 - MathConv - support multiply, round value and min/max borders
-- BrightnessConv - converts `0..<max>` to `0..255`, support set `max` value
 - and many others...
 
-For MIoT bool properties you should use `Converter`. For MIoT uint8 properties you
+For MIoT bool properties you should use `BaseConv`. For MIoT uint8 properties you
 should use `BoolConv`.
 
-By default, the entity is updated only if the decoded payload has its attribute. But one
-entity can process multiple attributes, example bulb: `light`, `brightness`,
-`color_temp`. In this case you should set `parent` attribute name:
-
-    BoolConv("light", "light", "4.1.85")
-    BrightnessConv("brightness", mi="14.1.85")
-    Converter("color_temp", mi="14.2.85")
-
-Another case: one converter may generate multiple attributes, so you should set `childs`
-for it. By default, `sensor` and `binary_sensor` with childs will adds its values to its
-attributes.
-
-If converter has `entity=ENTITY_LAZY` - it will work, but entity will setup only with first
-data from device. Useful if we don't know exact spec of device. Example, battery not
-exist on some firmwares of some devices.
+If converter has `entity=ENTITY_LAZY` - it will work, but entity will setup only with
+first data from device. Useful if we don't know exact spec of device. Example, battery
+not exist on some firmwares of some devices.
 
 The name of the attribute defines the device class, icon and unit of measure.
 Recommended attributes names:
 
-- motion - the sensor can only send motion detection (timeout in Hass)
-- occupancy - the sensor can send motion start and motion stop
-- plug - for sockets with male connector
-- outlet - for sockets with only female connector (wall installation)
-- switch - for relays and switches with buttons (wall installation, remotes)
-- led - control device led light
-- wireless - change mode from wired to wireless (decoupled)
-- power_on_state - default state when electricity is supplied
-- contact - for contact sensor
-- moisture - for water leak sensor
-
-Support level should be set only for confirmed devices. For theoretically supported it
-should be empty. For unsupported it should be less than 3.
-
-Support levels:
-- 5 - The device can do everything it can do
-- 4 - The device works well, missing some settings
-- 3 - The device works, but it missing some functionality
-- 2 - The device does not work well, it is not recommended to use
-- 1 - The device does not work at all
-- empty - theoretically supported, unconfirmed
+- `motion` - the sensor can only send motion detection (timeout in Hass)
+- `occupancy` - the sensor can send motion start and motion stop
+- `plug` - for sockets with male connector
+- `outlet` - for sockets with only female connector (wall installation)
+- `switch` - for relays and switches with buttons (wall installation, remotes)
+- `led` - control device led light
+- `wireless` - change mode from wired to wireless (decoupled)
+- `power_on_state` - default state when electricity is supplied
+- `contact` - for contact sensor
+- `moisture` - for water leak sensor
 
 Nice project with MIoT spec description: https://home.miot-spec.com/
 """
