@@ -207,7 +207,8 @@ def migrate_devices_store():
         # we can restore only zigbee uid to xiaomi did (not cloud did)
         if k.startswith("0x"):
             did = "lumi." + k.lstrip("0x")
-            XDevice.restore[did] = {"last_decode_ts": v["decode_ts"]}
+            store_device = XDevice.restore.get(did, {})
+            store_device.setdefault("last_decode_ts", v["decode_ts"])
 
         XDevice.restore.pop(k)
 
