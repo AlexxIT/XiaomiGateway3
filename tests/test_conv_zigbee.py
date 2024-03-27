@@ -23,15 +23,27 @@ def test_zigbee_plug():
         "commands": [
             {"commandcli": "zcl global read 6 0"},
             {"commandcli": "send 0x1234 1 1"},
-            {"commandcli": "raw 2820 {100000050508050b05}"},
+            {"commandcli": "zcl global read 2820 1285"},
             {"commandcli": "send 0x1234 1 1"},
-            {"commandcli": "raw 2820 {100000050508050b05}"},
+            {"commandcli": "zcl global read 2820 1288"},
             {"commandcli": "send 0x1234 1 1"},
-            {"commandcli": "raw 2820 {100000050508050b05}"},
+            {"commandcli": "zcl global read 2820 1291"},
             {"commandcli": "send 0x1234 1 1"},
             {"commandcli": "zcl global read 1794 0"},
             {"commandcli": "send 0x1234 1 1"},
             {"commandcli": "zcl global read 6 32770"},
+            {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+
+    assert silabs.optimize_read(p["commands"])
+    assert p == {
+        "commands": [
+            {"commandcli": "raw 6 {10000000000280}"},
+            {"commandcli": "send 0x1234 1 1"},
+            {"commandcli": "raw 2820 {100000050508050b05}"},
+            {"commandcli": "send 0x1234 1 1"},
+            {"commandcli": "zcl global read 1794 0"},
             {"commandcli": "send 0x1234 1 1"},
         ]
     }
@@ -45,7 +57,7 @@ def test_ikea_cover():
         "commands": [
             {"commandcli": "zcl global read 258 8"},
             {"commandcli": "send 0x1234 1 1"},
-            {"commandcli": "raw 1 {10000021002000}"},
+            {"commandcli": "zcl global read 1 33"},
             {"commandcli": "send 0x1234 1 1"},
         ]
     }
@@ -61,7 +73,7 @@ def test_ikea_cover():
     p = device.encode({"position": 23})
     assert p == {
         "commands": [
-            {"commandcli": "raw 258 {1100084d}"},
+            {"commandcli": "raw 258 {1100054d}"},
             {"commandcli": "send 0x1234 1 1"},
         ]
     }
@@ -133,12 +145,13 @@ def test_sonoff_motion():
 
 def test_aqara_bulb():
     device = XDevice("lumi.light.acn014", nwk="0x1234")
-    p = device.encode({"brightness": 50, "transition": 5.0})
+    p = device.encode({"transition": 2.5, "brightness": 50})
     assert p == {
         "commands": [
-            {"commandcli": "zcl level-control o-mv-to-level 50 50"},
+            {"commandcli": "zcl level-control o-mv-to-level 50 25"},
             {"commandcli": "send 0x1234 1 1"},
-        ]
+        ],
+        "transition": 2.5,
     }
 
 
@@ -172,19 +185,3 @@ def test_error():
     device = XDevice("dummy", type=ZIGBEE)
     p = decode(device, payload)
     assert p == {}
-
-
-def test_philips_hue():
-    device = XDevice("LCT001")
-    attrs = {i.attr for i in device.converters}
-    p = device.encode_read(attrs)
-    assert p == {
-        "commands": [
-            {"commandcli": "zcl global read 6 0"},
-            {"commandcli": "send 0x0000 1 11"},
-            {"commandcli": "zcl global read 8 0"},
-            {"commandcli": "send 0x0000 1 11"},
-            {"commandcli": "raw 768 {1000000000010007000800}"},
-            {"commandcli": "send 0x0000 1 11"},
-        ]
-    }

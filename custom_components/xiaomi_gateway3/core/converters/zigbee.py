@@ -35,7 +35,7 @@ TYPE_UINT32 = 0x23  # t.uint32_t
 TYPE_ENUM8 = 0x30  # t.enum8
 
 
-def conv(value: int, src1: int, src2: int, dst1: int, dst2: int) -> int:
+def conv(value: int | float, src1: int, src2: int, dst1: int, dst2: int) -> int:
     value = round((value - src1) / (src2 - src1) * (dst2 - dst1) + dst1)
     if value < min(dst1, dst2):
         value = min(dst1, dst2)
@@ -157,14 +157,9 @@ class ZBrightnessConv(ZConverter):
     cluster_id = LevelControl.cluster_id
     attr_id = LevelControl.AttributeDefs.current_level.id
 
-    def decode(self, device: "XDevice", payload: dict, data: dict):
-        if (value := data.get(self.attr_id)) is not None:
-            # zigbee - 0..254, hass - 1..255
-            payload[self.attr] = conv(value, 0, 254, 1, 255)
-
-    def encode(self, device: "XDevice", payload: dict, value: int):
-        value = conv(value, 1, 255, 0, 254)
-        cmd = zcl_level(device.nwk, self.ep or 1, value, 0)
+    def encode(self, device: "XDevice", payload: dict, value: int | float):
+        transition = payload.get("transition", 0)
+        cmd = zcl_level(device.nwk, self.ep or 1, round(value), transition)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -176,8 +171,9 @@ class ZColorTempConv(ZConverter):
     min: int = 153
     max: int = 500
 
-    def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_color_temp(device.nwk, self.ep or 1, round(value), 0)
+    def encode(self, device: "XDevice", payload: dict, value: int | float):
+        transition = payload.get("transition", 0)
+        cmd = zcl_color_temp(device.nwk, self.ep or 1, round(value), transition)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -195,7 +191,13 @@ class ZColorHSConv(ZConverter):
     def encode(self, device: "XDevice", payload: dict, value: tuple[int]):
         hue = conv(value[0], 0, 360, 0, 254)
         sat = conv(value[1], 0, 100, 0, 254)
-        cmd = zcl_color_hs(device.nwk, self.ep or 1, hue, sat, 0)
+        transition = payload.get("transition", 0)
+        cmd = zcl_color_hs(device.nwk, self.ep or 1, hue, sat, transition)
+        payload.setdefault("commands", []).extend(cmd)
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        cmd = zcl_read(device.nwk, self.ep or 1, self.cluster_id, self.attr_id1)
+        cmd += zcl_read(device.nwk, self.ep or 1, self.cluster_id, self.attr_id2)
         payload.setdefault("commands", []).extend(cmd)
 
 
@@ -208,61 +210,26 @@ class ZColorModeConv(ZConverter):
         if (value := data.get(self.attr_id)) is not None:
             payload[self.attr] = self.map[value]
 
-    def encode_read(self, device: "XDevice", payload: dict):
-        for item in payload.get("commands", []):
-            if item["commandcli"] != "zcl global read 768 7":
-                continue
-            cmd = zcl_read(
-                device.nwk,
-                self.ep or 1,
-                self.cluster_id,
-                ZColorHSConv.attr_id1,
-                ZColorHSConv.attr_id2,
-                ZColorTempConv.attr_id,
-                self.attr_id,
-            )
-            item["commandcli"] = cmd[0]["commandcli"]
-            return
-
 
 class ZTransitionConv(BaseConv):
     def encode(self, device: "XDevice", payload: dict, value: float):
-        for item in payload.get("commands", []):
-            cli: str = item["commandcli"]
-            if cli.startswith(("zcl level", "zcl color")):
-                words = cli.split(" ")
-                i = 5 if words[2] == "movetohueandsat" else 4
-                words[i] = str(int(value * 10.0))
-                item["commandcli"] = " ".join(words)
+        payload[self.attr] = value
 
 
-class ZElectricalBase(ZMathConv):
+class ZVoltageConv(ZConverter):
     cluster_id = ElectricalMeasurement.cluster_id
-
-    def encode_read(self, device: "XDevice", payload: dict):
-        # we can read three attrs from one cluster with single call
-        cmd = zcl_read(
-            device.nwk,
-            self.ep or 1,
-            self.cluster_id,
-            ElectricalMeasurement.AttributeDefs.rms_voltage.id,
-            ElectricalMeasurement.AttributeDefs.rms_current.id,
-            ElectricalMeasurement.AttributeDefs.active_power.id,
-        )
-        payload.setdefault("commands", []).extend(cmd)
-
-
-class ZVoltageConv(ZElectricalBase):
     attr_id = ElectricalMeasurement.AttributeDefs.rms_voltage.id
 
 
 @dataclass
-class ZCurrentConv(ZElectricalBase):
+class ZCurrentConv(ZMathConv):
+    cluster_id = ElectricalMeasurement.cluster_id
     attr_id = ElectricalMeasurement.AttributeDefs.rms_current.id
     multiply: float = 0.001
 
 
-class ZPowerConv(ZElectricalBase):
+class ZPowerConv(ZConverter):
+    cluster_id = ElectricalMeasurement.cluster_id
     attr_id = ElectricalMeasurement.AttributeDefs.active_power.id
 
 
@@ -346,15 +313,6 @@ class ZBatteryVoltConv(ZMathConv):
     cluster_id = PowerConfiguration.cluster_id
     attr_id = PowerConfiguration.AttributeDefs.battery_voltage.id
     multiply: float = 100
-
-
-# useful for reporting description
-# class ZBatteryVoltConv(ZBatteryConv):
-#     zattr = "battery_voltage"
-#
-#     def decode(self, device: "XDevice", payload: dict, value: dict):
-#         if isinstance(value.get("battery_voltage"), int):
-#             payload[self.zattr] = value[self.zattr] * 100
 
 
 ###############################################################################
@@ -576,20 +534,24 @@ class ZHueDimmerLevelConv(ZConverter):
         pass
 
 
-@dataclass
 class ZLumiBrightness(BaseConv):
     """Converter decode and read data in Lumi format for support heartbeats.
     But encode data in Zigbee format for support transition.
     """
 
-    transition: float = 1.5  # default from MiHome
+    ep = 1
 
     def decode(self, device: "XDevice", payload: dict, value: int):
-        payload[self.attr] = max(0, min(255, round(value / 100.0 * 255.0)))
+        # lumi - 0..100, hass - 1..255
+        payload[self.attr] = conv(value, 1, 100, 1, 255)
 
     def encode(self, device: "XDevice", payload: dict, value: int):
-        cmd = zcl_level(device.nwk, 1, value, self.transition)
-        payload.setdefault("commands", []).extend(cmd)
+        if "transition" in payload:
+            # noinspection PyTypeChecker
+            ZBrightnessConv.encode(self, device, payload, value)
+        else:
+            value = conv(value, 1, 255, 1, 100)
+            super().encode(device, payload, value)
 
 
 @dataclass

@@ -1188,7 +1188,8 @@ DEVICES += [{
     "support": 5,  # @AlexxIT
     "spec": [
         ZIASZoneConv("occupancy", "binary_sensor"),
-        ZBatteryPercConv("battery", "sensor"),
+        ZBatteryPercConv("battery", "sensor", multiply=0.5),
+        ZBatteryVoltConv("battery_voltage", "sensor"),
     ],
 }, {
     "TH01": ["Sonoff", "TH Sensor", "SNZB-02"],

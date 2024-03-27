@@ -349,18 +349,57 @@ def zcl_command(
 
 
 # zcl global read [cluster:2] [attributeId:2]
-def zcl_read(nwk: str, ep: int, cluster_id: int, *attrs, mfg: int = None) -> list:
+def zcl_read(nwk: str, ep: int, cluster_id: int, attr_id: int, mfg: int = None) -> list:
     """Generate Silabs Z3 read attribute command. Support multiple attrs."""
-    if len(attrs) > 1:
-        raw = "".join(int(a).to_bytes(2, "little").hex() for a in attrs)
-        return [
-            {"commandcli": f"raw {cluster_id} {{100000{raw}}}"},
-            {"commandcli": f"send {nwk} 1 {ep}"},
-        ]
+    cli = f"zcl global read {cluster_id} {attr_id}"
+    commands = [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
+    return [{"commandcli": f"zcl mfg-code {mfg}"}] + commands if mfg else commands
 
-    pre = [{"commandcli": f"zcl mfg-code {mfg}"}] if mfg is not None else []
-    cli = f"zcl global read {cluster_id} {attrs[0]}"
-    return pre + [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
+
+def optimize_read(commands: list[dict]) -> bool:
+    """Collect all similar zcl global read to one zigbee message."""
+    read: dict[tuple, list] = {}
+    mfg = cluster_id = attr_id = None
+    optimize = False
+
+    for item in commands:
+        cli: str = item["commandcli"]
+        if cli.startswith("zcl mfg-code"):
+            words = cli.split(" ")
+            mfg = words[2]
+        elif cli.startswith("zcl global read"):
+            words = cli.split(" ")
+            cluster_id = words[3]
+            attr_id = words[4]
+        elif cli.startswith("send") and cluster_id:
+            index = (cli, cluster_id, mfg)
+            if index in read:
+                read[index].append(attr_id)
+                optimize = True
+            else:
+                read[index] = [attr_id]
+            mfg = cluster_id = attr_id = None
+        else:
+            return False
+
+    if not optimize:
+        return False
+
+    # rebuild commands list
+    commands.clear()
+
+    for index, attrs in read.items():
+        cli, cluster_id, mfg = index
+        if mfg:
+            commands.append({"commandcli": f"zcl mfg-code {mfg}"})
+        if len(attrs) > 1:
+            raw = "".join(int(a).to_bytes(2, "little").hex() for a in attrs)
+            commands.append({"commandcli": f"raw {cluster_id} {{100000{raw}}}"})
+        else:
+            commands.append({"commandcli": f"zcl global read {cluster_id} {attrs[0]}"})
+        commands.append({"commandcli": cli})
+
+    return True
 
 
 # zcl global write [cluster:2] [attributeId:2] [type:4] [data:-1]

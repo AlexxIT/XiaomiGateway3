@@ -228,19 +228,6 @@ def test_zcl_read():
         {"commandcli": "send 0x1234 1 1"},
     ]
 
-    p = silabs.zcl_read(
-        "0x1234",
-        1,
-        ElectricalMeasurement.cluster_id,
-        ElectricalMeasurement.AttributeDefs.rms_voltage.id,
-        ElectricalMeasurement.AttributeDefs.rms_current.id,
-        ElectricalMeasurement.AttributeDefs.active_power.id,
-    )
-    assert p == [
-        {"commandcli": "raw 2820 {100000050508050b05}"},
-        {"commandcli": "send 0x1234 1 1"},
-    ]
-
     p = silabs.zcl_write("0x1234", 1, 0xFCC0, 9, 1, type_id=0x20, mfg=0x115F)
     assert p == [
         {"commandcli": "zcl mfg-code 4447"},

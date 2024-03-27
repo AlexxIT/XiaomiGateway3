@@ -148,7 +148,8 @@ class SilabsGateway(XGateway):
 
     async def silabs_send(self, device: XDevice, payload: dict):
         assert "commands" in payload, payload
-        # self.debug_device(device, "send", payload, tag="SLBS")
+
+        silabs.optimize_read(payload["commands"])
 
         if self.new_sdk:
             # fix payload for new SDK

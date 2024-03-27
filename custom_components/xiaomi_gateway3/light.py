@@ -96,31 +96,23 @@ class XZigbeeLight(XLight):
     def default_transition(self) -> float | None:
         return self.device.extra.get("default_transition")
 
-    async def async_turn_on(self, **kwargs):
-        if self.default_transition is not None:
-            kwargs.setdefault(ATTR_TRANSITION, self.default_transition)
+    async def async_turn_on(self, transition: int = None, **kwargs):
+        if self.default_transition is not None and transition is None:
+            transition = self.default_transition
 
-        if ATTR_TRANSITION in kwargs:
-            # important to sort args in right order, transition should be last
-            kwargs = {
-                k: kwargs[k]
-                for k in (
-                    ATTR_BRIGHTNESS,
-                    ATTR_COLOR_TEMP,
-                    ATTR_HS_COLOR,
-                    ATTR_TRANSITION,
-                )
-                if k in kwargs
-            }
+        if transition is not None:
+            # important to sort args in right order, transition should be first
+            kwargs = {ATTR_TRANSITION: transition} | kwargs
 
         self.device.write(kwargs if kwargs else {self.attr: True})
 
-    async def async_turn_off(self, **kwargs):
-        if self.default_transition is not None:
-            kwargs.setdefault(ATTR_TRANSITION, self.default_transition)
+    async def async_turn_off(self, transition: int = None, **kwargs):
+        if self.default_transition is not None and transition is None:
+            transition = self.default_transition
 
-        if ATTR_TRANSITION in kwargs:
+        if transition is not None:
             kwargs.setdefault(ATTR_BRIGHTNESS, 0)
+            kwargs = {ATTR_TRANSITION: transition} | kwargs
 
         self.device.write(kwargs if kwargs else {self.attr: False})
 
