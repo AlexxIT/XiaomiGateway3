@@ -36,12 +36,15 @@ class XGateway:
         prefix = __package__[:-10]  # .core.gate
         self.base_log = logging.getLogger(f"{prefix}.gate.{host}")
         self.mqtt_log = logging.getLogger(f"{prefix}.mqtt.{host}")
+        self.zigb_log = logging.getLogger(f"{prefix}.zigb.{host}")
 
         if debug := self.options.get("debug"):
             if "true" in debug:
                 self.base_log.setLevel(DEBUG)
             if "mqtt" in debug:
                 self.mqtt_log.setLevel(DEBUG)
+            if "zigbee" in debug:
+                self.zigb_log.setLevel(DEBUG)
 
     @cached_property
     def stats_domain(self) -> str | None:

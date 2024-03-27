@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+from logging import DEBUG
 
 from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
@@ -70,27 +71,37 @@ class SilabsGateway(XGateway):
         self.device.dispatch({GATEWAY: payload})
 
     def silabs_process_recv(self, data: dict):
+        if self.zigb_log.isEnabledFor(DEBUG):
+            # store decoded message, so we can use it later
+            data["decode"] = silabs.decode(data)
+            self.zigb_log.debug(data["decode"])
+
+        if data["eui64"] != "0x0000000000000000":
+            ieee = data["eui64"].lower()
+            did = "lumi." + ieee.lstrip("0x")
+            device: XDevice = self.devices.get(did)
+            if not device:
+                self.debug("message from unknown device")
+                return  # skip unknown device
+
+            device.extra["lqi"] = data["linkQuality"]
+            device.extra["rssi"] = data["rssi"]
+            device.extra["seq"] = int(data["APSCounter"], 0)
+
+            if self.stats_domain:
+                device.dispatch({ZIGBEE: True})
+        else:
+            # device is gateway
+            device = self.device
+
+        # process ZDO message
         if data["sourceEndpoint"] == "0x00":
             if data["clusterId"] == "0x8031":
-                coro = self.silabs_process_neighbors(data)
+                coro = self.silabs_process_neighbors(device, data)
                 asyncio.create_task(coro)
             return
 
-        ieee = data["eui64"].lower()
-        did = "lumi." + ieee.lstrip("0x")
-        device: XDevice = self.devices.get(did)
-        if not device:
-            self.debug("message from unknown device")
-            return
-
-        device.extra["lqi"] = data["linkQuality"]
-        device.extra["rssi"] = data["rssi"]
-        device.extra["seq"] = int(data["APSCounter"], 0)
-
-        if self.stats_domain:
-            device.dispatch({ZIGBEE: True})
-
-        # process raw zigbee if device supports it
+        # process ZCL message if device supports it
         if device.has_silabs():
             device.on_report(data, self)
 
@@ -188,17 +199,8 @@ class SilabsGateway(XGateway):
         payload = {"commands": silabs.zdo_mgmt_lqi(nwk, index)}
         await self.silabs_send(self.device, payload)
 
-    async def silabs_process_neighbors(self, data: dict):
-        if data["eui64"] != "0x0000000000000000":
-            ieee = data["eui64"].lower()
-            did = "lumi." + ieee.lstrip("0x")
-            device: XDevice = self.devices.get(did)
-            if not device:
-                return  # skip unknown device
-        else:
-            device = self.device
-
-        payload = silabs.decode(data)
+    async def silabs_process_neighbors(self, device: XDevice, data: dict):
+        payload = data.get("decode") or silabs.decode(data)
         self.debug("on_neighbors", device, data=payload)
 
         for neighbor in payload["neighbors"]:

@@ -362,7 +362,7 @@ class XDevice:
         """Internal func for unpack Silabs MQTT message."""
         cluster_id = int(value["clusterId"], 0)
         endpoint = int(value["sourceEndpoint"], 0)
-        v = None  # decode payload on demand
+        v: dict = value.get("decode")  # maybe we decode payload earlier for logs
 
         for conv in self.converters:
             if (
@@ -370,6 +370,7 @@ class XDevice:
                 and conv.cluster_id == cluster_id
                 and (conv.ep is None or conv.ep == endpoint)
             ):
+                # decode payload on demand
                 if v is None and not (v := silabs.decode(value)):
                     return
                 conv.decode(self, payload, v)
