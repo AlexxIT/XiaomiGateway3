@@ -102,6 +102,11 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
         kwargs = {}
 
         if user_input:
+            if "key" not in user_input:
+                user_input["key"] = await hass_utils.restore_gateway_key(
+                    self.hass, user_input["token"]
+                )
+
             # check gateway, key is optional
             info = await core_utils.gateway_info(**user_input)
             if "error" not in info:

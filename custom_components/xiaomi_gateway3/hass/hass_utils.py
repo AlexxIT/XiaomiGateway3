@@ -113,6 +113,7 @@ async def update_device_name(hass: HomeAssistant, cloud_device: dict):
 
 
 async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
+    # key probably OK, skip
     if len(config_entry.options.get("key", "")) == 16:
         return
 
@@ -128,6 +129,15 @@ async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
     data = await store.async_load() or {}
     data[info["did"]] = info
     await store.async_save(data)
+
+
+async def restore_gateway_key(hass: HomeAssistant, token: str) -> str | None:
+    store = Store(hass, 1, f"{DOMAIN}/keys.json")
+    if data := await store.async_load():
+        for device in data.values():
+            if device["token"] == token:
+                return device["key"]
+    return None
 
 
 class InfoDumper(yaml.SafeDumper):
