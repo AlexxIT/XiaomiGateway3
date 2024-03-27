@@ -264,3 +264,8 @@ def test_zdo():
         "ieee: 54:ef:44:10:88:88:88:88",
         "nwk: 0xE984",
     ]
+
+
+def test_general_4():
+    p = silabs.decode({"clusterId": "0x0000", "APSPlayload": "0x1C5F11760400"})
+    assert p == {"cluster": "basic", "general_command_id": 4, None: 0}

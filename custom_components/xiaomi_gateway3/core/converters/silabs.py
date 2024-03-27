@@ -187,6 +187,9 @@ def zcl_deserialize(cluster_id: int, data: bytes) -> dict:
         elif hdr.command_id == GeneralCommand.Read_Attributes_rsp:
             for attr in fields["status_records"]:
                 payload[attr.attrid] = value_decode(attr.value)
+        elif hdr.command_id == GeneralCommand.Write_Attributes_rsp:
+            for attr in fields["status_records"]:
+                payload[attr.attrid] = value_decode(attr.status)
         else:
             payload["header"] = hdr
             payload["response"] = resp
