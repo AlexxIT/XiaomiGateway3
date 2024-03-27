@@ -50,15 +50,13 @@ class MultiGateway(
 
             await self.handle_mqtt_messages()
 
-    async def enable_telnet(self):
+    async def enable_telnet(self) -> bool:
         """Enable telnet with miio protocol."""
         if not (token := self.options.get("token")):
             return False
         resp = await core_utils.enable_telnet(self.host, token, self.options.get("key"))
-        if resp and resp.get("result") != ["ok"]:
-            return True
-        self.debug("Can't enable telnet")
-        return False
+        self.debug("enable_telnet", data=resp)
+        return resp == "ok"
 
     async def prepare_gateway(self) -> bool:
         try:

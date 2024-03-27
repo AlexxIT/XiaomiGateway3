@@ -42,7 +42,7 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
         return None
 
     # try to enable telnet and return miio info
-    miio_info = await enable_telnet(host, token, key)
+    result = await enable_telnet(host, token, key)
 
     # waiting for telnet to start
     await asyncio.sleep(1)
@@ -51,36 +51,22 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
     if info := await gateway_info(host):
         return info
 
-    # if info is None - devise doesn't answer on pings
-    if miio_info is None:
-        return {"error": "cant_connect"}
-
-    # if empty info - device works but not answer on commands
-    if not miio_info:
-        return {"error": "wrong_token"}
-
-    # check if right model
-    if miio_info["model"] not in SUPPORTED_MODELS:
-        return {"error": "wrong_model"}
-
-    return {"error": "wrong_telnet"}
+    # result ok, but telnet can't be opened
+    return {"error": "wrong_telnet" if result == "ok" else result}
 
 
 # universal command for open telnet on all models
 TELNET_CMD = "passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"
 
 
-async def enable_telnet(host: str, token: str, key: str = None) -> dict | None:
+async def enable_telnet(host: str, token: str, key: str = None) -> str:
     # Strategy:
     # 1. Get miio info
-    # 2. Send common open telnet cmd if we can't get miio info
-    # 3. Send different telnet cmd based on gateway model and firmware
-    # 4. Return miio info and response on open telnet cmd
-
     miio = AsyncMiIO(host, token)
     if miio_info := await miio.info():
         model: str = miio_info.get("model")
         fwver: str = miio_info.get("fw_ver")
+        # 2. Send different telnet cmd based on gateway model and firmware
         if model == "lumi.gateway.mgl03":
             if fwver < "1.4.7":
                 methods = ["enable_telnet_service"]
@@ -93,16 +79,24 @@ async def enable_telnet(host: str, token: str, key: str = None) -> dict | None:
         elif model in ("lumi.gateway.mcn001", "lumi.gateway.mgl001"):
             methods = ["set_ip_info" if fwver < "1.0.7" else "system_command"]
         else:
-            return miio_info
+            return "wrong_model"
     else:
-        methods = ["set_ip_info", "enable_telnet_service"]
+        # 3. Send all open telnet cmd if we can't get miio info
+        methods = ["set_ip_info", "enable_telnet_service", "system_command"]
+
+    if key and len(key) != 16:
+        key = None
+
+    # 4. Return ok or some error
+    if methods == ["system_command"] and not key:
+        return "no_key"
 
     for method in methods:
         if method == "enable_telnet_service":
             params = None
         elif method == "set_ip_info":
             params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
-        elif method == "system_command" and key and len(key) == 16:
+        elif method == "system_command" and key:
             params = {
                 "password": miio_password(miio.device_id, miio_info["mac"], key),
                 "command": TELNET_CMD,
@@ -111,10 +105,19 @@ async def enable_telnet(host: str, token: str, key: str = None) -> dict | None:
             continue
 
         res = await miio.send(method, params, tries=1)
-        if miio_info and res:
-            miio_info["result"] = res.get("result")
+        # set_ip_info: {'result': ['ok']}
+        # system_command: {'result': ['ok']}
+        # system_command: {'error': {'code': -4004, 'message': 'inner error'}}
+        if res and res.get("result") == ["ok"]:
+            return "ok"
 
-    return miio_info
+    if miio_info:
+        return "wrong_telnet"
+
+    if miio_info is not None:
+        return "wrong_token"
+
+    return "cant_connect"
 
 
 def miio_password(did: str, mac: str, key: str) -> str:

@@ -344,7 +344,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         except Exception:
             return None
 
-    async def info(self) -> dict:
+    async def info(self, tries: int = 3) -> dict | None:
         """Get info about miIO device."""
-        resp = await self.send("miIO.info")
+        resp = await self.send("miIO.info", tries=tries)
         return resp.get("result") if resp else resp
