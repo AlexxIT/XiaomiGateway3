@@ -106,6 +106,10 @@ class XZigbeeLight(XLight):
 
         self.device.write(kwargs if kwargs else {self.attr: True})
 
+        # fix Philips Hue with polling
+        if self._attr_should_poll and (not kwargs or transition):
+            await asyncio.sleep(transition or 1)
+
     async def async_turn_off(self, transition: int = None, **kwargs):
         if self.default_transition is not None and transition is None:
             transition = self.default_transition
@@ -115,6 +119,10 @@ class XZigbeeLight(XLight):
             kwargs = {ATTR_TRANSITION: transition} | kwargs
 
         self.device.write(kwargs if kwargs else {self.attr: False})
+
+        # fix Philips Hue with polling
+        if self._attr_should_poll and (not kwargs or transition):
+            await asyncio.sleep(transition or 1)
 
 
 class XLightGroup(XLight):
