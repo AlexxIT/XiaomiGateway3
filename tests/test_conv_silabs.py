@@ -215,10 +215,14 @@ def test_xiaomi_basic():
     p = silabs.decode(
         {
             "clusterId": "0x0000",
-            "APSPlayload": "0x1C5F11590A050042156C756D692E73656E736F725F776C65616B2E61713101FF42220121D10B03281C0421A8430521080006240400000000082104020A210000641000",
+            "APSPlayload": "0x1C5F119F0A01FF421B03282D05214B00082108210921020464200B962300000000",
         }
     )
-    assert p
+    assert p == {
+        "cluster": "basic",
+        "general_command_id": 10,
+        65281: {3: 45, 5: 75, 8: 8456, 9: 1026, 100: 11, 150: 0},
+    }
 
 
 def test_zcl_read():

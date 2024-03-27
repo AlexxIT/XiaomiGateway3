@@ -7,6 +7,7 @@ from zigpy.zcl.foundation import (
     CommandSchema,
     TypeValue,
     ZCLCommandDef,
+    ZCLHeader,
 )
 from zigpy.zcl.foundation import GeneralCommand
 from zigpy.zdo import ZDO
@@ -31,8 +32,8 @@ def decode(payload: dict) -> dict | None:
         if payload.get("sourceEndpoint") == "0x00":
             return zdo_deserialize(cluster_id, data)
 
-        if cluster_id == 0:
-            return xiaomi_deserialize(data)
+        if cluster_id == 0 and (basic := xiaomi_deserialize(data)):
+            return basic
 
         return zcl_deserialize(cluster_id, data)
     except Exception as e:
@@ -215,41 +216,38 @@ def value_decode(value) -> bool | int | bytes:
     return value
 
 
-def xiaomi_deserialize(payload: bytes) -> dict:
-    if not (cluster := CLUSTERS.get("xiaomi")):
-        from zhaquirks.xiaomi import BasicCluster
-
-        # noinspection PyTypeChecker
-        cluster = CLUSTERS["xiaomi"] = BasicCluster(None)
-        cluster._log = lambda *_, **__: None
-
-    hdr, resp = cluster.deserialize(payload)
-
+def xiaomi_deserialize(data: bytes) -> dict | None:
+    hdr, data = ZCLHeader.deserialize(data)
     if (
-        hdr.frame_control.is_general
-        and hdr.command_id == GeneralCommand.Report_Attributes
+        not hdr.frame_control.is_general
+        or hdr.command_id != GeneralCommand.Report_Attributes
     ):
-        payload = {
-            "cluster": cluster.ep_attribute,
-            "general_command_id": hdr.command_id,
-        }
-        fields = resp.as_dict()
+        return None
 
-        for attr in fields["attribute_reports"]:
-            if attr.attrid == 0xFF01:
-                data: dict = {}
-                raw: bytes = attr.value.value
-                while raw not in (b"", b"\x00"):
-                    attrid = int(raw[0])
-                    value, raw = TypeValue.deserialize(raw[1:])
-                    data[attrid] = value_decode(value)
-                payload[attr.attrid] = data
-            else:
-                payload[attr.attrid] = value_decode(attr.value)
+    payload = {
+        "cluster": "basic",
+        "general_command_id": hdr.command_id,
+    }
 
-        return payload
+    while len(data) >= 3:
+        attr_id = int.from_bytes(data[:2], "little")
+        if attr_id == 0xFF01:
+            if int(data[2]) != 0x42:
+                return None
 
-    return zcl_deserialize(0, payload)
+            data = data[4:]  # skip data length (sometimes wrong)
+            value = {}
+            while len(data) > 1:
+                sub_id = int(data[0])
+                sub_value, data = TypeValue.deserialize(data[1:])
+                value[sub_id] = value_decode(sub_value)
+        else:
+            sub_value, data = TypeValue.deserialize(data[2:])
+            value = value_decode(sub_value)
+
+        payload[attr_id] = value
+
+    return payload
 
 
 def get_type_id(cluster_id: int, attr_id: int) -> int:
