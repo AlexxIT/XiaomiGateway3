@@ -2,6 +2,7 @@ import asyncio
 import time
 
 from .base import XGateway
+from ..const import GATEWAY, BLE, MESH
 from ..device import XDevice
 from ..mini_mqtt import MQTTMessage
 
@@ -55,7 +56,7 @@ class MIoTGateway(XGateway):
         for did, params in devices.items():
             device = self.devices[did]
             device.on_report(params, self, ts)
-            if self.stats_domain:
+            if self.stats_domain and device.type in (BLE, MESH):
                 device.dispatch({device.type: ts})
 
     def miot_process_event(self, item: dict):
@@ -72,7 +73,7 @@ class MIoTGateway(XGateway):
             device.extra["seq"] = seq
 
         device.on_report(item, self, ts)
-        if self.stats_domain:
+        if self.stats_domain and device.type in (BLE, MESH):
             device.dispatch({device.type: ts})
 
     async def miot_send(self, device: XDevice, method: str, data: dict):
