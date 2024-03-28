@@ -363,7 +363,7 @@ def test_resets():
 
     p = device.decode({"res_name": "8.0.2002", "value": 24})
     assert p == {"resets": 24}
-    device.payload.update(p)
+    device.params.update(p)
 
     p = device.decode({"res_name": "8.0.2002", "value": 27})
     assert p == {"resets": 27}

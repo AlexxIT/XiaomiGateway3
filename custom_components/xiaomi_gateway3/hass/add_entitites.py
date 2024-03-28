@@ -1,7 +1,9 @@
+import copy
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry, entity_registry
-import copy
+
 from .entity import XEntity
 from .. import XDevice, MultiGateway
 from ..core.const import DOMAIN, GATEWAY, BLE, MESH, ZIGBEE
@@ -44,10 +46,11 @@ def handle_add_entities(
     def remove_device(device: XDevice):
         # remove device entities connection to this gateway
         if CONFIG_ENTRIES.get(device.did) == gw:
+            # remove lazy entities listener if device has them
+            if remove_listener := lazy_listeners.get(device.did):
+                remove_listener()
+
             CONFIG_ENTRIES.pop(device.did)
-        # remove lazy entities listener if device has them
-        if remove_listener := lazy_listeners.get(device.did):
-            remove_listener()
 
     gw.add_event_listner(EVENT_ADD_DEVICE, add_device)
     gw.add_event_listner(EVENT_REMOVE_DEVICE, remove_device)

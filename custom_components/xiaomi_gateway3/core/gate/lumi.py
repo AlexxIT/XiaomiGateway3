@@ -1,4 +1,5 @@
 import json
+import time
 
 from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
@@ -29,7 +30,7 @@ class LumiGateway(XGateway):
                 }
                 if did in xiaomi_did:
                     extra["cloud_did"] = xiaomi_did[did]
-                device = XDevice(item["model"], **extra)
+                device = self.init_device(item["model"], **extra)
 
             self.add_device(device)
 
@@ -62,7 +63,7 @@ class LumiGateway(XGateway):
 
         did = self.device.did if data["did"] == "lumi.0" else data["did"]
         if device := self.devices.get(did):
-            device.on_report(items, self)
+            device.on_report(items, self, int(time.time()))
 
     async def lumi_send(self, device: XDevice, command: str, data: dict):
         assert command in ("write", "read")

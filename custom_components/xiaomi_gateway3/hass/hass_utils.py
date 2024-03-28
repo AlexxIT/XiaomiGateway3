@@ -44,9 +44,15 @@ async def store_devices(hass: HomeAssistant):
     async def stop(*args):
         # update last_decode_ts for all devices in the store
         for device in XGateway.devices.values():
-            if device.last_decode_ts:
-                store_device = XDevice.restore.setdefault(device.cloud_did, {})
-                store_device["last_decode_ts"] = device.last_decode_ts
+            store_device = XDevice.restore.setdefault(device.cloud_did, {})
+            store_device["uid"] = device.uid
+            if device.last_report_ts:
+                store_device["last_report_ts"] = device.last_report_ts
+            if device.last_seen:
+                store_device["last_seen"] = {
+                    gw.device.uid: last_seen
+                    for gw, last_seen in device.last_seen.items()
+                }
         # save store if not empty
         if XDevice.restore:
             await store.async_save(XDevice.restore)
@@ -141,8 +147,6 @@ async def restore_gateway_key(hass: HomeAssistant, token: str) -> str | None:
 
 
 class InfoDumper(yaml.SafeDumper):
-    allow_unicode = True
-
     def ignore_aliases(self, data):
         return True
 
@@ -151,7 +155,7 @@ async def show_device_info(
     hass: HomeAssistant, device: XDevice, title: str, notification_id: str
 ):
     info = device.as_dict()
-    msg = f"```{yaml.dump(info, Dumper=InfoDumper)}```\n"
+    msg = f"```{yaml.dump(info, Dumper=InfoDumper, allow_unicode=True)}```\n"
 
     # 2. link to XiaomiGateway3
     query = {"q": f"repo:AlexxIT/XiaomiGateway3 {device.model}", "type": "code"}
@@ -221,16 +225,17 @@ def migrate_legacy_entitites_unique_id(hass: HomeAssistant):
 def migrate_devices_store():
     for k, v in list(XDevice.restore.items()):
         # check old storing format
-        if "decode_ts" not in v:
-            continue
+        if "decode_ts" in v:
+            # we can restore only zigbee uid to xiaomi did (not cloud did)
+            if k.startswith("0x"):
+                did = "lumi." + k.lstrip("0x")
+                store_device = XDevice.restore.get(did, {})
+                store_device.setdefault("last_report_ts", v["decode_ts"])
 
-        # we can restore only zigbee uid to xiaomi did (not cloud did)
-        if k.startswith("0x"):
-            did = "lumi." + k.lstrip("0x")
-            store_device = XDevice.restore.get(did, {})
-            store_device.setdefault("last_decode_ts", v["decode_ts"])
+            XDevice.restore.pop(k)
 
-        XDevice.restore.pop(k)
+        if "last_decode_ts" in v:
+            v["last_report_ts"] = v.pop("last_decode_ts")
 
 
 def check_entity_unique_id(registry_entry: RegistryEntry) -> str | None:

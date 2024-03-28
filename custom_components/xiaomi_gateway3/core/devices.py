@@ -1330,7 +1330,7 @@ DEVICES += [{
         BLEMathConv("conductivity", "sensor", mi=4105),  # uint16
         BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),  # uint8
     ],
-    "ttl": "60m"  # TODO: check right value
+    "ttl": "10m"  # BLE every 10 sec!
 }, {
     349: ["Xiaomi", "Flower Pot", "HHCCPOT002", "hhcc.bleflowerpot.v2"],  # 4104,4105
     "spec": [

@@ -44,7 +44,7 @@ class SilabsGateway(XGateway):
         #         device = self.devices.get(did)
         #         if not device:
         #             nwk = f"0x{w[0]:04}"
-        #             device = XDevice(
+        #             device = self.init_device(
         #                 "unknown", did=did, type=ZIGBEE, ieee=ieee, nwk=nwk
         #             )
         #
@@ -76,6 +76,8 @@ class SilabsGateway(XGateway):
             data["decode"] = silabs.decode(data)
             self.zigb_log.debug(data["decode"])
 
+        ts = int(time.time())
+
         if data["eui64"] != "0x0000000000000000":
             ieee = data["eui64"].lower()
             did = "lumi." + ieee.lstrip("0x")
@@ -88,8 +90,10 @@ class SilabsGateway(XGateway):
             device.extra["rssi"] = data["rssi"]
             device.extra["seq"] = int(data["APSCounter"], 0)
 
+            device.on_keep_alive(self, ts)
+
             if self.stats_domain:
-                device.dispatch({ZIGBEE: True})
+                device.dispatch({ZIGBEE: ts})
         else:
             # device is gateway
             device = self.device
@@ -103,7 +107,7 @@ class SilabsGateway(XGateway):
 
         # process ZCL message if device supports it
         if device.has_silabs():
-            device.on_report(data, self)
+            device.on_report(data, self, ts)
 
     async def silabs_process_join(self, data: dict):
         self.debug("Process join", data=data)
@@ -215,14 +219,14 @@ class SilabsGateway(XGateway):
                         child_device.extra["nwk_parent"] = device.nwk
                         # update stats sensor without increasing msg counter
                         if self.stats_domain:
-                            child_device.dispatch({ZIGBEE: False})
+                            child_device.dispatch({ZIGBEE: 0})
 
             elif rel == "Parent":
                 if device.extra.get("nwk_parent") != neighbor["nwk"]:
                     device.extra["nwk_parent"] = neighbor["nwk"]
                     # update stats sensor without increasing msg counter
                     if self.stats_domain:
-                        device.dispatch({ZIGBEE: False})
+                        device.dispatch({ZIGBEE: 0})
 
             # request neighbors search for child router
             if neighbor["device_type"] == "Router":

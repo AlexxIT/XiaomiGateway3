@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from .base import XGateway
 from ..device import XDevice
@@ -10,7 +11,7 @@ class MIoTGateway(XGateway):
     def miot_on_mqtt_publish(self, msg: MQTTMessage):
         if msg.topic in ("miio/report", "central/report"):
             if b'"properties_changed"' in msg.payload:
-                self.miot_process_properties(msg.json["params"])
+                self.miot_process_properties(msg.json["params"], from_cache=False)
             elif b'"event_occured"' in msg.payload:
                 self.miot_process_event(msg.json["params"])
         elif msg.topic == "miio/command_ack":
@@ -21,17 +22,28 @@ class MIoTGateway(XGateway):
                 for i in result
                 if isinstance(i, dict)
             ):
-                self.miot_process_properties(result)
+                self.miot_process_properties(result, from_cache=True)
 
-    def miot_process_properties(self, params: list):
+    def miot_process_properties(self, params: list, from_cache: bool):
         """Can receive multiple properties from multiple devices.
         data = [{'did':123,'siid':2,'piid':1,'value':True,'tid':158}]
         """
+        ts = int(time.time())
+
         # convert miio response format to multiple responses in lumi format
         devices: dict[str, list] = {}
         for item in params:
             if not (device := self.devices.get(item["did"])):
                 continue
+
+            if from_cache:
+                # won't update last_seen for messages from_cache
+                # AND skip this messages if device not in last_seen
+                # but only for devices with available_timeout
+                if self not in device.last_seen and device.available_timeout != 0:
+                    continue
+            else:
+                device.on_keep_alive(self, ts)
 
             if (seq := item.get("tid")) is not None:
                 if seq == device.extra.get("seq"):
@@ -42,24 +54,26 @@ class MIoTGateway(XGateway):
 
         for did, params in devices.items():
             device = self.devices[did]
+            device.on_report(params, self, ts)
             if self.stats_domain:
-                device.dispatch({device.type: True})
-            device.on_report(params, self)
+                device.dispatch({device.type: ts})
 
     def miot_process_event(self, item: dict):
         # {"did":"123","siid":8,"eiid":1,"tid":123,"ts":123,"arguments":[]}
-        if not (device := self.devices.get(item["did"])):
+        device = self.devices.get(item["did"])
+        if not device:
             return
+
+        ts = device.on_keep_alive(self)
 
         if (seq := item.get("tid")) is not None:
             if seq == device.extra.get("seq"):
                 return
             device.extra["seq"] = seq
 
+        device.on_report(item, self, ts)
         if self.stats_domain:
-            device.dispatch({device.type: True})
-
-        device.on_report(item, self)
+            device.dispatch({device.type: ts})
 
     async def miot_send(self, device: XDevice, method: str, data: dict):
         assert method in ("set_properties", "get_properties")

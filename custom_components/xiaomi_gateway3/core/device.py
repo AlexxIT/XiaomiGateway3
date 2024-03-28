@@ -29,9 +29,7 @@ RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
 RE_ZIGBEE_IEEE = re.compile(r"^[0-9a-f:]{23}$")  # lowercase hex with colons
 RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")  # lowercase hex with prefix 0x
 
-BATTERY_AVAILABLE = 3 * 60 * 60  # 3 hours
-POWER_AVAILABLE = 20 * 60  # 20 minutes
-POWER_POLL = 9 * 60  # 9 minutes
+POWER_POLL = 8 * 60  # 8 minutes
 
 
 class XDeviceExtra(TypedDict, total=False):
@@ -80,32 +78,20 @@ class XDevice:
         self.listeners: list[Callable] = []
         self.model = model
 
-        self.last_decode_gw: Optional["XGateway"] = None
-        self.last_decode_ts: float = 0
-        self.last_encode_ts: float = 0
+        # int for time.time() will be enough
+        self.last_report_gw: Optional["XGateway"] = None
+        self.last_report_ts: int = 0
+        self.last_request_ts: int = 0
         self.last_report: dict | None = None
-        self.payload: dict | None = {}
+        self.last_seen: dict["XGateway", int] = {}  # key is gateway uid
+        self.params: dict | None = {}
 
-        self.available_timeout: float = 0
-        self.poll_timeout: float = 0
+        self.available_timeout: int = 0
+        self.poll_timeout: int = 0
 
         self.assert_extra()
         self.init_defaults()
         self.init_converters()
-
-        if self.available_timeout == 0:
-            self.available = True
-        elif self.last_decode_ts != 0:
-            self.available = time.time() - self.last_decode_ts < self.available_timeout
-        else:
-            self.available = False
-
-    # def __repr__(self) -> str:
-    #     gw = sum(gw.available for gw in self.gateways)
-    #     return (
-    #         f"{self.type} {self.model} uid={self.uid} "
-    #         f"av={self.available} gw={gw}/{len(self.gateways)}"
-    #     )
 
     @cached_property
     def uid(self) -> str:
@@ -182,22 +168,24 @@ class XDevice:
         data = {
             "available": self.available,
             "extra": self.extra,
+            "last_seen": {
+                gw.device.uid: encode_time(ts - last_seen)
+                for gw, last_seen in self.last_seen.items()
+            },
             "listeners": len(self.listeners),
             "model": self.model,
+            "params": self.params,
             "ttl": encode_time(self.available_timeout),
             "uid": self.uid,
         }
-        if self.last_decode_gw:
-            data["last_decode_gw"] = self.last_decode_gw.as_dict()
-        if self.last_decode_ts:
-            data["last_decode"] = encode_time(ts - self.last_decode_ts)
-        if self.last_encode_ts:
-            data["last_encode"] = encode_time(ts - self.last_encode_ts)
-        if len(self.gateways) > 1:
-            data["gateways"] = ", ".join(i.device.uid for i in self.gateways)
-        for k in ("last_report", "payload"):
-            if v := getattr(self, k):
-                data[k] = v
+        if self.last_report:
+            data["last_report"] = self.last_report
+        if self.last_report_gw:
+            data["last_report_gw"] = self.last_report_gw.as_dict()
+        if self.last_report_ts:
+            data["last_report_ts"] = encode_time(ts - self.last_report_ts)
+        if self.last_request_ts:
+            data["last_request_ts"] = encode_time(ts - self.last_request_ts)
 
         return data
 
@@ -253,8 +241,9 @@ class XDevice:
                 self.extra["cloud_name"] = restore["cloud_name"]
             if "cloud_fw" in restore:
                 self.extra["cloud_fw"] = restore["cloud_fw"]
-            if "last_decode_ts" in restore:
-                self.last_decode_ts = restore["last_decode_ts"]
+            if "last_report_ts" in restore:
+                self.last_report_ts = restore["last_report_ts"]
+
         # init device extra from yaml config based on type, model, uid
         for k in (self.type, self.model, self.uid):
             if extra := XDevice.configs.get(k):
@@ -280,21 +269,42 @@ class XDevice:
 
         self.converters = desc["spec"]
 
-        if self.type in (GATEWAY, GROUP):
+        if self.type == ZIGBEE:
+            # lumi battery devices report every 55 min
+            self.available_timeout = 2 * 60 * 60 if self.has_battery() else 20 * 60
+        elif self.type == BLE:
+            # keep alive every 20 min
+            self.available_timeout = 45 * 60
+        elif self.type == MESH:
+            # keep alive every 15/30 min depends on device and gateway firmware
+            # same for powered and battery devices
+            self.available_timeout = 35 * 60
+        elif self.type == GATEWAY:
+            self.poll_timeout = POWER_POLL
+            return
+        else:
             return
 
-        # init available_timeout and poll_timeout
-        if not self.has_battery():
-            self.available_timeout = POWER_AVAILABLE
-            self.poll_timeout = POWER_POLL
-        else:
-            self.available_timeout = BATTERY_AVAILABLE
+        if (v := desc.get("ttl")) is not None:
+            self.available_timeout = decode_time(v) if isinstance(v, str) else v
 
-        ttl = desc.get("ttl")
-        if isinstance(ttl, str):
-            ttl = decode_time(ttl)
-        if ttl is not None:
-            self.available_timeout = ttl
+        if self.type in (MESH, ZIGBEE) and not self.has_battery():
+            self.poll_timeout = POWER_POLL
+
+    def restore_last_seen(self, gw: "XGateway"):
+        is_available = False
+        if self.available_timeout != 0:
+            if store := XDevice.restore.get(self.cloud_did):
+                if last_seen := store.get("last_seen", {}).get(gw.device.uid):
+                    if time.time() - last_seen < self.available_timeout:
+                        self.last_seen[gw] = last_seen
+                        is_available = True
+        else:
+            is_available = True
+
+        if is_available and not self.available:
+            self.available = is_available
+            self.dispatch({"available": is_available})
 
     def decode(self, data: dict | list) -> dict:
         """Decode data from device. Support only one item or list of items."""
@@ -400,13 +410,21 @@ class XDevice:
 
         return payload
 
-    def on_report(self, data: dict | list, gw: "XGateway" = None) -> dict:
+    def on_keep_alive(self, gw: "XGateway", ts: int = None) -> int:
+        if ts is None:
+            ts = int(time.time())
+        if gw not in self.gateways:
+            gw.add_device(self)
+        self.last_seen[gw] = ts
+        return ts
+
+    def on_report(self, data: dict | list, gw: "XGateway", ts: int) -> dict:
         """Process data from device."""
         if payload := self.decode(data):
-            self.last_decode_gw = gw
-            self.last_decode_ts = time.time()
+            self.last_report_gw = gw
+            self.last_report_ts = ts
             self.last_report = payload
-            self.payload.update(payload)
+            self.params.update(payload)
 
             if not self.available:
                 # update available and state with one step
@@ -422,15 +440,15 @@ class XDevice:
     @property
     def send_gateway(self) -> "XGateway":
         """Select best gateway for send command (write or read)."""
-        if self.last_decode_gw in self.gateways and self.last_decode_gw.available:
-            return self.last_decode_gw
+        if self.last_report_gw in self.gateways and self.last_report_gw.available:
+            return self.last_report_gw
 
         return next((i for i in self.gateways if i.available), None)
 
     def write(self, payload: dict):
         """Send write command to device."""
         if (gw := self.send_gateway) and (data := self.encode(payload)):
-            self.last_encode_ts = time.time()
+            self.last_request_ts = time.time()
             gw.debug("write", device=self, data=payload)
             return asyncio.create_task(gw.write(self, data))
 
@@ -440,34 +458,38 @@ class XDevice:
             attrs = {i.attr for i in self.converters}
 
         if (gw := self.send_gateway) and (data := self.encode_read(attrs)):
-            self.last_encode_ts = time.time()
+            self.last_request_ts = time.time()
             gw.debug("read", device=self, data=attrs)
             return asyncio.create_task(gw.read(self, data))
 
-    def update(self, ts: float = None):
+    def update(self, ts: int = None):
         """Update device available and state if necessary."""
         if ts is None:
-            ts = time.time()
+            ts = int(time.time())
 
-        # 1. Check if last message from device more than timeout
-        # 2. Check if any device gateways available
-        if self.available_timeout and ts - self.last_decode_ts > self.available_timeout:
-            available = False
-        elif not any(i.available for i in self.gateways):
-            available = False
+        if self.available_timeout != 0:
+            # available based on last_seen value and gw.available
+            is_available = False
+            for gw, last_seen in list(self.last_seen.items()):
+                if ts - last_seen < self.available_timeout:
+                    if gw.available:
+                        is_available = True
+                else:
+                    self.last_seen.pop(gw)
         else:
-            available = True
+            # available based on gw.available
+            is_available = any(gw.available for gw in self.gateways)
 
-        if self.available != available:
-            self.available = available
-            self.dispatch({"available": available})
+        if self.available != is_available:
+            self.available = is_available
+            self.dispatch({"available": is_available})
 
         # 1. Check if device can be polled
         # 2. Check if last message from device more than timeout
         # 3. Check if last message to device more than timeout
         if (
             self.poll_timeout
-            and ts - self.last_decode_ts > self.poll_timeout
-            and ts - self.last_encode_ts > self.poll_timeout
+            and ts - self.last_report_ts > self.poll_timeout
+            and ts - self.last_request_ts > self.poll_timeout
         ):
             self.read()

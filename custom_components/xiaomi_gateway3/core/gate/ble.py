@@ -1,5 +1,7 @@
+import time
+
 from .base import XGateway
-from ..device import XDevice, BLE
+from ..device import BLE
 from ..mini_mqtt import MQTTMessage
 from ..shell.shell_mgw import ShellMGW
 
@@ -15,7 +17,7 @@ class BLEGateway(XGateway):
             if not device:
                 mac = reverse_mac(row[1])  # aa:bb:cc:dd:ee:ff
                 model = row[2]
-                device = XDevice(model, did=did, type=BLE, mac=mac)
+                device = self.init_device(model, did=did, type=BLE, mac=mac)
             self.add_device(device)
 
     def ble_on_mqtt_publish(self, msg: MQTTMessage):
@@ -41,25 +43,30 @@ class BLEGateway(XGateway):
             if "mac" not in data["dev"]:
                 self.debug("Unknown device without mac", data=data)
                 return
+            # create device "on the fly"
             model = data["dev"]["pdid"]
             mac = data["dev"]["mac"].lower()
-            device = XDevice(model, type=BLE, mac=mac, did=did)
+            device = self.init_device(model, type=BLE, mac=mac, did=did)
             self.add_device(device)
+
+        ts = device.on_keep_alive(self)
 
         if data["frmCnt"] == device.extra.get("seq"):
             return
         device.extra["seq"] = data["frmCnt"]
 
+        device.on_report(data["evt"], self, ts)
         if self.stats_domain:
-            device.dispatch({BLE: True})
-
-        device.on_report(data["evt"], self)
+            device.dispatch({BLE: ts})
 
     def ble_process_keepalive(self, data: list):
+        ts = int(time.time())
+
         for item in data:
             if device := self.devices.get(item["did"]):
                 # noinspection PyTypedDict
                 device.extra["rssi_" + self.device.uid] = item["rssi"]
+                device.on_keep_alive(self, ts)
 
 
 def reverse_mac(s: str):

@@ -1,6 +1,6 @@
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, UTC
 from functools import cached_property
 from typing import TYPE_CHECKING, Callable
 
@@ -190,8 +190,8 @@ class XStatsEntity(XEntity):
             self._attr_is_on = data["available"]
             state_change = True
 
-        if on_message := data.get(self.attr):
-            self._attr_native_value = utcnow()
+        if ts := data.get(self.attr):
+            self._attr_native_value = datetime.fromtimestamp(ts, UTC)
 
             if "msg_received" in self._attr_extra_state_attributes:
                 self._attr_extra_state_attributes["msg_received"] += 1
@@ -209,7 +209,7 @@ class XStatsEntity(XEntity):
 
             state_change = True
 
-        elif on_message is False:
+        elif ts == 0:
             state_change = True
 
         if state_change and self.hass:

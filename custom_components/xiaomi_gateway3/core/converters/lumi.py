@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 class ResetsConv(BaseConv):
     # noinspection PyTypedDict
     def decode(self, device: "XDevice", payload: dict, value: int):
-        if "resets" in device.payload and value > device.payload["resets"]:
+        if "resets" in device.params and value > device.params["resets"]:
             device.extra.setdefault("new_resets", 0)
-            device.extra["new_resets"] += value - device.payload["resets"]
+            device.extra["new_resets"] += value - device.params["resets"]
 
         super().decode(device, payload, value)
 

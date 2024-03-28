@@ -90,25 +90,33 @@ class XGateway:
                 for handler in listeners:
                     handler(*args, **kwargs)
         except Exception as e:
-            self.error("dispatch_event", exc_info=e)
+            self.error(f"dispatch_event: {event} {args} {kwargs}", exc_info=e)
 
     def remove_all_event_listners(self):
         self.listeners.clear()
 
-    def add_device(self, device: XDevice):
-        if device.did not in self.devices:
-            self.debug("add_device", device=device, data=device.extra)
-            self.devices[device.did] = device
+    def init_device(self, model: str | int, **kwargs) -> XDevice:
+        device = XDevice(model, **kwargs)
+        self.debug("init_device", device=device, data=device.extra)
+        self.devices[device.did] = device
+        return device
 
-        if self not in device.gateways:
-            device.gateways.append(self)
-            self.dispatch_event(EVENT_ADD_DEVICE, device)
+    def add_device(self, device: XDevice):
+        if self in device.gateways:
+            return
+
+        device.restore_last_seen(self)
+
+        self.debug("add_device", device=device)
+        device.gateways.append(self)
+        self.dispatch_event(EVENT_ADD_DEVICE, device)
 
     def remove_device(self, device: XDevice):
-        if self in device.gateways:
-            self.debug("remove_device", device=device)
-            device.gateways.remove(self)
-            self.dispatch_event(EVENT_REMOVE_DEVICE, device)
+        if self not in device.gateways:
+            return
+        self.debug("remove_device", device=device)
+        device.gateways.remove(self)
+        self.dispatch_event(EVENT_REMOVE_DEVICE, device)
 
     def remove_all_devices(self):
         for device in self.devices.values():
@@ -125,12 +133,14 @@ class XGateway:
             }
             if "lan_mac" in info:
                 extra["mac2"] = info["lan_mac"]
-            self.device = XDevice(info["model"], **extra)
+            self.device = self.init_device(info["model"], **extra)
         self.add_device(self.device)
 
     async def handle_mqtt_messages(self):
+        if not await self.mqtt.connect(self.host):
+            return
+
         try:
-            await self.mqtt.connect(self.host)
             await self.mqtt.subscribe("#")
             self.on_mqtt_connect()
             async for msg in self.mqtt:
@@ -139,11 +149,8 @@ class XGateway:
             self.debug(f"MQTT processing issue", exc_info=e)
         finally:
             try:
-                self.debug(f"MQTT before disconnect")
                 await self.mqtt.disconnect()
-                self.debug(f"MQTT before close")
                 await self.mqtt.close()
-                self.debug(f"MQTT before on_mqtt_disconnect")
                 self.on_mqtt_disconnect()
             except Exception as e:
                 self.debug(f"MQTT clossing issue", exc_info=e)
@@ -158,7 +165,7 @@ class XGateway:
         self.debug("MQTT disconnected")
         self.available = False
         self.timer_task.cancel()
-        self.update_devices(time.time())
+        self.update_devices(int(time.time()))
 
     def on_mqtt_message(self, msg: MQTTMessage):
         if msg.topic == "broker/ping":
@@ -172,11 +179,11 @@ class XGateway:
     async def timer(self):
         while True:
             ts = time.time()
-            self.update_devices(ts)
+            self.update_devices(int(ts))
             self.dispatch_event(EVENT_TIMER, ts)
             await asyncio.sleep(30)
 
-    def update_devices(self, ts: float):
+    def update_devices(self, ts: int):
         for device in self.devices.values():
             if self in device.gateways:
                 device.update(ts)
