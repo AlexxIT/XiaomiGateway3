@@ -29,7 +29,7 @@ RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
 RE_ZIGBEE_IEEE = re.compile(r"^[0-9a-f:]{23}$")  # lowercase hex with colons
 RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")  # lowercase hex with prefix 0x
 
-POWER_POLL = 8 * 60  # 8 minutes
+POWER_POLL = 10 * 60  # 10 minutes
 
 
 class XDeviceExtra(TypedDict, total=False):
@@ -271,7 +271,8 @@ class XDevice:
 
         if self.type == ZIGBEE:
             # lumi battery devices report every 55 min
-            self.available_timeout = 2 * 60 * 60 if self.has_battery() else 20 * 60
+            # power poll every 10 min (internal integration logic)
+            self.available_timeout = 2 * 60 * 60 if self.has_battery() else 25 * 60
         elif self.type == BLE:
             # keep alive every 20 min
             self.available_timeout = 45 * 60
