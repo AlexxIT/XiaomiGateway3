@@ -131,6 +131,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     if config_entry.version == 1:
+        hass_utils.migrate_legacy_devices_unique_id(hass)
         hass_utils.migrate_legacy_entitites_unique_id(hass)
         hass_utils.migrate_devices_store()
     return True

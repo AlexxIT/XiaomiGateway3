@@ -207,18 +207,45 @@ def remove_stats_entities(hass: HomeAssistant, config_entry: ConfigEntry):
         registry.async_remove(entity_id)
 
 
+def migrate_legacy_devices_unique_id(hass: HomeAssistant):
+    registry = device_registry.async_get(hass)
+    for device in registry.devices.values():
+        try:
+            if not any(
+                i[1] != migrate_uid(i[1]) for i in device.identifiers if i[0] == DOMAIN
+            ):
+                continue
+
+            new_identifiers = {
+                (DOMAIN, migrate_uid(i[1])) if i[0] == DOMAIN else i
+                for i in device.identifiers
+            }
+            _LOGGER.info(f"Migrate device {device.identifiers} to {new_identifiers}")
+            registry.async_update_device(device.id, new_identifiers=new_identifiers)
+        except Exception as e:
+            _LOGGER.warning(f"Migration error for {device}: {repr(e)}")
+
+
 def migrate_legacy_entitites_unique_id(hass: HomeAssistant):
     registry = entity_registry.async_get(hass)
-    for entity in list(registry.entities.values()):
-        if entity.platform != DOMAIN:
+    for entry in list(registry.entities.values()):
+        if entry.platform != DOMAIN:
             continue
 
         try:
-            if new_uid := check_entity_unique_id(entity):
-                _LOGGER.info(f"Migrate {entity.entity_id} to unique_id: {new_uid}")
-                registry.async_update_entity(entity.entity_id, new_unique_id=new_uid)
+            # split mac and attr in unique id
+            uid, attr = entry.unique_id.split("_", 1)
+
+            new_uid = migrate_uid(uid)
+            new_attr = migrate_attr(attr, entry.original_device_class)
+            if uid == new_uid and attr == new_attr:
+                continue
+
+            new_unique_id = f"{new_uid}_{new_attr}"
+            _LOGGER.info(f"Migrate entity '{entry.unique_id}' to '{new_unique_id}'")
+            registry.async_update_entity(entry.entity_id, new_unique_id=new_unique_id)
         except Exception as e:
-            _LOGGER.warning(f"Migration error for {entity}: {repr(e)}")
+            _LOGGER.warning(f"Migration error for {entry}: {repr(e)}")
 
 
 def migrate_devices_store():
@@ -237,46 +264,35 @@ def migrate_devices_store():
             v["last_report_ts"] = v.pop("last_decode_ts")
 
 
-def check_entity_unique_id(registry_entry: RegistryEntry) -> str | None:
-    has_update = False
-
-    # split mac and attr in unique id
-    uid, attr = registry_entry.unique_id.split("_", 1)
-
+def migrate_uid(uid: str) -> str:
     if uid.startswith("0x"):
         # ZIGBEE format should be "0x" + 16 hex lowercase
         if len(uid) < 18:
-            uid = f"0x{uid[2:]:>016s}"
-            has_update = True
+            return f"0x{uid[2:]:>016s}"
     elif len(uid) == 12:
         # GATEWAY, BLE, MESH format should be 12 hex lowercase
         if uid.isupper():
-            uid = uid.lower()
-            has_update = True
-    elif not uid.startswith("group"):
+            return uid.lower()
+    elif len(uid) == 16:
         # GROUP format should be "group" + big int
-        if registry_entry.original_icon == "mdi:lightbulb-group":
-            did = int.from_bytes(bytes.fromhex(uid), "big")
-            uid = f"group{did}"
-            has_update = True
+        did = int.from_bytes(bytes.fromhex(uid), "big")
+        return f"group{did}"
+    return uid
 
+
+def migrate_attr(attr: str, device_class: str) -> str:
     if attr == "switch":
         # attr for "plug" and "outlet" should be not "switch"
-        if registry_entry.original_device_class in ("plug", "outlet"):
-            attr = registry_entry.original_device_class
-            has_update = True
+        if device_class in ("plug", "outlet"):
+            return device_class
     elif attr.startswith("channel ") or attr.endswith(" density"):
         # spaces in attr was by mistake
-        attr = attr.replace(" ", "_")
-        has_update = True
+        return attr.replace(" ", "_")
     elif attr == "pressure_state":
-        attr = "pressure"
-        has_update = True
+        return "pressure"
     elif attr == "occupancy_distance":
-        attr = "distance"
-        has_update = True
-
-    return f"{uid}_{attr}" if has_update else None
+        return "distance"
+    return attr
 
 
 def remove_device(hass: HomeAssistant, device: XDevice):
