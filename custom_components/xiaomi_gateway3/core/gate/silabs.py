@@ -129,6 +129,9 @@ class SilabsGateway(XGateway):
             self.warning("Can't find device after join")
             return
 
+        await self.silabs_config(device)
+
+    async def silabs_config(self, device: XDevice):
         payload = {}
         for conv in device.converters:
             if isinstance(conv, ZConverter):

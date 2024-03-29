@@ -40,15 +40,15 @@ CMD_DISABLE = "disable"
 CMD_ENABLE = "enable"
 CMD_PAIR = "pair"
 CMD_FORCE_PAIR = "force_pair"
+CMD_PARENT_SCAN = "parent_scan"
 CMD_FLASH_EZSP = "flash_ezsp"
 CMD_FW_LOCK = "firmware_lock"
 CMD_OPENMIIO_RELOAD = "openmiio_reload"
 CMD_RUN_FTP = "run_ftp"
 CMD_REBOOT = "reboot"
 # ZIGBEE
-CMD_REJOIN = "rejoin"
+CMD_RECONFIG = "reconfig"
 CMD_REMOVE = "remove"
-CMD_PARENT_SCAN = "parent_scan"
 
 
 class XCommandSelect(XEntity, SelectEntity):
@@ -79,7 +79,7 @@ class XCommandSelect(XEntity, SelectEntity):
         elif self.device.type == ZIGBEE:
             if self.device.has_controls():
                 self._attr_options.append(CMD_UPDATE)
-            self._attr_options += [CMD_REJOIN, CMD_REMOVE]
+            self._attr_options += [CMD_RECONFIG, CMD_REMOVE]
         elif self.device.type == MESH:
             self._attr_options += [CMD_UPDATE]
 
@@ -100,8 +100,8 @@ class XCommandSelect(XEntity, SelectEntity):
             self.device.read()
 
         # ZIGBEE
-        elif option == CMD_REJOIN:
-            await self.gw.silabs_rejoin(self.device)
+        elif option == CMD_RECONFIG:
+            await self.gw.silabs_config(self.device)
         elif option == CMD_REMOVE:
             await self.gw.device.write({"remove_did": self.device.did})
 
