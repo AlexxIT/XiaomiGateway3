@@ -43,7 +43,7 @@ CMD_FORCE_PAIR = "force_pair"
 CMD_PARENT_SCAN = "parent_scan"
 CMD_FLASH_EZSP = "flash_ezsp"
 CMD_FW_LOCK = "firmware_lock"
-CMD_OPENMIIO_RELOAD = "openmiio_reload"
+CMD_OPENMIIO_RESTART = "openmiio_restart"
 CMD_RUN_FTP = "run_ftp"
 CMD_REBOOT = "reboot"
 # ZIGBEE
@@ -65,17 +65,27 @@ class XCommandSelect(XEntity, SelectEntity):
         if self.device.type == GATEWAY:
             self._attr_options += [
                 CMD_UPDATE,
-                CMD_PAIR,
-                CMD_FORCE_PAIR,
-                CMD_PARENT_SCAN,
                 CMD_RUN_FTP,
                 CMD_REBOOT,
-                CMD_OPENMIIO_RELOAD,
                 CMD_DISABLE,
                 CMD_ENABLE,
             ]
             if self.device.model == "lumi.gateway.mgl03":
-                self._attr_options += [CMD_FLASH_EZSP, CMD_FW_LOCK]
+                self._attr_options += [
+                    CMD_FW_LOCK,
+                    CMD_OPENMIIO_RESTART,
+                    CMD_PAIR,
+                    CMD_FORCE_PAIR,
+                    CMD_PARENT_SCAN,
+                    CMD_FLASH_EZSP,
+                ]
+            else:
+                self._attr_options += [
+                    CMD_OPENMIIO_RESTART,
+                    CMD_PAIR,
+                    CMD_FORCE_PAIR,
+                    CMD_PARENT_SCAN,
+                ]
         elif self.device.type == ZIGBEE:
             if self.device.has_controls():
                 self._attr_options.append(CMD_UPDATE)
@@ -116,7 +126,7 @@ class XCommandSelect(XEntity, SelectEntity):
             await self.gw.stop()
         elif option == CMD_ENABLE:
             self.gw.start()
-        elif option in (CMD_RUN_FTP, CMD_REBOOT, CMD_OPENMIIO_RELOAD):
+        elif option in (CMD_RUN_FTP, CMD_REBOOT, CMD_OPENMIIO_RESTART):
             ok = await self.gw.telnet_command(option)
             self.device.dispatch({"data": OPT_OK if ok else OPT_ERROR})
         elif option == CMD_FW_LOCK:

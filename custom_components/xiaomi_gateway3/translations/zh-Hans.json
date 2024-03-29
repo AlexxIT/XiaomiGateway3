@@ -84,7 +84,7 @@
           "reboot": "网关重启",
           "ftp": "网关运行FTP",
           "flashzb": "Zigbee刷写EZSP",
-          "openmiio_reload": "重载OpenmiIO"
+          "openmiio_restart": "重载OpenmiIO"
         }
       },
       "data": {

@@ -80,7 +80,7 @@
           "reboot": "Gateway reboot",
           "run_ftp": "Gateway run FTP",
           "flash_ezsp": "Zigbee flash EZSP",
-          "openmiio_reload": "OpenmiIO reload",
+          "openmiio_restart": "OpenmiIO restart",
           "disable": "Gateway disable",
           "enable": "Gateway enable",
           "rejoin": "Zigbee rejoin",

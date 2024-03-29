@@ -79,7 +79,7 @@
             "reboot": "Перезагрузка шлюза",
             "run_ftp": "Запуск FTP на шлюзе",
             "flash_ezsp": "Прошивка EZSP Zigbee",
-            "openmiio_reload": "Перезагрузка OpenmiIO",
+            "openmiio_restart": "Перезагрузка OpenmiIO",
             "disable": "Отключение шлюза",
             "enable": "Включение шлюза",
             "rejoin": "Повторное подключение Zigbee",
