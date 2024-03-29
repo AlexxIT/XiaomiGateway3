@@ -80,29 +80,27 @@ async def enable_telnet(host: str, token: str, key: str = None) -> str:
             methods = ["set_ip_info" if fwver < "1.0.7" else "system_command"]
         else:
             return "wrong_model"
+
+        if "system_command" in methods and len(key or "") != 16:
+            return "no_key"
     else:
         # 3. Send all open telnet cmd if we can't get miio info
-        methods = ["set_ip_info", "enable_telnet_service", "system_command"]
-
-    if key and len(key) != 16:
-        key = None
+        # PS. Can't try `system_command` without `miio_info`
+        methods = ["set_ip_info", "enable_telnet_service"]
 
     # 4. Return ok or some error
-    if methods == ["system_command"] and not key:
-        return "no_key"
-
     for method in methods:
         if method == "enable_telnet_service":
             params = None
         elif method == "set_ip_info":
             params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
-        elif method == "system_command" and key:
+        elif method == "system_command":
             params = {
                 "password": miio_password(miio.device_id, miio_info["mac"], key),
                 "command": TELNET_CMD,
             }
         else:
-            continue
+            raise NotImplementedError(method)
 
         res = await miio.send(method, params, tries=1)
         # set_ip_info: {'result': ['ok']}
