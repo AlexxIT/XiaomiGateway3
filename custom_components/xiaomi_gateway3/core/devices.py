@@ -1220,15 +1220,15 @@ DEVICES += [{
     ],
 }, {
     "LWB010": ["Philips", "Hue white 806 lm", "9290011370B"],
-    "support": 2,  # TODO: state change, effect?
+    "support": 2,
     "spec": [
-        ZOnOffConv("light", "light", ep=11),
+        ZOnOffConv("light", "light", ep=11, entity={"poll": True}),
         ZBrightnessConv("brightness", ep=11),
         ZTransitionConv("transition"),
     ],
 }, {
     "LCT001": ["Philips", "Hue Color 600 lm", "9290012573A"],
-    "support": 2,  # TODO: state change, effect?
+    "support": 4,
     "spec": [
         ZOnOffConv("light", "light", ep=11, entity={"poll": True}),
         ZBrightnessConv("brightness", ep=11),
@@ -1249,7 +1249,7 @@ DEVICES += [{
     "FNB56-ZSC01LX1.2": [None, "Dimmer", "LXZ8-02A"],
     "TRADFRI bulb E27 W opal 1000lm": ["IKEA", "Bulb E27 1000 lm", "LED1623G12"],
     "TRADFRI bulb E27 WW 806lm": ["IKEA", "Bulb E27 806 lm", "LED1836G9"],
-    "support": 3,  # @AlexxIT TODO: tests, effect?
+    "support": 3,  # @AlexxIT
     "spec": [
         ZOnOffConv("light", "light"),
         ZBrightnessConv("brightness"),
@@ -1274,7 +1274,18 @@ DEVICES += [{
         # IKEARemoteConv2("action"),
     ],
 }, {
+    "TRADFRI Signal Repeater": ["IKEA", "TRADFRI signal repeater", "E1746"],
+    "spec": [],  # just repeater, no spec
+}, {
+    "TRADFRI open/close remote": ["IKEA", "TRADFRI open/close remote", "E1766"],
+    "support": 1,
+    "spec": [
+        ZBatteryPercConv("battery", "sensor", bind=True),
+        ZBatteryVoltConv("battery_voltage", "sensor"),
+    ],
+}, {
     "FYRTUR block-out roller blind": ["IKEA", "FYRTUR roller blind", "E1757"],
+    "support": 5,  # @AlexxIT
     "spec": [
         ZCoverCmd("motor", "cover", bind=True),
         ZCoverPos("position", report="1s 5h 1"),
