@@ -156,7 +156,7 @@ class SyncMiIO(BasemiIO):
             self.delta_ts = None
 
         else:
-            _LOGGER.warning(
+            _LOGGER.debug(
                 f"{self.addr[0]} | Device offline"
                 if pings >= 2
                 else f"{self.addr[0]} | Can't send {method} {params}"
@@ -230,8 +230,8 @@ class AsyncSocket(DatagramProtocol):
             return
         try:
             self.transport.close()
-        except Exception:
-            _LOGGER.exception("Error when closing async socket")
+        except Exception as e:
+            _LOGGER.error("Error when closing async socket", exc_info=e)
 
     async def connect(self, addr: tuple[str, int]):
         coro = asyncio.get_event_loop().create_datagram_endpoint(
@@ -325,10 +325,10 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             self.delta_ts = None
 
         if offline:
-            _LOGGER.warning(f"{self.addr[0]} | Device offline")
+            _LOGGER.debug(f"{self.addr[0]} | Device offline")
             return None
 
-        _LOGGER.info(f"{self.addr[0]} | No answer on {method} {params}")
+        _LOGGER.debug(f"{self.addr[0]} | No answer on {method} {params}")
         return {}
 
     async def send_bulk(self, method: str, params: list) -> list:
