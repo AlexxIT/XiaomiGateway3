@@ -457,7 +457,7 @@ def zdb_report(
     if type_id is None:
         type_id = get_type_id(cluster_id, attr_id)
 
-    data = attr_encode(type_id, change)
+    data = attr_encode(type_id, change).hex()
     cli = f"zcl global send-me-a-report {cluster_id} {attr_id} {type_id} {mint} {maxt} {{{data}}}"
     return [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
 
