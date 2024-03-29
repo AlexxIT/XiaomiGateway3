@@ -269,17 +269,18 @@ class XDevice:
 
         self.converters = desc["spec"]
 
+        # ABOUT. Set available_timeout = 3 * keep_alive + 5 min
         if self.type == ZIGBEE:
-            # lumi battery devices report every 55 min
+            # lumi battery devices report every 55 min (heartbeat)
             # power poll every 10 min (internal integration logic)
-            self.available_timeout = 2 * 60 * 60 if self.has_battery() else 25 * 60
+            self.available_timeout = 170 * 60 if self.has_battery() else 35 * 60
         elif self.type == BLE:
             # keep alive every 20 min
-            self.available_timeout = 45 * 60
+            self.available_timeout = 65 * 60
         elif self.type == MESH:
             # keep alive every 15/30 min depends on device and gateway firmware
             # same for powered and battery devices
-            self.available_timeout = 35 * 60
+            self.available_timeout = 50 * 60
         elif self.type == GATEWAY:
             self.poll_timeout = POWER_POLL
             return
