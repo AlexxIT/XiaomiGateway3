@@ -41,7 +41,7 @@ class MIoTGateway(XGateway):
                 # won't update last_seen for messages from_cache
                 # AND skip this messages if device not in last_seen
                 # but only for devices with available_timeout
-                if self not in device.last_seen and device.available_timeout != 0:
+                if self.device not in device.last_seen and device.type in (BLE, MESH):
                     continue
             else:
                 device.on_keep_alive(self, ts)

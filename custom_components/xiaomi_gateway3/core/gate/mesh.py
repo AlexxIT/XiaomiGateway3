@@ -68,5 +68,5 @@ class MeshGateway(XGateway):
         for item in data:
             if device := self.devices.get(item["did"]):
                 self.debug("ble_mesh_offline", device=device)
-                device.last_seen.pop(self, None)
+                device.last_seen.pop(self.device, None)
                 device.update()

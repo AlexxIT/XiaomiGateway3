@@ -50,8 +50,7 @@ async def store_devices(hass: HomeAssistant):
                 store_device["last_report_ts"] = device.last_report_ts
             if device.last_seen:
                 store_device["last_seen"] = {
-                    gw.device.uid: last_seen
-                    for gw, last_seen in device.last_seen.items()
+                    gw.uid: last_seen for gw, last_seen in device.last_seen.items()
                 }
         # save store if not empty
         if XDevice.restore:

@@ -83,7 +83,7 @@ class XDevice:
         self.last_report_ts: int = 0
         self.last_request_ts: int = 0
         self.last_report: dict | None = None
-        self.last_seen: dict["XGateway", int] = {}  # key is gateway uid
+        self.last_seen: dict["XDevice", int] = {}  # key is gateway uid
         self.params: dict | None = {}
 
         self.available_timeout: int = 0
@@ -169,7 +169,7 @@ class XDevice:
             "available": self.available,
             "extra": self.extra,
             "last_seen": {
-                gw.device.uid: encode_time(ts - last_seen)
+                gw.uid: encode_time(ts - last_seen)
                 for gw, last_seen in self.last_seen.items()
             },
             "listeners": len(self.listeners),
@@ -298,7 +298,7 @@ class XDevice:
             if store := XDevice.restore.get(self.cloud_did):
                 if last_seen := store.get("last_seen", {}).get(gw.device.uid):
                     if time.time() - last_seen < self.available_timeout:
-                        self.last_seen[gw] = last_seen
+                        self.last_seen[gw.device] = last_seen
                         is_available = True
         else:
             is_available = True
@@ -416,7 +416,7 @@ class XDevice:
             ts = int(time.time())
         if gw not in self.gateways:
             gw.add_device(self)
-        self.last_seen[gw] = ts
+        self.last_seen[gw.device] = ts
         return ts
 
     def on_report(self, data: dict | list, gw: "XGateway", ts: int) -> dict:
