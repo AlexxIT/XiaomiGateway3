@@ -71,17 +71,28 @@ class SilabsGateway(XGateway):
         self.device.dispatch({GATEWAY: payload})
 
     def silabs_process_recv(self, data: dict):
+        uid = data["eui64"].lower()
+        nwk = data["sourceAddress"].lower()
+
         if self.zigb_log.isEnabledFor(DEBUG):
             # store decoded message, so we can use it later
             data["decode"] = silabs.decode(data)
-            self.zigb_log.debug(data["decode"])
+            self.zigb_log.debug({"uid": uid, "nwk": nwk, "data": data["decode"]})
 
         ts = int(time.time())
 
-        if data["eui64"] != "0x0000000000000000":
-            ieee = data["eui64"].lower()
-            did = "lumi." + ieee.lstrip("0x")
-            device: XDevice = self.devices.get(did)
+        # IMPORTANT. Sometimes gateway send responses with NWK but without IEEE:
+        #   ==========handleUnknownDevice============
+        #   {"sourceAddress":"0x4A53","eui64":"0x0000000000000000"...}
+        if nwk != "0x0000":
+            if uid != "0x0000000000000000":
+                did = "lumi." + uid.lstrip("0x")
+                device: XDevice = self.devices.get(did)
+            else:
+                device: XDevice = next(
+                    (i for i in self.devices.values() if i.nwk == nwk), None
+                )
+
             if not device:
                 self.debug("message from unknown device")
                 return  # skip unknown device
