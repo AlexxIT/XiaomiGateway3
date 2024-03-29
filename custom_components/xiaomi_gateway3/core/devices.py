@@ -1290,6 +1290,7 @@ DEVICES += [{
         ZCoverCmd("motor", "cover", bind=True),
         ZCoverPos("position", report="1s 5h 1"),
         ZBatteryPercConv("battery", "sensor", bind=True, report="1h 12h 0"),
+        ZBatteryVoltConv("battery_voltage", "sensor"),
     ],
 }, {
     "Leak_Sensor": ["LifeControl", "Water Leak Sensor", "MCLH-07"],
