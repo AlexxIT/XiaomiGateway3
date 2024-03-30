@@ -11,7 +11,6 @@ from homeassistant.helpers.aiohttp_client import (
     async_create_clientsession,
     async_get_clientsession,
 )
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.storage import Store
 
 from .. import XDevice
@@ -121,8 +120,7 @@ async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
     options = config_entry.options
 
     # key probably OK, skip
-    key = options.get("key")
-    if not key or len(key) == 16:
+    if (key := options.get("key")) and len(key) == 16:
         return
 
     info = await core_utils.gateway_info(options["host"], options["token"])
