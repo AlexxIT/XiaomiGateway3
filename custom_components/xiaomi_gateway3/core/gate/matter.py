@@ -23,12 +23,12 @@ class MatterGateway(XGateway):
             self.add_device(device)
 
     def matter_on_mqtt_publish(self, msg: MQTTMessage):
-        if msg.topic == "local/matter/devMsg":
-            if b'"properties_changed_v3"' in msg.payload:
-                i = msg.payload.index(b'{"method"')
-                data = json.loads(msg.payload[i:])
-                self.matter_process_devmsg(data["params"])
-        elif msg.topic == "local/matter/response":
+        # if msg.topic == "local/matter/devMsg":
+        #     if b'"properties_changed_v3"' in msg.payload:
+        #         i = msg.payload.index(b'{"method"')
+        #         data = json.loads(msg.payload[i:])
+        #         self.matter_process_devmsg(data["params"])
+        if msg.topic == "local/matter/response":
             if b"properties_changed_v3" in msg.payload:
                 i = msg.payload.index(b'{"result"')
                 data = json.loads(msg.payload[i:].rstrip(b"\x00"))
