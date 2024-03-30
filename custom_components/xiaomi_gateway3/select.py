@@ -113,7 +113,10 @@ class XCommandSelect(XEntity, SelectEntity):
         elif option == CMD_RECONFIG:
             await self.gw.silabs_config(self.device)
         elif option == CMD_REMOVE:
-            await self.gw.device.write({"remove_did": self.device.did})
+            if self.device.model:
+                await self.gw.device.write({"remove_did": self.device.did})
+            else:
+                await self.gw.silabs_leave(self.device)
 
         # GATEWAY
         elif option == CMD_PAIR:
@@ -182,6 +185,7 @@ class XDataSelect(XEntity, SelectEntity):
             "pair_command",
             "added_device",
             "remove_did",
+            "left_uid",
         }
 
         # noinspection PyTypeChecker
@@ -219,11 +223,12 @@ class XDataSelect(XEntity, SelectEntity):
             # "res_name":"8.0.2082","value":{"did":"lumi.1234567890"}"
             # "res_name":"8.0.2082","value":"lumi.1234567890"
             did = value["did"] if isinstance(value, dict) else value
-            if device := MultiGateway.devices.get(did):
-                self.append_option(f"Removed: {device.uid}")
+            self.append_option(f"Removed: 0x{did[5:]:>016s}")
+        elif uid := data.get("left_uid"):
+            did = "lumi." + uid.lstrip("0x")
+            if device := self.gw.devices.get(did):
                 hass_utils.remove_device(self.hass, device)
-            else:
-                self.append_option(f"Removed: {did}")
+            self.append_option(f"Left: {uid}")
 
     async def async_select_option(self, option: str) -> None:
         if option == OPT_JOIN:

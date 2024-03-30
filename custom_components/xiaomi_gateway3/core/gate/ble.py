@@ -47,6 +47,7 @@ class BLEGateway(XGateway):
             model = data["dev"]["pdid"]
             mac = data["dev"]["mac"].lower()
             device = self.init_device(model, type=BLE, mac=mac, did=did)
+            device.available = True
             self.add_device(device)
 
         ts = device.on_keep_alive(self)

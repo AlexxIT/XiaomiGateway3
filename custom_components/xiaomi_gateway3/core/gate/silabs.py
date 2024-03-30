@@ -7,7 +7,7 @@ from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
 from ..converters import silabs
 from ..converters.zigbee import ZConverter
-from ..device import XDevice
+from ..device import XDevice, hex_to_ieee
 from ..mini_mqtt import MQTTMessage
 from ..shell.base import ShellBase
 from ..shell.session import Session
@@ -17,6 +17,7 @@ class SilabsGateway(XGateway):
     ieee: str
     new_sdk: bool
     force_pair: bool = False
+    unknown: dict = {}
 
     async def silabs_read_device(self, sh: ShellBase):
         # 1. Read coordinator info
@@ -59,14 +60,8 @@ class SilabsGateway(XGateway):
             asyncio.create_task(coro)
         elif msg.topic.endswith("/heartbeat"):
             self.silabs_process_heartbeat(msg.json)
-
-    def silabs_process_heartbeat(self, data: dict):
-        payload = {
-            "network_pan_id": data.get("networkPanId"),
-            "radio_tx_power": data.get("radioTxPower"),
-            "radio_channel": data.get("radioChannel"),
-        }
-        self.device.dispatch({GATEWAY: payload})
+        elif msg.topic.endswith("/deviceleft"):
+            self.silabs_process_deviceleft(msg.json)
 
     def silabs_process_recv(self, data: dict):
         uid = data["eui64"].lower()
@@ -79,21 +74,26 @@ class SilabsGateway(XGateway):
 
         ts = int(time.time())
 
-        # IMPORTANT. Sometimes gateway send responses with NWK but without IEEE:
-        #   ==========handleUnknownDevice============
-        #   {"sourceAddress":"0x4A53","eui64":"0x0000000000000000"...}
         if nwk != "0x0000":
-            if uid != "0x0000000000000000":
+            if uid == "0x0000000000000000":
+                # IMPORTANT. Sometimes gateway send responses with NWK but without IEEE:
+                #   ==========handleUnknownDevice============
+                #   {"sourceAddress":"0x4A53","eui64":"0x0000000000000000"...}
+                for device in self.devices.values():
+                    if device.nwk == nwk:
+                        break
+                else:
+                    self.debug("message from unknown IEEE")
+                    return  # skip unknown device
+            else:
                 did = "lumi." + uid.lstrip("0x")
                 device: XDevice = self.devices.get(did)
-            else:
-                device: XDevice = next(
-                    (i for i in self.devices.values() if i.nwk == nwk), None
-                )
-
-            if not device:
-                self.debug("message from unknown device")
-                return  # skip unknown device
+                if not device:
+                    if uid not in self.unknown:
+                        self.debug("silabs_add_unknown", uid=uid)
+                        self.unknown[uid] = {"did": did, "nwk": nwk}
+                        asyncio.create_task(self.silabs_process_unknown(uid))
+                    return
 
             device.extra["lqi"] = data["linkQuality"]
             device.extra["rssi"] = data["rssi"]
@@ -118,8 +118,34 @@ class SilabsGateway(XGateway):
         if device.has_silabs():
             device.on_report(data, self, ts)
 
+    def silabs_process_heartbeat(self, data: dict):
+        payload = {
+            "network_pan_id": data.get("networkPanId"),
+            "radio_tx_power": data.get("radioTxPower"),
+            "radio_channel": data.get("radioChannel"),
+        }
+        self.device.dispatch({GATEWAY: payload})
+
+    def silabs_process_deviceleft(self, data: dict):
+        uid = data["eui64"].lower()
+        self.debug("silabs_process_deviceleft", uid=uid)
+        self.device.dispatch({"left_uid": uid})
+        self.unknown.pop(uid, None)  # remove uid from unknown
+
+    async def silabs_process_unknown(self, uid: str):
+        await asyncio.sleep(10)  # 10 sec delay before adding unknown device
+
+        unk = self.unknown.pop(uid, {})
+        if not unk or unk["did"] in self.devices:
+            return
+
+        device = self.init_device(
+            None, did=unk["did"], type=ZIGBEE, ieee=hex_to_ieee(uid), nwk=unk["nwk"]
+        )
+        self.add_device(device)
+
     async def silabs_process_join(self, data: dict):
-        self.debug("Process join", data=data)
+        self.debug("silabs_process_join", data=data)
         try:
             async with Session(self.host) as sh:
                 # check if model should be prevented from unpairing
@@ -133,12 +159,8 @@ class SilabsGateway(XGateway):
         except Exception as e:
             self.error("Can't handle zigbee join", exc_info=e)
 
-        device = self.devices.get(data["did"])
-        if not device:
-            self.warning("Can't find device after join")
-            return
-
-        await self.silabs_config(device)
+        if device := self.devices.get(data["did"]):
+            await self.silabs_config(device)
 
     async def silabs_config(self, device: XDevice):
         payload = {}
@@ -149,7 +171,7 @@ class SilabsGateway(XGateway):
         if not payload:
             return
 
-        self.debug("config", device=device)
+        self.debug("silabs_config", device=device)
         await self.silabs_send(device, payload)
 
     async def silabs_rejoin(self, device: XDevice):

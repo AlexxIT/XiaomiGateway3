@@ -3,7 +3,7 @@ import time
 
 from .base import XGateway
 from ..const import ZIGBEE, GATEWAY
-from ..device import XDevice, XDeviceExtra
+from ..device import XDevice, XDeviceExtra, hex_to_ieee
 from ..mini_mqtt import MQTTMessage
 from ..shell.shell_mgw import ShellMGW
 from ..shell.shell_mgw2 import ShellMGW2
@@ -23,7 +23,7 @@ class LumiGateway(XGateway):
                 extra: XDeviceExtra = {
                     "did": did,
                     "type": ZIGBEE,
-                    "ieee": as_ieee(item["mac"][2:]),  # adds leading zeroes to mac
+                    "ieee": hex_to_ieee(item["mac"]),
                     "nwk": item["shortId"],
                     "fw_ver": item["appVer"],
                     "hw_ver": item["hardVer"],
@@ -84,10 +84,3 @@ def join_params(data: dict) -> list | None:
         if k in data:
             result = result + data[k] if result else data[k]
     return result
-
-
-def as_ieee(s: str):
-    s = s.rjust(16, "0")
-    return (
-        f"{s[:2]}:{s[2:4]}:{s[4:6]}:{s[6:8]}:{s[8:10]}:{s[10:12]}:{s[12:14]}:{s[14:]}"
-    )

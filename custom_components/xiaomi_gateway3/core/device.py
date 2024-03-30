@@ -32,6 +32,13 @@ RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")  # lowercase hex with prefix 0x
 POWER_POLL = 10 * 60  # 10 minutes
 
 
+def hex_to_ieee(hex: str) -> str:
+    s = hex[2:].rjust(16, "0")
+    return (
+        f"{s[:2]}:{s[2:4]}:{s[4:6]}:{s[6:8]}:{s[8:10]}:{s[10:12]}:{s[12:14]}:{s[14:]}"
+    )
+
+
 class XDeviceExtra(TypedDict, total=False):
     # from Gateway:
     type: str  # one of GATEWAY, ZIGBEE, BLE, MESH, GROUP
