@@ -118,11 +118,13 @@ async def update_device_name(hass: HomeAssistant, cloud_device: dict):
 
 
 async def store_gateway_key(hass: HomeAssistant, config_entry: ConfigEntry):
+    options = config_entry.options
+
     # key probably OK, skip
-    if len(config_entry.options.get("key", "")) == 16:
+    key = options.get("key")
+    if not key or len(key) == 16:
         return
 
-    options = config_entry.options
     info = await core_utils.gateway_info(options["host"], options["token"])
     if not info.get("key"):
         return
