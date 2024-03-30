@@ -149,7 +149,7 @@ class MultiGateway(
                 elif cmd == "reboot":
                     await sh.reboot()
                     return True
-                elif cmd == "openmiio_reload":
+                elif cmd == "openmiio_restart":
                     await sh.exec("killall openmiio_agent")
                     await asyncio.sleep(1)
                     await self.openmiio_prepare_gateway(sh)
