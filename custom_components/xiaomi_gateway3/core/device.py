@@ -293,6 +293,10 @@ class XDevice:
             # keep alive every 15/30 min depends on device and gateway firmware
             # same for powered and battery devices
             self.available_timeout = 50 * 60
+        elif self.type == MATTER:
+            self.available_timeout = 35 * 60
+            self.poll_timeout = POWER_POLL
+            return
         elif self.type == GATEWAY:
             self.poll_timeout = POWER_POLL
             return
