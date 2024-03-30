@@ -5,6 +5,7 @@ ZIGBEE = "zigbee"
 BLE = "ble"
 MESH = "mesh"
 GROUP = "group"
+MATTER = "matter"
 
 SUPPORTED_MODELS = (
     "lumi.gateway.mgl03",

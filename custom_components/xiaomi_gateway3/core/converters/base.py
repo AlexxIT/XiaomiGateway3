@@ -47,6 +47,8 @@ class BaseConv:
             siid, piid = self.mi.split(".p.")
             cmd = {"siid": int(siid), "piid": int(piid), "value": value}
             payload.setdefault("mi_spec", []).append(cmd)
+        elif len(self.mi) == 5:
+            payload.setdefault("params", []).append({"iid": self.mi, "value": value})
         else:
             cmd = {"res_name": self.mi, "value": value}
             payload.setdefault("params", []).append(cmd)
@@ -60,6 +62,8 @@ class BaseConv:
             siid, piid = self.mi.split(".p.")
             cmd = {"siid": int(siid), "piid": int(piid)}
             payload.setdefault("mi_spec", []).append(cmd)
+        elif len(self.mi) == 5:
+            payload.setdefault("params", []).append({"iid": self.mi})
         else:
             cmd = {"res_name": self.mi}
             payload.setdefault("params", []).append(cmd)

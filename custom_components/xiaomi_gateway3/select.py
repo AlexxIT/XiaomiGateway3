@@ -2,7 +2,7 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .core import ezsp
-from .core.const import GATEWAY, ZIGBEE, MESH
+from .core.const import GATEWAY, ZIGBEE, MESH, MATTER
 from .core.gateway import MultiGateway
 from .hass import hass_utils
 from .hass.entity import XEntity
@@ -90,7 +90,7 @@ class XCommandSelect(XEntity, SelectEntity):
             if self.device.has_controls():
                 self._attr_options.append(CMD_UPDATE)
             self._attr_options += [CMD_RECONFIG, CMD_REMOVE]
-        elif self.device.type == MESH:
+        elif self.device.type in (MESH, MATTER):
             self._attr_options += [CMD_UPDATE]
 
     @property

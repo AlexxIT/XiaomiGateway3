@@ -3103,3 +3103,11 @@ DEVICES += [{
         CurtainPosConv("position"),
     ],
 }]
+
+# Matter
+DEVICES += [{
+    "matter.plug.mplug": [None, "Matter Plug"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.1.1"),
+    ],
+}]

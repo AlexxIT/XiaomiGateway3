@@ -1,11 +1,12 @@
 import asyncio
 
 from . import core_utils
-from .const import GATEWAY, ZIGBEE, MESH, GROUP
+from .const import GATEWAY, ZIGBEE, MESH, GROUP, MATTER
 from .device import XDevice
 from .gate.base import EVENT_MQTT_PUBLISH, EVENT_TIMER
 from .gate.ble import BLEGateway
 from .gate.lumi import LumiGateway
+from .gate.matter import MatterGateway
 from .gate.mesh import MeshGateway
 from .gate.miot import MIoTGateway
 from .gate.openmiio import OpenMiioGateway
@@ -14,7 +15,13 @@ from .shell.session import Session
 
 
 class MultiGateway(
-    BLEGateway, LumiGateway, MeshGateway, MIoTGateway, OpenMiioGateway, SilabsGateway
+    BLEGateway,
+    LumiGateway,
+    MatterGateway,
+    MeshGateway,
+    MIoTGateway,
+    OpenMiioGateway,
+    SilabsGateway,
 ):
     main_task: asyncio.Task | None = None
 
@@ -92,6 +99,9 @@ class MultiGateway(
                     await self.ble_read_devices(sh)
                     await self.mesh_read_devices(sh)
 
+                if info["model"] == "lumi.gateway.mgl001":
+                    await self.matter_read_devices(sh)
+
             self.add_event_listner(EVENT_MQTT_PUBLISH, self.lumi_on_mqtt_publish)
             self.add_event_listner(EVENT_MQTT_PUBLISH, self.miot_on_mqtt_publish)
             self.add_event_listner(EVENT_MQTT_PUBLISH, self.openmiio_on_mqtt_publish)
@@ -100,6 +110,9 @@ class MultiGateway(
             if hasattr(sh, "read_db_bluetooth"):
                 self.add_event_listner(EVENT_MQTT_PUBLISH, self.ble_on_mqtt_publish)
                 self.add_event_listner(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
+
+            if info["model"] == "lumi.gateway.mgl001":
+                self.add_event_listner(EVENT_MQTT_PUBLISH, self.matter_on_mqtt_publish)
 
             self.add_event_listner(EVENT_TIMER, self.openmiio_on_timer)
             self.add_event_listner(EVENT_TIMER, self.silabs_on_timer)
@@ -123,6 +136,8 @@ class MultiGateway(
                 await self.lumi_send(device, "write", data)
         elif device.type in (MESH, GROUP):
             await self.miot_send(device, "set_properties", data)
+        elif device.type == MATTER:
+            await self.matter_send(device, "set_properties_v3", data)
 
     async def read(self, device: XDevice, data: dict):
         self.debug("read", device=device, data=data)
@@ -138,6 +153,8 @@ class MultiGateway(
                 await self.lumi_send(device, "read", data)
         elif device.type == MESH:
             await self.miot_send(device, "get_properties", data)
+        elif device.type == MATTER:
+            await self.matter_send(device, "get_properties_v3", data)
 
     async def telnet_command(self, cmd: str) -> bool | None:
         self.debug("telnet_command", data=cmd)

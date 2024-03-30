@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__package__)
 
-RE_UID = re.compile(r"(0x[0-9a-f]{16}|[0-9a-f]{12}|group[0-9]+)_[0-9a-z_]+")
+RE_UID = re.compile(r"(0x[0-9a-f]{16}|[0-9a-f]{12}|[0-9a-f]{16}|[0-9]{19,})_[0-9a-z_]+")
 
 
 def attr_human_name(attr: str):

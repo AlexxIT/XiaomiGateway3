@@ -5,7 +5,7 @@ import time
 from functools import cached_property
 from typing import Callable, TYPE_CHECKING, TypedDict, Optional
 
-from .const import GATEWAY, ZIGBEE, BLE, MESH, GROUP
+from .const import GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER
 from .converters import silabs
 from .converters.base import BaseConv, decode_time, encode_time
 from .converters.lumi import LUMI_GLOBALS
@@ -107,8 +107,10 @@ class XDevice:
             return self.extra["mac"].replace(":", "")
         if "ieee" in self.extra:
             return "0x" + self.extra["ieee"].replace(":", "")
-        if "did" in self.extra:
-            return self.extra["did"].replace(".", "")
+        if self.type == GROUP:
+            return self.did[6:]
+        if self.type == MATTER:
+            return self.did[2:]
 
     @cached_property
     def type(self) -> str:
@@ -224,7 +226,7 @@ class XDevice:
     def assert_extra(self):
         """Validate some extra fields."""
         if type := self.extra.get("type"):
-            assert type in (GATEWAY, ZIGBEE, BLE, MESH, GROUP)
+            assert type in (GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER)
         if mac := self.extra.get("mac"):
             assert RE_NETWORK_MAC.match(mac), mac
         if ieee := self.extra.get("ieee"):
@@ -240,6 +242,8 @@ class XDevice:
                 assert did.isdecimal()
             elif type == GROUP:
                 assert did.startswith("group.")
+            elif type == MATTER:
+                assert did.startswith("M.")
 
     def init_defaults(self):
         # restore device setting based on cloud did
@@ -334,6 +338,8 @@ class XDevice:
             self.decode_mibeacon(payload, value)
         elif "clusterId" in value:
             self.decode_silabs(payload, value)
+        elif "iid" in value:
+            self.decode_matter(payload, value)
 
     def decode_lumi(self, payload: dict, value: dict):
         """Internal func for unpack one lumi or miio attribute."""
@@ -393,6 +399,11 @@ class XDevice:
                 if v is None and not (v := silabs.decode(value)):
                     return
                 conv.decode(self, payload, v)
+
+    def decode_matter(self, payload: dict, value: dict):
+        for conv in self.converters:
+            if conv.mi == value["iid"]:
+                conv.decode(self, payload, value["value"])
 
     def encode(self, value: dict) -> dict:
         """Encode payload to supported spec, depends on attrs.
