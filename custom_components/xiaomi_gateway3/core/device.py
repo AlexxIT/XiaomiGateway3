@@ -269,7 +269,8 @@ class XDevice:
             if info := desc.get(model):
                 self.extra["market_brand"] = info[0]
                 self.extra["market_name"] = info[1]
-                self.extra["market_model"] = ", ".join(info[2:])
+                if len(info) > 2:
+                    self.extra["market_model"] = ", ".join(info[2:])
                 break
             # if this spec for current type
             if self.type == desc.get("default"):
