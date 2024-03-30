@@ -111,11 +111,13 @@ DEVICES = [{
         # support change with remote.send_command
         BaseConv("power_tx", mi="8.0.2012"),
         BaseConv("channel", mi="8.0.2024"),
+        # other
+        BaseConv("pan_id", mi="8.0.2157"),
 
         BaseConv("command", "select"),
         BaseConv("data", "select"),
 
-        # GatewayStats
+        MapConv("led", "switch", mi="6.p.1", map={0: True, 1: False}),  # dnd mode for mgl001
     ],
 }]
 
