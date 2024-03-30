@@ -66,5 +66,6 @@ class XActionSensor(XEntity, SensorEntity):
 XEntity.NEW["sensor"] = XSensor
 XEntity.NEW["sensor.attr.action"] = XActionSensor
 XEntity.NEW["sensor.attr.ble"] = XStatsSensor
+XEntity.NEW["sensor.attr.matter"] = XStatsSensor
 XEntity.NEW["sensor.attr.mesh"] = XStatsSensor
 XEntity.NEW["sensor.attr.zigbee"] = XStatsSensor

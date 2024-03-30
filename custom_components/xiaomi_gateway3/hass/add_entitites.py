@@ -6,7 +6,7 @@ from homeassistant.helpers import device_registry, entity_registry
 
 from .entity import XEntity
 from .. import XDevice, MultiGateway
-from ..core.const import DOMAIN, GATEWAY, BLE, MESH, ZIGBEE
+from ..core.const import DOMAIN, GATEWAY, BLE, MATTER, MESH, ZIGBEE
 from ..core.converters.base import BaseConv
 from ..core.gate.base import EVENT_ADD_DEVICE, EVENT_REMOVE_DEVICE
 
@@ -66,7 +66,7 @@ def get_entities(device: XDevice, stats_domain: str = None) -> list[XEntity]:
         converters.append(BaseConv("command", "select"))
 
     # custom stats sensors
-    if stats_domain and device.type in (BLE, MESH, ZIGBEE):
+    if stats_domain and device.type in (BLE, MATTER, MESH, ZIGBEE):
         converters.append(BaseConv(device.type, stats_domain))
 
     # custom entities settings from YAML

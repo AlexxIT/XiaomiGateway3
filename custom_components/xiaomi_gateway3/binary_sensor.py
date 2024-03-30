@@ -130,5 +130,6 @@ XEntity.NEW["binary_sensor"] = XBinarySensor
 XEntity.NEW["binary_sensor.attr.gateway"] = XGatewaySensor
 XEntity.NEW["binary_sensor.attr.motion"] = XMotionSensor
 XEntity.NEW["binary_sensor.attr.ble"] = XBinaryStatsSensor
+XEntity.NEW["binary_sensor.attr.matter"] = XBinaryStatsSensor
 XEntity.NEW["binary_sensor.attr.mesh"] = XBinaryStatsSensor
 XEntity.NEW["binary_sensor.attr.zigbee"] = XBinaryStatsSensor

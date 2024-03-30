@@ -199,7 +199,7 @@ def remove_stats_entities(hass: HomeAssistant, config_entry: ConfigEntry):
         entity.entity_id
         for entity in list(registry.entities.values())
         if entity.config_entry_id == config_entry.entry_id
-        and entity.unique_id.endswith(("_ble", "_mesh", "_zigbee"))
+        and entity.unique_id.endswith(("_ble", "_matter", "_mesh", "_zigbee"))
         and entity.domain != domain
     ]
 
