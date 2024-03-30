@@ -25,9 +25,7 @@ class SilabsGateway(XGateway):
         self.ieee = info["mac"][2:].upper()
         assert len(self.ieee) == 16
 
-        # version 1.3.33 on all gateways
-        # version 1.6.5 on lumi.gateway.mcn001 fw 1.0.7
-        self.new_sdk = info["sdkVer"] > "1.3.33"
+        self.new_sdk = info["hostVer"] >= "3.14"
 
         # little delay before neighbors scan
         self.silabs_neighbors_start_ts = time.time() - 3600 + 30
