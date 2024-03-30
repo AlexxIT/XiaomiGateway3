@@ -1303,6 +1303,8 @@ DEVICES += [{
 }, {
     "default": "zigbee",  # default zigbee device
     "spec": [
+        ZModelConv("model", "sensor", entity={"category": "diagnostic", "icon": "mdi:information", "lazy": True}),
+
         ZOnOffConv("switch", "switch", ep=1, bind=True, entity=ENTITY_LAZY),
         ZOnOffConv("channel_2", "switch", ep=2, entity=ENTITY_LAZY),
         ZOnOffConv("channel_3", "switch", ep=3, entity=ENTITY_LAZY),

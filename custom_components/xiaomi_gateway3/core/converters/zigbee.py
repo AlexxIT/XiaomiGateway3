@@ -645,3 +645,8 @@ class ZCoverPos(ZConverter):
             device.nwk, self.ep or 1, self.cluster_id, self.command_id, int(value)
         )
         payload.setdefault("commands", []).extend(cmd)
+
+
+class ZModelConv(ZConverter):
+    cluster_id = Basic.cluster_id
+    attr_id = Basic.AttributeDefs.model.id

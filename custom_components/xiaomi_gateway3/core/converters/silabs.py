@@ -207,15 +207,19 @@ def zcl_deserialize(cluster_id: int, data: bytes) -> dict:
     return payload
 
 
-def value_decode(value) -> bool | int | bytes:
+def value_decode(value) -> bool | int | float | bytes | str:
     if isinstance(value, TypeValue):
         return value_decode(value.value)
     if isinstance(value, bool):
         return bool(value)
     if isinstance(value, int):
         return int(value)
+    if isinstance(value, float):
+        return float(value)
     if isinstance(value, bytes):
         return bytes(value)
+    if isinstance(value, str):
+        return str(value)
     return value
 
 
