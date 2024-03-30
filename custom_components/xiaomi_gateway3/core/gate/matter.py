@@ -43,6 +43,7 @@ class MatterGateway(XGateway):
 
         for did, params in devices.items():
             device = self.devices[did]
+            device.on_keep_alive(self, ts)
             device.on_report(params, self, ts)
             if self.stats_domain:
                 device.dispatch({MATTER: ts})
