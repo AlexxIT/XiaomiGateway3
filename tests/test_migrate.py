@@ -12,8 +12,8 @@ def test_migrate_uid():
     p = new_identifiers({(DOMAIN, "0x158d000fffffff")})
     assert p == {("xiaomi_gateway3", "0x00158d000fffffff")}
 
-    p = new_identifiers({(DOMAIN, "14ae46fffffff000")})
-    assert p == {("xiaomi_gateway3", "group1490206592031780864")}
+    p = new_identifiers({(DOMAIN, "167b9c2aea42f000")})
+    assert p == {("xiaomi_gateway3", "1620060199102640128")}
 
     p = new_identifiers(
         {(DOMAIN, "50EC50FFFFFF"), (DOMAIN, "50ec50ffffff"), ("dummy", "id")}
@@ -40,5 +40,8 @@ def test_migrate_entity_unique_id():
     p = new_unique_id("0x158d000fffffff_switch", "plug")
     assert p == "0x00158d000fffffff_plug"
 
-    p = new_unique_id("13e81ad1f34ab000_light")
-    assert p == "group1434425970349748224_light"
+    p = new_unique_id("167b9c2aea42f000_light")
+    assert p == "1620060199102640128_light"
+
+    p = new_unique_id("group1620060199102640128_light")
+    assert p == "1620060199102640128_light"

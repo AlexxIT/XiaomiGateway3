@@ -1,5 +1,4 @@
 import logging
-import re
 from datetime import datetime, UTC
 from functools import cached_property
 from typing import TYPE_CHECKING, Callable
@@ -14,7 +13,6 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import ExtraStoredData, RestoredExtraData
 from homeassistant.helpers.template import Template
-from homeassistant.util import utcnow
 
 from .entity_description import setup_entity_description
 from ..core.const import DOMAIN, GATEWAY, ZIGBEE, BLE, MESH
@@ -25,8 +23,6 @@ if TYPE_CHECKING:
     from ..core.device import XDevice
 
 _LOGGER = logging.getLogger(__package__)
-
-RE_UID = re.compile(r"(0x[0-9a-f]{16}|[0-9a-f]{12}|[0-9a-f]{16}|[0-9]{19,})_[0-9a-z_]+")
 
 
 def attr_human_name(attr: str):
@@ -78,9 +74,6 @@ class XEntity(Entity):
         self._attr_name = attr_human_name(conv.attr)
         self._attr_should_poll = False
         self._attr_unique_id = f"{device.uid}_{conv.attr}"
-
-        # check uid for valid format
-        assert RE_UID.match(self._attr_unique_id), self._attr_unique_id
 
         setup_entity_description(self, conv)
 

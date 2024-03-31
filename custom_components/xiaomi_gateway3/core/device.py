@@ -29,6 +29,9 @@ RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
 RE_ZIGBEE_IEEE = re.compile(r"^[0-9a-f:]{23}$")  # lowercase hex with colons
 RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")  # lowercase hex with prefix 0x
 
+# ZIGBEE (z2m style), GATEWAY/BLE/MESH, MATTER, GROUP
+RE_UID = re.compile(r"^(0x[0-9a-f]{16}|[0-9a-f]{12}|[0-9a-f]{16}|[0-9]{19})$")
+
 POWER_POLL = 10 * 60  # 10 minutes
 
 
@@ -232,18 +235,18 @@ class XDevice:
         if ieee := self.extra.get("ieee"):
             assert RE_ZIGBEE_IEEE.match(ieee), ieee
         if did := self.extra.get("did"):
-            if type == GATEWAY:
+            if type in (GATEWAY, MESH):
                 assert did.isdecimal()
             elif type == ZIGBEE:
                 assert did.startswith("lumi.")
             elif type == BLE:
-                assert did.startswith("blt.")  # not sure if can be isdecimal()
-            elif type == MESH:
-                assert did.isdecimal()
+                # sometimes decimal https://github.com/AlexxIT/XiaomiGateway3/issues/973
+                assert did.startswith("blt.") or did.isdecimal()
             elif type == GROUP:
                 assert did.startswith("group.")
             elif type == MATTER:
                 assert did.startswith("M.")
+        assert RE_UID.match(self.uid), self.uid
 
     def init_defaults(self):
         # restore device setting based on cloud did

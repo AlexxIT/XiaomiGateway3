@@ -274,9 +274,11 @@ def migrate_uid(uid: str) -> str:
         if uid.isupper():
             return uid.lower()
     elif len(uid) == 16:
-        # GROUP format should be "group" + big int
-        did = int.from_bytes(bytes.fromhex(uid), "big")
-        return f"group{did}"
+        if uid.endswith("000"):
+            # GROUP format should be just 19 numbers
+            return str(int.from_bytes(bytes.fromhex(uid), "big"))
+    elif uid.startswith("group"):
+        return uid[5:]
     return uid
 
 
