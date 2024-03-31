@@ -103,21 +103,22 @@ DEVICES = [{
         BaseConv("discovered_mac", mi="8.0.2110"),
         BaseConv("pair_command", mi="8.0.2111"),
         BaseConv("added_device", mi="8.0.2084"),
-        BaseConv("remove_did", mi="8.0.2082"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
 
-        # also updated from child devices OTAConv
-        BaseConv("ota_progress"),
-
-        # support change with remote.send_command
-        BaseConv("power_tx", mi="8.0.2012"),
-        BaseConv("channel", mi="8.0.2024"),
-        # other
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
         BaseConv("pan_id", mi="8.0.2157"),
 
         BaseConv("command", "select"),
         BaseConv("data", "select"),
 
-        MapConv("led", "switch", mi="6.p.1", map={0: True, 1: False}),  # dnd mode for mgl001
+        MapConv("led", "light", mi="6.p.1", map={0: True, 1: False}, entity=ENTITY_CONFIG),  # dnd mode for mgl001
+        BaseConv("brightness", mi="6.p.3"),  # works only for Multimode 2
+
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="4.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_HOLD),
     ],
 }]
 
