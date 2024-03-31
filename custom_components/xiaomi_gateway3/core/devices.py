@@ -3111,4 +3111,14 @@ DEVICES += [{
     "spec": [
         BaseConv("switch", "switch", mi="2.1.1"),
     ],
+}, {
+    "matter.light.mlight": [None, "Matter Light"],
+    "spec": [
+        BaseConv("light", "light", mi="5.1.1"),
+        BrightnessConv("brightness", mi="5.1.3"),
+        ColorTempKelvin("color_temp", mi="5.1.5", mink=1000, maxk=10000),
+        MathConv("color", "number", mi="5.1.4", min=1, max=16777215),
+        MapConv("color_mode", mi="5.1.8", map={1: "rgb", 2: "color_temp"}),
+        MapConv("power_on_state", "select", mi="5.1.7", map={0: "default", 1: "off", 2: "on"}),
+    ],
 }]
