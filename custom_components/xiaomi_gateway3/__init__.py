@@ -134,6 +134,8 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         hass_utils.migrate_legacy_devices_unique_id(hass)
         hass_utils.migrate_legacy_entitites_unique_id(hass)
         hass_utils.migrate_devices_store()
+
+        hass.config_entries.async_update_entry(config_entry, version=4)
     return True
 
 
