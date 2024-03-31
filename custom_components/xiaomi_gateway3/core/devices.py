@@ -113,7 +113,7 @@ DEVICES = [{
         BaseConv("data", "select"),
 
         MapConv("led", "light", mi="6.p.1", map={0: True, 1: False}, entity=ENTITY_CONFIG),  # dnd mode for mgl001
-        BaseConv("brightness", mi="6.p.3"),  # works only for Multimode 2
+        BrightnessConv("brightness", mi="6.p.3"),  # works only for Multimode 2
 
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="4.e.1", value=BUTTON_SINGLE),
