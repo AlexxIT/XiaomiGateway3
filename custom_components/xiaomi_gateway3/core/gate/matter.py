@@ -23,18 +23,16 @@ class MatterGateway(XGateway):
             self.add_device(device)
 
     def matter_on_mqtt_publish(self, msg: MQTTMessage):
-        # if msg.topic == "local/matter/devMsg":
-        #     if b'"properties_changed_v3"' in msg.payload:
-        #         i = msg.payload.index(b'{"method"')
-        #         data = json.loads(msg.payload[i:])
-        #         self.matter_process_devmsg(data["params"])
         if msg.topic == "local/matter/response":
-            if b"properties_changed_v3" in msg.payload:
-                i = msg.payload.index(b'{"result"')
-                data = json.loads(msg.payload[i:].rstrip(b"\x00"))
-                self.matter_process_devmsg(data["result"][0]["RPC"]["params"])
+            if b'"properties_changed_v3"' in msg.payload:
+                data = decode(msg.payload)
+                self.matter_process_properties(data["result"][0]["RPC"]["params"])
+        elif msg.topic == "local/ot/rpcReq":
+            if b'"_sync.matter_dev_status"' in msg.payload:
+                data = decode(msg.payload)
+                self.matter_process_dev_status(data["params"]["dev_list"])
 
-    def matter_process_devmsg(self, params: list[dict]):
+    def matter_process_properties(self, params: list[dict]):
         devices: dict[str, list] = {}
         for item in params:
             if item["did"] not in self.devices:
@@ -49,6 +47,18 @@ class MatterGateway(XGateway):
             device.on_report(params, self, ts)
             if self.stats_domain:
                 device.dispatch({MATTER: ts})
+
+    def matter_process_dev_status(self, data: list[dict]):
+        ts = int(time.time())
+
+        for item in data:
+            if device := self.devices.get(item["did"]):
+                if item["status"] == "online":
+                    device.extra["rssi"] = item["rssi"]
+                    device.on_keep_alive(self, ts)
+                else:
+                    device.last_seen.pop(self.device, None)
+                    device.update()
 
     async def matter_send(self, device: XDevice, payload: dict):
         assert payload["method"] in ("set_properties_v3", "get_properties_v3"), payload
@@ -65,3 +75,8 @@ def encode(pos: int, value: int | str) -> bytes:
     if isinstance(value, str):
         value = value.encode() + b"\x00"
         return len(value).to_bytes(4, "little") + bytes([pos]) + value
+
+
+def decode(data: bytes) -> dict:
+    i = data.index(b'\x00\x00\x02{"') + 3
+    return json.loads(data[i:].rstrip(b"\x00"))
