@@ -362,10 +362,9 @@ class ZTuyaPlugModeConv(ZMapConv):
 class ZTuyaButtonConfig(ZConverter):
     def config(self, device: "XDevice", payload: dict):
         # some stupid but necessary magic from zigbee2mqtt
-        cmd = zcl_read(
-            device.nwk, self.ep or 1, 6, 0x04, 0x00, 0x01, 0x05, 0x07, 0xFFFE
-        )
-        cmd += zcl_read(device.nwk, self.ep or 1, 0xE001, 0xD011)
+        for attr_id in (0x00, 0x01, 0x04, 0x05, 0x07, 0xFFFE):
+            cmd = zcl_read(device.nwk, self.ep or 1, cluster_id=6, attr_id=attr_id)
+        cmd += zcl_read(device.nwk, self.ep or 1, cluster_id=0xE001, attr_id=0xD011)
         payload.setdefault("commands", []).extend(cmd)
 
 
