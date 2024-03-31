@@ -122,39 +122,50 @@ class MultiGateway(
             self.debug("Can't prepare gateway", exc_info=e)
             return False
 
-    async def write(self, device: XDevice, data: dict):
-        self.debug("write", device=device, data=data)
+    async def send(self, device: XDevice, data: dict):
         if device.type == GATEWAY:
-            if "mi_spec" in data:
-                await self.miot_send(device, "set_properties", data)
-            else:
-                await self.lumi_send(device, "write", data)
-        elif device.type == ZIGBEE:
-            if "commands" in data:
-                await self.silabs_send(device, data)
-            else:
-                await self.lumi_send(device, "write", data)
-        elif device.type in (MESH, GROUP):
-            await self.miot_send(device, "set_properties", data)
-        elif device.type == MATTER:
-            await self.matter_send(device, "set_properties_v3", data)
+            # support multispec in lumi and miot formats
+            if "cmd" in data:
+                lumi_data = (
+                    {
+                        "cmd": data["cmd"],
+                        "did": "lumi.0",
+                        "params": [i for i in data["params"] if "res_name" in i],
+                    }
+                    if "method" in data
+                    else data
+                )
+                await self.lumi_send(device, lumi_data)
 
-    async def read(self, device: XDevice, data: dict):
-        self.debug("read", device=device, data=data)
-        if device.type == GATEWAY:
-            if "mi_spec" in data:
-                await self.miot_send(device, "get_properties", data)
-            else:
-                await self.lumi_send(device, "read", data)
+            if "method" in data:
+                miot_data = (
+                    {
+                        "method": data["method"],
+                        "params": [i for i in data["params"] if "siid" in i],
+                    }
+                    if "cmd" in data
+                    else data
+                )
+                await self.miot_send(device, miot_data)
+
         elif device.type == ZIGBEE:
+            # support multispec in lumi and silabs format
+            if "cmd" in data:
+                lumi_data = (
+                    {"cmd": data["cmd"], "did": data["did"], "params": data["params"]}
+                    if "commands" in data
+                    else data
+                )
+                await self.lumi_send(device, lumi_data)
+
             if "commands" in data:
-                await self.silabs_send(device, data)
-            else:
-                await self.lumi_send(device, "read", data)
-        elif device.type == MESH:
-            await self.miot_send(device, "get_properties", data)
+                silabs_data = {"commands": data["commands"]} if "cmd" in data else data
+                await self.silabs_send(device, silabs_data)
+
+        elif device.type in (MESH, GROUP):
+            await self.miot_send(device, data)
         elif device.type == MATTER:
-            await self.matter_send(device, "get_properties_v3", data)
+            await self.matter_send(device, data)
 
     async def telnet_command(self, cmd: str) -> bool | None:
         self.debug("telnet_command", data=cmd)

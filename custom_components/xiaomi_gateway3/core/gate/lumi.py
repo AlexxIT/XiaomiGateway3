@@ -2,7 +2,7 @@ import json
 import time
 
 from .base import XGateway
-from ..const import ZIGBEE, GATEWAY
+from ..const import ZIGBEE
 from ..device import XDevice, XDeviceExtra, hex_to_ieee
 from ..mini_mqtt import MQTTMessage
 from ..shell.shell_mgw import ShellMGW
@@ -65,17 +65,11 @@ class LumiGateway(XGateway):
         if device := self.devices.get(did):
             device.on_report(items, self, int(time.time()))
 
-    async def lumi_send(self, device: XDevice, command: str, data: dict):
-        assert command in ("write", "read")
-        assert "params" in data or "mi_spec" in data
-        did = device.did if device.type != GATEWAY else "lumi.0"
-        # key = next(i for i in ("params", "mi_spec") if i in data)
-        # for item in data[key]:
-        #     command = "write" if "value" in item else "read"
-        #     await self.mqtt.publish(
-        #         "zigbee/recv", {"cmd": command, "did": did, key: [item]}
-        #     )
-        await self.mqtt.publish("zigbee/recv", {"cmd": command, "did": did, **data})
+    async def lumi_send(self, device: XDevice, payload: dict):
+        assert payload["cmd"] in ("write", "read"), payload
+        assert "did" in payload, payload
+        assert "params" in payload or "mi_spec" in payload, payload
+        await self.mqtt.publish("zigbee/recv", payload)
 
 
 def join_params(data: dict) -> list | None:

@@ -121,7 +121,7 @@ class XDevice:
 
     @cached_property
     def did(self) -> str:
-        return self.extra["did"]
+        return self.extra.get("did")
 
     @cached_property
     def cloud_did(self) -> str | None:
@@ -230,6 +230,7 @@ class XDevice:
         """Validate some extra fields."""
         if type := self.extra.get("type"):
             assert type in (GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER)
+            assert RE_UID.match(self.uid), self.uid
         if mac := self.extra.get("mac"):
             assert RE_NETWORK_MAC.match(mac), mac
         if ieee := self.extra.get("ieee"):
@@ -246,7 +247,6 @@ class XDevice:
                 assert did.startswith("group.")
             elif type == MATTER:
                 assert did.startswith("M.")
-        assert RE_UID.match(self.uid), self.uid
 
     def init_defaults(self):
         # restore device setting based on cloud did
@@ -478,7 +478,7 @@ class XDevice:
         if (gw := self.send_gateway) and (data := self.encode(payload)):
             self.last_request_ts = time.time()
             gw.debug("write", device=self, data=payload)
-            return asyncio.create_task(gw.write(self, data))
+            return asyncio.create_task(gw.send(self, data))
 
     def read(self, attrs: set = None):
         """Send read command to device."""
@@ -488,7 +488,7 @@ class XDevice:
         if (gw := self.send_gateway) and (data := self.encode_read(attrs)):
             self.last_request_ts = time.time()
             gw.debug("read", device=self, data=attrs)
-            return asyncio.create_task(gw.read(self, data))
+            return asyncio.create_task(gw.send(self, data))
 
     def update(self, ts: int = None):
         """Update device available and state if necessary."""

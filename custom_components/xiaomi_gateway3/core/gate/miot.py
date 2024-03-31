@@ -2,7 +2,7 @@ import asyncio
 import time
 
 from .base import XGateway
-from ..const import GATEWAY, BLE, MESH
+from ..const import BLE, MESH
 from ..device import XDevice
 from ..mini_mqtt import MQTTMessage
 
@@ -76,12 +76,8 @@ class MIoTGateway(XGateway):
         if self.stats_domain and device.type in (BLE, MESH):
             device.dispatch({device.type: ts})
 
-    async def miot_send(self, device: XDevice, method: str, data: dict):
-        assert method in ("set_properties", "get_properties")
-
-        payload = {"method": method, "params": data["mi_spec"]}
-        for item in payload["params"]:
-            item["did"] = device.did
+    async def miot_send(self, device: XDevice, payload: dict):
+        assert payload["method"] in ("set_properties", "get_properties"), payload
 
         # check if we can send command via any second gateway
         gw2 = next((gw for gw in device.gateways if gw != self and gw.available), None)

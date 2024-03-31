@@ -50,18 +50,13 @@ class MatterGateway(XGateway):
             if self.stats_domain:
                 device.dispatch({MATTER: ts})
 
-    async def matter_send(self, device: XDevice, method: str, data: dict):
-        assert method in ("set_properties_v3", "get_properties_v3")
-        id = int(time.time())
-        payload = {
-            "id": id,
-            "method": method,
-            "params": [{"did": device.did, **i} for i in data["params"]],
-        }
-        payload = json.dumps(payload, separators=(",", ":"))
-        payload = encode(0, id) + encode(1, "local/ot/rpcResponse") + encode(2, payload)
-
-        await self.mqtt.publish("local/ot/rpcDown/" + method, payload)
+    async def matter_send(self, device: XDevice, payload: dict):
+        assert payload["method"] in ("set_properties_v3", "get_properties_v3"), payload
+        assert "params" in payload, payload
+        payload["id"] = id = int(time.time())
+        data = json.dumps(payload, separators=(",", ":"))
+        data = encode(0, id) + encode(1, "local/ot/rpcResponse") + encode(2, data)
+        await self.mqtt.publish("local/ot/rpcDown/" + payload["method"], data)
 
 
 def encode(pos: int, value: int | str) -> bytes:

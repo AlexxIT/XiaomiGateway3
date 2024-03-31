@@ -95,7 +95,7 @@ class XGateway:
     def remove_all_event_listners(self):
         self.listeners.clear()
 
-    def init_device(self, model: str | int, **kwargs) -> XDevice:
+    def init_device(self, model: str | int | None, **kwargs) -> XDevice:
         device = XDevice(model, **kwargs)
         self.debug("init_device", device=device, data=device.extra)
         self.devices[device.did] = device
@@ -188,8 +188,5 @@ class XGateway:
             if self in device.gateways:
                 device.update(ts)
 
-    async def write(self, device: XDevice, data: dict):
-        pass
-
-    async def read(self, device: XDevice, data: dict):
+    async def send(self, device: XDevice, data: dict):
         pass

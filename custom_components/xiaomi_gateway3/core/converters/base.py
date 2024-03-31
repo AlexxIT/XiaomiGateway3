@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from ..const import BLE, GATEWAY, MATTER, ZIGBEE
+
 if TYPE_CHECKING:
     from ..device import XDevice
 
@@ -41,32 +43,57 @@ class BaseConv:
         payload[self.attr] = value
 
     def encode(self, device: "XDevice", payload: dict, value):
-        if not self.mi:
+        if not self.mi or device.type == BLE or ".e." in self.mi:
             return
         if ".p." in self.mi:
-            siid, piid = self.mi.split(".p.")
-            cmd = {"siid": int(siid), "piid": int(piid), "value": value}
-            payload.setdefault("mi_spec", []).append(cmd)
-        elif len(self.mi) == 5:
-            payload.setdefault("params", []).append({"iid": self.mi, "value": value})
+            s, p = self.mi.split(".p.")
+            if device.type == ZIGBEE:
+                payload["cmd"] = "write"
+                payload["did"] = device.did
+                params = {"siid": int(s), "piid": int(p), "value": value}
+                payload.setdefault("mi_spec", []).append(params)
+            else:
+                payload["method"] = "set_properties"
+                params = {
+                    "did": device.did,
+                    "siid": int(s),
+                    "piid": int(p),
+                    "value": value,
+                }
+                payload.setdefault("params", []).append(params)
+        elif device.type == MATTER:
+            payload["method"] = "set_properties_v3"
+            params = {"did": device.did, "iid": self.mi, "value": value}
+            payload.setdefault("params", []).append(params)
         else:
-            cmd = {"res_name": self.mi, "value": value}
-            payload.setdefault("params", []).append(cmd)
+            payload["cmd"] = "write"
+            payload["did"] = device.did if device.type != GATEWAY else "lumi.0"
+            params = {"res_name": self.mi, "value": value}
+            payload.setdefault("params", []).append(params)
 
     def encode_read(self, device: "XDevice", payload: dict):
-        if not self.mi:
+        if not self.mi or device.type == BLE or ".e." in self.mi:
             return
-        if ".e." in self.mi:
-            return
-        elif ".p." in self.mi:
-            siid, piid = self.mi.split(".p.")
-            cmd = {"siid": int(siid), "piid": int(piid)}
-            payload.setdefault("mi_spec", []).append(cmd)
-        elif len(self.mi) == 5:
-            payload.setdefault("params", []).append({"iid": self.mi})
+        if ".p." in self.mi:
+            s, p = self.mi.split(".p.")
+            if device.type == ZIGBEE:
+                payload["cmd"] = "read"
+                payload["did"] = device.did
+                params = {"siid": int(s), "piid": int(p)}
+                payload.setdefault("mi_spec", []).append(params)
+            else:
+                payload["method"] = "get_properties"
+                params = {"did": device.did, "siid": int(s), "piid": int(p)}
+                payload.setdefault("params", []).append(params)
+        elif device.type == MATTER:
+            payload["method"] = "get_properties_v3"
+            params = {"did": device.did, "iid": self.mi}
+            payload.setdefault("params", []).append(params)
         else:
-            cmd = {"res_name": self.mi}
-            payload.setdefault("params", []).append(cmd)
+            payload["cmd"] = "read"
+            payload["did"] = device.did if device.type != GATEWAY else "lumi.0"
+            params = {"res_name": self.mi}
+            payload.setdefault("params", []).append(params)
 
 
 @dataclass
