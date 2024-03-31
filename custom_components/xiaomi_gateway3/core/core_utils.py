@@ -32,7 +32,6 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
     try:
         async with Session(host) as sh:
             info = await sh.get_miio_info()
-            info["version"] = await sh.get_version()
         info["host"] = host
         return info
     except:

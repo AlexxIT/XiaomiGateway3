@@ -77,7 +77,7 @@ class XGateway:
     def error(self, msg: str, exc_info=None):
         self.base_log.error({"msg": msg}, exc_info=exc_info)
 
-    def add_event_listner(self, event: str, handler: Callable):
+    def add_event_listener(self, event: str, handler: Callable):
         listeners = self.listeners.setdefault(event, [])
         # protection from adding handler two times
         if any(i == handler for i in listeners):

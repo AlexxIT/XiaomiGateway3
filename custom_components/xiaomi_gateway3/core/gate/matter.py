@@ -11,8 +11,6 @@ from ..shell.shell_mgw2 import ShellMGW2
 class MatterGateway(XGateway):
     async def matter_read_devices(self, sh: ShellMGW2):
         raw = await sh.read_file("/data/matter/certification/device.json")
-        if not raw.startswith(b"["):
-            return
         for item in json.loads(raw):
             did = item["did"]
             device = self.devices.get(did)

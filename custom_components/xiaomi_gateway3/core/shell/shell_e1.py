@@ -40,6 +40,7 @@ class ShellE1(ShellBase):
             "model": props["model"],
             "token": props["miio_dtoken"].encode().hex(),
             "lan_mac": props.get("lan_mac"),
+            "version": await self.get_version()
         }
 
     async def read_xiaomi_did(self) -> dict[str, str]:

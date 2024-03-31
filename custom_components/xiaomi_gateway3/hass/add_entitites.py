@@ -52,8 +52,8 @@ def handle_add_entities(
 
             CONFIG_ENTRIES.pop(device.did)
 
-    gw.add_event_listner(EVENT_ADD_DEVICE, add_device)
-    gw.add_event_listner(EVENT_REMOVE_DEVICE, remove_device)
+    gw.add_event_listener(EVENT_ADD_DEVICE, add_device)
+    gw.add_event_listener(EVENT_REMOVE_DEVICE, remove_device)
 
 
 def get_entities(device: XDevice, stats_domain: str = None) -> list[XEntity]:

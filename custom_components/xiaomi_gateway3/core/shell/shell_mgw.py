@@ -51,6 +51,7 @@ class ShellMGW(ShellBase):
         m = re.findall(r"(did|key|mac|model)=(\S+)", raw.decode())
         props: dict[str, str] = dict(m)
         props["token"] = await self.get_token()
+        props["version"] = await self.get_version()
         return props
 
     db: SQLite = None

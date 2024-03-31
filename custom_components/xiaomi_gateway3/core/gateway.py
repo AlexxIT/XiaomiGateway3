@@ -79,43 +79,45 @@ class MultiGateway(
                     return False
 
                 info = await sh.get_miio_info()
-                info["version"] = await sh.get_version()
+                model, fw = info["model"], info["version"]
 
-                if (
-                    info["model"] == "lumi.gateway.mgl03"
-                    and info["version"] < "1.4.7_0160"
-                ):
+                if model == "lumi.gateway.mgl03" and fw < "1.4.7_0160":
                     self.error(f"Unsupported firmware: {info}")
                     return False
 
-                # base and zigbee
+                support_ble_mesh = model in (
+                    "lumi.gateway.mgl03",
+                    "lumi.gateway.mcn001",
+                    "lumi.gateway.mgl001",
+                )
+                support_matter = model == "lumi.gateway.mgl001" and fw >= "1.0.7_0019"
+
                 await self.base_read_device(info)
                 await self.lumi_read_devices(sh)
                 await self.silabs_read_device(sh)
                 await self.openmiio_prepare_gateway(sh)
 
-                # ble and mesh
-                if hasattr(sh, "read_db_bluetooth"):
+                if support_ble_mesh:
                     await self.ble_read_devices(sh)
                     await self.mesh_read_devices(sh)
 
-                if info["model"] == "lumi.gateway.mgl001":
+                if support_matter:
                     await self.matter_read_devices(sh)
 
-            self.add_event_listner(EVENT_MQTT_PUBLISH, self.lumi_on_mqtt_publish)
-            self.add_event_listner(EVENT_MQTT_PUBLISH, self.miot_on_mqtt_publish)
-            self.add_event_listner(EVENT_MQTT_PUBLISH, self.openmiio_on_mqtt_publish)
-            self.add_event_listner(EVENT_MQTT_PUBLISH, self.silabs_on_mqtt_publish)
+            self.add_event_listener(EVENT_MQTT_PUBLISH, self.lumi_on_mqtt_publish)
+            self.add_event_listener(EVENT_MQTT_PUBLISH, self.miot_on_mqtt_publish)
+            self.add_event_listener(EVENT_MQTT_PUBLISH, self.openmiio_on_mqtt_publish)
+            self.add_event_listener(EVENT_MQTT_PUBLISH, self.silabs_on_mqtt_publish)
 
-            if hasattr(sh, "read_db_bluetooth"):
-                self.add_event_listner(EVENT_MQTT_PUBLISH, self.ble_on_mqtt_publish)
-                self.add_event_listner(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
+            if support_ble_mesh:
+                self.add_event_listener(EVENT_MQTT_PUBLISH, self.ble_on_mqtt_publish)
+                self.add_event_listener(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
 
-            if info["model"] == "lumi.gateway.mgl001":
-                self.add_event_listner(EVENT_MQTT_PUBLISH, self.matter_on_mqtt_publish)
+            if support_matter:
+                self.add_event_listener(EVENT_MQTT_PUBLISH, self.matter_on_mqtt_publish)
 
-            self.add_event_listner(EVENT_TIMER, self.openmiio_on_timer)
-            self.add_event_listner(EVENT_TIMER, self.silabs_on_timer)
+            self.add_event_listener(EVENT_TIMER, self.openmiio_on_timer)
+            self.add_event_listener(EVENT_TIMER, self.silabs_on_timer)
 
             return True
         except Exception as e:
