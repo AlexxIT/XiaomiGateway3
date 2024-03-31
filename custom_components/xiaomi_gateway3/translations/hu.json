@@ -78,7 +78,7 @@
           "pair": "Zigbee párosítás",
           "bind": "Zigbee rögzítés",
           "ota": "Zigbee OTA",
-          "config": "Zigbee újrakonfigurálása",
+          "reconfig": "Zigbee újrakonfigurálása",
           "parent_scan": "Zigbee szkennelés",
           "firmware_lock": "Központi egység firmware verziójának rögzítése",
           "reboot": "Központi egység újraindítása",

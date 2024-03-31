@@ -74,7 +74,7 @@
           "force_pair": "Zigbee force pairing",
           "bind": "Zigbee binding",
           "ota": "Zigbee OTA",
-          "config": "Zigbee reconfig",
+          "reconfig": "Zigbee reconfig",
           "parent_scan": "Zigbee parent scan",
           "firmware_lock": "Gateway firmware lock",
           "reboot": "Gateway reboot",
@@ -84,7 +84,7 @@
           "disable": "Gateway disable",
           "enable": "Gateway enable",
           "rejoin": "Zigbee rejoin",
-          "remove": "Device delete"
+          "remove": "Zigbee delete"
         }
       },
       "data": {

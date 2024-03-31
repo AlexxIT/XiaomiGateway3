@@ -73,7 +73,7 @@
             "force_pair": "Принудительное сопряжение Zigbee",
             "bind": "Привязка Zigbee",
             "ota": "Zigbee OTA",
-            "config": "Переконфигурация Zigbee",
+            "reconfig": "Переконфигурация Zigbee",
             "parent_scan": "Сканирование родительских устройств Zigbee",
             "firmware_lock": "Блокировка прошивки шлюза",
             "reboot": "Перезагрузка шлюза",
