@@ -127,42 +127,38 @@ class MultiGateway(
     async def send(self, device: XDevice, data: dict):
         if device.type == GATEWAY:
             # support multispec in lumi and miot formats
-            if "cmd" in data:
-                lumi_data = (
-                    {
-                        "cmd": data["cmd"],
-                        "did": "lumi.0",
-                        "params": [i for i in data["params"] if "res_name" in i],
-                    }
-                    if "method" in data
-                    else data
-                )
+            if "cmd" in data and "method" in data:
+                lumi_data = {
+                    "cmd": data["cmd"],
+                    "did": "lumi.0",
+                    "params": [i for i in data["params"] if "res_name" in i],
+                }
+                miot_data = {
+                    "method": data["method"],
+                    "params": [i for i in data["params"] if "siid" in i],
+                }
                 await self.lumi_send(device, lumi_data)
-
-            if "method" in data:
-                miot_data = (
-                    {
-                        "method": data["method"],
-                        "params": [i for i in data["params"] if "siid" in i],
-                    }
-                    if "cmd" in data
-                    else data
-                )
                 await self.miot_send(device, miot_data)
+            elif "cmd" in data:
+                await self.lumi_send(device, data)
+            elif "method" in data:
+                await self.miot_send(device, data)
 
         elif device.type == ZIGBEE:
             # support multispec in lumi and silabs format
-            if "cmd" in data:
-                lumi_data = (
-                    {"cmd": data["cmd"], "did": data["did"], "params": data["params"]}
-                    if "commands" in data
-                    else data
-                )
+            if "cmd" in data and "commands" in data:
+                lumi_data = {
+                    "cmd": data["cmd"],
+                    "did": data["did"],
+                    "params": data["params"],
+                }
+                silabs_data = {"commands": data["commands"]}
                 await self.lumi_send(device, lumi_data)
-
-            if "commands" in data:
-                silabs_data = {"commands": data["commands"]} if "cmd" in data else data
                 await self.silabs_send(device, silabs_data)
+            elif "cmd" in data:
+                await self.lumi_send(device, data)
+            elif "commands" in data:
+                await self.silabs_send(device, data)
 
         elif device.type in (MESH, GROUP):
             await self.miot_send(device, data)
