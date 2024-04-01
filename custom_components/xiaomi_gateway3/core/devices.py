@@ -1781,7 +1781,6 @@ DEVICES += [{
     955: [None, "Lock M2", "ydhome.lock.m2silver"],
     982: ["Xiaomi", "Qingping Door Sensor", "CGH1", "cgllc.magnet.hodor"],
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM", "zimi.mosq.v1"],
-    1161: ["Xiaomi", "Toothbrush T500", "MES601"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1001
     1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM", "lumi.lock.bzacn2"],
