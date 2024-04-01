@@ -1442,7 +1442,7 @@ DEVICES += [{
     "spec": [
         ConstConv("motion", "binary_sensor", mi=15, value=True),
         BLEMapConv("light", "binary_sensor", mi=15, map={"000000": False, "000100": True}),  # 0 - moving no light, 256 - moving with light
-        BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),
+        BLEByteConv("battery", "sensor", mi=4106),
         BLEMathConv("idle_time", "sensor", mi=4119),
         BLEMapConv("light", mi=4120, map={"00": False, "01": True}),
     ],
