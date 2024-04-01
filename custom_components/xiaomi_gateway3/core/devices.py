@@ -1383,6 +1383,14 @@ DEVICES += [{
     ],
     "ttl": "12h",
 }, {
+    1161: ["Xiaomi", "Toothbrush T500", "MES601"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        BLEByteConv("battery", "sensor", mi=4106),  # uint8
+        BLEByteConv("supply", "sensor", mi=4115),  # uint8, Remaining percentage, range 0~100
+        BLEToothbrush("toothbrush", mi=16),
+    ],
+}, {
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD", "jiqid.robot.cube"],  # 4097
     "spec": [
         BLEMapConv("action", "sensor", mi=4097, map={"000000": "right", "010000": "left"}),
