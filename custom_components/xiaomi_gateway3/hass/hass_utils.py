@@ -60,7 +60,7 @@ async def store_devices(hass: HomeAssistant):
 
 def get_cloud_gateways(hass: HomeAssistant) -> list[dict]:
     gateways = []
-    for item in hass.data[DOMAIN].values():
+    for item in hass.data.get(DOMAIN, {}).values():
         if isinstance(item, MiCloud) and item.devices:
             gateways += [i for i in item.devices if i["model"] in SUPPORTED_MODELS]
     return gateways
