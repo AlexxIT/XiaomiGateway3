@@ -147,11 +147,11 @@ class MultiGateway(
         elif device.type == ZIGBEE:
             # support multispec in lumi and silabs format
             if "cmd" in data and "commands" in data:
-                lumi_data = {
-                    "cmd": data["cmd"],
-                    "did": data["did"],
-                    "params": data["params"],
-                }
+                lumi_data = {"cmd": data["cmd"], "did": data["did"]}
+                if "params" in data:
+                    lumi_data["params"] = data["params"]
+                if "mi_spec" in data:
+                    lumi_data["mi_spec"] = data["mi_spec"]
                 silabs_data = {"commands": data["commands"]}
                 await self.lumi_send(device, lumi_data)
                 await self.silabs_send(device, silabs_data)
