@@ -219,8 +219,9 @@ DEVICES += [{
         ButtonConv("button_1", mi="13.1.85"),
         ButtonConv("button_2", mi="13.2.85"),
         ButtonConv("button_both", mi="13.5.85"),
-        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
         BoolConv("interlock", "switch", mi="4.9.85", entity=ENTITY_CONFIG),
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
     ],
 }, {
     "lumi.ctrl_neutral2": ["Aqara", "Double Wall Switch (no N)", "QBKG03LM"],
