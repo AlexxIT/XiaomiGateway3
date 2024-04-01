@@ -24,6 +24,9 @@ def handle_add_entities(
             return
 
         if device.did not in CONFIG_ENTRIES:
+            # connect all device entities to this gateway
+            CONFIG_ENTRIES[device.did] = gw
+
             # instant setup all entities, except lazy
             for entity in get_entities(device, gw.stats_domain):
                 gw.debug("add_entity", device=device, entity=entity.entity_id)
@@ -32,9 +35,6 @@ def handle_add_entities(
             # add listener for setup lazy entities (if device has them)
             if remove_listener := handle_lazy_entities(hass, config_entry, device):
                 lazy_listeners[device.did] = remove_listener
-
-            # connect all device entities to this gateway
-            CONFIG_ENTRIES[device.did] = gw
         else:
             # device already added to another config entry (gateway)
             # so we add device to the current config entry
@@ -109,28 +109,48 @@ def handle_lazy_entities(
     hass: HomeAssistant, config_entry: ConfigEntry, device: XDevice
 ):
     """Create entities only when first data arrived."""
+    # 1. Check if device has lazy entities
     lazy_attrs = {
         i.attr for i in device.converters if i.entity and i.entity.get("lazy")
     }
+    # 2. Exit if none
+    if not lazy_attrs:
+        return None
+
+    def add_lazy_entity(attr: str) -> XEntity:
+        lazy_attrs.remove(attr)
+
+        conv = next(i for i in device.converters if i.attr == attr)
+        entity = create_entity(device, conv)
+
+        gw = CONFIG_ENTRIES.get(device.did)
+        gw.debug("add_lazy_entity", device=device, entity=entity.entity_id)
+        add_entity(hass, config_entry, entity)
+        return entity
+
+    # 3. Restore previous lazy entities from Hass entity registry
+    prefix = device.uid + "_"
+    reg = entity_registry.async_get(hass)
+    for entry in reg.entities.values():
+        if entry.platform != DOMAIN or not entry.unique_id.startswith(prefix):
+            continue
+        _, attr = entry.unique_id.split("_", 1)
+        if attr in lazy_attrs:
+            add_lazy_entity(attr)
+
+    # 4. Exit if none left
     if not lazy_attrs:
         return None
 
     def on_device_update(data: dict):
         for attr in data.keys() & lazy_attrs:
-            lazy_attrs.remove(attr)
-
-            conv = next(i for i in device.converters if i.attr == attr)
-            entity = create_entity(device, conv)
+            entity = add_lazy_entity(attr)
             entity.on_device_update(data)
-
-            gw = CONFIG_ENTRIES.get(device.did)
-            gw.debug("add_lazy_entity", device=device, entity=entity.entity_id)
-
-            add_entity(hass, config_entry, entity)
 
             if not lazy_attrs:
                 device.remove_listener(on_device_update)
 
+    # 5. Wait for rest lazy entities in every message from the device
     device.add_listener(on_device_update)
     return lambda: device.remove_listener(on_device_update)
 
