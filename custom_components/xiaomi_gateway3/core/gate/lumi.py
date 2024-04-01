@@ -67,9 +67,12 @@ class LumiGateway(XGateway):
 
     async def lumi_send(self, device: XDevice, payload: dict):
         assert payload["cmd"] in ("write", "read"), payload
-        assert "did" in payload, payload
-        assert "params" in payload or "mi_spec" in payload, payload
-        await self.mqtt.publish("zigbee/recv", payload)
+        for item in payload.get("params", []):
+            data = {"cmd": payload["cmd"], "did": payload["did"], "params": [item]}
+            await self.mqtt.publish("zigbee/recv", data)
+        for item in payload.get("mi_spec", []):
+            data = {"cmd": payload["cmd"], "did": payload["did"], "mi_spec": [item]}
+            await self.mqtt.publish("zigbee/recv", data)
 
 
 def join_params(data: dict) -> list | None:

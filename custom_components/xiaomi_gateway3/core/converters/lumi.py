@@ -46,6 +46,9 @@ class ButtonConv(BaseConv):
         elif self.attr.startswith("button"):
             payload["action"] = self.attr + "_" + BUTTON.get(value, UNKNOWN)
 
+    def encode_read(self, device: "XDevice", payload: dict):
+        pass
+
 
 class VibrationConv(BaseConv):
     def decode(self, device: "XDevice", payload: dict, value: int):
