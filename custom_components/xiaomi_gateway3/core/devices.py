@@ -50,8 +50,8 @@ Recommended attributes names:
 - `led` - control device led light
 - `wireless` - change mode from wired to wireless (decoupled)
 - `power_on_state` - default state when electricity is supplied
-- `contact` - for contact sensor
-- `moisture` - for water leak sensor
+- `contact` - for door/windor sensor (zigbee2mqtt - contact, hass - door or window)
+- `water_leak` - for water leak sensor (zigbee2mqtt - water_leak, hass - moisture)
 
 Nice project with MIoT spec description: https://home.miot-spec.com/
 """

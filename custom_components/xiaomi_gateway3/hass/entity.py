@@ -69,7 +69,6 @@ class XEntity(Entity):
             hw_version=device.extra.get("hw_ver"),
             via_device=via_device,
         )
-        # self._attr_entity_registry_enabled_default = conv.enabled in (True, None)
         self._attr_has_entity_name = True
         self._attr_name = attr_human_name(conv.attr)
         self._attr_should_poll = False
@@ -77,8 +76,13 @@ class XEntity(Entity):
 
         setup_entity_description(self, conv)
 
-        entity_name = device.extra.get("entity_name") or device.uid
-        self.entity_id = f"{conv.domain}.{entity_name}_{conv.attr}"
+        if entity_name := device.extra.get("entity_name"):
+            if entity_name.endswith(conv.attr):
+                self.entity_id = f"{conv.domain}.{entity_name}"
+            else:
+                self.entity_id = f"{conv.domain}.{entity_name}_{conv.attr}"
+        else:
+            self.entity_id = f"{conv.domain}.{device.uid}_{conv.attr}"
 
         self.on_init()
 
