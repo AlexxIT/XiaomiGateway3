@@ -28,9 +28,11 @@ class MatterGateway(XGateway):
                 data = decode(msg.payload)
                 self.matter_process_properties(data["result"][0]["RPC"]["params"])
         elif msg.topic == "local/ot/rpcReq":
+            # {"method":"_sync.matter_dev_status","params":{"dev_list":null}}
             if b'"_sync.matter_dev_status"' in msg.payload:
                 data = decode(msg.payload)
-                self.matter_process_dev_status(data["params"]["dev_list"])
+                if dev_list := data["params"].get("dev_list"):
+                    self.matter_process_dev_status(dev_list)
 
     def matter_process_properties(self, params: list[dict]):
         devices: dict[str, list] = {}
