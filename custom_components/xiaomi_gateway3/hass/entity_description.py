@@ -41,7 +41,7 @@ ENTITY_KEYS = {
     "mode": "_attr_mode",  # NumberMode
     "name": "_attr_name",
     "poll": "_attr_should_poll",
-    "stats": "_attr_state_class",
+    "statistics": "_attr_state_class",
     "units": "_attr_native_unit_of_measurement",
     "visible": "_attr_entity_registry_visible_default",
 }
@@ -153,7 +153,7 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     },
     "sensor.energy": {
         "class": SENSOR.ENERGY,
-        "stats": SensorStateClass.TOTAL,
+        "statistics": SensorStateClass.TOTAL,
         "units": UnitOfEnergy.KILO_WATT_HOUR,
     },
     ##
@@ -228,5 +228,14 @@ def setup_entity_description(entity: Entity, conv: BaseConv) -> bool:
         if k == "category":
             v = EntityCategory(v)
         setattr(entity, ENTITY_KEYS.get(k) or k, v)
+
+    # sensor with unit_of_measurement and without state_class will be MEASUREMENT
+    # https://developers.home-assistant.io/docs/core/entity/sensor/#long-term-statistics
+    if (
+        conv.domain == "sensor"
+        and hasattr(entity, "_attr_native_unit_of_measurement")
+        and not hasattr(entity, "_attr_state_class")
+    ):
+        setattr(entity, "_attr_state_class", SensorStateClass.MEASUREMENT)
 
     return True
