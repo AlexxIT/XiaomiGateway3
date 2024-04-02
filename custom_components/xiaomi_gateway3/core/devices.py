@@ -1402,6 +1402,7 @@ DEVICES += [{
         BaseConv("action", "sensor"),
         BLEFinger("fingerprint", mi=6),
         BLEDoor("door", mi=7),
+        BLEMapConv("action", mi=8, map={"00": "disarmed", "01": "armed"}),
         BLELock("lock", mi=11),
         BaseConv("contact", "binary_sensor"),  # from mi=7
         BLEByteConv("battery", "sensor", mi=4106),
