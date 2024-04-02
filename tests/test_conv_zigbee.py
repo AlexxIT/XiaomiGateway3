@@ -59,6 +59,8 @@ def test_ikea_cover():
             {"commandcli": "send 0x1234 1 1"},
             {"commandcli": "zcl global read 1 33"},
             {"commandcli": "send 0x1234 1 1"},
+            {"commandcli": "zcl global read 1 32"},
+            {"commandcli": "send 0x1234 1 1"},
         ]
     }
 
@@ -156,7 +158,7 @@ def test_aqara_bulb():
 
 
 def test_unknown_device():
-    device = XDevice("dummy", type=ZIGBEE)
+    device = XDevice("dummy", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa")
     p = decode(device, {"clusterId": "0x0400", "APSPlayload": "0x18610A0000211F00"})
     assert p == {"illuminance": 31}
     p = decode(device, {"clusterId": "0x0402", "APSPlayload": "0x18020A0000298C07"})
@@ -182,6 +184,6 @@ def test_error():
     p = silabs.decode(payload)
     assert p == {"cluster": "power", "general_command_id": 1, 33: None}
 
-    device = XDevice("dummy", type=ZIGBEE)
+    device = XDevice("dummy", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa")
     p = decode(device, payload)
     assert p == {}

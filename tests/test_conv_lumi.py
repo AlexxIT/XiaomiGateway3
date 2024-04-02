@@ -265,13 +265,13 @@ def test_lumi_encode():
     device = XDevice("lumi.plug")
 
     p = device.encode({"plug": True})
-    assert p == {"params": [{"res_name": "4.1.85", "value": 1}]}
+    assert p["params"] == [{"res_name": "4.1.85", "value": 1}]
 
     device = XDevice("lumi.switch.l0agl1")
     assert device.market_name == "Aqara Relay T1 EU (no N)"
 
     p = device.encode({"switch": True})
-    assert p == {"mi_spec": [{"siid": 2, "piid": 1, "value": True}]}
+    assert p["params"] == [{"did": None, "siid": 2, "piid": 1, "value": True}]
 
 
 def test_lumi_curtain():
@@ -285,10 +285,10 @@ def test_lumi_curtain():
     assert p == {"position": 100}
 
     p = device.encode({"motor": "stop"})
-    assert p == {"params": [{"res_name": "14.2.85", "value": 2}]}
+    assert p["params"] == [{"res_name": "14.2.85", "value": 2}]
 
     p = device.encode({"position": 48})
-    assert p == {"params": [{"res_name": "1.1.85", "value": 48}]}
+    assert p["params"] == [{"res_name": "1.1.85", "value": 48}]
 
 
 def test_mi_curtain():
@@ -327,10 +327,10 @@ def test_mi_curtain():
     assert p == {"motor": "close"}
 
     p = device.encode({"motor": "open"})
-    assert p == {"mi_spec": [{"siid": 2, "piid": 2, "value": 2}]}
+    assert p["params"] == [{"did": None, "siid": 2, "piid": 2, "value": 2}]
 
     p = device.encode({"position": 60})
-    assert p == {"mi_spec": [{"siid": 2, "piid": 4, "value": 60}]}
+    assert p["params"] == [{"did": None, "siid": 2, "piid": 4, "value": 60}]
 
 
 def test_gateway():
@@ -377,10 +377,10 @@ def test_aqara_dnd_time():
     assert p == {"led_dnd_time": "22:00-09:07"}
 
     p = device.encode({"led_dnd_time": "22:00-09:07"})
-    assert p == {"mi_spec": [{"siid": 6, "piid": 3, "value": 118030358}]}
+    assert p["params"] == [{"did": None, "siid": 6, "piid": 3, "value": 118030358}]
 
     p = device.encode({"led_dnd_time": "23:59-23:59"})
-    assert p == {"mi_spec": [{"siid": 6, "piid": 3, "value": 991378199}]}
+    assert p["params"] == [{"did": None, "siid": 6, "piid": 3, "value": 991378199}]
 
     p = device.decode([{"piid": 3, "siid": 6, "value": 991378199}])
     assert p == {"led_dnd_time": "23:59-23:59"}

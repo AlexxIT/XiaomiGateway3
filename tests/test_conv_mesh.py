@@ -11,7 +11,7 @@ def test_es1():
     assert p == {"induction_range": "0+0.8_1.5+2.3_3.0_3.8_4.5_5.3_6"}
 
     p = device.encode({"induction_range": "0+0.8+1.5+2.3+3.0_3.8_4.5_5.3_6"})
-    assert p == {"mi_spec": [{"piid": 2, "siid": 3, "value": 15}]}
+    assert p["params"] == [{"did": None, "piid": 2, "siid": 3, "value": 15}]
 
 
 def test_11724():
@@ -21,4 +21,4 @@ def test_11724():
     assert p == {"night_light_time": "23:59-10:44"}
 
     p = device.encode({"night_light_time": "23:59-10:44"})
-    assert p == {"mi_spec": [{"siid": 3, "piid": 16, "value": 23591044}]}
+    assert p["params"] == [{"did": None, "siid": 3, "piid": 16, "value": 23591044}]
