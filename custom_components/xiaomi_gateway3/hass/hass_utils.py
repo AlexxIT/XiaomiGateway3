@@ -24,9 +24,8 @@ _LOGGER = logging.getLogger(__package__)
 
 def fix_yaml_devices_config(value: dict):
     for uid, config in list(value.items()):
-        new_uid = f"0x{uid:016x}" if isinstance(uid, int) else uid.lower()
-        if uid != new_uid:
-            value[new_uid] = value.pop(uid)
+        if isinstance(uid, int) and uid > 100_000:  # fix uid as int
+            value[f"0x{uid:016x}"] = value.pop(uid)
         for k, v in config.items():
             if isinstance(v, dict):
                 config[k] = dict(v)  # fix NodeDictClass
