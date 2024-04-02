@@ -140,6 +140,12 @@ def test_1694():
         "message": "Match successful",
     }
 
+    p = device.decode({"eid": 8, "edata": "01"})
+    assert p == {"action": "armed"}
+
+    p = device.decode({"eid": 8, "edata": "00"})
+    assert p == {"action": "disarmed"}
+
 
 def test_9095():
     device = XDevice(9095)
