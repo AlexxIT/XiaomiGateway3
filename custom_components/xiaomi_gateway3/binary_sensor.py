@@ -1,11 +1,11 @@
 import asyncio
 import time
+from datetime import datetime, UTC
 from functools import cached_property
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.script import ATTR_LAST_TRIGGERED
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.util import utcnow
 
 from .hass.entity import XEntity, XStatsEntity
 
@@ -54,13 +54,14 @@ class XBinaryStatsSensor(XStatsEntity, BinarySensorEntity):
 
 class XMotionSensor(XEntity, BinarySensorEntity):
     """Smart motion sensor with custom occupancy_timeout."""
-    _unrecorded_attributes = {ATTR_LAST_TRIGGERED}
 
     _attr_is_on: bool = False
-    _last_on: float = 0
-    _last_off: float = 0
-    _timeout_pos: int = 0
-    _clear_task: asyncio.Task = None
+    _unrecorded_attributes = {ATTR_LAST_TRIGGERED}
+
+    clear_task: asyncio.Task = None
+    last_off_ts: float = 0
+    last_on_ts: float = 0
+    next_occupancy_timeout_pos: int = 0
 
     def on_init(self):
         self._attr_extra_state_attributes = {}
@@ -78,28 +79,30 @@ class XMotionSensor(XEntity, BinarySensorEntity):
 
         # don't trigger motion right after illumination
         ts = time.time()
-        if ts - self._last_on < 1:
+        if ts - self.last_on_ts < 1:
             return
 
-        if self._clear_task:
-            self._clear_task.cancel()
+        if self.clear_task:
+            self.clear_task.cancel()
+
+        utcnow = datetime.fromtimestamp(ts, UTC)
 
         self._attr_is_on = True
-        self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = utcnow()
-        self._last_on = ts
+        self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = utcnow
+        self.last_on_ts = ts
 
         if timeout := self.occupancy_timeout:
             if isinstance(timeout, list):
-                pos = min(self._timeout_pos, len(timeout) - 1)
-                delay = timeout[pos]
-                self._timeout_pos += 1
+                delay = timeout[self.next_occupancy_timeout_pos]
+                if self.next_occupancy_timeout_pos + 1 < len(timeout):
+                    self.next_occupancy_timeout_pos += 1
             else:
                 delay = timeout
 
-            if delay < 0 and ts + delay < self._last_off:
+            if delay < 0 and ts + delay < self.last_off_ts:
                 delay *= 2
 
-            self._clear_task = self.hass.loop.create_task(
+            self.clear_task = self.hass.loop.create_task(
                 self.async_clear_state(abs(delay))
             )
 
@@ -109,15 +112,15 @@ class XMotionSensor(XEntity, BinarySensorEntity):
     async def async_clear_state(self, delay: float):
         await asyncio.sleep(delay)
 
-        self._last_off = time.time()
-        self._timeout_pos = 0
+        self.last_off_ts = time.time()
+        self.next_occupancy_timeout_pos = 0
 
         self._attr_is_on = False
         self._async_write_ha_state()
 
     async def async_will_remove_from_hass(self):
-        if self._clear_task:
-            self._clear_task.cancel()
+        if self.clear_task:
+            self.clear_task.cancel()
 
         if self._attr_is_on:
             self._attr_is_on = False
