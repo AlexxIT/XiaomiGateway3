@@ -472,6 +472,8 @@ Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them 
 
 ## Zigbee2MQTT Mode
 
+**IMPORTANT**. According to real user reviews zigbee2mqtt does not work well with EFR32 chips. More positive feedback when working with ZHA.
+
 [Zigbee2MQTT](https://www.zigbee2mqtt.io/) is a bigest project that support [hundreds](https://www.zigbee2mqtt.io/information/supported_devices.html) Zigbee devices from different vendors. And can be integrate with a lot of home automation projects.
 
 **Note:** The zigbee chip of this gateway (EFR32 EZSP) is supported in zigbee2mqtt in [experimental mode](https://www.zigbee2mqtt.io/guide/adapters/#experimental).
