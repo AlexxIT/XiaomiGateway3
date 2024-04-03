@@ -82,3 +82,17 @@ def test_buttons():
     device = XDevice(1946)
     p = get_actions(device.human_model)
     assert p == ["button_1_single", "button_2_single"]
+
+
+def test_buttons_6473():
+    device = XDevice(6473)
+    p = get_actions(device.human_model)
+    assert p == [
+        "button_1_single",
+        "button_2_single",
+        "button_both_single",
+        "button_1_double",
+        "button_2_double",
+        "button_1_hold",
+        "button_2_hold",
+    ]

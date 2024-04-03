@@ -17,7 +17,7 @@ from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from .core.const import DOMAIN
-from .core.converters.base import BaseConv, ConstConv
+from .core.converters.base import BaseConv, ConstConv, MapConv
 from .core.converters.const import (
     BUTTON_SINGLE,
     BUTTON_DOUBLE,
@@ -52,7 +52,9 @@ def get_actions(human_model: str) -> list[str] | None:
                         if conv.attr == "action":
                             if isinstance(conv, ConstConv):
                                 actions.append(conv.value)
-                            if isinstance(conv, BLEMapConv):
+                            elif isinstance(conv, MapConv):
+                                actions += list(conv.map.values())
+                            elif isinstance(conv, BLEMapConv):
                                 actions += list(conv.map.values())
                         elif conv.attr == "button":
                             actions += BUTTONS
