@@ -14,9 +14,7 @@ Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Ga
 | Xiaomi Gateway 2 (CN)           | DGNWG02LM             | **no**, [goto][1] |
 | Xiaomi Gateway (EU)             | DGNWG05LM             | **no**, [goto][2] |
 
-**Other.** Aqara Hub E1 (EU), Aqara G2H (CN), Aqara H1 (CN), Aqara M1S (CN), Aqara M2 (
-CN), Aqara P3 (CN) | HE1-G01, ZNSXJ12LM, QBCZWG11LM, ZHWG15LM, ZHWG12LM, KTBL12LM - **no
-**, [goto][3]
+**Other.** Aqara Hub E1 (EU), Aqara G2H (CN), Aqara H1 (CN), Aqara M1S (CN), Aqara M2 (CN), Aqara P3 (CN) | HE1-G01, ZNSXJ12LM, QBCZWG11LM, ZHWG15LM, ZHWG12LM, KTBL12LM - **no**, [goto][3]
 
 [1]: https://www.home-assistant.io/integrations/xiaomi_aqara/
 [2]: https://openlumi.github.io/
@@ -63,21 +61,33 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 | Xiaomi Multimode Gateway (CN/EU)   | 1.5.5 - 1.5.6 | Token and Key |
 | Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.7         | Token and Key |
 
+**PS.** Firmwares from 1.4.6 to 1.4.7 for Xiaomi Multimode Gateway may work but **UNSUPPORTED**. Please don't create issues if something doesn't work on them.
+
+**PS.** For "*only Token*" firmwares integration will get Key automatically and save it to integration settings and to `/config/.storage/xiaomi_gateway3/keys.json`. Please save it safely somewhere else.
+
+Recommended firmwares:
+- Xiaomi Multimode Gateway (CN/EU) - 1.5.4 - 1.5.6
+- Xiaomi Multimode Gateway 2 (CN/EU) - 1.0.6 - 1.0.7
+- Aqara Hub E1 (CN) - 4.0.1
+
 **HOWTO get token** [read here](#obtain-mi-home-device-token)
 
 **HOWTO get key**
 
-| Gateway                                                                                 | Situation                                              | Solution                                                             |
-|-----------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------------------------------------------|
-| Xiaomi Multimode Gateway (CN/EU)                                                        | came from the factory with firmware 1.4.6 and lower    | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
-| Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you update firmware | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
-| Xiaomi Multimode Gateway (CN/EU)                                                        | never worked in the Hass                               | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
-| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | never worked in the Hass                               | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
-| Aqara Hub E1 (CN)                                                                       | never worked in the Hass                               | no solution                                                          |
+| Gateway                                                                                 | Situation                                                                           | Solution                                                             |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.4 and lower                                                            | setup integration and use only Token                                 |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.6 and lower                                                            | setup integration and use only Token                                 |
+| Aqara Hub E1 (CN)                                                                       | firmware 4.0.1 and lower                                                            | setup integration and use only Token                                 |
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, but shipped from the factory with firmware 1.4.6 and lower | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
+| Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you updated it to latest firmware                | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
+| Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | no solution                                                          |
 
 - Read more https://github.com/AlexxIT/Blog/issues/13
 
-- For Xiaomi Multimode Gateway you also can:
+For Xiaomi Multimode Gateway you also can:
 
 - optional update firmware via [Telnet](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
 - optional install [custom firmware](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
