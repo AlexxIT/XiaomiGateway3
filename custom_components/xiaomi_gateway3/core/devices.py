@@ -1379,6 +1379,7 @@ DEVICES += [{
     2528: ["Xiaomi", "Kettle Pro", "MJHWSHO2YM", "yunmi.kettle.v12"],  # RU
     "spec": [
         BLEKettle("power", "binary_sensor", mi=4101),  # power+state+temperature
+        BaseConv("state", "sensor"),
         BaseConv("temperature", "sensor"),
     ],
     "ttl": "12h",
