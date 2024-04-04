@@ -1384,6 +1384,15 @@ DEVICES += [{
     ],
     "ttl": "12h",
 }, {
+    735: ["Xiaomi", "Honeywell Formaldehyde Monitor", "JQJCY01YM", "yuemee.airmonitor.mhfd1"],
+    "spec": [
+        BLEMathConv("temperature", "sensor", mi=4100, multiply=0.1, round=1, signed=True),  # int16
+        BLEMathConv("humidity", "sensor", mi=4102, multiply=0.1),  # uint16
+        BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),  # no in new firmwares
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/1177
+        BLEMathConv("formaldehyde", "sensor", mi=4112, multiply=0.01),  # uint16
+    ],
+}, {
     1161: ["Xiaomi", "Toothbrush T500", "MES601"],
     "spec": [
         BaseConv("action", "sensor"),
@@ -1414,6 +1423,7 @@ DEVICES += [{
         BLEMathConv("temperature", "sensor", mi=4100, multiply=0.1, round=1, signed=True),  # int16
         BLEMathConv("humidity", "sensor", mi=4102, multiply=0.1),  # uint16
         BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),  # no in new firmwares
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/1127
         BLEMathConv("formaldehyde", "sensor", mi=4112, multiply=0.001),  # uint16
     ]
 }, {
