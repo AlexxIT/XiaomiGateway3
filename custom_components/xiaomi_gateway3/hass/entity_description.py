@@ -225,8 +225,11 @@ def setup_entity_description(entity: Entity, conv: BaseConv) -> bool:
     for k, v in desc.items():
         if k == "lazy" or v is None:
             continue
-        if k == "category":
+        if k == "category" and type(v) is str:
             v = EntityCategory(v)
+        elif k == "class" and type(v) is str:
+            if domain_class := DOMAIN_CLASSES.get(conv.domain):
+                v = domain_class(v)
         setattr(entity, ENTITY_KEYS.get(k) or k, v)
 
     # sensor with unit_of_measurement and without state_class will be MEASUREMENT
