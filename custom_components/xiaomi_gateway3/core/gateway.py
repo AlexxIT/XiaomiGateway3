@@ -82,8 +82,7 @@ class MultiGateway(
                 model, fw = info["model"], info["version"]
 
                 if model == "lumi.gateway.mgl03" and fw < "1.4.7_0160":
-                    self.error(f"Unsupported firmware: {info}")
-                    return False
+                    self.warning(f"Unsupported firmware: {info}")
 
                 support_ble_mesh = model in (
                     "lumi.gateway.mgl03",
