@@ -27,6 +27,8 @@ BUTTON_BOTH_13 = "button_both_13"
 BUTTON_BOTH_23 = "button_both_23"
 
 BUTTON_BOTH_SINGLE = "button_both_single"
+BUTTON_BOTH_DOUBLE = "button_both_double"
+BUTTON_BOTH_HOLD = "button_both_hold"
 
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/converters/fromZigbee.js#L4738
 BUTTON = {

@@ -3102,6 +3102,22 @@ DEVICES += [{
         MathConv("light_on_gradient_time", "number", mi="2.p.8", multiply=0.5, min=0, max=10, entity=ENTITY_CONFIG),
     ]
 }, {
+    15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        BaseConv("switch_4", "switch", mi="23.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "off", 1: "wireless"}),
+        MapConv("mode_4", "select", mi="23.p.4", map={0: "off", 1: "wireless"}),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1.p.2", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_BOTH_SINGLE}),
+        MapConv("action", mi="5.e.2.p.2", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_BOTH_DOUBLE}),
+        MapConv("action", mi="5.e.3.p.2", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_BOTH_HOLD}),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
