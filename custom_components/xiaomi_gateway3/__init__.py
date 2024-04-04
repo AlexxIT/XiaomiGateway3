@@ -71,9 +71,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             template.hass = hass
             XEntity.attributes_template = template
 
-    # TODO: fixme
-    MultiGateway.base_log = logging.getLogger(__name__)
-
     hass.data[DOMAIN] = {}
 
     await hass_utils.store_devices(hass)
