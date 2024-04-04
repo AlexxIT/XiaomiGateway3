@@ -2757,8 +2757,8 @@ DEVICES += [{
         CurtainPosConv("position", mi="2.p.2"),
         BaseConv("battery", "sensor", mi="3.p.1"),
         BaseConv("security_mode", "switch", mi="4.p.6", entity=ENTITY_CONFIG),
-        BaseConv("power_replenishment", "sensor", mi="7.p.1", entity=ENTITY_CONFIG),
-        BaseConv("realtime_current_in", "sensor", mi="7.p.2", entity=ENTITY_CONFIG),
+        BaseConv("power_replenishment", "sensor", mi="7.p.1", entity={"category": "diagnostic", "enabled": False, "lazy": True, "units": "mAh"}),
+        BaseConv("realtime_current_in", "sensor", mi="7.p.2", entity={"category": "diagnostic", "enabled": False, "class": "current", "units": "mA"}),
     ],
 }, {
     10813: ["Yeelink", "Curtain Motor C1", "YCCBCI008", "yeelink.curtain.crc1"],
