@@ -456,6 +456,26 @@ class ZLumiWaterLeak(ZConverter):
             payload[self.attr] = bool(value[100])
 
 
+# Gateway doesn't unpack gas status, don't know why.
+class ZLumiGasHeartbeat(ZConverter):
+    """Decode gas status from Lumi Basic cluster."""
+
+    cluster_id = Basic.cluster_id
+
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if value := data.get(0xFF01):
+            if value[150] == 0:
+                payload[self.attr] = False
+            elif value[150] == 0x42000000:
+                payload[self.attr] = True
+            elif value[150] == 0x43000000:
+                payload[self.attr] = True
+                payload["action"] = BUTTON_SINGLE
+            elif value[150] == 0x08000000:
+                payload[self.attr] = False
+                payload["action"] = BUTTON_SINGLE
+
+
 class ZLumiSensConv(ZConverter):
     cluster_id = IasZone.cluster_id
     attr_id = 0xFFF0  # read attr

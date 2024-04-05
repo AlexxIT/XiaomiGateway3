@@ -482,6 +482,7 @@ DEVICES += [{
         BaseConv("gas_density", "sensor", mi="0.1.85"),
         BoolConv("gas", "binary_sensor", mi="13.1.85"),
         ZLumiSensConv("sensitivity", "select"),  # config
+        ZLumiGasHeartbeat("gas"),
     ],
 }, {
     "lumi.curtain": ["Aqara", "Curtain", "ZNCLDJ11LM"],
