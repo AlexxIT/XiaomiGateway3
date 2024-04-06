@@ -1756,6 +1756,16 @@ DEVICES += [{
     ],
     # "ttl": "25h"
 }, {
+    14456: ["LeMesh", "Scenario wireless knob switch K4", "lemesh.remote.ts4"],
+    "spec": [
+        BaseConv("battery", "sensor", mi="4.p.1003"),  # uint8
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: "knob_single", 2: BUTTON_1_SINGLE, 3: BUTTON_2_SINGLE, 4: BUTTON_3_SINGLE, 5: BUTTON_4_SINGLE, 6: "knob_increasing", 7: "knob_reduced", 8: "knob_hold_increasing", 9: "knob_hold_reduced"}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: "knob_double", 2: BUTTON_1_DOUBLE, 3: BUTTON_2_DOUBLE, 4: BUTTON_3_DOUBLE, 5: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: "knob_hold", 2: BUTTON_1_HOLD, 3: BUTTON_2_HOLD, 4: BUTTON_3_HOLD, 5: BUTTON_4_HOLD}),
+    ],
+    # "ttl": "6h"  # battery every 6 hours
+}, {
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
     "spec": [
         BaseConv("action", "sensor"),
