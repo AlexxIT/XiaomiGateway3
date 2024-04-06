@@ -19,6 +19,11 @@ class SilabsGateway(XGateway):
     force_pair: bool = False
     unknown: dict = {}
 
+    # sometimes Multimode Gateway 1 stop respond on /commands (no /executed messages)
+    # probably this happenes when Aqara Bulb exist in network
+    # so we will restart Z3GatewayHost on next /heartbeat
+    commands_ts: float = 0
+
     async def silabs_read_device(self, sh: ShellBase):
         # 1. Read coordinator info
         raw = await sh.read_file("/data/zigbee/coordinator.info")
@@ -60,6 +65,10 @@ class SilabsGateway(XGateway):
             asyncio.create_task(coro)
         elif msg.topic.endswith("/heartbeat"):
             self.silabs_process_heartbeat(msg.json)
+        elif msg.topic.endswith("/commands"):
+            self.commands_ts = time.time()
+        elif msg.topic.endswith("/executed"):
+            self.commands_ts = 0
         elif msg.topic.endswith("/deviceleft"):
             self.silabs_process_deviceleft(msg.json)
 
@@ -119,6 +128,11 @@ class SilabsGateway(XGateway):
             device.on_report(data, self, ts)
 
     def silabs_process_heartbeat(self, data: dict):
+        if self.commands_ts and time.time() - self.commands_ts > 5:
+            self.commands_ts = 0
+            self.warning("Z3GatewayHost has no respond - restart it")
+            asyncio.create_task(self.silabs_restart())
+
         payload = {
             "network_pan_id": data.get("networkPanId"),
             "radio_tx_power": data.get("radioTxPower"),
@@ -270,3 +284,11 @@ class SilabsGateway(XGateway):
         index = payload["start_index"] + len(payload["neighbors"])
         if index < payload["entries"]:
             await self.silabs_neighbors_read(device.nwk, index)
+
+    async def silabs_restart(self):
+        try:
+            async with Session(self.host) as sh:
+                # names for all supported gateway models
+                await sh.exec("killall Lumi_Z3GatewayHost_MQTT mZ3GatewayHost_MQTT")
+        except Exception as e:
+            self.warning("Can't restart silabs", exc_info=e)
