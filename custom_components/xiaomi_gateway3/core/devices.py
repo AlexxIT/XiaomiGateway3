@@ -1384,7 +1384,7 @@ DEVICES += [{
         BaseConv("state", "sensor"),
         BaseConv("temperature", "sensor"),
     ],
-    "ttl": "12h",
+    # "ttl": "12h",
 }, {
     735: ["Xiaomi", "Honeywell Formaldehyde Monitor", "JQJCY01YM", "yuemee.airmonitor.mhfd1"],
     "spec": [
@@ -1407,7 +1407,7 @@ DEVICES += [{
     "spec": [
         BLEMapConv("action", "sensor", mi=4097, map={"000000": "right", "010000": "left"}),
     ],
-    "ttl": "7d",  # don't send any data
+    # "ttl": "7d",  # don't send any data
 }, {
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM", "lumi.lock.bzacn2"],  # 6,7,8,11,4106,4110,4111
     "spec": [
@@ -1434,7 +1434,7 @@ DEVICES += [{
         BLEMapConv("action", "sensor", mi=4097, map={"000000": "single", "000001": "double", "000002": "hold"}),
         BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),
     ],
-    "ttl": "60m",  # battery every 5 min
+    # "ttl": "60m",  # battery every 5 min
 }, {
     2038: ["Xiaomi", "Night Light 2", "MJYD02YL-A", "yeelink.light.nl1"],  # 15,4103,4106,4119
     "spec": [
@@ -1451,7 +1451,7 @@ DEVICES += [{
         BLEMathConv("battery", "sensor", mi=4106),
         BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_SINGLE}, entity=ENTITY_DISABLED),  # button click
     ],
-    "ttl": "60m"  # battery every 4? hour
+    # "ttl": "60m"  # battery every 4? hour
 }, {
     2455: ["Honeywell", "Smoke Alarm", "JTYJ-GD-03MI", "lumi.sensor_smoke.mcn02"],
     "spec": [
@@ -1459,7 +1459,7 @@ DEVICES += [{
         BLEMapConv("action", "sensor", mi=4117, map={"02": "error"}, entity=ENTITY_DISABLED),
         BLEByteConv("battery", "sensor", mi=4106),
     ],
-    "ttl": "60m",  # battery every 4:30 min
+    # "ttl": "60m",  # battery every 4:30 min
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/180
     2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM", "lumi.motion.bmgl01"],  # 15,4119,4120,4123
@@ -1481,7 +1481,7 @@ DEVICES += [{
         BaseConv("idle_time", "sensor", mi=4119),  # diagnostic
         BLEMapConv("light", "binary_sensor", mi=4120, map={"00": False, "01": True}),
     ],
-    "ttl": "60m",  # battery every 11 min
+    # "ttl": "60m",  # battery every 11 min
 }, {
     2443: ["Xiaomi", "Door/Window Sensor 2", "MCCGQ02HL", "isa.magnet.dw2hl"],
     "spec": [
@@ -1494,7 +1494,7 @@ DEVICES += [{
         BLEMapConv("light", "binary_sensor", mi=4120, map={"00": False, "01": True}),
         BLEByteConv("battery", "sensor", mi=4106, entity=ENTITY_LAZY),
     ],
-    "ttl": "3d",  # battery every 1 day
+    # "ttl": "3d",  # battery every 1 day
 }]
 
 # Xiaomi BLE MiBeacon2 + MIoT spec
@@ -1520,7 +1520,7 @@ DEVICES += [{
         MapConv("action", mi="3.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE}),
         MapConv("action", mi="3.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD}),
     ],
-    "ttl": "60m",  # battery every 5 min
+    # "ttl": "60m",  # battery every 5 min
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/826
     7184: ["Linptech", "Wireless Button", "K11", "linp.remote.k9b01"],
@@ -1532,7 +1532,7 @@ DEVICES += [{
         MapConv("action", mi="3.e.1012.p.1", map={1: BUTTON_SINGLE, 8: BUTTON_HOLD, 15: BUTTON_DOUBLE}),
         BaseConv("battery", mi="2.p.1003"),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     15895: ["Linptech", "Wireless Button KS1Pro", "KS1PBB", "linp.sensor_ht.ks1bp"],
     "spec": [
@@ -1552,7 +1552,7 @@ DEVICES += [{
         MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: "button_4_double"}),
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     9095: ["Xiaomi", "Wireless Button", "XMWXKG01LM", "lumi.remote.mcn001"],
     "spec": [
@@ -1568,7 +1568,7 @@ DEVICES += [{
         ConstConv("action", mi="3.e.1014", value=BUTTON_HOLD),
         BaseConv("battery", mi="2.p.1003"),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     5860: ["Xiaomi", "TH Clock", "LYWSD02MMC", "miaomiaoce.sensor_ht.o2"],
     9538: ["Xiaomi", "TH Clock Pro", "LYWSD02MMC", "miaomiaoce.sensor_ht.t8"],
@@ -1617,7 +1617,7 @@ DEVICES += [{
         MapConv("action", mi="12.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
         MapConv("action", mi="12.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: "button_4_double", 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     6742: ["LeMesh", "Wireless Button", "lemesh.remote.ts1"],
     "spec": [
@@ -1658,7 +1658,7 @@ DEVICES += [{
         MapConv("contact", "binary_sensor", mi="2.p.1004", map={1: True, 2: False}),
         BaseConv("battery", "sensor", mi="3.p.1003"),
     ],
-    "ttl": "60m",
+    # "ttl": "60m",
 }, {
     6017: ["Xiaomi", "Face Recognition Smart Door Lock", "XMZNMS09LM", "lumi.lock.mcn002"],
     "spec": [
@@ -1683,7 +1683,7 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1006", value="doorbell"),
         BaseConv("timestamp", mi="5.e.1006.p.1"),
     ],
-    "ttl": "25h"
+    # "ttl": "25h"
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/973
     10249: ["Xiaomi", "Door Lock E10", "XMZNMS01OD", "oms.lock.dl01"],
@@ -1703,7 +1703,7 @@ DEVICES += [{
         ConstConv("action", mi="6.e.1006", value="doorbell"),
         BaseConv("timestamp", mi="6.e.1006.p.1"),
     ],
-    "ttl": "25h"
+    # "ttl": "25h"
 }, {
     1393: ["Xiaomi", "Safe Cayo Anno 30Z", "lcrmcr.safe.ms30b"],
     "spec": [
@@ -1720,7 +1720,7 @@ DEVICES += [{
         # battery action
         ConstConv("action", mi="4.e.1", value="battery_low"),
     ],
-    "ttl": "25h"
+    # "ttl": "25h"
 }, {
     11273: ["PTX", "BLE Wireless situation knob switch", "PTX-X6-QMIMB", "090615.remote.x6xnsw"],
     "spec": [
@@ -1733,7 +1733,7 @@ DEVICES += [{
         ConstConv("action", mi="3.e.1013", value="knob_reduced"),
         ConstConv("action", mi="3.e.1014", value="knob_press"),
     ],
-    "ttl": "7d"
+    # "ttl": "7d"
 }, {
     12183: ["Xiaomi", "Door Lock M20 Pro", "loock.lock.r2"],
     "spec": [
@@ -1754,7 +1754,7 @@ DEVICES += [{
         # lock binary_sensor
         MapConv("lock", "binary_sensor", mi="2.e.1020.p.3", map={1: STATE_LOCKED, 2: STATE_UNLOCK}),
     ],
-    "ttl": "25h"
+    # "ttl": "25h"
 }, {
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
     "spec": [
@@ -1773,7 +1773,7 @@ DEVICES += [{
         MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
     17825: ["Unknown", "Eight scene knob switch", "cxw.remote.ble006"],
@@ -1786,7 +1786,7 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1036", value="rotate"),
         BaseConv("rotate", mi="5.e.1036.p.2"),
     ],
-    "ttl": "6h"  # battery every 6 hours
+    # "ttl": "6h"  # battery every 6 hours
 }, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
