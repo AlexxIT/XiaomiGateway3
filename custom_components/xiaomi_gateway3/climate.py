@@ -36,11 +36,13 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
     )
+    _attr_target_temperature = 0
+    _attr_target_temperature_step = 1
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
     _attr_min_temp = 17
-    _attr_target_temperature_step = 1
+
     _enabled = None
     _mode = None
 
@@ -48,17 +50,23 @@ class XAqaraS2(XEntity, ClimateEntity):
         self.listen_attrs |= {"power", "current_temp", "hvac_mode", "target_temp"}
 
     def set_state(self, data: dict):
-        self._enabled = data.get("power")
-        self._attr_current_temperature = data.get("current_temp")
-        self._attr_fan_mode = data.get("fan_mode")
-        self._attr_hvac_mode = data.get("hvac_mode")
-        self._mode = data.get("hvac_mode")
-        # better support HomeKit
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/707#issuecomment-1099109552
-        self._attr_hvac_action = ACTIONS.get(self._attr_hvac_mode)
-        # fix scenes with turned off climate
-        # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
-        self._attr_target_temperature = data.get("target_temp", 0)
+        if "power" in data:
+            self._enabled = data["power"]
+        if "current_temp" in data:
+            self._attr_current_temperature = data["current_temp"]
+        if "fan_mode" in data:
+            self._attr_fan_mode = data["fan_mode"]
+        if "hvac_mode" in data:
+            self._attr_hvac_mode = data["hvac_mode"]
+            self._mode = data["hvac_mode"]
+            # better support HomeKit
+            # https://github.com/AlexxIT/XiaomiGateway3/issues/707#issuecomment-1099109552
+            self._attr_hvac_action = ACTIONS.get(self._attr_hvac_mode)
+        if "target_temp" in data:
+            # fix scenes with turned off climate
+            # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
+            self._attr_target_temperature = data["target_temp"]
+
         self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
 
     async def async_set_temperature(self, temperature: int, **kwargs) -> None:
