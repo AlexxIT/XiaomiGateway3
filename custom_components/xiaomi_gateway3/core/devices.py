@@ -2676,6 +2676,19 @@ DEVICES += [{
         BaseConv("led", "switch", mi="8.p.1"),
     ],
 }, {
+    9804: ["Yeelight", "Magnetic Track Array Spotlight", "yeelink.light.ml6"],
+    9811: ["Yeelight", "Magnetic Track Light Bar", "yeelink.light.ml7"],
+    9812: ["Yeelight", "Magnetic Track Spotlight", "yeelink.light.ml8"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("power_on_state", "select", mi="2.p.4", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("mode", "select", mi="2.p.5", map={0: "Dummy", 1: "Lighting", 2: "Night Light", 3: "TV", 4: "Reading", 5: "Hospitality", 6: "Warmth"}),
+        MathConv("light_off_gradient_time", "number", mi="2.p.7", multiply=0.5, min=0, max=10),
+        MathConv("light_on_gradient_time", "number", mi="2.p.8", multiply=0.5, min=0, max=10),
+    ],
+}, {
     11253: ["LianXun", "Switch Four-key Mesh", "lxun.switch.lxswm4"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
