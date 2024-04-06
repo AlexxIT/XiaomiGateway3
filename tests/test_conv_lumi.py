@@ -392,3 +392,9 @@ def test_gas():
     attrs = {"gas", "gas_density"}
     p = device.encode_read(attrs)
     assert p
+
+
+def test_aqara_motion_e1():
+    device = XDevice("lumi.motion.acn001")
+    p = device.decode({"siid": 2, "eiid": 1, "arguments": [{"piid": 1, "value": 179}]})
+    assert p == {"illuminance": 179, "motion": True}

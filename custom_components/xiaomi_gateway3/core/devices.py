@@ -424,7 +424,7 @@ DEVICES += [{
     "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
     "spec": [
         ConstConv("motion", "binary_sensor", mi="2.e.1", value=True),
-        BaseConv("illuminance", "sensor", mi="2.p.1"),
+        BaseConv("illuminance", "sensor", mi="2.e.1.p.1"),
         BatVoltConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map={1: False, 2: True}),  # diagnostic
     ],
