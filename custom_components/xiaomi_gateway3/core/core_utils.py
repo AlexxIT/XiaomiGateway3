@@ -67,7 +67,7 @@ async def enable_telnet(host: str, token: str, key: str = None) -> str:
         fwver: str = miio_info.get("fw_ver")
         # 2. Send different telnet cmd based on gateway model and firmware
         if model == "lumi.gateway.mgl03":
-            if fwver < "1.4.7":
+            if fwver < "1.4.6_0043":
                 methods = ["enable_telnet_service"]
             elif fwver < "1.5.5":
                 methods = ["set_ip_info"]
