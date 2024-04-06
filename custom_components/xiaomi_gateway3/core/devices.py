@@ -2324,14 +2324,12 @@ DEVICES += [{
     ],
     "ttl": "7d",
 }, {
-    # urn:miot-spec-v2:device:light:0000A001:yeelink-nl2:1:0000C81D 米家智能光感夜灯
     4736: ["Yeelight", "Mesh Night Light", "MJYD05YL", "yeelink.light.nl2"],
     "spec": [
         BaseConv("switch", "light", mi="2.p.1"),  # bool
         BoolConv("light", "binary_sensor", mi="3.p.1")  # uint8 0-Dark 1-Bright
     ],
 }, {
-    # urn:miot-spec-v2:device:outlet:0000A002:qmi-psv3:1:0000C816小米智能插线板2 5位插孔
     4896: ["Xiaomi", "Mesh Power Strip 2", "XMZNCXB01QM", "qmi.plug.psv3"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),  # bool
