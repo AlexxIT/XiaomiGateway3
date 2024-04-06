@@ -445,35 +445,27 @@ class ZLumiCubeRotate(ZConverter):
         )
 
 
-# Gateway doesn't unpack moisture status for sensor on firmware 4, don't know why.
-class ZLumiWaterLeak(ZConverter):
-    """Decode moisture status from Lumi Basic cluster."""
-
+@dataclass
+class ZLumiBasicAlarm(ZConverter):
     cluster_id = Basic.cluster_id
+    basic_attr: int = None
 
     def decode(self, device: "XDevice", payload: dict, data: dict):
+        # Some old lumi sensors doesn't sends periodic "no alarm" status.
+        # But they all has this status in the heartbeats (basic cluster).
+        # For "lumi.sensor_wleak.aq1" on firmware 4 sensor:
+        #   100: 1 - water leak (sometimes correct, sometimes not)
+        #   100: 0 - no water leak
+        # For "lumi.sensor_natgas" and "lumi.sensor_smoke" sensor:
+        #   150: 0x42000000 - gas
+        #   150: 0x43000000 - gas and button click
+        #   150: 0x08000000 - no gas button click
+        #   150: 0x02040200 - smoke
+        #   150: 0x03000000 - smoke and button click
+        #   150: 0 - no gas, no smoke
         if value := data.get(0xFF01):
-            payload[self.attr] = bool(value[100])
-
-
-# Gateway doesn't unpack gas status, don't know why.
-class ZLumiGasHeartbeat(ZConverter):
-    """Decode gas status from Lumi Basic cluster."""
-
-    cluster_id = Basic.cluster_id
-
-    def decode(self, device: "XDevice", payload: dict, data: dict):
-        if value := data.get(0xFF01):
-            if value[150] == 0:
+            if value[self.basic_attr] == 0:
                 payload[self.attr] = False
-            elif value[150] == 0x42000000:
-                payload[self.attr] = True
-            elif value[150] == 0x43000000:
-                payload[self.attr] = True
-                payload["action"] = BUTTON_SINGLE
-            elif value[150] == 0x08000000:
-                payload[self.attr] = False
-                payload["action"] = BUTTON_SINGLE
 
 
 class ZLumiSensConv(ZConverter):

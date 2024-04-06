@@ -435,7 +435,7 @@ DEVICES += [{
         BoolConv("moisture", "binary_sensor", mi="3.1.85"),
         BatVoltConv("battery", "sensor", mi="8.0.2008"),
         BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
-        ZLumiWaterLeak("moisture"),  # fix bug for sensors on firmware 4
+        ZLumiBasicAlarm("moisture", basic_attr=100),  # read "no alarm" from heartbeats
     ],
 }, {
     # vibration sensor
@@ -474,6 +474,7 @@ DEVICES += [{
         BatVoltConv("battery", "sensor", mi="8.0.2008"),
         BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
         ZLumiSensConv("sensitivity", "select"),  # config
+        ZLumiBasicAlarm("smoke", basic_attr=150),  # read "no alarm" from heartbeats
     ],
 }, {
     "lumi.sensor_natgas": ["Honeywell", "Gas Sensor", "JTQJ-BF-01LM/BW"],
@@ -482,7 +483,7 @@ DEVICES += [{
         BaseConv("gas_density", "sensor", mi="0.1.85"),
         BoolConv("gas", "binary_sensor", mi="13.1.85"),
         ZLumiSensConv("sensitivity", "select"),  # config
-        ZLumiGasHeartbeat("gas"),
+        ZLumiBasicAlarm("gas", basic_attr=150),  # read "no alarm" from heartbeats
     ],
 }, {
     "lumi.curtain": ["Aqara", "Curtain", "ZNCLDJ11LM"],
