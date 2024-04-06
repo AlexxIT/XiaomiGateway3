@@ -2670,6 +2670,13 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="6.p.1"),
         BaseConv("led", "switch", mi="6.p.2"),
     ]
+},{
+    9610: ["Unknown", "Double Wall Switch", "bean.switch.bl02"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("led", "switch", mi="8.p.1"),
+    ],
 }, {
     11253: ["LianXun", "Switch Four-key Mesh", "lxun.switch.lxswm4"],
     "spec": [
