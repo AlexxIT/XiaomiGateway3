@@ -87,7 +87,7 @@ class ClimateConv(BaseConv):
         if "fan_mode" in value:
             b[1] = self.fan[value["fan_mode"]]
         if "target_temp" in value:
-            b[3] = int(value["target_temp"])
+            b[2] = int(value["target_temp"])
         value = int.from_bytes(b, "big")
         super().encode(device, payload, value)
 
