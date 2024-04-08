@@ -1395,7 +1395,7 @@ DEVICES += [{
         BLEMathConv("formaldehyde", "sensor", mi=4112, multiply=0.01),  # uint16
     ],
 }, {
-    1161: ["Xiaomi", "Toothbrush T500", "MES601"],
+    1161: ["Xiaomi", "Toothbrush T500", "MES601", "soocare.toothbrush.m1s"],
     "spec": [
         BaseConv("action", "sensor"),
         BLEByteConv("battery", "sensor", mi=4106),  # uint8
