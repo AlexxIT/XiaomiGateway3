@@ -97,10 +97,13 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
 
 async def read_firmware(host: str) -> Optional[str]:
-    from bellows.ezsp import EZSP
-
-    ezsp = EZSP({"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None})
+    ezsp = None
     try:
+        from bellows.ezsp import EZSP
+
+        ezsp = EZSP(
+            {"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None}
+        )
         await ezsp.connect(use_thread=False)
         await ezsp.startup_reset()
         _, _, version = await ezsp.get_board_info()
@@ -108,7 +111,8 @@ async def read_firmware(host: str) -> Optional[str]:
         _LOGGER.debug(f"{host} [FWUP] Read firmware error: {e}")
         return None
     finally:
-        ezsp.close()
+        if ezsp:
+            ezsp.close()
 
     _LOGGER.debug(f"{host} [FWUP] Current zigbee firmware v{version}")
 
