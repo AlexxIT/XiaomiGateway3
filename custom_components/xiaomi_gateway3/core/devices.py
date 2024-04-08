@@ -1735,7 +1735,7 @@ DEVICES += [{
     ],
     # "ttl": "7d"
 }, {
-    12183: ["Xiaomi", "Door Lock M20 Pro", "loock.lock.r2"],
+    12183: ["Lockin", "Door Lock M20 Pro", "loock.lock.r2"],
     "spec": [
         # lock action
         BaseConv("action", "sensor"),
@@ -1811,15 +1811,15 @@ DEVICES += [{
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM", "lumi.lock.bzacn1"],
     2054: ["Xiaomi", "Toothbrush T700", "MES604", "k0918.toothbrush.t700"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/657
-    2444: ["Xiaomi", "Door Lock", "XMZNMST02YD", "loock.lock.t1"],
-    2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001", "loock.safe.v1"],
+    2444: ["Lockin", "Door Lock", "XMZNMST02YD", "loock.lock.t1"],
+    2480: ["Lockin", "Safe Box", "BGX-5/X1-3001", "loock.safe.v1"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM", "lumi.lock.bacn01"],
-    3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
+    3343: ["Lockin", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
     3641: ["Xiaomi", "Door Lock 1S", "XMZNMS08LM", "lumi.lock.bmcn04"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/776
     3685: ["Xiaomi", "Face Recognition Smart Door Lock X", "XMZNMS06LM", "lumi.lock.bmcn05"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1156
-    3899: ["Xiaomi", "Door Lock", "XMZNMSTO3YD", "loock.lock.t1pro"],
+    3899: ["Lockin", "Door Lock", "XMZNMSTO3YD", "loock.lock.t1pro"],
     6032: ["Xiaomi", "Toothbrush T700i", "MES604", "k0918.toothbrush.t700i"],
     "spec": [
         # https://iot.mi.com/new/doc/accesses/direct-access/embedded-development/ble/object-definition
