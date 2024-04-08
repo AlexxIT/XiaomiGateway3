@@ -1410,14 +1410,17 @@ DEVICES += [{
     # "ttl": "7d",  # don't send any data
 }, {
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM", "lumi.lock.bzacn2"],  # 6,7,8,11,4106,4110,4111
+    7735: ["Lockin", "Smart Door Lock S50M", "loock.lock.fvl109"],  # 6,7,8,11,4106,4110,4111
     "spec": [
         BaseConv("action", "sensor"),
+        BaseConv("contact", "binary_sensor"),  # from mi=7
         BLEFinger("fingerprint", mi=6),
         BLEDoor("door", mi=7),
         BLEMapConv("action", mi=8, map={"00": "disarmed", "01": "armed"}),
         BLELock("lock", mi=11),
-        BaseConv("contact", "binary_sensor"),  # from mi=7
         BLEByteConv("battery", "sensor", mi=4106),
+        BLEMapConv("lock", "binary_sensor", mi=4110, map={"00": True, "01": False}),  # reverse
+        BLEMapConv("door", "binary_sensor", mi=4111, map={"00": True, "01": False}),  # reverse
     ]
 }, {
     1809: ["Xiaomi", "Air Quality Monitor", "PTH-1", "fbs.airmonitor.pth02"],
