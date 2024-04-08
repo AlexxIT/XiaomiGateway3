@@ -1,4 +1,5 @@
 import asyncio
+import time
 from functools import cached_property
 
 from homeassistant.components.light import (
@@ -126,7 +127,7 @@ class XZigbeeLight(XLight):
 
 
 class XLightGroup(XLight):
-    update_event: asyncio.Event
+    wait_update: bool = False
 
     def childs(self):
         return [
@@ -137,7 +138,6 @@ class XLightGroup(XLight):
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
-        self.update_event = asyncio.Event()
         for child in self.childs():
             child.add_listener(self.forward_child_update)
 
@@ -147,24 +147,27 @@ class XLightGroup(XLight):
             child.remove_listener(self.forward_child_update)
 
     def forward_child_update(self, data: dict):
-        self.update_event.set()
-        self.device.dispatch(data)
+        self.wait_update = False
+        self.on_device_update(data)
 
-    async def wait_for_update(self, delay=10):
-        try:
-            self.update_event.clear()
-            async with asyncio.timeout(delay):
-                await self.update_event.wait()
-        except TimeoutError:
-            pass
+    async def wait_update_with_timeout(self, delay: float):
+        # thread safe wait logic, because `forward_child_update` and `async_turn_on`
+        # can be called from different threads and we can't use asyncio.Event here
+        wait_unil = time.time() + delay
+        while self.wait_update:
+            await asyncio.sleep(0.5)
+            if time.time() > wait_unil:
+                break
 
     async def async_turn_on(self, **kwargs):
+        self.wait_update = True
         await super().async_turn_on(**kwargs)
-        await self.wait_for_update()
+        await self.wait_update_with_timeout(10.0)
 
     async def async_turn_off(self, **kwargs):
+        self.wait_update = True
         await super().async_turn_off(**kwargs)
-        await self.wait_for_update()
+        await self.wait_update_with_timeout(10.0)
 
 
 XEntity.NEW["light"] = XLight
