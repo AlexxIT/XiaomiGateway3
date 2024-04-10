@@ -2672,13 +2672,6 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="6.p.1"),
         BaseConv("led", "switch", mi="6.p.2"),
     ]
-},{
-    9610: ["Unknown", "Double Wall Switch", "bean.switch.bl02"],
-    "spec": [
-        BaseConv("channel_1", "switch", mi="2.p.1"),
-        BaseConv("channel_2", "switch", mi="3.p.1"),
-        BaseConv("led", "switch", mi="8.p.1"),
-    ],
 }, {
     9804: ["Yeelight", "Magnetic Track Array Spotlight", "yeelink.light.ml6"],
     9811: ["Yeelight", "Magnetic Track Light Bar", "yeelink.light.ml7"],
@@ -2932,7 +2925,7 @@ DEVICES += [{
         ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),
     ],
 }, {
-    9610: ["Bean", "Mesh Double Wall Switch (L)", "bean.switch.bl01"],
+    9610: ["Bean", "Mesh Double Wall Switch (L)", "bean.switch.bl02"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
