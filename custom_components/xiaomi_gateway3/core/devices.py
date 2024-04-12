@@ -2102,12 +2102,6 @@ DEVICES += [{
         BaseConv("channel_4", "switch", mi="12.p.1"),
     ],
 }, {
-    9609: ["Bean", "Mesh Switch", "bean.switch.bl01"],
-    "spec": [
-        BaseConv("switch", "switch", mi="2.p.1"),
-        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
-    ],
-}, {
     2258: ["PTX", "Mesh Single Wall Switch", "PTX-SK1M", "090615.switch.mesw1"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
@@ -2678,13 +2672,6 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="6.p.1"),
         BaseConv("led", "switch", mi="6.p.2"),
     ]
-},{
-    9610: ["Unknown", "Double Wall Switch", "bean.switch.bl02"],
-    "spec": [
-        BaseConv("channel_1", "switch", mi="2.p.1"),
-        BaseConv("channel_2", "switch", mi="3.p.1"),
-        BaseConv("led", "switch", mi="8.p.1"),
-    ],
 }, {
     9804: ["Yeelight", "Magnetic Track Array Spotlight", "yeelink.light.ml6"],
     9811: ["Yeelight", "Magnetic Track Light Bar", "yeelink.light.ml7"],
@@ -2930,7 +2917,40 @@ DEVICES += [{
         MapConv("mode_4", "select", mi="5.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
     ]
 }, {
-    9612: ["Unkown", "Mesh Singel Wall Switch", "bean.switch.bl01"],
+    9609: ["Bean", "Mesh Single Wall Switch (L)", "bean.switch.bl01"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MapConv("mode", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),
+    ],
+}, {
+    9610: ["Bean", "Mesh Double Wall Switch (L)", "bean.switch.bl02"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),  # config
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+    ],
+}, {
+    9611: ["Bean", "Mesh Triple Wall Switch (L)", "bean.switch.bl03"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+    ],
+}, {
+    9612: ["Bean", "Mesh Single Wall Switch (LN)", "bean.switch.bl01"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         MapConv("mode", "select", mi="2.p.2", map={0: "off", 1: "wireless", 2: "flex", 3: "scene"}),  # config
@@ -2938,7 +2958,7 @@ DEVICES += [{
         ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),
     ]
 }, {
-    9613: ["Unkown", "Mesh Double Wall Switch", "bean.switch.bl02"],
+    9613: ["Bean", "Mesh Double Wall Switch (LN)", "bean.switch.bl02"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
@@ -2949,7 +2969,7 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
     ]
 }, {
-    9614: ["Unkown", "Mesh Triple Wall Switch", "bean.switch.bl03"],
+    9614: ["Bean", "Mesh Triple Wall Switch (LN)", "bean.switch.bl03"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
