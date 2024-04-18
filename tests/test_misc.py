@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass
 
 from bellows.uart import Gateway
-from sensor_state_data import BinarySensorDeviceClass
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 
 from custom_components.xiaomi_gateway3.core.converters.base import BaseConv
 

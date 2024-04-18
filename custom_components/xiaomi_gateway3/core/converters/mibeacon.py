@@ -1,7 +1,8 @@
 import struct
+from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
+
 from .base import BaseConv
 
 if TYPE_CHECKING:
