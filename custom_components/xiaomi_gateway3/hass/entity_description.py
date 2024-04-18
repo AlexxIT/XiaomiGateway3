@@ -11,7 +11,6 @@ from homeassistant.const import (
     LIGHT_LUX,
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    EntityCategory,
     UnitOfElectricPotential,
     UnitOfElectricCurrent,
     UnitOfEnergy,
@@ -21,7 +20,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, EntityCategory
 
 from ..core.converters.base import BaseConv
 

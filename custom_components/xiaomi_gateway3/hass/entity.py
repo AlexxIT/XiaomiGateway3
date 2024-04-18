@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from functools import cached_property
 from typing import TYPE_CHECKING, Callable
 
@@ -7,9 +7,8 @@ from homeassistant.helpers.device_registry import (
     CONNECTION_BLUETOOTH,
     CONNECTION_NETWORK_MAC,
     CONNECTION_ZIGBEE,
-    DeviceInfo,
 )
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import ExtraStoredData, RestoredExtraData
 from homeassistant.helpers.template import Template
@@ -188,7 +187,7 @@ class XStatsEntity(XEntity):
             state_change = True
 
         if ts := data.get(self.attr):
-            self._attr_native_value = datetime.fromtimestamp(ts, UTC)
+            self._attr_native_value = datetime.fromtimestamp(ts, timezone.utc)
 
             if "msg_received" in self._attr_extra_state_attributes:
                 self._attr_extra_state_attributes["msg_received"] += 1

@@ -1,6 +1,6 @@
 import asyncio
 import time
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from functools import cached_property
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
@@ -85,7 +85,7 @@ class XMotionSensor(XEntity, BinarySensorEntity):
         if self.clear_task:
             self.clear_task.cancel()
 
-        utcnow = datetime.fromtimestamp(ts, UTC)
+        utcnow = datetime.fromtimestamp(ts, timezone.utc)
 
         self._attr_is_on = True
         self._attr_extra_state_attributes[ATTR_LAST_TRIGGERED] = utcnow

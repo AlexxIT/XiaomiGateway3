@@ -1,9 +1,8 @@
 import logging
 
 import voluptuous as vol
-from homeassistant.components.system_log import CONF_LOGGER
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import MAJOR_VERSION, MINOR_VERSION, EVENT_HOMEASSISTANT_STOP
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry
@@ -37,6 +36,7 @@ PLATFORMS = [
 CONF_DEVICES = "devices"
 CONF_ATTRIBUTES_TEMPLATE = "attributes_template"
 CONF_OPENMIIO = "openmiio"
+CONF_LOGGER = "logger"
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -53,13 +53,6 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    # 2022.5.0  - AlarmControlPanelEntityFeature, ClimateEntityFeature, HVACMode
-    # 2022.11.0 - UnitOfEnergy, UnitOfLength, UnitOfPower, UnitOfTemperature
-    # 2023.1.0  - UnitOfElectricCurrent, UnitOfElectricPotential, UnitOfTime
-    if (MAJOR_VERSION, MINOR_VERSION) < (2023, 1):
-        _LOGGER.error("Minimum supported Hass version 2023.1")
-        return False
-
     if config := config.get(DOMAIN):
         if devices_config := config.get(CONF_DEVICES):
             XDevice.configs = hass_utils.fix_yaml_devices_config(devices_config)
