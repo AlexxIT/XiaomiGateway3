@@ -91,12 +91,10 @@ def test_sensor_motion_e1():
     device = XDevice("lumi.motion.acn001")
     assert device.market_name == "Aqara Motion Sensor E1"
 
-    p = device.decode(
-        [{"siid": 2, "eiid": 1, "arguments": [{"siid": 2, "piid": 1, "value": 9}]}]
-    )
-    assert p == {"illuminance": 9, "motion": True}
+    p = device.decode({"siid": 2, "eiid": 1, "arguments": [{"piid": 1, "value": 179}]})
+    assert p == {"illuminance": 179, "motion": True}
 
-    p = device.decode([{"siid": 2, "piid": 1, "value": 10, "code": 0}])
+    p = device.decode({"siid": 2, "piid": 1, "value": 10, "code": 0})
     assert p == {"illuminance": 10}
 
 
