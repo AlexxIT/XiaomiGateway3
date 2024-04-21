@@ -1411,6 +1411,7 @@ DEVICES += [{
     # "ttl": "7d",  # don't send any data
 }, {
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM", "lumi.lock.bzacn2"],  # 6,7,8,11,4106,4110,4111
+    1695: ["Aqara", "Door Lock N200", "ZNMS17LM", "lumi.lock.bzacn1"],  # 6,7,8,11,4106,4110,4111
     7735: ["Lockin", "Smart Door Lock S50M", "loock.lock.fvl109"],  # 6,7,8,11,4106,4110,4111
     "spec": [
         BaseConv("action", "sensor"),
@@ -1812,7 +1813,6 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1001
     1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM", "lumi.lock.bzacn2"],
-    1695: ["Aqara", "Door Lock N200", "ZNMS17LM", "lumi.lock.bzacn1"],
     2054: ["Xiaomi", "Toothbrush T700", "MES604", "k0918.toothbrush.t700"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/657
     2444: ["Lockin", "Door Lock", "XMZNMST02YD", "loock.lock.t1"],
