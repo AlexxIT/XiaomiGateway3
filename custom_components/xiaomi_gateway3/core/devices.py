@@ -2640,8 +2640,8 @@ DEVICES += [{
 }, {
     15658: ["Linptech", "Single Wall Switch QT1", "linp.switch.qt1db1"],
     "spec": [
-        BaseConv("channel_1", "switch", mi="2.p.1"),
-        BoolConv("wireless_1", "switch", mi="2.p.2"),
+        BaseConv("switch", "switch", mi="2.p.1"),
+        BoolConv("wireless", "switch", mi="2.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
         MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2:"Medium", 3:"High"}),
