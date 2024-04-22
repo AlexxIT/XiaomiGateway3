@@ -1523,12 +1523,12 @@ DEVICES += [{
         BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE, "000001": BUTTON_1_DOUBLE, "000002": BUTTON_1_HOLD, "010000": BUTTON_2_SINGLE, "010001": BUTTON_2_DOUBLE, "010002": BUTTON_2_HOLD}),
         BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),  # uint8
         # miot spec
-        ConstConv("action", mi="2.e.1.p.1", value=BUTTON_1_SINGLE),
-        ConstConv("action", mi="2.e.2.p.1", value=BUTTON_1_DOUBLE),
-        ConstConv("action", mi="2.e.3.p.1", value=BUTTON_1_HOLD),
-        ConstConv("action", mi="4.e.1.p.1", value=BUTTON_2_SINGLE),
-        ConstConv("action", mi="4.e.2.p.1", value=BUTTON_2_DOUBLE),
-        ConstConv("action", mi="4.e.3.p.1", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="2.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="2.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="2.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="4.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_2_HOLD),
         BaseConv("battery", mi="3.p.1003"),        
     ],
     # "ttl": "6h"  # battery every 6 hours
