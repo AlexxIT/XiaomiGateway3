@@ -3244,6 +3244,17 @@ DEVICES += [{
         MapConv("action", mi="5.e.3.p.2", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_BOTH_HOLD}),
     ]
 }, {
+    12261: ["Lingju", "Bluetooth Mesh Switch", "linju.switch.sw0a01"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),  # bool
+        MapConv("power_on_state", "select", mi="2.p.2", map={0: "default", 1: "on", 2: "off"}),
+        BoolConv("led", "switch", mi="3.p.2"),
+        MapConv("interactive_switch", "select", mi="3.p.3", map={1: "control", 2: "decontrol"}, entity=ENTITY_CONFIG),
+        BoolConv("flex_switch", "switch", mi="3.p.4", entity=ENTITY_CONFIG),
+        MapConv("icon_style", "select", mi="3.p.5", map={0: "Lamp-bulb", 1: "Cylindrical-spotlight", 2: "Ceiling-light", 3: "Hanging-lamp", 4: "Lamp-belt", 5: "Small-electric-appliance", 6: "Socket", 7: "Valve", 8: "Electrical-machinery"}, entity=ENTITY_CONFIG),
+        BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
