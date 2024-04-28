@@ -386,6 +386,7 @@ DEVICES += [{
         MathConv("pressure", "sensor", mi="0.3.85", multiply=0.01),
         BatVoltConv("battery", "sensor", mi="8.0.2008"),
         BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("battery_voltage", "sensor"),  # diagnostic
     ],
 }, {
     # door window sensor
