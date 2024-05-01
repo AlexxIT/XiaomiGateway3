@@ -1662,8 +1662,8 @@ DEVICES += [{
     "spec": [
         BLEMapConv("water_leak", "binary_sensor", mi=18438, map={"00": False, "01": True}),
         BLEByteConv("battery", "sensor", mi=19459),
-        BaseConv("water_leak", "binary_sensor", mi="2.p.1006"),  # bool
-        BaseConv("battery", "sensor", mi="3.p.1003"),  # uint8
+        BaseConv("water_leak", mi="2.p.1006"),  # bool
+        BaseConv("battery", mi="3.p.1003"),  # uint8
     ],
 }, {
     16204: ["Linptech", "Pressure Sensor", "PS1BB", "linp.senpres.ps1bb"],
