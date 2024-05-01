@@ -210,6 +210,21 @@ def test_7184():
     assert p == {"action": "double"}
 
 
+def test_16143():
+    device = XDevice(16143)
+    assert device.market_name == "Linptech Submersion Sensor"
+
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1337
+    p = device.decode({"eid": 18438, "edata": "01"})
+    assert p == {"water_leak": True}
+
+    p = device.decode({"eid": 18438, "edata": "00"})
+    assert p == {"water_leak": False}
+
+    p = device.decode({"eid": 19459, "edata": "51"})
+    assert p == {"battery": 81}
+
+
 def test_6473():
     device = XDevice(6473)
     assert device.market_name == "Yeelight Double Button"

@@ -1660,6 +1660,8 @@ DEVICES += [{
 }, {
     16143: ["Linptech", "Submersion Sensor", "RS1BB", "linp.flood.rs1bb"],
     "spec": [
+        BLEMapConv("water_leak", "binary_sensor", mi=18438, map={"00": False, "01": True}),
+        BLEByteConv("battery", "sensor", mi=19459),
         BaseConv("water_leak", "binary_sensor", mi="2.p.1006"),  # bool
         BaseConv("battery", "sensor", mi="3.p.1003"),  # uint8
     ],
