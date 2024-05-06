@@ -3116,12 +3116,16 @@ DEVICES += [{
     ],
 }, {
     13521: ["Xiaomi", "Xiaomi Smart Wall Outlet Pro", "XMZNCZ01LM", "xiaomi.plug.mcn001"],
+    17885: ["Xiaomi", "Xiaomi Smart Wall Outlet Pro", "XMZNCZ01LM", "xiaomi.plug.mcn003"],
     "spec": [
         BaseConv("outlet", "switch", mi="2.p.1"),
         MapConv("power_on_state", "select", mi="2.p.2", map={0: "default", 1: "off", 2: "on"}),
         MapConv("fault", "sensor", mi="2.p.3", map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
+        MathConv("energy", "sensor", mi="3.p.1", round=2, step=0.01),
         MathConv("power", "sensor", mi="3.p.6", round=1),
+        BaseConv("power_consumption_accumulation_way", "binary_sensor", mi="3.p.7", entity=ENTITY_DIAGNOSTIC),
         BaseConv("led", "switch", mi="4.p.1"),
+        BaseConv("child_lock", "switch", mi="5.p.1"),  # config
     ],
 }, {
     7082: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx340"],
