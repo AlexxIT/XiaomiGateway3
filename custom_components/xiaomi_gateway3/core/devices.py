@@ -1536,6 +1536,10 @@ DEVICES += [{
 }, {
     6473: ["Yeelight", "Double Button", "XMWXKG01YL", "yeelink.remote.contrl"],
     "spec": [
+        # mibeacon2 spec
+        MapConv("action", mi=19980, map={"01": BUTTON_1_SINGLE, "02": BUTTON_2_SINGLE, "03": BUTTON_BOTH_SINGLE}),
+        MapConv("action", mi=19981, map={"01": BUTTON_1_DOUBLE, "02": BUTTON_2_DOUBLE}),
+        MapConv("action", mi=19982, map={"01": BUTTON_1_HOLD, "02": BUTTON_2_HOLD}),
         # miot spec
         BaseConv("battery", "sensor", mi="2.p.1003"),
         BaseConv("action", "sensor"),
