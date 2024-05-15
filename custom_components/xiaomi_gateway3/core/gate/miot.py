@@ -90,7 +90,12 @@ class MIoTGateway(XGateway):
         self, device: XDevice, payload: dict, gw2, delay: float = 1.0
     ):
         fut = asyncio.get_event_loop().create_future()
-        device.add_listener(fut.set_result)
+
+        def try_set_result(r):
+            if not fut.done():
+                fut.set_result(r)
+
+        device.add_listener(try_set_result)
         await self.mqtt.publish("miio/command", payload)
         try:
             async with asyncio.timeout(delay):
@@ -98,4 +103,4 @@ class MIoTGateway(XGateway):
         except TimeoutError:
             await gw2.mqtt.publish("miio/command", payload)
         finally:
-            device.remove_listener(fut.set_result)
+            device.remove_listener(try_set_result)
