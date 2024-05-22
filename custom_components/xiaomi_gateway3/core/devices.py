@@ -662,6 +662,17 @@ DEVICES += [{
         # Converter("mode", "sensor", mi="2.p.3"),  # only auto
     ],
 }, {
+    19363: ["Xijia", "Curtain Motor", "xijia1.curtain.x3"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "close", 1: "stop", 2: "open"}),
+        BaseConv("target_position", mi="2.p.4"),
+        CurtainPosConv("position", mi="2.p.3"),
+        MapConv("run_state", mi="2.p.2", map={0: "closing", 1: "stop", 2: "opening"}),
+        BaseConv("battery", "sensor", mi="3.p.1"),  # percent
+        BoolConv("motor_reverse", "switch", mi="2.p.5"),  # uint8, config
+        MapConv("battery_charging", "binary_sensor", mi="3.p.2", map={1: True, 2: False}),  # diagnostic
+    ],
+}, {
     "lumi.remote.acn003": ["Aqara", "Single Wall Button E1 CN", "WXKG16LM"],
     # https://github.com/niceboygithub/AqaraGateway/pull/118/files
     "lumi.remote.acn007": ["Aqara", "Single Wall Button E1", "WXKG20LM"],
