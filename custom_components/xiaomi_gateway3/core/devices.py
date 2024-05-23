@@ -1626,6 +1626,17 @@ DEVICES += [{
         BaseConv("idle_time", mi="2.p.1024"),
     ],
 }, {
+    # https://home.miot-spec.com/spec/xiaomi.sensor_occupy.03
+    18051: ["Xiaomi", "Occupancy Sensor", "XMOSB01XS", "xiaomi.sensor_occupy.03"],
+    "spec": [
+        # main sensors
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),#Tested
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),#Tested
+        # other sensors
+        BaseConv("battery", mi="3.p.1003"),
+
+    ],
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
     13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS", "xiaomi.motion.pir1"],
     "spec": [
@@ -3265,7 +3276,7 @@ DEVICES += [{
         MapConv("icon_style", "select", mi="3.p.5", map={0: "Lamp-bulb", 1: "Cylindrical-spotlight", 2: "Ceiling-light", 3: "Hanging-lamp", 4: "Lamp-belt", 5: "Small-electric-appliance", 6: "Socket", 7: "Valve", 8: "Electrical-machinery"}, entity=ENTITY_CONFIG),
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
-}, {
+},{
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
