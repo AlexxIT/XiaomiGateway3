@@ -3288,6 +3288,7 @@ DEVICES += [{
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
 }, {
+    # https://home.miot-spec.com/spec/mvs.light.wy0a02
     17970: ["MVS", "MVS Mesh Light", "mvs.light.wy0a02"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
