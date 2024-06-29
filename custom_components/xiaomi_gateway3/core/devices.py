@@ -1823,7 +1823,37 @@ DEVICES += [{
         ConstConv("action", mi="2.e.1012", value=BUTTON_SINGLE),
         ConstConv("action", mi="2.e.1013", value=BUTTON_DOUBLE),
         ConstConv("action", mi="2.e.1014", value=BUTTON_HOLD),
-    ]
+    ],
+}, {
+    14608: ["PTX", "Mesh Wireless Switch", "PTX-AK1-QMIMC", "090615.remote.akswr1"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1012", value=BUTTON_SINGLE),
+        ConstConv("action", mi="2.e.1014", value=BUTTON_HOLD),
+        ConstConv("action", mi="3.e.1001", value="low_battery"),
+    ],
+}, {
+    14609: ["PTX", "Mesh Double Wireless Switch", "PTX-AK2-QMIMB", "090615.remote.akswr2"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1012", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="2.e.1014", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="3.e.1001", value="low_battery"),
+        ConstConv("action", mi="4.e.1012", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="4.e.1014", value=BUTTON_2_HOLD),
+    ],
+}, {
+    14610: ["PTX", "Mesh Triple Wireless Switch", "PTX-AK3-QMIMB", "090615.remote.akswr3"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1012", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="2.e.1014", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="3.e.1001", value="low_battery"),
+        ConstConv("action", mi="4.e.1012", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="4.e.1014", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="5.e.1012", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="5.e.1014", value=BUTTON_3_HOLD),
+    ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1294
     14945: ["Linptech", "Wireless Button KS1", "linp.remote.ks1"],
