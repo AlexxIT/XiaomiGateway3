@@ -1,396 +1,417 @@
+import asyncio
 import logging
 import re
 import time
-from collections import deque
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from functools import cached_property
+from typing import Callable, TYPE_CHECKING, TypedDict, Optional
 
-from . import converters
-from .converters import (
-    Converter,
-    LUMI_GLOBALS,
-    GATEWAY,
-    ZIGBEE,
-    BLE,
-    MESH,
-    MESH_GROUP_MODEL,
-)
-from .converters.stats import STAT_GLOBALS
+from .const import GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER
+from .converters import silabs
+from .converters.base import BaseConv, decode_time, encode_time
+from .converters.lumi import LUMI_GLOBALS
+from .converters.zigbee import ZConverter
+from .devices import DEVICES
 
 if TYPE_CHECKING:
-    from .entity import XEntity
-    from .gateway.base import GatewayBase
+    from .gate.base import XGateway
 
-_LOGGER = logging.getLogger(__name__)
+try:
+    # noinspection PyUnresolvedReferences
+    from xiaomi_gateway3 import DEVICES  # loading external converters
+except ModuleNotFoundError:
+    pass
+except Exception as e:
+    logger = logging.getLogger(__package__)
+    logger.error("Can't load external converters", exc_info=e)
 
-RE_DID = re.compile(r"^lumi.[1-9a-f][0-9a-f]{,15}$")
-RE_ZIGBEE_MAC = re.compile(r"^0x[0-9a-f]{16}$")
-RE_NETWORK_MAC = re.compile(r"^[0-9a-f]{12}$")
-RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")
 
-BATTERY_AVAILABLE = 3 * 60 * 60  # 3 hours
-POWER_AVAILABLE = 20 * 60  # 20 minutes
-POWER_POLL = 9 * 60  # 9 minutes
+RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
+RE_ZIGBEE_IEEE = re.compile(r"^[0-9a-f:]{23}$")  # lowercase hex with colons
+RE_NWK = re.compile(r"^0x[0-9a-z]{4}$")  # lowercase hex with prefix 0x
 
-# all legacy names for backward compatibility with 1st version
-LEGACY_ATTR_ID = {
-    "channel_1": "channel 1",
-    "channel_2": "channel 2",
-    "channel_3": "channel 3",
-    "gas_density": "gas density",
-    "group": "light",
-    "outlet": "switch",
-    "plug": "switch",
-    "smoke_density": "smoke density",
-}
+# ZIGBEE (z2m style), GATEWAY/BLE/MESH, MATTER, GROUP
+RE_UID = re.compile(r"^(0x[0-9a-f]{16}|[0-9a-f]{12}|[0-9a-f]{16}|[0-9]{19})$")
+
+POWER_POLL = 10 * 60  # 10 minutes
+
+
+def hex_to_ieee(hex: str) -> str:
+    s = hex[2:].rjust(16, "0")
+    return (
+        f"{s[:2]}:{s[2:4]}:{s[4:6]}:{s[6:8]}:{s[8:10]}:{s[10:12]}:{s[12:14]}:{s[14:]}"
+    )
+
+
+class XDeviceExtra(TypedDict, total=False):
+    # from Gateway:
+    type: str  # one of GATEWAY, ZIGBEE, BLE, MESH, GROUP
+    did: str  # device ID ("ble." "lumi." "group." "123")
+    mac: str  # for GATEWAY, BLE, MESH (lowercase hex with colons)
+    mac2: str  # lan mac for Xiaomi Multimode Gateway 2
+    ieee: str  # for ZIGBEE (lowercase hex with colons, EUI64)
+    nwk: str  # for ZIGBEE
+    nwk_parent: str  # for ZIGBEE, NWK of parent device
+    fw_ver: int  # firmware version for GATEWAY and ZIGBEE
+    hw_ver: int  # hardware version for ZIGBEE
+    childs: list[str]  # for mesh GROUP
+    cloud_did: str  # for new ZIGBEE devices did will be "lumi", but cloud_did will be "123"
+    seq: int  # BLE duplicate event check
+    lqi: int  # for ZIGBEE
+    rssi: int  # for GATEWAY, ZIGBEE, BLE, MESH
+    # from DEVICES
+    market_brand: str  # from DEVICES
+    market_name: str  # from DEVICES
+    market_model: str  # from DEVICES
+    # from Cloud
+    cloud_name: str  # device name from cloud
+    cloud_fw: str  # device firmware from cloud
+    # from YAML
+    name: str  # device name override from YAML
+    model: str  # device model override from YAML
+    entity_name: str  # entity name override from YAML
+    entities: dict[str, str | None] | bool  # custom domains for attr
+    default_transition: float  # default transition for lights
+    invert_state: bool  # invert state for binary sensors
+    occupancy_timeout: list[float] | float  # occupancy timeout for motion
 
 
 class XDevice:
-    converters: List[Converter] = None
+    configs: dict[str, dict] = {}  # key is device.uid
+    restore: dict[str, dict] = {}  # key is device.cloud_did
 
-    available_timeout: float = 0
-    poll_timeout: float = 0
-    decode_ts: float = 0
-    encode_ts: float = 0
+    converters: list[BaseConv]
 
-    _available: bool = None
-
-    def __init__(
-        self,
-        type: str,
-        model: Union[str, int, None],
-        did: str,
-        mac: str,
-        nwk: str = None,
-    ):
-        """Base class to handle device of any type."""
-        assert type in (GATEWAY, ZIGBEE, BLE, MESH)
-        if type == ZIGBEE:
-            assert isinstance(model, str) or model is None
-            assert RE_DID.match(did)
-            assert RE_ZIGBEE_MAC.match(mac)
-            assert RE_NWK.match(nwk)
-        elif type == BLE:
-            assert isinstance(model, int)
-            assert did.startswith("blt.") or did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac)
-        elif model == MESH_GROUP_MODEL:
-            assert did.startswith("group.")
-        elif type == MESH:
-            assert isinstance(model, int)
-            assert did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac), mac
-        elif type == GATEWAY:
-            assert isinstance(model, str)
-            assert did.isdecimal()
-            assert RE_NETWORK_MAC.match(mac), mac
-
-        # TODO: assert mac
-        self.type = type
+    def __init__(self, model: str | int, **kwargs):
+        self.available: bool = False
+        self.gateways: list["XGateway"] = []
+        self.extra: XDeviceExtra = kwargs
+        self.listeners: list[Callable] = []
         self.model = model
-        self.did = did
-        self.mac = mac
-        self.nwk = nwk
 
-        # device brand, model, name and converters
-        self.info = converters.get_device_info(model, type) if model else None
-        # all device entities
-        self.entities: Dict[str, "XEntity"] = {}
-        # device gateways (one for GW and Zigbee), multiple for BLE and Mesh
-        self.gateways: List["GatewayBase"] = []
+        # int for time.time() will be enough
+        self.last_report_gw: Optional["XGateway"] = None
+        self.last_report_ts: int = 0
+        self.last_request_ts: int = 0
+        self.last_report: dict | None = None
+        self.last_seen: dict["XDevice", int] = {}  # key is gateway uid
+        self.params: dict | None = {}
 
-        # internal device storage from any useful data
-        self.extra: Dict[str, Any] = {}
-        self.lazy_setup = set()
+        self.available_timeout: int = 0
+        self.poll_timeout: int = 0
 
-    def as_dict(self, ts: float) -> dict:
-        resp = {k: getattr(self, k) for k in ("type", "model", "fw_ver", "available")}
-        if self.decode_ts:
-            resp["decode_time"] = round(ts - self.decode_ts)
-        if self.encode_ts:
-            resp["encode_time"] = round(ts - self.encode_ts)
+        self.assert_extra()
+        self.init_defaults()
+        self.init_converters()
 
-        resp["entities"] = {
-            attr: entity.hass_state for attr, entity in self.entities.items()
-        }
-        resp["gateways"] = [gw.device.unique_id for gw in self.gateways]
+    @cached_property
+    def uid(self) -> str:
+        """Universal Hass UID for devices."""
+        if "mac" in self.extra:
+            return self.extra["mac"].replace(":", "")
+        if "ieee" in self.extra:
+            return "0x" + self.extra["ieee"].replace(":", "")
+        if self.type == GROUP:
+            return self.did[6:]
+        if self.type == MATTER:
+            return self.did[2:]
 
-        if self.type in self.entities:
-            resp["stats"] = self.entities[self.type].extra_state_attributes
+    @cached_property
+    def type(self) -> str:
+        return self.extra.get("type") or "none"
 
-        return resp
+    @cached_property
+    def did(self) -> str:
+        return self.extra.get("did")
 
-    @property
-    def available(self):
-        return self._available
+    @cached_property
+    def cloud_did(self) -> str | None:
+        """Cloud DID same as DID for most devices except new ZIGBEE."""
+        return self.extra.get("cloud_did") or self.extra.get("did")
 
-    @available.setter
-    def available(self, value: bool):
-        if self._available == value:
-            return
-        self._available = value
-        if self.entities:
-            self.update_available()
+    @cached_property
+    def nwk(self) -> str:
+        return self.extra.get("nwk") or "0x0000"  # 0 - for GATEWAY
 
-    @property
-    def unique_id(self) -> str:
-        return self.extra.get("unique_id", self.mac)
-
-    @property
-    def name(self) -> str:
-        return self.info.name if self.info else "Unknown"
-
-    @property
-    def fw_ver(self) -> Any:
-        return self.extra.get("fw_ver")
-
-    @property
+    @cached_property
     def ieee(self) -> str:
-        """For Hass device connections."""
-        return ":".join([self.mac[i : i + 2] for i in range(2, 18, 2)])
+        return self.extra["ieee"]
+
+    @cached_property
+    def market_name(self) -> str:
+        return f"{self.extra['market_brand']} {self.extra['market_name']}"
+
+    @cached_property
+    def miot_model(self) -> str | None:
+        """Get device model for Xiaomi MiOT cloud."""
+        if isinstance(self.model, str) and self.model.startswith("lumi."):
+            return self.model  # for GATEWAY and ZIGBEE
+        model = self.extra.get("market_model") or str(self.model)
+        if m := re.search(r"[a-z0-9]+\.[a-z0-9_.]+", model):
+            return m[0]
 
     @property
-    def has_zigbee_conv(self) -> bool:
-        if not self.converters:
-            return False
-        return any(True for conv in self.converters if conv.zigbee)
+    def human_name(self) -> str:
+        return (
+            self.extra.get("name")  # from yaml
+            or self.extra.get("cloud_name")  # from cloud
+            or self.extra.get("market_name")  # from DEVICES
+            or "Unknown " + self.type
+        )
 
-    def has_support(self, feature: str) -> bool:
-        if feature == "zigbee":
-            return self.type == ZIGBEE
-
-        if feature == "zigbee+ble":
-            return self.type in (ZIGBEE, BLE)
-
-        if not self.model:
-            return False
-
-        if feature == "bind_from":
-            # Aqara Opple support binding from
-            if self.type == ZIGBEE and self.model.endswith("86opcn01"):
-                return True
-
-            conv = self.converters[0]
-            return (
-                conv.zigbee == "on_off"
-                and conv.domain == "sensor"
-                and getattr(conv, "bind", False)
-            )
-
-        if feature == "bind_to":
-            conv = self.converters[0]
-            return self.type == ZIGBEE and conv.domain in ("switch", "light")
-
-    def update_model(self, value: str):
-        # xiaomi soft adds tail to some models: .v1 or .v2 or .v3
-        self.model = value[:-3] if value[-3:-1] == ".v" else value
-        self.info = converters.get_device_info(self.model, self.type)
-
-    def attr_unique_id(self, attr: str):
-        return f"{self.unique_id}_{LEGACY_ATTR_ID.get(attr, attr)}"
-
-    def attr_name(self, attr: str):
-        # this words always uppercase
-        if attr in ("ble", "led", "rssi", "usb"):
-            return self.info.name + " " + attr.upper()
-
-        attr = attr.replace("_", " ").title()
-
-        # skip second attr in name if exists
-        if attr in self.info.name:
-            return self.info.name
-
-        return self.info.name + " " + attr
-
-    def entity_id(self, conv: Converter):
-        name = self.extra.get("entity_name", self.mac)
-        return f"{conv.domain}.{name}_{conv.attr}"
-
-    # TODO: rename
-    def subscribe_attrs(self, conv: Converter):
-        attrs = {conv.attr}
-        if conv.childs:
-            attrs |= set(conv.childs)
-        attrs.update(c.attr for c in self.converters if c.parent == conv.attr)
-        return attrs
-
-    def __str__(self):
-        s = f"XDevice({self.type}, {self.model}, {self.mac}"
-        s += f", {self.nwk})" if self.nwk else ")"
+    @property
+    def human_model(self) -> str:
+        s = self.type.upper() if self.type == BLE else self.type.capitalize()
+        if "market_model" in self.extra:
+            s += ": " + self.extra["market_model"]
+            if isinstance(self.model, str):
+                s += ", " + self.model  # for GATEWAY and ZIGBEE
+        else:
+            s += f": {self.model}"
         return s
 
-    def setup_entitites(self, gateway: "GatewayBase", stats: bool = False):
-        """
-        xiaomi_gateway3:
-          devices:
-            0x001234567890:  # match device by IEEE
-              entities:
-                plug: light            # change entity domain (switch to light)
-                power:                 # disable default entity
-                zigbee: sensor         # adds stat entity only for this device
-                parent: sensor         # adds entity from attribute value
-                lqi: sensor            # adds entity from attribute value
-              model: lumi.plug.mitw01            # overwrite model
-              name: Kitchen Refrigerator         # overwrite device name
-              entity_name: kitchen_refrigerator  # overwrite entity name
+    @cached_property
+    def firmware(self) -> str | None:
+        return self.extra.get("fw_ver") or self.extra.get("cloud_fw")
 
-        System kwargs:
-          decode_ts - aka "last_seen" from device (stored in config folder)
-          unique_id - ID legacy format from 1st version
-          restore_entities - skip lazy status for exist entities
-        """
-        kwargs: Dict[str, Any] = {}
+    def as_dict(self, ts: float = None) -> dict[str, int | str | bool]:
+        if ts is None:
+            ts = time.time()
 
-        if stats:
-            kwargs["entities"] = {self.type: "sensor"}
+        data = {
+            "available": self.available,
+            "extra": self.extra,
+            "last_seen": {
+                gw.uid: encode_time(ts - last_seen)
+                for gw, last_seen in self.last_seen.items()
+            },
+            "listeners": len(self.listeners),
+            "model": self.model,
+            "params": self.params,
+            "ttl": encode_time(self.available_timeout),
+            "uid": self.uid,
+        }
+        if self.last_report:
+            data["last_report"] = self.last_report
+        if self.last_report_gw:
+            data["last_report_gw"] = self.last_report_gw.as_dict()
+        if self.last_report_ts:
+            data["last_report_ts"] = encode_time(ts - self.last_report_ts)
+        if self.last_request_ts:
+            data["last_request_ts"] = encode_time(ts - self.last_request_ts)
 
-        for key in (self.type, self.model, self.mac, self.did):
-            if key in gateway.defaults:
-                update(kwargs, gateway.defaults[key])
+        return data
 
-        if "decode_ts" in kwargs and self.decode_ts == 0:
-            self.decode_ts = kwargs["decode_ts"]
+    def add_listener(self, handler: Callable):
+        if handler not in self.listeners:
+            self.listeners.append(handler)
 
-        if "model" in kwargs:
-            # support change device model in config
-            self.update_model(kwargs["model"])
+    def dispatch(self, data: dict):
+        """Notify all listeners with new data."""
+        for handler in self.listeners:
+            handler(data)
 
-        if "name" in kwargs:
-            # support set device name in config
-            self.info.name = kwargs["name"]
+    def remove_listener(self, handler: Callable):
+        if handler in self.listeners:
+            self.listeners.remove(handler)
 
-        for k in ("entity_name", "unique_id"):
-            if k in kwargs:
-                self.extra[k] = kwargs[k]
+    def has_battery(self) -> bool:
+        """Device has any converter with "battery" in name."""
+        return any(i.attr.startswith("battery") for i in self.converters)
 
-        entities = kwargs.get("entities") or {}
-        restore_entities = kwargs.get("restore_entities") or []
+    def has_controls(self) -> bool:
+        """Device has any non sensor entity."""
+        return any("sensor" not in i.domain for i in self.converters if i.domain)
 
-        self.setup_converters(entities)
-        # update available before create entities
-        self.setup_available()
+    def has_silabs(self) -> bool:
+        """Device has any silabs (zigbee) converter."""
+        return any(isinstance(i, ZConverter) for i in self.converters)
 
-        for conv in self.converters:
-            # support change attribute domain in config
-            domain = kwargs.get(conv.attr, conv.domain)
-            if domain is None:
-                continue
-            if conv.enabled is None and conv.attr not in restore_entities:
-                self.lazy_setup.add(conv.attr)
-                continue
-            gateway.setup_entity(domain, self, conv)
+    def assert_extra(self):
+        """Validate some extra fields."""
+        if type := self.extra.get("type"):
+            assert type in (GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER)
+            assert RE_UID.match(self.uid), self.uid
+        if mac := self.extra.get("mac"):
+            assert RE_NETWORK_MAC.match(mac), mac
+        if ieee := self.extra.get("ieee"):
+            assert RE_ZIGBEE_IEEE.match(ieee), ieee
+        if did := self.extra.get("did"):
+            if type in (GATEWAY, MESH):
+                assert did.isdecimal()
+            elif type == ZIGBEE:
+                assert did.startswith("lumi.")
+            elif type == BLE:
+                # sometimes decimal https://github.com/AlexxIT/XiaomiGateway3/issues/973
+                assert did.startswith("blt.") or did.isdecimal()
+            elif type == GROUP:
+                assert did.startswith("group.")
+            elif type == MATTER:
+                assert did.startswith("M.")
 
-    def setup_converters(self, entities: dict = None):
-        """If no entities - use only required converters. Otherwise search for
-        converters in:
-           - STAT_GLOBALS list
-           - converters childs list (always sensor)
-        """
-        if entities is None:
-            self.converters = self.info.spec
-            return
+    def init_defaults(self):
+        # restore device setting based on cloud did
+        if restore := XDevice.restore.get(self.cloud_did):
+            if "cloud_name" in restore:
+                self.extra["cloud_name"] = restore["cloud_name"]
+            if "cloud_fw" in restore:
+                self.extra["cloud_fw"] = restore["cloud_fw"]
+            if "last_report_ts" in restore:
+                self.last_report_ts = restore["last_report_ts"]
 
-        self.converters = self.info.spec.copy()
+        # init device extra from yaml config based on type, model, uid
+        for k in (self.type, self.model, self.uid):
+            if extra := XDevice.configs.get(k):
+                self.extra.update(extra)
 
-        for attr, domain in entities.items():
-            if not isinstance(domain, str):
-                continue
-            if attr in STAT_GLOBALS:
-                self.converters.append(STAT_GLOBALS[attr])
-                continue
-            for conv in self.converters:
-                if conv.childs and attr in conv.childs:
-                    conv = Converter(attr, domain)
-                    self.converters.append(conv)
+    def init_converters(self):
+        # support custom model from yaml
+        model = self.extra.get("model") or self.model
 
-    def setup_available(self):
-        # TODO: change to better logic?
-        if self.type == GATEWAY or self.model == MESH_GROUP_MODEL:
-            self.available = True
-            return
-
-        # TODO: change to better logic?
-        if any(True for c in self.converters if c.attr == "battery"):
-            self.available_timeout = self.info.ttl or BATTERY_AVAILABLE
+        for desc in DEVICES:
+            # if this spec for current model
+            if info := desc.get(model):
+                self.extra["market_brand"] = info[0]
+                self.extra["market_name"] = info[1]
+                if len(info) > 2:
+                    self.extra["market_model"] = ", ".join(info[2:])
+                break
+            # if this spec for current type
+            if self.type == desc.get("default"):
+                break
         else:
-            self.available_timeout = self.info.ttl or POWER_AVAILABLE
+            self.converters = []
+            return
+
+        self.converters = desc["spec"]
+
+        # ABOUT. Set available_timeout = 3 * keep_alive + 5 min
+        if self.type == ZIGBEE:
+            # lumi battery devices report every 55 min (heartbeat)
+            # power poll every 10 min (internal integration logic)
+            self.available_timeout = 170 * 60 if self.has_battery() else 35 * 60
+        elif self.type == BLE:
+            # keep alive every 20 min
+            self.available_timeout = 65 * 60
+        elif self.type == MESH:
+            # keep alive every 15/30 min depends on device and gateway firmware
+            # same for powered and battery devices
+            self.available_timeout = 50 * 60
+        elif self.type == MATTER:
+            self.available_timeout = 35 * 60
+            self.poll_timeout = POWER_POLL
+            return
+        elif self.type == GATEWAY:
+            self.poll_timeout = POWER_POLL
+            return
+        else:
+            return
+
+        if (v := desc.get("ttl")) is not None:
+            self.available_timeout = decode_time(v) if isinstance(v, str) else v
+
+        if self.type in (MESH, ZIGBEE) and not self.has_battery():
             self.poll_timeout = POWER_POLL
 
-        self.available = (time.time() - self.decode_ts) < self.available_timeout
+    def restore_last_seen(self, gw: "XGateway"):
+        is_available = False
+        if self.available_timeout != 0:
+            if store := XDevice.restore.get(self.cloud_did):
+                if last_seen := store.get("last_seen", {}).get(gw.device.uid):
+                    if time.time() - last_seen < self.available_timeout:
+                        self.last_seen[gw.device] = last_seen
+                        is_available = True
+        else:
+            is_available = True
 
-    def decode(self, attr_name: str, value: Any) -> Optional[dict]:
-        """Find converter by attr_name and decode value."""
-        for conv in self.converters:
-            if conv.attr == attr_name:
-                self.available = True
-                self.decode_ts = time.time()
+        if is_available and not self.available:
+            self.available = is_available
+            self.dispatch({"available": is_available})
 
-                payload = {}
-                conv.decode(self, payload, value)
-                return payload
-        return None
-
-    def decode_lumi(self, value: list) -> dict:
-        """Decode value from Zigbee Lumi/MIoT spec."""
+    def decode(self, data: dict | list) -> dict:
+        """Decode data from device. Support only one item or list of items."""
         payload = {}
+        if isinstance(data, list):
+            for value in data:
+                self.decode_one(payload, value)
+        else:
+            self.decode_one(payload, data)
+        return payload
 
-        for param in value:
-            # Lumi spec has `error_code`, MIoT spec has `code`
-            if param.get("error_code", 0) != 0 or param.get("code", 0) != 0:
-                continue
-            if "value" in param:
-                v = param["value"]
-            else:
-                v = param["arguments"]
-                if v and "siid" in param:
-                    # add siid to every argument
-                    for item in param["arguments"]:
-                        if "piid" in item or "eiid" in item and "siid" not in item:
-                            item["siid"] = param["siid"]
+    def decode_one(self, payload: dict, value: dict):
+        if "res_name" in value:
+            self.decode_lumi(payload, value)
+        elif "siid" in value:
+            self.decode_miot(payload, value)
+        elif "eid" in value:
+            self.decode_mibeacon(payload, value)
+        elif "clusterId" in value:
+            self.decode_silabs(payload, value)
+        elif "iid" in value:
+            self.decode_matter(payload, value)
 
-            # res_name is Lumi format
-            if "res_name" in param:
-                prop = param["res_name"]
-                conv: Converter = LUMI_GLOBALS.get(prop)
-                if conv:
-                    conv.decode(self, payload, v)
-                    if conv.attr == "online":
-                        return payload
+    def decode_lumi(self, payload: dict, value: dict):
+        """Internal func for unpack one lumi or miio attribute."""
+        if value.get("error_code", 0) != 0:
+            return
 
-            # piid or eiid is MIoT format
-            elif "piid" in param:
-                prop = f"{param['siid']}.p.{param['piid']}"
-            elif "eiid" in param:
-                prop = f"{param['siid']}.e.{param['eiid']}"
-            else:
-                raise RuntimeError
+        mi = value["res_name"]
+        v = value["value"]
 
-            self.available = True
-            self.decode_ts = time.time()
+        if conv := LUMI_GLOBALS.get(mi):
+            conv.decode(self, payload, v)
 
+        for conv in self.converters:
+            if conv.mi == mi:
+                conv.decode(self, payload, v)
+
+    def decode_miot(self, payload: dict, value: dict):
+        if value.get("code", 0) != 0:
+            return
+
+        # {"cmd":"report","did":"lumi","params":[{"aiid":1,"in":[],"siid":8}]}
+        if "piid" in value:
+            # process property
+            mi = f"{value['siid']}.p.{value['piid']}"
             for conv in self.converters:
-                if conv.mi == prop:
-                    conv.decode(self, payload, v)
+                if conv.mi == mi:
+                    conv.decode(self, payload, value["value"])
+        elif "eiid" in value:
+            # process event
+            mi = f"{value['siid']}.e.{value['eiid']}"
+            for conv in self.converters:
+                if conv.mi == mi:
+                    conv.decode(self, payload, None)
+            # process event arguments properties
+            for item in value["arguments"]:
+                item.setdefault("siid", mi)
+                self.decode_miot(payload, item)
 
-        return payload
-
-    def decode_miot(self, value: list):
-        """Decode value from Mesh MIoT spec."""
-        if MESH in self.entities:
-            self.update(self.decode(MESH, value))
-
-        return self.decode_lumi(value)
-
-    def decode_zigbee(self, value: dict) -> Optional[dict]:
-        """Decode value from Zigbee spec."""
-        self.available = True
-        self.decode_ts = time.time()
-
-        payload = {}
+    def decode_mibeacon(self, payload: dict, value: dict):
         for conv in self.converters:
-            if conv.zigbee == value["cluster"]:
-                conv.decode(self, payload, value)
-        return payload
+            if conv.mi == value["eid"]:
+                conv.decode(self, payload, value["edata"])
+
+    def decode_silabs(self, payload: dict, value: dict):
+        """Internal func for unpack Silabs MQTT message."""
+        cluster_id = int(value["clusterId"], 0)
+        endpoint = int(value["sourceEndpoint"], 0)
+        v: dict = value.get("decode")  # maybe we decode payload earlier for logs
+
+        for conv in self.converters:
+            if (
+                isinstance(conv, ZConverter)
+                and conv.cluster_id == cluster_id
+                and (conv.ep is None or conv.ep == endpoint)
+            ):
+                # decode payload on demand
+                if v is None and not (v := silabs.decode(value)):
+                    return
+                conv.decode(self, payload, v)
+
+    def decode_matter(self, payload: dict, value: dict):
+        for conv in self.converters:
+            if conv.mi == value["iid"]:
+                conv.decode(self, payload, value["value"])
 
     def encode(self, value: dict) -> dict:
         """Encode payload to supported spec, depends on attrs.
@@ -399,92 +420,104 @@ class XDevice:
         @return: dict with `params` (lumi spec), `mi_spec` (miot spec),
             `commands` (zigbee spec)
         """
-        self.encode_ts = time.time()
         payload = {}
+
         for k, v in value.items():
             for conv in self.converters:
                 if conv.attr == k:
                     conv.encode(self, payload, v)
+
         return payload
 
     def encode_read(self, attrs: set) -> dict:
-        self.encode_ts = time.time()
         payload = {}
+
         for conv in self.converters:
             if conv.attr in attrs:
-                conv.read(self, payload)
+                conv.encode_read(self, payload)
+
+        return payload
+
+    def on_keep_alive(self, gw: "XGateway", ts: int = None) -> int:
+        if ts is None:
+            ts = int(time.time())
+        if gw not in self.gateways:
+            gw.add_device(self)
+        self.last_seen[gw.device] = ts
+        return ts
+
+    def on_report(self, data: dict | list, gw: "XGateway", ts: int) -> dict:
+        """Process data from device."""
+        if payload := self.decode(data):
+            self.last_report_gw = gw
+            self.last_report_ts = ts
+            self.last_report = payload
+            self.params.update(payload)
+
+            if not self.available:
+                # update available and state with one step
+                self.available = payload["available"] = True
+
+            # log before dispatch
+            gw.debug("on_report", device=self, data=payload)
+
+            self.dispatch(payload)
+
         return payload
 
     @property
-    def powered(self) -> bool:
-        return "sensor" not in self.converters[0].domain
+    def send_gateway(self) -> "XGateway":
+        """Select best gateway for send command (write or read)."""
+        if self.last_report_gw in self.gateways and self.last_report_gw.available:
+            return self.last_report_gw
 
-    def update(self, value: dict):
-        """Push new state to Hass entities."""
-        if not value:
-            return
+        return next((i for i in self.gateways if i.available), None)
 
-        attrs = value.keys()
+    def write(self, payload: dict):
+        """Send write command to device."""
+        if (gw := self.send_gateway) and (data := self.encode(payload)):
+            self.last_request_ts = time.time()
+            gw.debug("write", device=self, data=payload)
+            return asyncio.create_task(gw.send(self, data))
 
-        if self.lazy_setup:
-            for attr in self.lazy_setup & attrs:
-                conv = next(c for c in self.converters if c.attr == attr)
-                gateway = self.gateways[0]
-                if conv.domain not in gateway.setups:
-                    return
-                self.lazy_setup.remove(attr)
-                gateway.setups[conv.domain](gateway, self, conv)
+    def read(self, attrs: set = None):
+        """Send read command to device."""
+        if attrs is None:
+            attrs = {i.attr for i in self.converters}
 
-        for entity in self.entities.values():
-            if entity.subscribed_attrs & attrs:
-                entity.async_set_state(value)
-                # noinspection PyProtectedMember
-                if entity.added:
-                    entity.async_write_ha_state()
+        if (gw := self.send_gateway) and (data := self.encode_read(attrs)):
+            self.last_request_ts = time.time()
+            gw.debug("read", device=self, data=attrs)
+            return asyncio.create_task(gw.send(self, data))
 
-    def update_available(self):
-        for entity in self.entities.values():
-            entity.async_update_available()
-            # noinspection PyProtectedMember
-            if entity.added:
-                entity.async_write_ha_state()
+    def update(self, ts: int = None):
+        """Update device available and state if necessary."""
+        if ts is None:
+            ts = int(time.time())
 
-
-def update(orig_dict: dict, new_dict: dict):
-    for k, v in new_dict.items():
-        if isinstance(v, dict):
-            orig_dict[k] = update(orig_dict.get(k, {}), v)
-        elif isinstance(v, list):
-            orig_dict[k] = orig_dict.get(k, []) + v
+        if self.available_timeout != 0:
+            # available based on last_seen value and gw.available
+            is_available = False
+            for gw, last_seen in list(self.last_seen.items()):
+                if ts - last_seen < self.available_timeout:
+                    if gw.available:
+                        is_available = True
+                else:
+                    self.last_seen.pop(gw)
         else:
-            orig_dict[k] = new_dict[k]
-    return orig_dict
+            # available based on gw.available
+            is_available = any(gw.available for gw in self.gateways)
 
+        if self.available != is_available:
+            self.available = is_available
+            self.dispatch({"available": is_available})
 
-def logger_wrapper(func, log: deque, name: str = None):
-    def wrap(*args):
-        if not (name is None and args[0] == "ble"):
-            ts = datetime.now().isoformat(timespec="milliseconds")
-            log.append(
-                {"ts": ts, "type": name, "value": args[0]}
-                if name
-                else {"ts": ts, "type": "decode_" + args[0], "value": args[1]}
-            )
-        return func(*args)
-
-    return wrap
-
-
-def logger(device: XDevice) -> Optional[list]:
-    if "logger" not in device.extra:
-        device.extra["logger"] = log = deque(maxlen=100)
-        device.decode = logger_wrapper(device.decode, log)
-        device.decode_lumi = logger_wrapper(device.decode_lumi, log, "decode_lumi")
-        device.decode_zigbee = logger_wrapper(
-            device.decode_zigbee, log, "decode_silabs"
-        )
-        device.encode = logger_wrapper(device.encode, log, "encode")
-        device.encode_read = logger_wrapper(device.encode_read, log, "encode_read")
-        return None
-
-    return list(device.extra["logger"])
+        # 1. Check if device can be polled
+        # 2. Check if last message from device more than timeout
+        # 3. Check if last message to device more than timeout
+        if (
+            self.poll_timeout
+            and ts - self.last_report_ts > self.poll_timeout
+            and ts - self.last_request_ts > self.poll_timeout
+        ):
+            self.read()

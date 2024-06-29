@@ -78,13 +78,13 @@
           "pair": "Zigbee配对",
           "bind": "Zigbee绑定",
           "ota": "Zigbee OTA",
-          "config": "Zigbee重新配置",
-          "parentscan": "Zigbee父设备扫描",
-          "firmwarelock": "网关固件锁定",
+          "reconfig": "Zigbee重新配置",
+          "parent_scan": "Zigbee父设备扫描",
+          "firmware_lock": "网关固件锁定",
           "reboot": "网关重启",
           "ftp": "网关运行FTP",
           "flashzb": "Zigbee刷写EZSP",
-          "openmiio_reload": "重载OpenmiIO"
+          "openmiio_restart": "重载OpenmiIO"
         }
       },
       "data": {

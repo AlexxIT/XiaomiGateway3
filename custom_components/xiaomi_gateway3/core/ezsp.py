@@ -9,9 +9,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.requirements import async_process_requirements
 
-from . import shell
 from .const import DOMAIN
-from .shell.base import OPENMIIO_CMD
+from .shell.const import OPENMIIO_CMD
+from .shell.session import Session
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
     _LOGGER.debug(f"{host} [FWUP] Target zigbee firmware v{tar_fw}")
 
-    session = shell.Session(host)
+    session = Session(host)
 
     try:
         await session.connect()
@@ -97,18 +97,22 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 
 
 async def read_firmware(host: str) -> Optional[str]:
-    from bellows.ezsp import EZSP
-
-    ezsp = EZSP({"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None})
+    ezsp = None
     try:
-        # noinspection PyProtectedMember
-        await asyncio.wait_for(ezsp._probe(), timeout=10)
+        from bellows.ezsp import EZSP
+
+        ezsp = EZSP(
+            {"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None}
+        )
+        await ezsp.connect(use_thread=False)
+        await ezsp.startup_reset()
         _, _, version = await ezsp.get_board_info()
     except Exception as e:
         _LOGGER.debug(f"{host} [FWUP] Read firmware error: {e}")
         return None
     finally:
-        ezsp.close()
+        if ezsp:
+            ezsp.close()
 
     _LOGGER.debug(f"{host} [FWUP] Current zigbee firmware v{version}")
 

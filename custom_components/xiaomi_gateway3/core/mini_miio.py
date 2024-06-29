@@ -14,7 +14,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__package__ + ".miio")
 
 HELLO = bytes.fromhex(
     "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
@@ -156,7 +156,7 @@ class SyncMiIO(BasemiIO):
             self.delta_ts = None
 
         else:
-            _LOGGER.warning(
+            _LOGGER.debug(
                 f"{self.addr[0]} | Device offline"
                 if pings >= 2
                 else f"{self.addr[0]} | Can't send {method} {params}"
@@ -230,10 +230,10 @@ class AsyncSocket(DatagramProtocol):
             return
         try:
             self.transport.close()
-        except Exception:
-            _LOGGER.exception("Error when closing async socket")
+        except Exception as e:
+            _LOGGER.error("Error when closing async socket", exc_info=e)
 
-    async def connect(self, addr: tuple):
+    async def connect(self, addr: tuple[str, int]):
         coro = asyncio.get_event_loop().create_datagram_endpoint(
             lambda: self, remote_addr=addr
         )
@@ -325,10 +325,10 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             self.delta_ts = None
 
         if offline:
-            _LOGGER.warning(f"{self.addr[0]} | Device offline")
+            _LOGGER.debug(f"{self.addr[0]} | Device offline")
             return None
 
-        _LOGGER.info(f"{self.addr[0]} | No answer on {method} {params}")
+        _LOGGER.debug(f"{self.addr[0]} | No answer on {method} {params}")
         return {}
 
     async def send_bulk(self, method: str, params: list) -> list:
@@ -344,7 +344,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
         except Exception:
             return None
 
-    async def info(self):
+    async def info(self, tries: int = 3) -> dict | None:
         """Get info about miIO device."""
-        resp = await self.send("miIO.info")
+        resp = await self.send("miIO.info", tries=tries)
         return resp.get("result") if resp else resp

@@ -4,16 +4,17 @@
 
 Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Gateway 3), **Xiaomi Multimode Gateway 2**, **Aqara Hub E1** on default firmwares over LAN.
 
-| Gateway                         | Model      | Supported         |
-|---------------------------------|------------|-------------------|
-| Xiaomi Multimode Gateway (CN)   | ZNDMWG03LM | **supported**     |
-| Xiaomi Multimode Gateway (EU)   | ZNDMWG02LM | **supported**     |
-| Xiaomi Multimode Gateway 2 (CN) | DMWG03LM   | **supported**     |
-| Xiaomi Multimode Gateway 2 (EU) | ZNDMWG04LM | **supported**     |
-| Aqara Hub E1 (CN)               | ZHWG16LM   | **supported**     |
-| Xiaomi Gateway 2 (CN)           | DGNWG02LM  | **no**, [goto][1] |
-| Xiaomi Gateway (EU)             | DGNWG05LM  | **no**, [goto][2] |
-| Aqara Hub E1 (EU), Aqara G2H (CN), Aqara H1 (CN), Aqara M1S (CN), Aqara M2 (CN), Aqara P3 (CN) | HE1-G01, ZNSXJ12LM, QBCZWG11LM, ZHWG15LM, ZHWG12LM, KTBL12LM | **no**, [goto][3] |
+| Gateway                         | Model                 | Supported         |
+|---------------------------------|-----------------------|-------------------|
+| Xiaomi Multimode Gateway (CN)   | ZNDMWG03LM            | **yes**           |
+| Xiaomi Multimode Gateway (EU)   | ZNDMWG02LM, YTC4044GL | **yes**           |
+| Xiaomi Multimode Gateway 2 (CN) | DMWG03LM              | **yes**           |
+| Xiaomi Multimode Gateway 2 (EU) | ZNDMWG04LM, BHR6765GL | **yes**           |
+| Aqara Hub E1 (CN)               | ZHWG16LM              | **yes**           |
+| Xiaomi Gateway 2 (CN)           | DGNWG02LM             | **no**, [goto][1] |
+| Xiaomi Gateway (EU)             | DGNWG05LM             | **no**, [goto][2] |
+
+**Other.** Aqara Hub E1 (EU), Aqara G2H (CN), Aqara H1 (CN), Aqara M1S (CN), Aqara M2 (CN), Aqara P3 (CN) | HE1-G01, ZNSXJ12LM, QBCZWG11LM, ZHWG15LM, ZHWG12LM, KTBL12LM - **no**, [goto][3]
 
 [1]: https://www.home-assistant.io/integrations/xiaomi_aqara/
 [2]: https://openlumi.github.io/
@@ -52,20 +53,41 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 
 ## Supported Firmwares
 
-Component support original gateway firmware. You do not need to manually open, solder and flash the devices.
+| Gateway                            | Firmwares     | Required      |
+|------------------------------------|---------------|---------------|
+| Xiaomi Multimode Gateway (CN/EU)   | 1.5.0 - 1.5.4 | only Token    |
+| Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.3 - 1.0.6 | only Token    |
+| Aqara Hub E1 (CN)                  | 4.0.1         | only Token    |
+| Xiaomi Multimode Gateway (CN/EU)   | 1.5.5 - 1.5.6 | Token and Key |
+| Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.7         | Token and Key |
 
-The following versions are confirmed and supported:
+**PS.** Firmwares from 1.4.6 to 1.4.7 for Xiaomi Multimode Gateway may work but **UNSUPPORTED**. Please don't create issues if something doesn't work on them.
 
-- **Home Assistant** from `2022.8.x` to `2023.5.x`
-- **Xiaomi Multimode Gateway CN/EU** from `1.5.0_xxxx` to `1.5.4_xxxx`
-- **Xiaomi Multimode Gateway 2 CN/EU** from `1.0.3_xxxx` to `1.0.6_xxxx`
-- **Aqara Hub E1 CN** - `4.0.1_0001`
+**PS.** For "*only Token*" firmwares integration will get Key automatically and save it to integration settings and to `/config/.storage/xiaomi_gateway3/keys.json`. Please save it safely somewhere else.
 
-Limited support for:
+Recommended firmwares:
+- Xiaomi Multimode Gateway (CN/EU) - 1.5.4 - 1.5.6
+- Xiaomi Multimode Gateway 2 (CN/EU) - 1.0.6 - 1.0.7
+- Aqara Hub E1 (CN) - 4.0.1
 
-- **Xiaomi Multimode Gateway CN/EU** for `1.5.5_0006`, [read more](https://github.com/AlexxIT/Blog/issues/13)
+**HOWTO get token** [read here](#obtain-mi-home-device-token)
 
-For Xiaomi Multimode Gateway you can:
+**HOWTO get key**
+
+| Gateway                                                                                 | Situation                                                                           | Solution                                                             |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.4 and lower                                                            | setup integration and use only Token                                 |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.6 and lower                                                            | setup integration and use only Token                                 |
+| Aqara Hub E1 (CN)                                                                       | firmware 4.0.1 and lower                                                            | setup integration and use only Token                                 |
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, but shipped from the factory with firmware 1.4.6 and lower | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
+| Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you updated it to latest firmware                | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
+| Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
+| Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | no solution                                                          |
+
+- Read more https://github.com/AlexxIT/Blog/issues/13
+
+For Xiaomi Multimode Gateway you also can:
 
 - optional update firmware via [Telnet](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
 - optional install [custom firmware](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
@@ -93,15 +115,13 @@ Zigbee devices in ZHA or z2m modes doesn't controlled by this integration!
 
 Xiaomi BLE and Mesh devices works simultaneously in Mi Home and Hass. No matter which zigbee mode is used.
 
-Other Zigbee, BLE and Mesh devices not from the list below also may work with limited support of functionality. 
-
-Some BLE devices have no known default entities (asterisk in the list). Their entities appear when receiving data from the devices.
+Matter devices supported only for Xiaomi Multimode Gateway 2 (EU) with fw 1.0.7_0019 and higher.
 
 Some BLE devices may or may not have battery data depending on the device firmware.
 
 Gateway entity shows connection state to gateway. It has many useful information in attributes.
 
-Zigbee and BLE devices has optional `zigbee` and `ble` that shows `last_seen` time in state and may useful intormation in attributes.
+Zigbee, BLE, Mesh and Matter devices has optional `zigbee`, `ble`, `mesh`, `matter` that shows `last_report` time in state and may useful intormation in attributes.
 
 ### Add new device
 
@@ -189,6 +209,54 @@ Bluetooth BLE and Mesh devices can work simultaneously with all gateways. In thi
 
 If a user has more than one Bluetooth Mesh Gateway on the network - only one will send Bluetooth device data to the cloud. But this integration can continue to collect Bluetooth data from all gateways simultaneously and locally.
 
+## Device command select
+
+**Device info** - displays device information in notification.
+
+```yaml
+extra:
+  cloud_fw: 2.1.1_0025               # device firmware from cloud integration
+  cloud_name: Dev Presence Sensor 2  # device name from cloud integration
+  did: '1005xxxxxx'                  # device ID from MiHome
+  mac: 64:9e:31:xx:xx:xx
+  market_brand: Linptech
+  market_model: ES1ZB, linp.sensor_occupy.hb01
+  market_name: Presence Sensor ES1
+  rssi_54ef44xxxxxx: -69             # rssi for each gateway
+  rssi_54ef55xxxxxx: -79
+  seq: 185                           # message sequence number
+  type: mesh                         # device type: gateway, zigbee, ble, mesh, group, matter
+last_report:                         # last decoded report from device
+  not_occupancy_duration: 11
+last_report_gw:                      # the gateway that received the last report
+  fw_ver: 1.0.7_0021
+  host: 192.168.1.123
+  mac: 54:ef:44:xx:xx:xx
+  model: lumi.gateway.mcn001
+  name: Gateway 2
+last_report_ts: 48s                  # how long ago was the last message
+last_seen:
+  54ef44xxxxxx: 48s                  # how long ago each gateway seen device
+  54ef55xxxxxx: 48s
+listeners: 7                         # subscribers for device updates (internal logic)
+model: 10441                         # device model (number for BLE and Mesh, string for Zigbee and Matter)
+params:                              # all decoded params in one message
+  action: away
+  distance: 5.15
+  illuminance: 237.0
+  not_occupancy_duration: 11
+  occupancy: false
+  occupancy_duration: 0
+ttl: 50m                             # time to live (TTL) - available timeout (maximum last_seen value)
+uid: 649e31xxxxxx                    # hass UID - "12 hex mac" for BLE and Mesh, "0x + 16 hex IEEE" for Zigbee 
+```
+
+**Device update** - manual call for device params update. Don't work for many Zigbee battery devices. Don't work for all BLE devices. Don't work for offline Mesh devices.
+
+**Zigbee reconfig** - start the initial setup process for 3rd party Zigbee devices
+
+**Delete device** - manual call leave command for Zigbee devices. **Important!** Hass device will be automatically removed only when device leave network. You need to wake up the battery device so it can receive leave command.
+
 ## Statistics table
 
 ![](assets/zigbee_table.png)
@@ -214,51 +282,26 @@ If a user has more than one Bluetooth Mesh Gateway on the network - only one wil
 - **rssi** - gateway Wi-Fi signal strength
 - **uptime** - gateway uptime after reboot
 
-Read more about additional attributes from [openmiio](https://github.com/AlexxIT/openmiio_agent#openmiioreport). 
-
-**Zigbee sensor**
-
-- sensor shows time of receiving the last message from this device
-- **ieee** - zigbee device "long" address
-- **nwk** - zigbee device "short" address
-- **available** - device available state
-- **parent** - `0xABCD` if device connected to zigbee router or `-` if device connected to gateway or `?` for unknown parent 
-- **type** - zigbee `router` or end `device` or `?` for unknown type
-- **msg_received** - amount of messages received from the device
-- **msg_missed** - amount of unreceived messages from the device, calculated using the sequence number of messages
-- **linkquality** - zigbee signal quality, below 100 is very weak
-- **rssi** - zigbee signal quality, no recommendations
-- **last_msg** - type of last received message
-- **new_resets** - the number of device reboots since Hass reboot, supported in some Xiaomi/Aqara devices
-
-**BLE and Mesh sensor**
-
-- sensor shows time of receiving the last message from this device
-- **mac** - device MAC address
-- **available** - device available state
-- **msg_received** - amount of messages received from the device
-- **last_msg** - type of last received message
+Read more about additional attributes from [openmiio](https://github.com/AlexxIT/openmiio_agent#openmiioreport).
 
 ## Gateway controls
 
-The old version of integration used two switches, pair and firmware_lock. If you still have them after the upgrade, remove them manually.
-
-The new version has two drop-down lists (select entities) - command and data.
-
 Available commands:
 
+- **Gateway run FTP** - enable FTP on gateway
+- **Gateway reboot** - reboot gateway
+- **Gateway disable/enable** - just for test, so you can check gateway offline logic
+- **OpenmiIO reload** - restart [openmiio](https://github.com/AlexxIT/openmiio_agent) app on gateway
 - **Zigbee pairing** - start the process of adding a new zigbee device
    - you can also start the process by pressing the physical button on the gateway three times
    - you can also start the process from the Mi Home app
-- **Zigbee binding** - configure the bindings of zigbee devices, only if they support it
-- **Zigbee OTA** - try to update the zigbee device if there is firmware for it
-- **Zigbee reconfig** - start the initial setup process for the device
-   - the battery devices must first be woken up manually
-- **Zigbee parent scan** - update the zigbee stats table manually
+- **Zigbee force pairing** - similar to default pairing, but without cloud verification of the device. So some unsupported lumi devices can be added this way. But they still won't work without a proper converter.
+- **Zigbee parent scan** - update the zigbee parents info manually (it updates automatically every 1h when stats sensors enabled)
+
+Only for Xiaomi Multimode Gateway 1:
+
 - **Gateway firmware Lock** - block the gateway firmware update ([read more](#supported-firmwares))
-- **Gateway reboot** - reboot gateway
-- **Gateway run FTP** - enable FTP on gateway
-- **OpenmiIO reload** - restart [openmiio](https://github.com/AlexxIT/openmiio_agent) app on gateway
+- **Zigbee flash EZSP** - update zigbee chip firmare (incompatible with MiHome mode)
 
 ## Advanced config
 
@@ -269,15 +312,8 @@ Available commands:
 - **Host** - gateway IP-address, should be fixed on your Wi-Fi router
 - **Token** - gateway Mi Home token, changed only when you add gateway to Mi Home app
 - **Key** - gateway secret key, [read more](https://github.com/AlexxIT/Blog/issues/13)
-- **Support Bluetooth devices** - enable processing BLE and Mesh devices data from gateway
 - **Add statistic sensors** - [read more](#statistics-table)
 - **Debug logs** - enable different levels of logging ([read more](#debug-mode))
-
-Don't enable DANGER settings if you don't know what you doing.
-
-**[DANGER] Use storage in memory**
-
-Multi-Mode Gateway has an hardware problem with interruptions for zigbee and bluetooth serial data. You can lose zigbee or bluetooth data when writing to the gateway permanent memory. This setting reduces the amount of writing to the gateway's permanent memory. But if you restart the gateway at an bad moment - you may lose the newly added devices and have to add them again.
 
 ### Devices config
 
@@ -285,10 +321,9 @@ This options configured in the `configuration.yaml`. Section: `xiaomi_gateway3 >
 
 As a device you can specify:
 
-- IEEE - should be 18 symbols with `0x` and leading zeroes (for zigbee devices)
-- MAC - should be 12 symbols (for BLE and Mesh devices)
+- device UID - you can check it in the entities name
 - model - string for zigbee devices and number for BLE and Mesh devices
-- type - gateway, zigbee, ble, mesh
+- type - gateway, zigbee, ble, mesh, matter
 
 **Overwrite device model**
 
@@ -357,21 +392,36 @@ Attention! Template is calculated only at the start of the Hass.
 ```yaml
 xiaomi_gateway3:
   attributes_template: |
-    {% if attr in ('zigbee', 'ble', 'mesh') %}{{{
-      "device_name": device.info.name,
-      "device_fw_ver": device.fw_ver,
+    {% if attr in ('zigbee', 'ble', 'mesh') %}
+    {{{
+      "integration": "gw3",
+      "name": device.human_name,
+      "device_fw_ver": device.firmware,
       "device_model": device.model,
-      "device_market_model": device.info.model,
-      "gateway_name": gateway.info.name,
-      "gateway_fw_ver": gateway.fw_ver
-    }}}{% elif attr == 'gateway' %}{{{
-      "device_fw_ver": device.fw_ver,
-    }}}{% endif %}
+      "device_market_model": device.human_model,
+      "device_manufacturer": device.extra.market_brand,
+      "gate": gateway.human_name,
+      "gateway_model": gateway.model,
+      "gateway_fw_ver": gateway.firmware
+    }}}
+    {% elif attr == 'gateway' %}
+    {{{
+      "integration": "gw3",
+      "gate": gateway.human_name,
+      "gateway_model": gateway.human_model,
+      "gateway_fw_ver": gateway.firmware
+    }}}
+    {% elif attr == 'battery' %}
+    {{{
+      "integration": "gw3",
+      "name": device.human_name,
+      "gate": gateway.human_name,
+      "battery": "true"
+    }}}
+    {% endif %}
 ```
 
 ### Entities customize
-
-This options configured in the `configuration.yaml`. Section: `homeassistant > customize > entity_id`.
 
 **Occupancy timeout** for moving sensor.
 
@@ -382,42 +432,33 @@ This options configured in the `configuration.yaml`. Section: `homeassistant > c
 - **fast back timer** starts with doubled value if the person moves immediately after the timer is off
 
 ```yaml
-homeassistant:
-  customize:
-    binary_sensor.0x158d0003456789_motion:
+xiaomi_gateway3:
+  devices:
+    "0x00158d0003456789":
       occupancy_timeout: 180  # simple mode
-    binary_sensor.0x158d0003456788_motion:
+    "0x00158d0003456788":
       occupancy_timeout: -120  # fast back mode
-    binary_sensor.0x158d0003456787_motion:
+    "0x00158d0003456787":
       occupancy_timeout: [-120, 240, 300]  # progressive timer
-    binary_sensor.0x158d0003456786_motion:
+    "0x00158d0003456786":
       occupancy_timeout: 1  # for hacked 5 sec sensors
 ```
 
 **Invert state** for contact sensor.
 
 ```yaml
-homeassistant:
-  customize:
-    binary_sensor.0x158d0003456789_contact:
+xiaomi_gateway3:
+  devices:
+    "0x00158d0003456789":
       invert_state: 1  # any non-empty value will reverse the logic
-```
-
-**Ignore offline** device status.
-
-```yaml
-homeassistant:
-  customize:
-    switch.0x158d0003456789_switch:
-      ignore_offline: 1  # any non-empty value
 ```
 
 **Zigbee bulb default transition**.
 
 ```yaml
-homeassistant:
-  customize:
-    light.0x86bd7fffe000000_light:
+xiaomi_gateway3:
+  devices:
+    "0x86bd7fffe0000000":
       default_transition: 5
 ```
 
@@ -440,6 +481,8 @@ When you turn on ZHA mode - Zigbee devices in Mi Home will stop working. BLE and
 Zigbee devices will not migrate from Mi Home to ZHA. You will need to pair them again with ZHA.
 
 ## Zigbee2MQTT Mode
+
+**IMPORTANT**. According to real user reviews zigbee2mqtt does not work well with EFR32 chips. More positive feedback when working with ZHA.
 
 [Zigbee2MQTT](https://www.zigbee2mqtt.io/) is a bigest project that support [hundreds](https://www.zigbee2mqtt.io/information/supported_devices.html) Zigbee devices from different vendors. And can be integrate with a lot of home automation projects.
 
@@ -476,7 +519,7 @@ It is possible because of these people:
 
 ## Handle Button Actions
 
-Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its **state** for a split second and returns to an empty state. The **attributes** contain useful data, they are not cleared after the event is triggered.
+Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its **state** for half a second and returns to an empty state. The **attributes** contain useful data, they are not cleared after the event is triggered.
 
 Depending on the button model, its state may be:
 - single button: `single`, `double`, `triple`, `quadruple`, `many`, `hold`, `release`, `shake`
@@ -589,11 +632,6 @@ Logging can be setup from:
 
 - [Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > **Xiaomi Gateway 3** > Configure > Debug logs: Basic, MQTT, Zigbee > Refresh the Home Assistant web page.
 
-**View:**
-
-- [Settings](https://my.home-assistant.io/redirect/config/) > [Integrations](https://my.home-assistant.io/redirect/integrations/) > **Xiaomi Gateway 3** > Three dots > Known Issues
-- or [System information](https://my.home-assistant.io/redirect/system_health/) > **Xiaomi Gateway 3** > debug
-
 **2. Integration config (YAML)**
 
 Component can log different debug events from different gateways. You can set global `debug_mode` for all gateways or config custom modes for custom gateways from GUI.
@@ -604,18 +642,17 @@ Recommended config:
 xiaomi_gateway3:
   logger:
     filename: xiaomi_gateway3.log  # default empty
-    propagate: False  # if False - disable log to home-assistant.log and console, default True
-    max_bytes: 100000000  # file size, default 0
-    backup_count: 3  # file rotation count, default 0
-    debug_mode: true,miio,mqtt  # global modes for all gateways, default empty
+    propagate: False               # if False - disable log to home-assistant.log and console, default True
+    max_bytes: 100000000           # file size, default 0
+    backup_count: 3                # file rotation count, default 0
 ```
 
 Additional settings
 
 ```yaml
     level: debug  # default
-    mode: a  # a - append to file, w - write new file, default
-    format: "%(asctime)s %(message)s"  # default
+    mode: a       # a - append to file, w - write new file, default
+    format: "%(asctime)s %(levelname)s [%(name)s] %(message)s"  # default
 ```
 
 **3. Hass default config**

@@ -4,8 +4,9 @@
       "no_servers": "請至少選擇一個伺服器",
       "cant_login": "無法登入，請確認使用者名稱與密碼",
       "cant_connect": "無法連線至網關",
+	    "no_key": "因網關韌體缺少金鑰(Key)而無法支援",
       "wrong_model": "網關型號不支援",
-      "wrong_token": "小米智能家庭權杖錯誤",
+      "wrong_token": "網關Token錯誤",
       "wrong_telnet": "開啟 Telnet 指令錯誤",
       "verify": "點選確認 URL"
     },
@@ -18,7 +19,7 @@
       },
       "cloud": {
         "title": "新增小米雲服務帳號",
-        "description": "僅選擇已榜定設備的伺服器{verify}",
+        "description": "選擇有綁定設備的伺服器{verify}",
         "data": {
           "username": "Email / 小米帳號 ID",
           "password": "密碼",
@@ -26,10 +27,11 @@
         }
       },
       "token": {
-        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得米家智能家庭設備權杖 Token。",
+        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得網關 Token。",
         "data": {
-          "host": "主機端",
-          "token": "權杖"
+          "host": "網關IP",
+          "token": "Token",
+          "key": "Key"
         }
       }
     }
@@ -37,7 +39,7 @@
   "options": {
     "step": {
       "cloud": {
-        "title": "小米雲設備資訊",
+        "title": "小米雲端裝置資訊",
         "data": {
           "did": "裝置"
         },
@@ -46,12 +48,13 @@
       "user": {
         "title": "網關設定",
         "data": {
-          "host": "主機端",
-          "token": "密鑰",
-          "telnet_cmd": "開啟 Telnet 指令",
-          "ble": "支援藍芽裝置",
+          "host": "網關IP",
+          "token": "Token",
+          "key": "Key",          
+          "telnet_cmd": "開啟Telnet指令",          
+          "ble": "支援的藍牙裝置",
           "stats": "新增統計資料感測器",
-          "debug": "Debug logs"
+          "debug": "偵錯日誌"
         }
       }
     }
@@ -69,6 +72,51 @@
       "button_both_12": "第 1 與第 2 個按鈕同時按下",
       "button_both_13": "第 1 與第 3 個按鈕同時按下",
       "button_both_23": "第 2 與第 3 個按鈕同時按下"
+    }
+  },
+  "entity": {
+    "select": {
+      "command": {
+        "state": {
+          "info": "裝置資訊",	
+          "update": "裝置更新",		  
+          "pair": "Zigbee配對",
+          "force_pair": "Zigbee強制配對",		  
+          "bind": "Zigbee绑定",
+          "ota": "Zigbee OTA",
+          "reconfig": "Zigbee重新設定",
+          "parent_scan": "Zigbee parent掃描",
+          "firmware_lock": "網關韌體鎖定",
+          "reboot": "網關重新啟動",
+          "run_ftp": "網關啟動FTP",
+          "flash_ezsp": "Zigbee flash EZSP",
+          "openmiio_restart": "重新啟動OpenmiIO",
+          "disable": "網關停用",
+          "enable": "網關啟用",
+          "rejoin": "Zigbee重新加入",
+          "remove": "Zigbee刪除"		  
+        }
+      },
+      "data": {
+        "state": {
+          "enabled": "已啟用",
+          "disabled": "已停用",
+          "unknown": "未知",
+          "ok": "OK",
+          "error": "錯誤",
+          "permit_join": "允許配對",
+          "stop_join": "停止配對",
+          "cancel": "取消",
+          "key_secure": "發送網路密鑰（安全）",
+          "key_legacy": "發送網路密鑰（傳統）",
+          "no_firmware": "無韌體",
+          "bind": "绑定",
+          "unbind": "解除绑定",
+          "no_devices": "沒有裝置",
+          "original": "原始韌體",
+          "custom": "客製韌體"
+        }
+      }
     }
   }
 }

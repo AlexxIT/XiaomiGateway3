@@ -1,271 +1,288 @@
-from homeassistant.components.sensor import DOMAIN
+from custom_components.xiaomi_gateway3 import XDevice
 
-from custom_components.xiaomi_gateway3.core.device import XDevice, BLE
-from custom_components.xiaomi_gateway3.core.gateway.base import GatewayBase
 
-assert DOMAIN  # fix circular import
-
-DID = "blt.3.abc"
-MAC = "112233aabbcc"
-DID2 = "123456789"  # locks have nubm did
+def test_flower_care():
+    device = XDevice(152)
+    assert device.market_name == "Xiaomi Flower Care"
+    p = device.decode({"eid": 4100, "edata": "BF00"})
+    assert p == {"temperature": 19.1}
+    p = device.decode({"eid": 4103, "edata": "000000"})
+    assert p == {"illuminance": 0}
+    p = device.decode({"eid": 4104, "edata": "1C"})
+    assert p == {"moisture": 28}
+    p = device.decode({"eid": 4105, "edata": "3101"})
+    assert p == {"conductivity": 305}
 
 
 def test_night_light():
-    device = XDevice(BLE, 2038, DID, MAC)
-    assert device.info.name == "Xiaomi Night Light 2"
-    device.setup_converters()
-
-    p = device.decode("mibeacon", {"eid": 15, "edata": "640000"})
+    device = XDevice(2038)
+    assert device.market_name == "Xiaomi Night Light 2"
+    p = device.decode({"eid": 15, "edata": "640000"})
     assert p == {"light": True, "motion": True}
-    p = device.decode("mibeacon", {"eid": 4103, "edata": "640000"})
+    p = device.decode({"eid": 4103, "edata": "640000"})
     assert p == {"light": True}
-    p = device.decode("mibeacon", {"eid": 4106, "edata": "64"})
+    p = device.decode({"eid": 4106, "edata": "64"})
     assert p == {"battery": 100}
-    p = device.decode("mibeacon", {"eid": 4119, "edata": "78000000"})
+    p = device.decode({"eid": 4119, "edata": "78000000"})
     assert p == {"idle_time": 120}
 
 
 def test_kettle():
-    device = XDevice(BLE, 131, DID, MAC)
-    assert device.info.name == "Xiaomi Kettle"
-    device.setup_converters()
-
-    p = device.decode("mibeacon", {"eid": 4101, "edata": "0063"})
+    device = XDevice(131)
+    assert device.market_name == "Xiaomi Kettle"
+    p = device.decode({"eid": 4101, "edata": "0063"})
     assert p == {"power": False, "state": "idle", "temperature": 99}
-    p = device.decode("mibeacon", {"eid": 4101, "edata": "0154"})
+    p = device.decode({"eid": 4101, "edata": "0154"})
     assert p == {"power": True, "state": "heat", "temperature": 84}
 
 
-def test_new_th():
-    device = XDevice(BLE, 4611, DID, MAC)
-    assert device.info.name == "Xiaomi TH Sensor"
-    device.setup_converters()
+def test_839():
+    device = XDevice(839)
+    p = device.decode({"eid": 4109, "edata": "EC003901"})
+    assert p == {"humidity": 31.3, "temperature": 23.6}
+
+
+def test_2443():
+    device = XDevice(2443)
+    assert device.market_name == "Xiaomi Door/Window Sensor 2"
+    p = device.decode({"eid": 4121, "edata": "01"})
+    assert p == {"contact": False}
+    p = device.decode({"eid": 4120, "edata": "01"})
+    assert p == {"light": True}
+    p = device.decode({"eid": 4121, "edata": "02"})
+    assert p == {"action": "timeout"}
+
+
+def test_2455():
+    device = XDevice(2455)
+    assert device.market_name == "Honeywell Smoke Alarm"
+    p = device.decode({"eid": 4117, "edata": "01"})
+    assert p == {"smoke": True}
+    p = device.decode({"eid": 4117, "edata": "02"})
+    assert p == {"action": "error"}
+
+
+def test_4611():
+    device = XDevice(4611)
+    assert device.market_name == "Xiaomi TH Sensor"
 
     # old format
     # https://github.com/AlexxIT/XiaomiGateway3/issues/490
-    p = device.decode("mibeacon", {"eid": 19464, "edata": "cdcc3e42"})
+    p = device.decode({"eid": 19464, "edata": "cdcc3e42"})
     assert p == {"humidity": 47.7}
 
-    p = device.decode("mibeacon", {"eid": 19457, "edata": "cdcca841"})
+    p = device.decode({"eid": 19457, "edata": "cdcca841"})
     assert p == {"temperature": 21.1}
 
     # new miIO format for Gateway fw 1.5.4+
     # https://github.com/AlexxIT/XiaomiGateway3/issues/929
-    p = device.decode_miot(
-        [{"did": "blt.3.123", "siid": 3, "piid": 1008, "value": 39.099998, "tid": 153}]
-    )
+    p = device.decode({"siid": 3, "piid": 1008, "value": 39.099998})
     assert p == {"humidity": 39.1}
 
-    p = device.decode_miot(
-        [{"did": "blt.3.123", "siid": 3, "piid": 1001, "value": 24.600000, "tid": 154}]
-    )
+    p = device.decode({"siid": 3, "piid": 1001, "value": 24.600000})
     assert p == {"temperature": 24.6}
 
 
-def test_lock():
-    device = XDevice(BLE, 1694, DID2, MAC)
-    assert device.info.name == "Aqara Door Lock N100 (Bluetooth)"
-    device.setup_converters()
+def test_1694():
+    device = XDevice(1694)
+    assert device.market_name == "Aqara Door Lock N100 (Bluetooth)"
 
-    p = device.decode("mibeacon", {"eid": 4106, "edata": "329aaecd62"})
+    p = device.decode({"eid": 4106, "edata": "329aaecd62"})
     assert p == {"battery": 50}
 
-    p = device.decode("mibeacon", {"eid": 11, "edata": "a400000000b8aecd62"})
-    assert p
+    p = device.decode({"eid": 11, "edata": "a400000000b8aecd62"})
+    assert p == {
+        "action": "lock",
+        "action_id": 4,
+        "error": None,
+        "key_id": 0,
+        "message": "Unlock inside the door",
+        "method": "manual",
+        "method_id": 10,
+        "timestamp": "2022-07-12T20:26:16",
+    }
 
-    p = device.decode("mibeacon", {"eid": 7, "edata": "00c5aecd62"})
-    assert p
+    p = device.decode({"eid": 7, "edata": "00c5aecd62"})
+    assert p == {
+        "action": "door",
+        "action_id": 0,
+        "contact": True,
+        "message": "Door is open",
+        "timestamp": "2022-07-12T20:26:29",
+    }
 
-    p = device.decode("mibeacon", {"eid": 7, "edata": "01cbaecd62"})
-    assert p
+    p = device.decode({"eid": 7, "edata": "01cbaecd62"})
+    assert p == {
+        "action": "door",
+        "action_id": 1,
+        "contact": False,
+        "message": "Door is closed",
+        "timestamp": "2022-07-12T20:26:35",
+    }
 
-    p = device.decode("mibeacon", {"eid": 11, "edata": "2002000180c4aecd62"})
-    assert p
+    p = device.decode({"eid": 11, "edata": "2002000180c4aecd62"})
+    assert p == {
+        "action": "lock",
+        "action_id": 0,
+        "error": None,
+        "key_id": 2,
+        "message": "Unlock outside the door",
+        "method": "biological",
+        "method_id": 2,
+        "timestamp": "2022-07-12T20:26:28",
+    }
 
-    p = device.decode("mibeacon", {"eid": 6, "edata": "ffffffff00"})
-    assert p
+    p = device.decode({"eid": 6, "edata": "ffffffff00"})
+    assert p == {
+        "action": "fingerprint",
+        "action_id": 0,
+        "key_id": "0xffffffff",
+        "message": "Match successful",
+    }
+
+    p = device.decode({"eid": 8, "edata": "01"})
+    assert p == {"action": "armed"}
+
+    p = device.decode({"eid": 8, "edata": "00"})
+    assert p == {"action": "disarmed"}
 
 
 def test_9095():
-    device = XDevice(BLE, 9095, DID, MAC)
-    assert device.info.name == "Xiaomi Wireless Button"
-    device.setup_converters()
+    device = XDevice(9095)
+    assert device.market_name == "Xiaomi Wireless Button"
 
     # old format
-    p = device.decode("mibeacon", {"eid": 19980, "edata": ""})
+    p = device.decode({"eid": 19980, "edata": ""})
     assert p == {"action": "single"}
-
-    p = device.decode("mibeacon", {"eid": 19981, "edata": ""})
+    p = device.decode({"eid": 19981, "edata": ""})
     assert p == {"action": "double"}
-
-    p = device.decode("mibeacon", {"eid": 19982, "edata": ""})
+    p = device.decode({"eid": 19982, "edata": ""})
     assert p == {"action": "hold"}
 
     # new format
-    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1012, "arguments": []}])
-    assert p == {"action": "single", "button": 1}
-
-    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1013, "arguments": []}])
-    assert p == {"action": "double", "button": 2}
-
-    p = device.decode_miot([{"did": DID, "siid": 3, "eiid": 1014, "arguments": []}])
-    assert p == {"action": "hold", "button": 16}
+    p = device.decode({"siid": 3, "eiid": 1012, "arguments": []})
+    assert p == {"action": "single"}
+    p = device.decode({"siid": 3, "eiid": 1013, "arguments": []})
+    assert p == {"action": "double"}
+    p = device.decode({"siid": 3, "eiid": 1014, "arguments": []})
+    assert p == {"action": "hold"}
 
 
 def test_10987():
-    device = XDevice(BLE, 10987, DID, MAC)
-    assert device.info.name == "Linptech Motion Sensor 2"
-    device.setup_converters()
+    device = XDevice(10987)
+    assert device.market_name == "Linptech Motion Sensor 2"
 
     # old format
     # https://github.com/AlexxIT/XiaomiGateway3/issues/809
-    p = device.decode(
-        "mibeacon",
-        {"did": DID, "eid": 18952, "edata": "00008041", "pdid": 10987, "seq": 72},
-    )
+    p = device.decode({"eid": 18952, "edata": "00008041"})
     assert p == {"motion": True, "illuminance": 16.0}
+    p = device.decode({"eid": 18456, "edata": "3c00"})
+    assert p == {"idle_time": 60}
+    p = device.decode({"eid": 18953, "edata": "54020040"})  # unknown
+    assert p == {"unknown": "54020040"}
 
     # new format
     # https://github.com/AlexxIT/XiaomiGateway3/issues/956
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 2,
-                "eiid": 1008,
-                "tid": 240,
-                "arguments": [{"piid": 1005, "value": 23.000000}],
-            }
-        ]
+    p = device.decode(
+        {"siid": 2, "eiid": 1008, "arguments": [{"piid": 1005, "value": 23.000000}]}
     )
     assert p == {"motion": True, "illuminance": 23.0}
 
 
 def test_7184():
-    device = XDevice(BLE, 7184, DID, MAC)
-    assert device.info.name == "Linptech Wireless Button"
-    device.setup_converters()
+    device = XDevice(7184)
+    assert device.market_name
 
     # old format
     # https://github.com/AlexxIT/XiaomiGateway3/pull/844
-    p = device.decode(
-        "mibeacon",
-        {"did": DID, "eid": 19980, "edata": "01", "pdid": 7184},
-    )
+    p = device.decode({"eid": 19980, "edata": "01"})
     assert p == {"action": "single"}
 
     # new format
     # https://github.com/AlexxIT/XiaomiGateway3/issues/867
     # https://github.com/AlexxIT/XiaomiGateway3/issues/826
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 3,
-                "eiid": 1012,
-                "tid": 117,
-                "arguments": [{"piid": 1, "value": 1}],
-            }
-        ]
-    )
+    p = device.decode({"siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 1}]})
     assert p == {"action": "single"}
 
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 3,
-                "eiid": 1012,
-                "tid": 117,
-                "arguments": [{"piid": 1, "value": 15}],
-            }
-        ]
+    p = device.decode(
+        {"siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 15}]}
     )
     assert p == {"action": "double"}
 
 
+def test_16143():
+    device = XDevice(16143)
+    assert device.market_name == "Linptech Submersion Sensor"
+
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1337
+    p = device.decode({"eid": 18438, "edata": "01"})
+    assert p == {"water_leak": True}
+
+    p = device.decode({"eid": 18438, "edata": "00"})
+    assert p == {"water_leak": False}
+
+    p = device.decode({"eid": 19459, "edata": "51"})
+    assert p == {"battery": 81}
+
+
 def test_6473():
-    device = XDevice(BLE, 6473, DID, MAC)
-    assert device.info.name == "Xiaomi Double Button"
-    device.setup_converters()
+    device = XDevice(6473)
+    assert device.market_name == "Yeelight Double Button"
 
     # new format https://github.com/AlexxIT/XiaomiGateway3/issues/965
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 1}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 1}]})
     assert p == {"action": "button_1_single"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 2}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 2}]})
     assert p == {"action": "button_2_single"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1013, "arguments": [{"piid": 1, "value": 1}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1013, "arguments": [{"piid": 1, "value": 1}]})
     assert p == {"action": "button_1_double"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1013, "arguments": [{"piid": 1, "value": 2}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1013, "arguments": [{"piid": 1, "value": 2}]})
     assert p == {"action": "button_2_double"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1014, "arguments": [{"piid": 1, "value": 1}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1014, "arguments": [{"piid": 1, "value": 1}]})
     assert p == {"action": "button_1_hold"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1014, "arguments": [{"piid": 1, "value": 2}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1014, "arguments": [{"piid": 1, "value": 2}]})
     assert p == {"action": "button_2_hold"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 3}]}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1012, "arguments": [{"piid": 1, "value": 3}]})
     assert p == {"action": "button_both_single"}
 
 
 def test_9385():
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1169
-    device = XDevice(BLE, 9385, DID, MAC)
-    assert device.info.name == "Mijia Smart Timer"
-    device.setup_converters()
+    device = XDevice(9385)
+    assert device.market_name == "Mijia Timer"
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 2, "eiid": 1025, "arguments": []}]
-    )
+    p = device.decode({"siid": 2, "eiid": 1025, "arguments": []})
     assert p == {"action": "timer1"}
 
-    p = device.decode_miot(
-        [{"did": DID, "siid": 3, "eiid": 1025, "arguments": []}]
-    )
+    p = device.decode({"siid": 3, "eiid": 1025, "arguments": []})
     assert p == {"action": "timer2"}
 
 
 def test_10249():
-    device = XDevice(BLE, 10249, DID, MAC)
-    assert device.info.name == "Xiaomi Door Lock E10"
-    device.setup_converters()
+    device = XDevice(10249)
+    assert device.market_name == "Xiaomi Door Lock E10"
 
-    p = device.decode_miot([{"did": DID, "siid": 4, "piid": 1021, "value": 2}])
+    p = device.decode([{"siid": 4, "piid": 1021, "value": 2}])
     assert p == {"door": "unlocked"}
 
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 3,
-                "eiid": 1020,
-                "arguments": [
-                    {"piid": 1, "value": 65535},  # Operation ID
-                    {"piid": 2, "value": 15},  # Operation Method
-                    {"piid": 3, "value": 2},  # Lock Action
-                    {"piid": 4, "value": 1},  # Operation Position
-                    {"piid": 6, "value": 1676548432},  # Current Time
-                ],
-            }
-        ]
+    p = device.decode(
+        {
+            "siid": 3,
+            "eiid": 1020,
+            "arguments": [
+                {"piid": 1, "value": 65535},  # Operation ID
+                {"piid": 2, "value": 15},  # Operation Method
+                {"piid": 3, "value": 2},  # Lock Action
+                {"piid": 4, "value": 1},  # Operation Position
+                {"piid": 6, "value": 1676548432},  # Current Time
+            ],
+        }
     )
     assert p == {
         "action": "unlock",
@@ -277,21 +294,18 @@ def test_10249():
         "timestamp": 1676548432,
     }
 
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 3,
-                "eiid": 1020,
-                "arguments": [
-                    {"piid": 1, "value": 102},
-                    {"piid": 2, "value": 2},
-                    {"piid": 3, "value": 2},
-                    {"piid": 4, "value": 2},
-                    {"piid": 6, "value": 1676548449},
-                ],
-            }
-        ]
+    p = device.decode(
+        {
+            "siid": 3,
+            "eiid": 1020,
+            "arguments": [
+                {"piid": 1, "value": 102},
+                {"piid": 2, "value": 2},
+                {"piid": 3, "value": 2},
+                {"piid": 4, "value": 2},
+                {"piid": 6, "value": 1676548449},
+            ],
+        }
     )
     assert p == {
         "action": "unlock",
@@ -303,29 +317,7 @@ def test_10249():
         "timestamp": 1676548449,
     }
 
-    p = device.decode_miot(
-        [
-            {
-                "did": DID,
-                "siid": 6,
-                "eiid": 1006,
-                "arguments": [{"piid": 1, "value": 1681029598}],
-            }
-        ]
+    p = device.decode(
+        {"siid": 6, "eiid": 1006, "arguments": [{"piid": 1, "value": 1681029598}]}
     )
     assert p == {"action": "doorbell", "timestamp": 1681029598}
-
-
-def test_lazy_setup():
-    device = XDevice(BLE, 9538, DID, MAC)
-    assert device.info.name == "Xiaomi TH Clock Pro"
-    device.setup_converters()
-
-    gw = GatewayBase()
-    gw.options = {}
-    gw.setups = {}
-    gw.add_device(device.did, device)
-
-    # https://github.com/AlexxIT/XiaomiGateway3/issues/1095
-    payload = device.decode("mibeacon", {"eid": 18435, "edata": "64"})
-    device.update(payload)

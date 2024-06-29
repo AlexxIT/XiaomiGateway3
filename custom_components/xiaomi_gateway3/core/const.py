@@ -1,5 +1,19 @@
 DOMAIN = "xiaomi_gateway3"
-TITLE = "Xiaomi Gateway 3"
+
+GATEWAY = "gateway"
+ZIGBEE = "zigbee"
+BLE = "ble"
+MESH = "mesh"
+GROUP = "group"
+MATTER = "matter"
+
+SUPPORTED_MODELS = (
+    "lumi.gateway.mgl03",
+    "lumi.gateway.aqcn02",
+    "lumi.gateway.aqcn03",
+    "lumi.gateway.mcn001",
+    "lumi.gateway.mgl001",
+)
 
 PID_WIFI = 0
 PID_BLE = 6
@@ -29,4 +43,4 @@ def source_hash() -> str:
         return source_hash.__doc__
 
     except Exception as e:
-        return f"{type(e).__name__}: {e}"
+        return repr(e)

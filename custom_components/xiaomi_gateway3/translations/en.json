@@ -4,6 +4,7 @@
       "no_servers": "Please select at least one server",
       "cant_login": "Can't login, check username and password",
       "cant_connect": "Can't connect to gateway",
+      "no_key": "Unsupported gateway firmware without key",
       "wrong_model": "Unsupported gateway model",
       "wrong_token": "Wrong Mi Home token",
       "wrong_telnet": "Wrong open telnet command",
@@ -60,33 +61,30 @@
   },
   "device_automation": {
     "trigger_type": {
-      "button": "Button press",
-      "button_1": "1st button press",
-      "button_2": "2nd button press",
-      "button_3": "3rd button press",
-      "button_4": "4th button press",
-      "button_5": "5th button press",
-      "button_6": "6th button press",
-      "button_both": "Both button press",
-      "button_both_12": "1st and 2nd button press",
-      "button_both_13": "1st and 3rd button press",
-      "button_both_23": "2nd and 3rd button press"
+      "action": "Action"
     }
   },
   "entity": {
     "select": {
       "command": {
         "state": {
+          "info": "Device info",
+          "update": "Device update",
           "pair": "Zigbee pairing",
+          "force_pair": "Zigbee force pairing",
           "bind": "Zigbee binding",
           "ota": "Zigbee OTA",
-          "config": "Zigbee reconfig",
-          "parentscan": "Zigbee parent scan",
-          "firmwarelock": "Gateway firmware lock",
+          "reconfig": "Zigbee reconfig",
+          "parent_scan": "Zigbee parent scan",
+          "firmware_lock": "Gateway firmware lock",
           "reboot": "Gateway reboot",
-          "ftp": "Gateway run FTP",
-          "flashzb": "Zigbee flash EZSP",
-          "openmiio_reload": "OpenmiIO reload"
+          "run_ftp": "Gateway run FTP",
+          "flash_ezsp": "Zigbee flash EZSP",
+          "openmiio_restart": "OpenmiIO restart",
+          "disable": "Gateway disable",
+          "enable": "Gateway enable",
+          "rejoin": "Zigbee rejoin",
+          "remove": "Zigbee delete"
         }
       },
       "data": {

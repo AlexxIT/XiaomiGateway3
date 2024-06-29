@@ -1,282 +1,270 @@
 import logging
-from typing import Union, Dict
 
-from zigpy.types import EUI64
 from zigpy.zcl import Cluster
 from zigpy.zcl.foundation import (
-    ZCLHeader,
-    Attribute,
-    ReadAttributeRecord,
     DATA_TYPES,
-    ZCLAttributeDef,  # zigpy 0.43.1
+    GENERAL_COMMANDS,
+    CommandSchema,
+    TypeValue,
+    ZCLCommandDef,
+    ZCLHeader,
 )
+from zigpy.zcl.foundation import GeneralCommand
 from zigpy.zdo import ZDO
-from zigpy.zdo.types import ZDOCmd, SizePrefixedSimpleDescriptor, NodeDescriptor
-
-try:
-    from zigpy.zcl.foundation import GeneralCommand as Command
-except Exception:
-    # noinspection PyUnresolvedReferences
-    from zigpy.zcl.foundation import Command
+from zigpy.zdo.types import (
+    ZDOCmd,
+    Neighbors,
+    NodeDescriptor,
+    SizePrefixedSimpleDescriptor,
+    Status as ZDOStatus,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 CLUSTERS = {}
 
 
-# noinspection PyTypeChecker
-def decode(data: dict):
-    """Decode Silabs Z3 GatewayHost MQTT message using zigpy library. Supports
-    ZDO payload and ZCL payload.
-    """
+def decode(payload: dict) -> dict | None:
     try:
-        if data["sourceEndpoint"] == "0x00":
-            # decode ZDO
-            if "zdo" not in CLUSTERS:
-                zdo = CLUSTERS["zdo"] = ZDO(None)
-            else:
-                zdo = CLUSTERS["zdo"]
+        cluster_id = int(payload["clusterId"], 0)
+        data = bytes.fromhex(payload["APSPlayload"][2:])  # 0xAABBCCDDEEFF
 
-            cluster_id = int(data["clusterId"], 0)
-            raw = bytes.fromhex(data["APSPlayload"][2:])
-            hdr, args = zdo.deserialize(cluster_id, raw)
-            cmd = ZDOCmd(hdr.command_id).name
-            if hdr.command_id == ZDOCmd.Active_EP_rsp:
-                return {"command": cmd, "status": str(args[0]), "endpoints": args[2]}
-            elif hdr.command_id == ZDOCmd.Simple_Desc_rsp:
-                desc: SizePrefixedSimpleDescriptor = args[2]
-                return {
-                    "command": cmd,
-                    "status": str(args[0]),
-                    "device_type": desc.device_type,
-                    "device_version": desc.device_version,
-                    "endpoint": desc.endpoint,
-                    "input_clusters": desc.input_clusters,
-                    "output_clusters": desc.output_clusters,
-                    "profile": desc.profile,
-                }
-            elif hdr.command_id == ZDOCmd.Node_Desc_rsp:
-                desc: NodeDescriptor = args[2]
-                return {
-                    "command": cmd,
-                    "status": str(args[0]),
-                    "is_mains_powered": desc.is_mains_powered,
-                    "logical_type": str(desc.logical_type),
-                    "manufacturer_code": desc.manufacturer_code,
-                }
-            elif hdr.command_id in (ZDOCmd.Bind_rsp, ZDOCmd.Mgmt_Leave_rsp):
-                return {
-                    "command": cmd,
-                    "status": str(args[0]),
-                }
-            elif hdr.command_id in (ZDOCmd.Node_Desc_req, ZDOCmd.Active_EP_req):
-                return {"command": cmd}
-            elif hdr.command_id == ZDOCmd.Simple_Desc_req:
-                return {
-                    "command": cmd,
-                    "endpoint": args[0],
-                }
-            elif hdr.command_id == ZDOCmd.Bind_req:
-                return {
-                    "command": cmd,
-                    "src_addr": args[0],
-                    "src_endpoint": args[1],
-                    "cluster": args[2],
-                    "dst_addr": args[3],
-                }
-            elif hdr.command_id == ZDOCmd.IEEE_addr_rsp:
-                return {
-                    "command": cmd,
-                    "status": args[0],
-                    "ieee": args[1],
-                    "nwk": args[2],
-                }
-            elif hdr.command_id == ZDOCmd.Mgmt_Leave_req:
-                return {
-                    "command": cmd,
-                    "ieee": args[0],
-                }
-            elif hdr.command_id == ZDOCmd.Mgmt_NWK_Update_rsp:
-                return {
-                    "command": cmd,
-                    "status": args[0],
-                    "channels": args[1],
-                    "total": args[2],
-                    "failures": args[3],
-                    "energy": args[4],
-                }
-            elif hdr.command_id == ZDOCmd.NWK_addr_rsp:
-                return {
-                    "command": cmd,
-                    "status": args[0],
-                    "ieee": args[1],
-                    "nwk": args[2],
-                }
-            elif hdr.command_id == ZDOCmd.Mgmt_Lqi_req:
-                # https://docs.silabs.com/zigbee/6.5/af_v2/group-zdo
-                return {"command": cmd, "start_index": args[0]}
-            elif hdr.command_id == ZDOCmd.Mgmt_Lqi_rsp:
-                return {"command": cmd}
-            else:
-                raise NotImplemented
+        if payload.get("sourceEndpoint") == "0x00":
+            return zdo_deserialize(cluster_id, data)
 
-        # decode ZCL
-        cluster_id = int(data["clusterId"], 0)
-        if cluster_id not in CLUSTERS:
-            cluster = CLUSTERS[cluster_id] = Cluster.from_id(None, cluster_id)
-            cluster._log = lambda *_, **__: None
-        else:
-            cluster = CLUSTERS[cluster_id]
+        if cluster_id == 0 and (basic := xiaomi_deserialize(data)):
+            return basic
 
-        raw = bytes.fromhex(data["APSPlayload"][2:])
-        try:
-            hdr, args = cluster.deserialize(raw)
-            hdr: ZCLHeader
-        except ValueError as e:
-            return {"cluster_id": cluster_id, "error": str(e)}
-        except KeyError as e:
-            return {"cluster_id": cluster_id, "error": f"Key error: {e}"}
-
-        payload = {
-            "endpoint": int(data["sourceEndpoint"], 0),
-            "seq": hdr.tsn,
-        }
-
-        if cluster.ep_attribute:
-            payload["cluster"] = cluster.ep_attribute
-        else:
-            payload["cluster_id"] = cluster_id
-
-        if hdr.frame_control.is_general:
-            payload["command"] = Command(hdr.command_id).name
-
-            if (
-                hdr.command_id == Command.Report_Attributes
-                or hdr.command_id == Command.Write_Attributes
-            ):
-                (attrs,) = args
-                for attr in attrs:
-                    assert isinstance(attr, Attribute)
-                    if attr.attrid in cluster.attributes:
-                        name = cluster.attributes[attr.attrid].name
-                    else:
-                        name = attr.attrid
-
-                    value = attr.value.value
-                    if isinstance(value, bytes) and value:
-                        payload[name] = "0x" + value.hex()
-                    elif isinstance(value, list) and not isinstance(value, EUI64):
-                        payload[name] = [v.value for v in value]
-                    elif isinstance(value, int):
-                        payload[name] = int(value)
-                    else:
-                        payload[name] = value
-
-            elif hdr.command_id == Command.Read_Attributes_rsp:
-                (attrs,) = args
-                for attr in attrs:
-                    assert isinstance(attr, ReadAttributeRecord)
-                    if attr.attrid in cluster.attributes:
-                        name = cluster.attributes[attr.attrid].name
-                    else:
-                        name = attr.attrid
-
-                    if attr.value is not None:
-                        value = attr.value.value
-                        if isinstance(value, bytes) and value:
-                            payload[name] = "0x" + value.hex()
-                        elif isinstance(value, list):
-                            payload[name] = [v.value for v in value]
-                        elif isinstance(value, int):
-                            payload[name] = int(value)
-                        else:
-                            payload[name] = value
-                    else:
-                        payload[name] = str(attr.status)
-
-            elif hdr.command_id == Command.Read_Attributes:
-                (attrs,) = args
-                payload["value"] = attrs
-
-            elif hdr.command_id == Command.Configure_Reporting:
-                (attrs,) = args
-                # fix __repr__ bug
-                for attr in attrs:
-                    if not hasattr(attr, "reportable_change"):
-                        attr.reportable_change = None
-                payload["value"] = attrs
-
-            elif (
-                hdr.command_id == Command.Write_Attributes_rsp
-                or hdr.command_id == Command.Configure_Reporting_rsp
-            ):
-                (resp,) = args
-                payload["status"] = [str(attr.status) for attr in resp]
-
-            elif hdr.command_id == Command.Discover_Commands_Received_rsp:
-                payload["status"] = bool(args[0])
-                payload["value"] = args[1]
-
-            elif hdr.command_id == Command.Default_Response:
-                payload["value"] = args[0]
-                payload["status"] = str(args[1])
-
-            else:
-                if isinstance(args, bytes) and args:
-                    args = "0x" + args.hex()
-                payload["command_id"] = int(hdr.command_id)
-                payload["value"] = args
-
-        elif hdr.frame_control.is_cluster:
-            # if isinstance(args, bytes) and args:
-            #     args = "0x" + args.hex()
-
-            payload["command_id"] = hdr.command_id
-            if hdr.command_id < len(cluster.commands):
-                payload["command"] = cluster.commands[hdr.command_id]
-            if args:
-                payload["value"] = args
-
-        else:
-            if isinstance(args, bytes) and args:
-                args = "0x" + args.hex()
-
-            payload.update({"command_id": hdr.command_id, "value": args})
-
-        return payload
-
+        return zcl_deserialize(cluster_id, data)
     except Exception as e:
         _LOGGER.debug("Error while parsing zigbee", exc_info=e)
         return None
 
 
-def get_cluster(cluster: str) -> Cluster:
-    # noinspection PyProtectedMember
-    return next(
-        cls for cls in Cluster._registry.values() if cls.ep_attribute == cluster
-    )
+def zdo_deserialize(cluster_id: int, payload: bytes):
+    if (zdo := CLUSTERS.get("zdo")) is None:
+        zdo = CLUSTERS["zdo"] = ZDO(None)
+
+    hdr, args = zdo.deserialize(cluster_id, payload)
+    if hdr.command_id == ZDOCmd.Active_EP_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": str(args[0]),
+            "endpoints": args[2],
+        }
+    elif hdr.command_id == ZDOCmd.Simple_Desc_rsp:
+        desc: SizePrefixedSimpleDescriptor = args[2]
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": str(args[0]),
+            "device_type": desc.device_type,
+            "device_version": desc.device_version,
+            "endpoint": desc.endpoint,
+            "input_clusters": desc.input_clusters,
+            "output_clusters": desc.output_clusters,
+            "profile": desc.profile,
+        }
+    elif hdr.command_id == ZDOCmd.Node_Desc_rsp:
+        desc: NodeDescriptor = args[2]
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": str(args[0]),
+            "is_mains_powered": desc.is_mains_powered,
+            "logical_type": str(desc.logical_type),
+            "manufacturer_code": desc.manufacturer_code,
+        }
+    elif hdr.command_id in (ZDOCmd.Bind_rsp, ZDOCmd.Mgmt_Leave_rsp):
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": str(args[0]),
+        }
+    elif hdr.command_id in (ZDOCmd.Node_Desc_req, ZDOCmd.Active_EP_req):
+        return {"zdo_command": hdr.command_id.name}
+    elif hdr.command_id == ZDOCmd.Simple_Desc_req:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "endpoint": args[0],
+        }
+    elif hdr.command_id == ZDOCmd.Bind_req:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "src_addr": args[0],
+            "src_endpoint": args[1],
+            "cluster": args[2],
+            "dst_addr": args[3],
+        }
+    elif hdr.command_id == ZDOCmd.IEEE_addr_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": args[0],
+            "ieee": args[1],
+            "nwk": args[2],
+        }
+    elif hdr.command_id == ZDOCmd.Mgmt_Leave_req:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "ieee": args[0],
+        }
+    elif hdr.command_id == ZDOCmd.Mgmt_NWK_Update_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": args[0],
+            "channels": args[1],
+            "total": args[2],
+            "failures": args[3],
+            "energy": args[4],
+        }
+    elif hdr.command_id == ZDOCmd.NWK_addr_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": args[0].name,
+            "ieee": str(args[1]),
+            "nwk": str(args[2]),
+        }
+    elif hdr.command_id == ZDOCmd.Mgmt_Lqi_req:
+        # https://docs.silabs.com/zigbee/6.5/af_v2/group-zdo
+        return {"zdo_command": hdr.command_id.name, "start_index": args[0]}
+    elif hdr.command_id == ZDOCmd.Mgmt_Lqi_rsp:
+        assert args[0] == ZDOStatus.SUCCESS, args  # status
+        neighbors: Neighbors = args[1]
+        items = [
+            {
+                "ieee": str(i.ieee),
+                "nwk": str(i.nwk).lower(),
+                "device_type": i.device_type.name,
+                "relationship": i.relationship.name,
+                "depth": int(i.depth),
+                "lqi": int(i.lqi),
+            }
+            for i in neighbors.NeighborTableList
+        ]
+        return {
+            "zdo_command": hdr.command_id.name,
+            "entries": int(neighbors.Entries),
+            "start_index": int(neighbors.StartIndex),
+            "neighbors": items,
+        }
+    elif hdr.command_id == ZDOCmd.Mgmt_Rtg_rsp:
+        return {
+            "zdo_command": hdr.command_id.name,
+            "status": args[0],
+            "routes": args[1],
+        }
+    else:
+        raise NotImplemented
 
 
-def get_attr(attributes: Dict[int, ZCLAttributeDef], attr: Union[str, int]) -> int:
-    if isinstance(attr, int):
-        return attr
-    return next(v.id for v in attributes.values() if v.name == attr)
+def zcl_deserialize(cluster_id: int, data: bytes) -> dict:
+    """Decode Silabs Z3 GatewayHost MQTT message using zigpy library. Supports
+    ZDO payload and ZCL payload.
+    """
+    if not (cluster := CLUSTERS.get(cluster_id)):
+        # noinspection PyTypeChecker
+        cluster = CLUSTERS[cluster_id] = Cluster.from_id(None, cluster_id)
+        cluster._log = lambda *_, **__: None
+
+    try:
+        hdr, resp = cluster.deserialize(data)
+    except ValueError as e:
+        return {"cluster_id": cluster_id, "error": str(e)}
+    except KeyError as e:
+        return {"cluster_id": cluster_id, "error": f"Key error: {e}"}
+
+    payload: dict = {"cluster": cluster.ep_attribute} if cluster.ep_attribute else {}
+
+    if hdr.frame_control.is_general:
+        payload["general_command_id"] = hdr.command_id
+        fields = resp.as_dict()
+
+        if hdr.command_id == GeneralCommand.Read_Attributes:
+            payload.update(fields)
+        elif hdr.command_id == GeneralCommand.Report_Attributes:
+            for attr in fields["attribute_reports"]:
+                payload[attr.attrid] = value_decode(attr.value)
+        elif hdr.command_id == GeneralCommand.Write_Attributes:
+            for attr in fields["attributes"]:
+                payload[attr.attrid] = value_decode(attr.value)
+        elif hdr.command_id == GeneralCommand.Read_Attributes_rsp:
+            for attr in fields["status_records"]:
+                payload[attr.attrid] = value_decode(attr.value)
+        elif hdr.command_id == GeneralCommand.Write_Attributes_rsp:
+            for attr in fields["status_records"]:
+                payload[attr.attrid] = value_decode(attr.status)
+        else:
+            payload["header"] = hdr
+            payload["response"] = resp
+
+    elif hdr.frame_control.is_cluster:
+        payload["cluster_command_id"] = hdr.command_id
+        if isinstance(resp, CommandSchema):
+            payload["value"] = {k: value_decode(v) for k, v in resp.as_dict().items()}
+        else:
+            payload["value"] = resp
+
+    else:
+        payload = {"header": hdr, "cluster": cluster, "response": resp}
+
+    return payload
 
 
-def get_attr_type(attributes: Dict[int, ZCLAttributeDef], attr: str) -> (int, int):
-    attr = next(v for v in attributes.values() if v.name == attr)
-    typeid = next(k for k, v in DATA_TYPES.items() if v[1] == attr.type)
-    return attr.id, typeid
+def value_decode(value) -> bool | int | float | bytes | str:
+    if isinstance(value, TypeValue):
+        return value_decode(value.value)
+    if isinstance(value, bool):
+        return bool(value)
+    if isinstance(value, int):
+        return int(value)
+    if isinstance(value, float):
+        return float(value)
+    if isinstance(value, bytes):
+        return bytes(value)
+    if isinstance(value, str):
+        return str(value)
+    return value
 
 
-# noinspection PyProtectedMember
-def get_type_len(type: int) -> int:
-    t = DATA_TYPES[type][1]
-    if hasattr(t, "_length"):
-        return t._length
-    if hasattr(t, "_size"):
-        return t._size
-    raise NotImplementedError
+def xiaomi_deserialize(data: bytes) -> dict | None:
+    hdr, data = ZCLHeader.deserialize(data)
+    if (
+        not hdr.frame_control.is_general
+        or hdr.command_id != GeneralCommand.Report_Attributes
+    ):
+        return None
+
+    payload = {
+        "cluster": "basic",
+        "general_command_id": hdr.command_id,
+    }
+
+    while len(data) >= 3:
+        attr_id = int.from_bytes(data[:2], "little")
+        if attr_id == 0xFF01:
+            if int(data[2]) != 0x42:
+                return None
+
+            data = data[4:]  # skip data length (sometimes wrong)
+            value = {}
+            while len(data) > 1:
+                sub_id = int(data[0])
+                sub_value, data = TypeValue.deserialize(data[1:])
+                value[sub_id] = value_decode(sub_value)
+        else:
+            sub_value, data = TypeValue.deserialize(data[2:])
+            value = value_decode(sub_value)
+
+        payload[attr_id] = value
+
+    return payload
+
+
+def get_type_id(cluster_id: int, attr_id: int) -> int:
+    attr = XCluster(cluster_id).attributes[attr_id]
+    return next(k for k, v in DATA_TYPES.items() if issubclass(attr.type, v[1]))
+
+
+def attr_encode(type_id: int, value: int) -> bytes:
+    cls = DATA_TYPES[type_id][1]
+    return cls(value).serialize()
 
 
 def zcl_on_off(nwk: str, ep: int, value: bool) -> list:
@@ -295,7 +283,7 @@ def zcl_level(nwk: str, ep: int, br: int, tr: float) -> list:
     ]
 
 
-def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
+def zcl_color_temp(nwk: str, ep: int, ct: int, tr: float) -> list:
     """Generate Silabs Z3 command (cluster 0x0300)."""
     tr = int(tr * 10.0)  # zcl format - tenths of a seconds
     return [
@@ -304,83 +292,155 @@ def zcl_color(nwk: str, ep: int, ct: int, tr: float) -> list:
     ]
 
 
-# zcl global read [cluster:2] [attributeId:2]
-def zcl_read(nwk: str, ep: int, cluster: Union[str, int], *attrs) -> list:
-    """Generate Silabs Z3 read attribute command. Support multiple attrs."""
-    if isinstance(cluster, str):
-        cluster = get_cluster(cluster)
-        cid = cluster.cluster_id
-
-        # convert List[str] to List[int]
-        attrs = [get_attr(cluster.attributes, attr) for attr in attrs]
-    else:
-        cid = cluster
-
-    assert isinstance(cid, int)
-    for attr in attrs:
-        assert isinstance(attr, int)
-
-    if len(attrs) > 1:
-        raw = "".join([int(a).to_bytes(2, "little").hex() for a in attrs])
-        return [
-            {"commandcli": f"raw {cid} {{100000{raw}}}"},
-            {"commandcli": f"send {nwk} 1 {ep}"},
-        ]
-
+def zcl_color_hs(nwk: str, ep: int, h: int, s: int, tr: float) -> list:
+    """Generate Silabs Z3 command (cluster 0x0300)."""
+    tr = int(tr * 10.0)  # zcl format - tenths of a seconds
     return [
-        {"commandcli": f"zcl global read {cid} {attrs[0]}"},
+        {"commandcli": f"zcl color-control movetohueandsat {h} {s} {tr} 0 0"},
         {"commandcli": f"send {nwk} 1 {ep}"},
     ]
+
+
+# noinspection PyProtectedMember
+class XCluster:
+    cluster: Cluster
+
+    def __init__(self, cluster_id: int):
+        self.cluster = Cluster._registry[cluster_id]
+
+    @property
+    def id(self):
+        return self.cluster.cluster_id
+
+    @property
+    def attributes(self):
+        return self.cluster.attributes
+
+    def command(self, command_id: int, *args, **kwargs) -> bytes:
+        command = self.cluster.server_commands[command_id]
+        return self.request(False, command, *args, **kwargs)
+
+    def read_attrs(self, *args) -> bytes:
+        command = GENERAL_COMMANDS[GeneralCommand.Read_Attributes]
+        return self.request(True, command, args)
+
+    def request(self, general: bool, command: ZCLCommandDef, *args, **kwargs) -> bytes:
+        # noinspection PyArgumentList
+        hdr, request = self.cluster._create_request(
+            None,  # self
+            general=general,
+            command_id=command.id,
+            schema=command.schema,
+            manufacturer=None,
+            tsn=0,  # will be owerwriten by silabs software
+            disable_default_response=True,  # silabs uses this value by default
+            direction=0,  # can't use const, because it is wrong on old Hass
+            args=args,  # command args
+            kwargs=kwargs,  # command kwargs
+        )
+
+        # noinspection PyUnresolvedReferences
+        return hdr.serialize() + request.serialize()
+
+
+def zcl_command(
+    nwk: str, ep: int, cluster_id: str | int, command_id: int, *args
+) -> list[dict]:
+    raw = XCluster(cluster_id).command(command_id, *args).hex()
+    return [
+        {"commandcli": f"raw {cluster_id} {{{raw}}}"},
+        {"commandcli": f"send {nwk} 1 {ep}"},
+    ]
+
+
+# zcl global read [cluster:2] [attributeId:2]
+def zcl_read(nwk: str, ep: int, cluster_id: int, attr_id: int, mfg: int = None) -> list:
+    """Generate Silabs Z3 read attribute command. Support multiple attrs."""
+    cli = f"zcl global read {cluster_id} {attr_id}"
+    commands = [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
+    return [{"commandcli": f"zcl mfg-code {mfg}"}] + commands if mfg else commands
+
+
+def optimize_read(commands: list[dict]) -> bool:
+    """Collect all similar zcl global read to one zigbee message."""
+    read: dict[tuple, list] = {}
+    mfg = cluster_id = attr_id = None
+    optimize = False
+
+    for item in commands:
+        cli: str = item["commandcli"]
+        if cli.startswith("zcl mfg-code"):
+            words = cli.split(" ")
+            mfg = words[2]
+        elif cli.startswith("zcl global read"):
+            words = cli.split(" ")
+            cluster_id = words[3]
+            attr_id = words[4]
+        elif cli.startswith("send") and cluster_id:
+            index = (cli, cluster_id, mfg)
+            if index in read:
+                read[index].append(attr_id)
+                optimize = True
+            else:
+                read[index] = [attr_id]
+            mfg = cluster_id = attr_id = None
+        else:
+            return False
+
+    if not optimize:
+        return False
+
+    # rebuild commands list
+    commands.clear()
+
+    for index, attrs in read.items():
+        cli, cluster_id, mfg = index
+        if mfg:
+            commands.append({"commandcli": f"zcl mfg-code {mfg}"})
+        if len(attrs) > 1:
+            raw = "".join(int(a).to_bytes(2, "little").hex() for a in attrs)
+            commands.append({"commandcli": f"raw {cluster_id} {{100000{raw}}}"})
+        else:
+            commands.append({"commandcli": f"zcl global read {cluster_id} {attrs[0]}"})
+        commands.append({"commandcli": cli})
+
+    return True
 
 
 # zcl global write [cluster:2] [attributeId:2] [type:4] [data:-1]
 def zcl_write(
     nwk: str,
     ep: int,
-    cluster: Union[str, int],
-    attr: Union[str, int],
-    data: int,
+    cluster_id: int,
+    attr_id: int,
+    value: int,
     *,
+    type_id: int = None,
     mfg: int = None,
-    type: int = None,
 ) -> list:
     """Generate Silabs Z3 write attribute command."""
-    if isinstance(cluster, str):
-        cluster = get_cluster(cluster)
-        if isinstance(attr, str):
-            attr, type = get_attr_type(cluster.attributes, attr)
-        cluster = cluster.cluster_id
+    if type_id is None:
+        type_id = get_type_id(cluster_id, attr_id)
 
-    assert isinstance(cluster, int)
-    assert isinstance(attr, int) and isinstance(type, int)
-
-    type_len = get_type_len(type)
-    # data always string hex: {FFFF}
-    data = data.to_bytes(type_len, "little").hex()
+    data = attr_encode(type_id, value).hex()
 
     pre = [{"commandcli": f"zcl mfg-code {mfg}"}] if mfg is not None else []
-    return pre + [
-        {"commandcli": f"zcl global write {cluster} {attr} {type} {{{data}}}"},
-        {"commandcli": f"send {nwk} 1 {ep}"},
-    ]
+    cli = f"zcl global write {cluster_id} {attr_id} {type_id} {{{data}}}"
+    return pre + [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
 
 
 # zdo bind [destination:2] [source Endpoint:1] [destEndpoint:1] [cluster:2] [remoteEUI64:8] [destEUI64:8]
-def zdo_bind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
+def zdo_bind(nwk: str, ep: int, cluster_id: int, src: str, dst: str) -> list:
     """Generate Silabs Z3 bind command."""
-    cluster = get_cluster(cluster)
-    cid = cluster.cluster_id
-    return [{"commandcli": f"zdo bind {nwk} {ep} 1 {cid} {{{src}}} {{{dst}}}"}]
+    cli = f"zdo bind {nwk} {ep} 1 {cluster_id} {{{src}}} {{{dst}}}"
+    return [{"commandcli": cli}]
 
 
 # zdo unbind unicast [target:2] [source eui64:8] [source endpoint:1] [clusterID:2] [destinationEUI64:8] [destEndpoint:1]
-def zdo_unbind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
+def zdo_unbind(nwk: str, ep: int, cluster_id: int, src: str, dst: str) -> list:
     """Generate Silabs Z3 bind command."""
-    cluster = get_cluster(cluster)
-    cid = cluster.cluster_id
-    return [
-        {"commandcli": f"zdo unbind unicast {nwk} {{{src}}} {ep} {cid} {{{dst}}} 1"}
-    ]
+    cli = f"zdo unbind unicast {nwk} {{{src}}} {ep} {cluster_id} {{{dst}}} 1"
+    return [{"commandcli": cli}]
 
 
 # zcl global send-me-a-report [cluster:2] [attributeId:2] [dataType:1] [minReportTime:2] [maxReportTime:2] [reportableChange:-1]
@@ -390,29 +450,32 @@ def zdo_unbind(nwk: str, ep: int, cluster: str, src: str, dst: str) -> list:
 def zdb_report(
     nwk: str,
     ep: int,
-    cluster: str,
-    attr: str,
+    cluster_id: int,
+    attr_id: int,
     mint: int,
     maxt: int,
     change: int,
-    type: int = None,
+    *,
+    type_id: int = None,
 ):
-    cluster = get_cluster(cluster)
-    cid = cluster.cluster_id
+    if type_id is None:
+        type_id = get_type_id(cluster_id, attr_id)
 
-    if isinstance(attr, str):
-        attr, type = get_attr_type(cluster.attributes, attr)
-
-    type_len = get_type_len(type)
-    change = change.to_bytes(type_len, "little").hex()
-    return [
-        {
-            "commandcli": f"zcl global send-me-a-report {cid} {attr} {type} {mint} {maxt} {{{change}}}"
-        },
-        {"commandcli": f"send {nwk} 1 {ep}"},
-    ]
+    data = attr_encode(type_id, change).hex()
+    cli = f"zcl global send-me-a-report {cluster_id} {attr_id} {type_id} {mint} {maxt} {{{data}}}"
+    return [{"commandcli": cli}, {"commandcli": f"send {nwk} 1 {ep}"}]
 
 
 # zdo leave [target:2] [removeChildren:1] [rejoin:1]
 def zdo_leave(nwk: str):
     return [{"commandcli": f"zdo leave {nwk} 0 0"}]
+
+
+# zdo mgmt-lqi [target:2] [startIndex:1]
+def zdo_mgmt_lqi(nwk: str, index: int = 0):
+    return [{"commandcli": f"zdo mgmt-lqi {nwk} {index}"}]
+
+
+# 	zdo route [target:2] [index:1]
+def zdo_route(nwk: str, index: int = 0):
+    return [{"commandcli": f"zdo route {nwk} {index}"}]

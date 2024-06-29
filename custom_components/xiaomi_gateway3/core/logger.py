@@ -33,7 +33,7 @@ import voluptuous as vol
 from homeassistant.const import CONF_FILENAME
 from homeassistant.helpers import config_validation as cv
 
-FMT = "%(asctime)s %(message)s"
+FMT = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
 
 CONFIG_SCHEMA = vol.Schema(
     {

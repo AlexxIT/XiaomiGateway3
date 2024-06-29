@@ -29,7 +29,8 @@
         "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) или [вручную](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
         "data": {
           "host": "IP-адрес",
-          "token": "Токен"
+          "token": "Токен",
+          "key": "Ключ"
         }
       }
     }
@@ -48,6 +49,7 @@
         "data": {
           "host": "IP-адрес",
           "token": "Токен",
+          "key": "Ключ",
           "telnet_cmd": "Команда для открытия Telnet",
           "ble": "Поддержка Bluetooth устройств",
           "stats": "Добавить сенсоры статистики",
@@ -58,17 +60,52 @@
   },
   "device_automation": {
     "trigger_type": {
-      "button": "Нажатие кнопки",
-      "button_1": "Нажатие первой кнопки",
-      "button_2": "Нажатие второй кнопки",
-      "button_3": "Нажатие третьей кнопки",
-      "button_4": "Нажатие четвёртой кнопки",
-      "button_5": "Нажатие пятой кнопки",
-      "button_6": "Нажатие шестой кнопки",
-      "button_both": "Нажатие двух кнопок",
-      "button_both_12": "Нажатие первой и второй кнопок",
-      "button_both_13": "Нажатие первой и третей кнопок",
-      "button_both_23": "Нажатие второй и третьей кнопок"
+      "action": "Действие"
     }
-  }
+  },
+  "entity": {
+      "select": {
+        "command": {
+          "state": {
+            "info": "Информация об устройстве",
+            "update": "Обновление устройства",
+            "pair": "Сопряжение Zigbee",
+            "force_pair": "Принудительное сопряжение Zigbee",
+            "bind": "Привязка Zigbee",
+            "ota": "Zigbee OTA",
+            "reconfig": "Переконфигурация Zigbee",
+            "parent_scan": "Сканирование родительских устройств Zigbee",
+            "firmware_lock": "Блокировка прошивки шлюза",
+            "reboot": "Перезагрузка шлюза",
+            "run_ftp": "Запуск FTP на шлюзе",
+            "flash_ezsp": "Прошивка EZSP Zigbee",
+            "openmiio_restart": "Перезагрузка OpenmiIO",
+            "disable": "Отключение шлюза",
+            "enable": "Включение шлюза",
+            "rejoin": "Повторное подключение Zigbee",
+            "remove": "Удаление устройства"
+          }
+        },
+        "data": {
+          "state": {
+            "enabled": "Включено",
+            "disabled": "Отключено",
+            "unknown": "Неизвестно",
+            "ok": "OK",
+            "error": "ОШИБКА",
+            "permit_join": "Готов к подключению",
+            "stop_join": "Сопряжение остановлено",
+            "cancel": "Отмена",
+            "key_secure": "Отправить сетевой ключ (безопасный)",
+            "key_legacy": "Отправить сетевой ключ (устаревший)",
+            "no_firmware": "Нет прошивки",
+            "bind": "Привязать",
+            "unbind": "Отвязать",
+            "no_devices": "Нет устройств",
+            "original": "Оригинальный",
+            "custom": "Пользовательский"
+          }
+        }
+      }
+    }
 }

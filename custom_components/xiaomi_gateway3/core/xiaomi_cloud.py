@@ -38,22 +38,23 @@ import time
 
 from aiohttp import ClientSession
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__package__ + ".cloud")
 
 SERVERS = ["cn", "de", "i2", "ru", "sg", "us"]
 UA = "Android-7.1.1-1.0.0-ONEPLUS A3010-136-%s APP/xiaomi.smarthome APPV/62830"
 
 
 class MiCloud:
-    auth = None
-    verify = None
+    auth: dict[str, str] = None
+    verify: str = None
+    devices: list[dict] = None
 
     def __init__(self, session: ClientSession, servers: list = None):
         self.session = session
         self.servers = servers or ["cn"]
         self.device_id = get_random_string(16)
 
-    async def login(self, username: str, password: str):
+    async def login(self, username: str, password: str) -> bool:
         try:
             payload = await self._login_step1()
             data = await self._login_step2(username, password, payload)
@@ -75,7 +76,7 @@ class MiCloud:
             _LOGGER.exception(f"Can't login to Mi Cloud: {e}")
             return False
 
-    async def _login_step1(self):
+    async def _login_step1(self) -> dict:
         r = await self.session.get(
             "https://account.xiaomi.com/pass/serviceLogin",
             cookies={"sdkVersion": "3.8.6", "deviceId": self.device_id},
@@ -89,7 +90,7 @@ class MiCloud:
             k: v for k, v in resp.items() if k in ("sid", "qs", "callback", "_sign")
         }
 
-    async def _login_step2(self, username: str, password: str, payload: dict):
+    async def _login_step2(self, username: str, password: str, payload: dict) -> dict:
         payload["user"] = username
         payload["hash"] = hashlib.md5(password.encode()).hexdigest().upper()
 
@@ -105,13 +106,13 @@ class MiCloud:
         resp = json.loads(raw[11:])
         return resp
 
-    async def _login_step3(self, location):
+    async def _login_step3(self, location) -> str:
         r = await self.session.get(location, headers={"User-Agent": UA})
         service_token = r.cookies["serviceToken"].value
         _LOGGER.debug(f"MiCloud step3")
         return service_token
 
-    async def get_devices(self):
+    async def get_devices(self) -> list[dict] | None:
         payload = {
             "getVirtualModel": True,
             "getHuamiDevices": 1,
@@ -127,7 +128,7 @@ class MiCloud:
             total += resp["list"]
         return total
 
-    async def get_rooms(self):
+    async def get_rooms(self) -> list[dict] | None:
         payload = {"fg": True, "fetch_share": True, "limit": 300}
 
         total = []
@@ -139,7 +140,7 @@ class MiCloud:
                 total += home["roomlist"]
         return total
 
-    async def get_bindkey(self, did: str):
+    async def get_bindkey(self, did: str) -> str | None:
         payload = {"did": did, "pdid": 1}
         for server in self.servers:
             resp = await self.request(server, "/v2/device/blt_get_beaconkey", payload)
@@ -273,9 +274,8 @@ def gen_signature(url: str, signed_nonce: str, data: dict) -> str:
 
 
 def encrypt_rc4(pwd, data):
-    return base64.b64encode(
-        RC4(base64.b64decode(pwd.encode())).init1024().crypt(data.encode())
-    ).decode()
+    s = RC4(base64.b64decode(pwd.encode())).init1024().crypt(data.encode())
+    return base64.b64encode(s).decode()
 
 
 def decrypt_rc4(pwd, data):
