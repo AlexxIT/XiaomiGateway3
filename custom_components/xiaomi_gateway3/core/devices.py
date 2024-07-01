@@ -2038,6 +2038,18 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.7", map={0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"})
     ]
 }, {
+    # https://home.miot-spec.com/spec/mvs.light.wy0a01
+    17964: ["Mvs", "Mvs light", "mvs.light.wy0a01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=5000),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "Tv",9: "Reading",10: "Computer",11: "Hospitality",12: "Entertainment",13: "Wakeup",14: "Dusk",15: "Sleeping",16: "Model-1",17: "Model-2",18: "Model-3",19: "Model-4"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("flex-switch", "switch", mi="4.p.12"),
+        BoolConv("night-light-switch", "switch", mi="4.p.13"),
+    ],
+}, {
     12455: ["Yeelight", "K Series Single Wall Switch", "YLYKG-0025/0020", "yeelink.switch.ylsw4"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
