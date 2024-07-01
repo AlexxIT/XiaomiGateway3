@@ -1849,6 +1849,16 @@ DEVICES += [{
     ],
     # "ttl": "6h"  # battery every 6 hours
 }, {
+    # https://home.miot-spec.com/spec/ailol.remote.ts4
+    18250: ["ZXFANS", "ZXFANS F2 smart knob remote control", "ailol.remote.ts4"],
+    "spec": [
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "knob_increasing", 6: "knob_reduced"}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+    ]
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
