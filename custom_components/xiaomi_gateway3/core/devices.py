@@ -3014,14 +3014,18 @@ DEVICES += [{
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
         BaseConv("channel_4", "switch", mi="5.p.1"),
-        BaseConv("switch_status_1", "switch", mi="11.p.1"),
-        BaseConv("switch_status_2", "switch", mi="12.p.1"),
-        BaseConv("switch_status_3", "switch", mi="13.p.1"),
-        BaseConv("switch_status_4", "switch", mi="14.p.1"),
-        MapConv("mode_1", "select", mi="2.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_2", "select", mi="3.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_3", "select", mi="4.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_4", "select", mi="5.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="11.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="12.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="13.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="14.e.1", value=BUTTON_4_SINGLE),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("led_mode_normal", "select", mi="6.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally Off", 3: "Normally On"}, entity=ENTITY_CONFIG),  # config
+        MapConv("led_mode_special", "select", mi="6.p.2", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally Off", 3: "Normally On"}, entity=ENTITY_CONFIG),  # config
+        BaseConv("backlight", "switch", mi="6.p.3"),
     ]
 }, {
     9609: ["Bean", "Mesh Single Wall Switch (L)", "bean.switch.bl01"],
