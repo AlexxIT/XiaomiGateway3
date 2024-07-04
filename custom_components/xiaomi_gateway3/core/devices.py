@@ -3281,6 +3281,17 @@ DEVICES += [{
         MathConv("light_on_gradient_time", "number", mi="2.p.8", multiply=0.5, min=0, max=10, entity=ENTITY_CONFIG),
     ]
 }, {
+    5093: [None, "Two Key Mesh Switch", "topwit.switch.rzw02"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Default", 1: "Wireless", 2: "Flex"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Default", 1: "Wireless", 2: "Flex"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+    ]
+}, {
     15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
@@ -3307,7 +3318,7 @@ DEVICES += [{
         MapConv("icon_style", "select", mi="3.p.5", map={0: "Lamp-bulb", 1: "Cylindrical-spotlight", 2: "Ceiling-light", 3: "Hanging-lamp", 4: "Lamp-belt", 5: "Small-electric-appliance", 6: "Socket", 7: "Valve", 8: "Electrical-machinery"}, entity=ENTITY_CONFIG),
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
-},{
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
