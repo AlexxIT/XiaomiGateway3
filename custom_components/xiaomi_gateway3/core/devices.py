@@ -2095,6 +2095,8 @@ DEVICES += [{
         ConstConv("action", mi="16.e.3", value=BUTTON_3_HOLD),
     ],
 }, {
+    # LeMesh generic. Pro model has 4 extra scene buttons, but their action replaces normal wireless button so the converter is exactly the same.
+    14460: ["LeMesh", "Scene Mesh four key Switch Pro", "lemesh.switch.sw4f01"],
     12458: ["Yeelight", "K Series 4-Key Wall Switch", "YLYKG-0028/0023", "yeelink.switch.ylsw7"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
@@ -2122,7 +2124,7 @@ DEVICES += [{
         ConstConv("action", mi="16.e.2", value=BUTTON_2_DOUBLE),
         ConstConv("action", mi="16.e.3", value=BUTTON_3_HOLD),
         ConstConv("action", mi="17.e.1", value=BUTTON_4_SINGLE),
-        ConstConv("action", mi="17.e.2", value="button_4_double"),
+        ConstConv("action", mi="17.e.2", value=BUTTON_4_DOUBLE),
         ConstConv("action", mi="17.e.3", value=BUTTON_4_HOLD),
     ],
 }, {
@@ -3012,14 +3014,18 @@ DEVICES += [{
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
         BaseConv("channel_4", "switch", mi="5.p.1"),
-        BaseConv("switch_status_1", "switch", mi="11.p.1"),
-        BaseConv("switch_status_2", "switch", mi="12.p.1"),
-        BaseConv("switch_status_3", "switch", mi="13.p.1"),
-        BaseConv("switch_status_4", "switch", mi="14.p.1"),
-        MapConv("mode_1", "select", mi="2.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_2", "select", mi="3.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_3", "select", mi="4.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
-        MapConv("mode_4", "select", mi="5.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "toggle_switch"}),  # config
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="11.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="12.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="13.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="14.e.1", value=BUTTON_4_SINGLE),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle"}),  # config
+        MapConv("led_mode_normal", "select", mi="6.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally Off", 3: "Normally On"}, entity=ENTITY_CONFIG),  # config
+        MapConv("led_mode_special", "select", mi="6.p.2", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally Off", 3: "Normally On"}, entity=ENTITY_CONFIG),  # config
+        BaseConv("backlight", "switch", mi="6.p.3"),
     ]
 }, {
     9609: ["Bean", "Mesh Single Wall Switch (L)", "bean.switch.bl01"],
@@ -3106,36 +3112,54 @@ DEVICES += [{
     ],
 }, {
     14431: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (1 Gang)", "XMQBKG04LM", "xiaomi.switch.pro1"],
+    # White variant
+    17767: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (1 Gang)", "XMQBKG04LM", "xiaomi.switch.wpro1"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="3.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="3.e.3", value=BUTTON_HOLD),
         MapConv("fault", "sensor", mi="2.p.3", map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
         MathConv("power", "sensor", mi="4.p.2", round=1),
         BaseConv("led", "switch", mi="5.p.1"),
     ],
 }, {
     14432: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (2 Gang)", "XMQBKG05LM", "xiaomi.switch.pro2"],
+    # White variant
+    17768: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (2 Gang)", "XMQBKG05LM", "xiaomi.switch.wpro2"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_1_HOLD),
         ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_2_HOLD),
         MapConv("fault", "sensor", mi="2.p.3", map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
         MathConv("power", "sensor", mi="6.p.2", round=1),
         BaseConv("led", "switch", mi="7.p.1"),
     ],
 }, {
     14433: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (3 Gang)", "XMQBKG06LM", "xiaomi.switch.pro3"],
+    # White variant
+    17769: ["Xiaomi", "Xiaomi Smart Wall Switch Pro (3 Gang)", "XMQBKG05LM", "xiaomi.switch.wpro3"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
         ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
         MapConv("fault", "sensor", mi="2.p.3", map={0: "No Faults", 1: "Over Temperature", 2: "Overload", 3: "Overload And Overheat"}),
         MathConv("power", "sensor", mi="8.p.2", round=1),
         BaseConv("led", "switch", mi="9.p.1"),
@@ -3261,6 +3285,17 @@ DEVICES += [{
         MathConv("light_on_gradient_time", "number", mi="2.p.8", multiply=0.5, min=0, max=10, entity=ENTITY_CONFIG),
     ]
 }, {
+    5093: [None, "Two Key Mesh Switch", "topwit.switch.rzw02"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Default", 1: "Wireless", 2: "Flex"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Default", 1: "Wireless", 2: "Flex"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+    ]
+}, {
     15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
@@ -3287,7 +3322,7 @@ DEVICES += [{
         MapConv("icon_style", "select", mi="3.p.5", map={0: "Lamp-bulb", 1: "Cylindrical-spotlight", 2: "Ceiling-light", 3: "Hanging-lamp", 4: "Lamp-belt", 5: "Small-electric-appliance", 6: "Socket", 7: "Valve", 8: "Electrical-machinery"}, entity=ENTITY_CONFIG),
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
-},{
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
