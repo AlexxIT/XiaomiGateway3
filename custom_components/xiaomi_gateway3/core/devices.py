@@ -2070,6 +2070,14 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.5", map={0: "Warmth", 1: "TV", 2: "Reading", 3: "Night", 4: "Hospitality", 5: "Leisure", 6: "Office", 255: "Normal"}),
     ],
 }, {
+    # https://home.miot-spec.com/s/ftd.light.dsplmp
+    13233: [None, "Mesh Light", "ftd.light.dsplmp"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=3000, maxk=6500),
+    ],
+}, {
     15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001", "yeelink.light.ml10"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
