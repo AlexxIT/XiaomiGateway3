@@ -2169,7 +2169,7 @@ DEVICES += [{
         ConstConv("action", mi="15.e.2", value=BUTTON_2_DOUBLE),
         ConstConv("action", mi="15.e.3", value=BUTTON_2_HOLD),
         ConstConv("action", mi="16.e.1", value=BUTTON_3_SINGLE),
-        ConstConv("action", mi="16.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="16.e.2", value=BUTTON_3_DOUBLE),
         ConstConv("action", mi="16.e.3", value=BUTTON_3_HOLD),
         ConstConv("action", mi="17.e.1", value=BUTTON_4_SINGLE),
         ConstConv("action", mi="17.e.2", value=BUTTON_4_DOUBLE),
