@@ -2060,6 +2060,31 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
+    17964: ["LeMesh", "Smart downlight Mesh version", "mvs.light.wy0a01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Sun", 5: "Moon", 7: "Warmth", 8: "Cinema", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "Custom1", 17: "Custom2", 18: "Custom3", 19: "Custom4"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "ON", 2: "OFF"}),  # config
+        BaseConv("flex_switch", "switch", mi="2.p.12"),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+        BoolConv("save_state", "switch", mi="5.p.1", entity=ENTITY_CONFIG),  # config
+        MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),  # config
+    ]
+}, {
+    17157: ["LeMesh", "Scene Mesh monochrome light V2S series", "lemesh.light.w00a02"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Sun", 5: "Moon", 7: "Warmth", 8: "Cinema", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "Custom1", 17: "Custom2", 18: "Custom3", 19: "Custom4", 20: "Breath", 21: "Jump"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "ON", 2: "OFF"}),  # config
+        BaseConv("flex_switch", "switch", mi="2.p.12"),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+        BoolConv("save_state", "switch", mi="5.p.1", entity=ENTITY_CONFIG),  # config
+        MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),  # config
+    ]
+}, {
     10729: [None, "Mesh Light", "jymc.light.falmp"],
     12066: [None, "Mesh Light", "ftd.light.ftdlmp"],
     "spec": [
