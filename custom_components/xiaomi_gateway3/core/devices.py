@@ -3283,6 +3283,18 @@ DEVICES += [{
         MapConv("led", "select", mi="4.p.1", map={0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"})
     ]
 }, {
+    15461: [None, "V6 Intelligent On-off Device(Mesh)", "giot.switch.v6oodm"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "select", mi="2.p.6", map={0: "OFF", 1: "ON", 2: "Last State"}),
+        MapConv("led", "select", mi="4.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally OFF", 3: "Normally ON"}),
+        BoolConv("flex_switch", "switch", mi="5.p.1"),
+        MapConv("rocker_switch", "select", mi="6.p.1", map={0: "Self-resetting Mode", 1: "Flip Mode", 2: "Sync Mode"}, entity=ENTITY_CONFIG),
+        BoolConv("inching_mode", "switch", mi="2.p.5", entity=ENTITY_CONFIG),
+        MapConv("inching_state", "select", mi="3.p.1", map={False: "Default OFF", True: "Default ON"}, entity=ENTITY_CONFIG),
+        MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200, step=1, round=1, entity=ENTITY_CONFIG)
+    ]
+}, {
     13139: ["GranwinIoT", "Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
