@@ -1676,6 +1676,14 @@ DEVICES += [{
         MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
     ]
 }, {
+    16186: ["Smartfrog", "Wireless Button", "giot.remote.v58kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: "button_4_double", 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
+    ]
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:timer:0000A0BD:hoto-kt:1
     9385: ["Mijia", "Timer", "hoto.timer.kt"],
     "spec": [
