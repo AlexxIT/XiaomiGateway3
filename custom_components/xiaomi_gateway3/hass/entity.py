@@ -85,7 +85,7 @@ class XEntity(Entity):
             self.entity_id = f"{conv.domain}.{device.uid}_{conv.attr}"
 
         if (MAJOR_VERSION, MINOR_VERSION) >= (2023, 7):
-            if self._default_to_device_class_name():
+            if self._default_to_device_class_name() and conv.attr not in ("ble", "zigbee", "mesh", "gateway"):
                 delattr(self, "_attr_name")
 
         self.on_init()
