@@ -1644,7 +1644,7 @@ DEVICES += [{
         BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),#Tested
         BaseConv("illuminance", "sensor", mi="2.p.1005"),#Tested
         # other sensors
-        BaseConv("battery", mi="3.p.1003"),
+        BaseConv("battery", "sensor", mi="3.p.1003", entity=ENTITY_LAZY),
 
     ],
 }, {
