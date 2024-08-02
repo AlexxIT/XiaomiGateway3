@@ -1659,6 +1659,12 @@ DEVICES += [{
         # BaseConv("idle_time", mi="2.p.1053"),  # custom-no-motion-time
     ],
 }, {
+    8613: ["H+", "Double Wall Switch", "huca.switch.dh2"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+    ],    
+}, {
     12382: ["H+", "Wireless Button", "huca.remote.wx8"],
     "spec": [
         BaseConv("action", "sensor"),
@@ -1824,6 +1830,19 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: "knob_hold", 2: BUTTON_1_HOLD, 3: BUTTON_2_HOLD, 4: BUTTON_3_HOLD, 5: BUTTON_4_HOLD}),
     ],
     # "ttl": "6h"  # battery every 6 hours
+}, {
+    14468: ["LeMesh", "Triple Wall Switch", "lemesh.switch.sw3f01"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+    ],
+}, {
+    14469: ["LeMesh", "Double Wall Switch", "lemesh.switch.sw2f01"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+    ],
 }, {
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
     "spec": [
@@ -2068,6 +2087,15 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
+    16697: ["LeMesh", "Mesh Light", "lemesh.light.wy0a20"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "lighting", 5: "night", 7: "warmth", 8: "TV", 9: "reading", 10: "computer", 11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk", 15: "sleep"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+    ],
+}, {
     17964: ["LeMesh", "Smart downlight Mesh version", "mvs.light.wy0a01"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
@@ -2109,6 +2137,7 @@ DEVICES += [{
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", mink=3000, maxk=6500),
+        MapConv("mode", "select", mi="2.p.5", map={0: "warmth", 1: "TV", 2: "reading", 3: "night", 4: "hospitality", 5: "leisure", 6: "office", 7: "sleep", 8: "wakeup", 255: "normal"}),
     ],
 }, {
     15745: ["Yeelight", "Mesh Downlight Z1", "YCCSLI001", "yeelink.light.ml10"],
