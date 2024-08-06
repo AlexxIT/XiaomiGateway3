@@ -83,7 +83,7 @@ class OpenMiioGateway(XGateway):
 
     async def openmiio_restart(self):
         try:
-            async with Session(self.host) as sh:
+            async with Session(self.host, telnet_password = self.options["telnet_password"]) as sh:
                 if await sh.only_one():
                     await self.openmiio_prepare_gateway(sh)
         except Exception as e:
