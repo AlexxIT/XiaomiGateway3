@@ -3445,6 +3445,19 @@ DEVICES += [{
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
 }, {
+    17725: ["Unknown", "Intelligent On-off Device(Mesh)", "iot.switch.tdq3"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        BoolConv("fault", "binary_sensor", mi="2.p.3", entity=ENTITY_DISABLED),
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "Default", 1: "Off", 2: "On"}),
+        BaseConv("led", "switch", mi="6.p.1"),
+        MathConv("double_click_close", "number", mi="7.p.4", min=0, max=1439, entity=ENTITY_DISABLED),
+        MathConv("local_timing", "number", mi="7.p.5", min=0, max=4294967295, entity=ENTITY_DISABLED),
+        MathConv("jog_mode", "number", mi="7.p.6", min=1, max=4294967295, entity=ENTITY_DISABLED),
+        BaseConv("child_lock", "switch", mi="7.p.7", entity=ENTITY_DISABLED),
+        MapConv("rocker_switch", "select", mi="7.p.8", map={0: "Self-resetting Mode", 1: "Flip Mode", 2: "Sync Mode"}, entity=ENTITY_DISABLED),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
