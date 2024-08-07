@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from functools import cached_property
 from typing import TYPE_CHECKING, Callable
 
+from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
 from homeassistant.helpers.device_registry import (
     CONNECTION_BLUETOOTH,
     CONNECTION_NETWORK_MAC,
@@ -82,6 +83,10 @@ class XEntity(Entity):
                 self.entity_id = f"{conv.domain}.{entity_name}_{conv.attr}"
         else:
             self.entity_id = f"{conv.domain}.{device.uid}_{conv.attr}"
+
+        if (MAJOR_VERSION, MINOR_VERSION) >= (2023, 7):
+            if self._default_to_device_class_name() and conv.attr not in ("ble", "zigbee", "mesh", "gateway"):
+                delattr(self, "_attr_name")
 
         self.on_init()
 
