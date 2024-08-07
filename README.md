@@ -312,6 +312,7 @@ Only for Xiaomi Multimode Gateway 1:
 - **Host** - gateway IP-address, should be fixed on your Wi-Fi router
 - **Token** - gateway Mi Home token, changed only when you add gateway to Mi Home app
 - **Key** - gateway secret key, [read more](https://github.com/AlexxIT/Blog/issues/13)
+- **Telnet Password** - gateway(`Aqara_Hub_E1` or `Mijia_Hub_V2`) telnet password. Password will setup while adding integration(keep field empty if you don't want setup password), or you need change both integration config and password in telnet(`passwd` or `chpasswd`) later.
 - **Add statistic sensors** - [read more](#statistics-table)
 - **Debug logs** - enable different levels of logging ([read more](#debug-mode))
 

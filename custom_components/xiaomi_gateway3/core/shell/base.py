@@ -5,9 +5,10 @@ import aiohttp
 
 
 class ShellBase:
-    def __init__(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+    def __init__(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, telnet_password: str = None):
         self.reader = reader
         self.writer = writer
+        self.telnet_password = telnet_password
 
     async def close(self):
         if not self.writer:
