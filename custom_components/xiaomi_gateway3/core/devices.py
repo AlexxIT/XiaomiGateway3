@@ -1787,6 +1787,27 @@ DEVICES += [{
     ],
     # "ttl": "25h"
 }, {
+    # https://home.miot-spec.com/spec/lcrmcr.lock.cb2207
+    11450: ["CRMCR", "intelligent glass door lock", "lcrmcr.lock.cb2207"],
+    "spec": [
+        # ok sensors
+        BaseConv("action", "sensor"), # state changes when below actions are triggered, like wireless button
+        ConstConv("action", mi="3.e.1020", value="lock_event"),
+        ConstConv("action", mi="3.e.1007", value="exception_occurred"),
+        ConstConv("action", mi="5.e.1001", value="low_battery"), 
+        BaseConv("last_lock_action", "sensor", mi="3.e.1020.p.1"), # seems no use, sensor always "0"
+        MapConv("last_method", "sensor", mi="3.e.1020.p.2", map={
+            1: "ble", 2: "password", 3: "fingerprint", 4: "nfc", 5: "otp", 6: "indoor", 7: "remoter"
+        }),
+        MathConv("last_user_id", "sensor", mi="3.e.1020.p.3", min=0, max=65534), # blocked sensor revert to "65535"
+        MapConv("last_error", "sensor", mi="3.e.1007.p.5", map={
+            1: "wrong_password", 2: "wrong_fingerprint", 3: "worng_nfc", 4: "battery_low"
+        }),
+        BaseConv("battery", "sensor", mi="5.p.1003"),
+
+    ],
+    # "ttl": "25h"
+}, {
     11273: ["PTX", "BLE Wireless situation knob switch", "PTX-X6-QMIMB", "090615.remote.x6xnsw"],
     "spec": [
         BaseConv("action", "sensor"),
