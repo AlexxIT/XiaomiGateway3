@@ -3071,7 +3071,7 @@ DEVICES += [{
     "ttl": "7d",
 }, {
     11724: ["GranwinIoT", "Mesh Light V5", "giot.light.v5ssm"],
-    15504: ["GranwinIoT", "Mesh Light V8", "giot.light.v8ssm"]
+    15504: ["GranwinIoT", "Mesh Light V8", "giot.light.v8ssm"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
