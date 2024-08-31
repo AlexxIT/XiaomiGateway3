@@ -11,7 +11,7 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/AlexxIT/XiaomiGateway3/issues",
   "requirements": [
-    "zigpy>=0.52.3"
+    "zigpy>=0.52.3,<0.66.0"
   ],
   "version": "4.0.5"
 }
