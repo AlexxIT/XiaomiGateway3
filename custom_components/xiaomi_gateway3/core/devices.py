@@ -3454,6 +3454,20 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
     ]
 }, {
+    # https://home.miot-spec.com/spec/hoto.light.lamp
+    9387: ["Xiaomi", "Multifunctional Camping Lantern", "hoto.light.lamp"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=5000),
+        MathConv("color", "number", mi="2.p.4", min=1, max=16777215),
+        MapConv("mode", "select", mi="2.p.5", map={1: "Auto", 2: "Day", 3: "Color", 4: "Warmth", 5: "Leisure"}),
+        BaseConv("battery", "sensor", mi="3.p.1"), 
+        MapConv("main_ charging_state", "sensor", mi="3.p.2", map={0: "Not Plug", 1: "Plug In"}), 
+        MapConv("sub_ charging_state", "sensor", mi="3.p.3", map={0: "No Equipment", 1: "Charging", 2: "Full", 3: "Inserted Without Charge"}), 
+        BoolConv("delay_switch", "switch", mi="4.p.1"),
+        MathConv("delay_time", "number", mi="4.p.2", min=1, max=60), 
+}, {
     15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
