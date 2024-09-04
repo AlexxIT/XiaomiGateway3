@@ -3466,7 +3466,8 @@ DEVICES += [{
         MapConv("main_ charging_state", "sensor", mi="3.p.2", map={0: "Not Plug", 1: "Plug In"}), 
         MapConv("sub_ charging_state", "sensor", mi="3.p.3", map={0: "No Equipment", 1: "Charging", 2: "Full", 3: "Inserted Without Charge"}), 
         BoolConv("delay_switch", "switch", mi="4.p.1"),
-        MathConv("delay_time", "number", mi="4.p.2", min=1, max=60), 
+        MathConv("delay_time", "number", mi="4.p.2", min=1, max=60),
+    ]
 }, {
     15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
