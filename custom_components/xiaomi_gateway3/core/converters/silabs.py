@@ -22,7 +22,9 @@ try:
     # for https://github.com/zigpy/zigpy/blob/0.66.0/zigpy/zcl/foundation.py
     from zigpy.zcl.foundation import DataType
 
-    DATA_TYPES = {int(d.type_id): d for d in DataType}
+    DATA_TYPES = {
+        int(d.type_id): (d.description, d.python_type, d.type_class) for d in DataType
+    }
 except ImportError:
     # for https://github.com/zigpy/zigpy/blob/0.65.4/zigpy/zcl/foundation.py
     from zigpy.zcl.foundation import DATA_TYPES
