@@ -7,8 +7,9 @@ from homeassistant.components.switch import SwitchDeviceClass
 from homeassistant.const import (
     CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
     CONCENTRATION_PARTS_PER_BILLION,
-    CONDUCTIVITY,
     LIGHT_LUX,
+    MAJOR_VERSION,
+    MINOR_VERSION,
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfElectricPotential,
@@ -21,6 +22,12 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.helpers.entity import Entity, EntityCategory
+
+if (MAJOR_VERSION, MINOR_VERSION) >= (2024, 7):
+    from homeassistant.const import UnitOfConductivity
+    CONDUCTIVITY = UnitOfConductivity.MICROSIEMENS
+else:
+    from homeassistant.const import CONDUCTIVITY
 
 from ..core.converters.base import BaseConv
 
