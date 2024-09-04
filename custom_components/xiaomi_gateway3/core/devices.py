@@ -3509,6 +3509,20 @@ DEVICES += [{
         MapConv("rocker_switch", "select", mi="7.p.8", map={0: "Self-resetting Mode", 1: "Flip Mode", 2: "Sync Mode"}, entity=ENTITY_DISABLED),
     ]
 }, {
+    17970: ["MVS", "MVS Mesh Light", "mvs.light.wy0a02"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleeping", 16: "Model-1", 17: "Model-2", 18: "Model-3", 19: "Model-4"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),  # config
+        BaseConv("flex_switch", "switch", mi="2.p.12"),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13"),
+        MapConv("user_save", "select", mi="5.p.1", map={0: "OFF", 1: "ON"}),  # config
+        MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}),
+        MathConv("delay", "number", mi="5.p.3", min=0, max=60),
+    ]
+}, {
     16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
