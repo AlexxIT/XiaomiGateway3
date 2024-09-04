@@ -3476,6 +3476,28 @@ DEVICES += [{
         MapConv("rocker_switch", "select", mi="7.p.8", map={0: "Self-resetting Mode", 1: "Flip Mode", 2: "Sync Mode"}, entity=ENTITY_DISABLED),
     ]
 }, {
+    16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("channel_4", "switch", mi="5.p.1"),
+        BaseConv("channel_5", "switch", mi="13.p.1"),
+        BaseConv("channel_6", "switch", mi="14.p.1"),
+        MapConv("mode_1", "select", mi="2.p.6", map={0: "Normal", 1: "Linkage", 2: "Atom"}),  # config
+        MapConv("mode_2", "select", mi="3.p.4", map={0: "Normal", 1: "Linkage", 2: "Atom"}),  # config
+        MapConv("mode_3", "select", mi="4.p.4", map={0: "Normal", 1: "Linkage", 2: "Atom"}),  # config
+        MapConv("mode_4", "select", mi="5.p.4", map={0: "Normal", 1: "Linkage", 2: "Atom"}),  # config
+        MapConv("mode_5", "select", mi="13.p.2", map={0: "Scene", 1: "Wireless"}),  # config
+        MapConv("mode_6", "select", mi="14.p.2", map={0: "Scene", 1: "Wireless"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_3", "select", mi="4.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_4", "select", mi="5.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="6.e.1.p.2", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
