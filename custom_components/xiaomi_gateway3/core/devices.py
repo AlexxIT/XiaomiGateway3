@@ -1641,11 +1641,12 @@ DEVICES += [{
     18051: ["Xiaomi", "Occupancy Sensor", "XMOSB01XS", "xiaomi.sensor_occupy.03"],
     "spec": [
         # main sensors
-        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),#Tested
-        BaseConv("illuminance", "sensor", mi="2.p.1005"),#Tested
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
         # other sensors
         BaseConv("battery", "sensor", mi="3.p.1003", entity=ENTITY_LAZY),
-
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity=ENTITY_DISABLED),
+        BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity=ENTITY_DISABLED),
     ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
