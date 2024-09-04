@@ -2702,6 +2702,7 @@ DEVICES += [{
     ],
 }, {
     10789: ["Zxgs", "Mesh Two Color Scene Light", "zxgs.light.bdcl01"],
+    16108: ["WLG", "Smart Light", "wlg.light.wy0a01"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
