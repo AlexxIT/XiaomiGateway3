@@ -1837,6 +1837,24 @@ DEVICES += [{
     ],
     # "ttl": "25h"
 }, {
+    13121: ["Xiaomi", "Smart Door Lock E20 (Video Monitor)", "loock.lock.r2"],
+    "spec": [
+        # lock action
+        BaseConv("action", "sensor"),
+        BaseConv("method", "sensor"),
+        BaseConv("action_id", mi="2.e.1020.p.3"),
+        BaseConv("method_id", mi="2.e.1020.p.5"),
+        BaseConv("key_id", "sensor", mi="2.e.1020.p.1"),
+        BaseConv("timestamp", mi="2.e.1020.p.2"),
+        MapConv("action", mi="2.e.1020.p.3", map={1: "lock", 2: "unlock", 3: "Lifted Up The Door Handle From Outside To Lock", 4: "locked_from_inside", 5: "released_lock_from_inside", 6: "enabled_child_lock", 7: "disabled_child_lock", 8: "enable_the_away_from_home_mode", 9: "disable_the_away_from_home_mode"}),
+        MapConv("method", mi="2.e.1020.p.5", map={1: "mobile_phone", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "finger_vein", 7: "palm_print", 8: "lock_key", 9: "one_time_password", 10: "periodic_password", 11: "homekit", 12: "coerce", 13: "two_step_verification", 14: "turntable", 15: "manual", 16: "auto"}),
+        MapConv("door", "sensor", mi="3.p.1021", map={1: "locked", 2: "unlocked", 3: "timeout", 4: "ajar"}),
+        MapConv("position", mi="2.e.1020.p.6", map={1: "indoor", 2: "outdoor", 3: "unknown"}),
+        BaseConv("battery", "sensor", mi="7.p.1003"),
+        ConstConv("action", mi="5.e.1006", value="doorbell"),
+        BaseConv("timestamp", mi="5.e.1006.p.1"),
+    ],
+}, {
     14456: ["LeMesh", "Scenario wireless knob switch K4", "lemesh.remote.ts4"],
     "spec": [
         BaseConv("battery", "sensor", mi="4.p.1003"),  # uint8
