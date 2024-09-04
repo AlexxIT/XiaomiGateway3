@@ -3516,6 +3516,15 @@ DEVICES += [{
         MapConv("action", mi="6.e.1.p.2", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single"}),
     ],
 }, {
+    20066: [None, "Mesh Light", "yankon.light.ykmesh"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "none", 1: "warmth", 2: "tv", 3: "reading", 4: "computer", 5: "hospitality", 6: "entertainment", 7: "lighting", 8: "night light"}),
+        MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 2: "on"}),  # config
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
