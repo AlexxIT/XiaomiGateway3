@@ -3485,6 +3485,37 @@ DEVICES += [{
         MapConv("action", mi="5.e.3.p.2", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_BOTH_HOLD}),
     ]
 }, {
+    15418: ["LeMesh", "Mesh Switch", "lemesh.switch.sw4a02"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("channel_4", "switch", mi="12.p.1"),
+        BaseConv("led", "switch", mi="5.p.1"),
+        MapConv("power_on_state_1", "select", mi="2.p.2", map={1: "On", 2: "Off", 3: "Default"}),
+        MapConv("power_on_state_2", "select", mi="3.p.2", map={1: "On", 2: "Off", 3: "Default"}),
+        MapConv("power_on_state_3", "select", mi="4.p.2", map={1: "On", 2: "Off", 3: "Default"}),
+        MapConv("power_on_state_4", "select", mi="12.p.2", map={1: "On", 2: "Off", 3: "Default"}),
+        MapConv("wireless_1", "select", mi="2.p.3", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),
+        MapConv("wireless_2", "select", mi="3.p.3", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),
+        MapConv("wireless_3", "select", mi="4.p.3", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),
+        MapConv("wireless_4", "select", mi="12.p.3", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),
+        MapConv("mode", "select", mi="8.p.1", map={1: "Top Speed Mode", 2: "Standard Mode"}),
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="14.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="15.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="15.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="15.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="16.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="16.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="16.e.3", value=BUTTON_3_HOLD),
+        ConstConv("action", mi="17.e.1", value=BUTTON_4_SINGLE),
+        ConstConv("action", mi="17.e.2", value=BUTTON_4_DOUBLE),
+        ConstConv("action", mi="17.e.3", value=BUTTON_4_HOLD),
+    ],
+}, {
     12261: ["Lingju", "Bluetooth Mesh Switch", "linju.switch.sw0a01"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),  # bool
