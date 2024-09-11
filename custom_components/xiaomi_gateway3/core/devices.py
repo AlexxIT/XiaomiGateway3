@@ -1862,9 +1862,9 @@ DEVICES += [{
             1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"
         }),
         MapConv("method", "sensor", mi="2.e.1020.p.2", map={
-            1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "Finger Vein",
-            7: "Palm Print", 8: "key", 9: "one_time_password", 10: "periodic_password",
-            11: "Homekit", 12: "coerce", 13: "Two Step Verification", 14: "Turntable",
+            1: "mobile_phone", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "finger_vein",
+            7: "palm_print", 8: "lock_key", 9: "one_time_password", 10: "periodic_password",
+            11: "homekit", 12: "coerce", 13: "two_step_verification", 14: "turntable",
             15: "manual", 16: "auto"
         }),
         MapConv("lock_action", "sensor", mi="2.e.1020.p.3", map={
