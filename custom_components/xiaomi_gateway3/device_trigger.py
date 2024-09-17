@@ -38,6 +38,12 @@ TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
 BUTTONS = [BUTTON_SINGLE, BUTTON_DOUBLE, BUTTON_TRIPLE, BUTTON_HOLD, BUTTON_RELEASE]
 
 
+def append(dst: list, src):
+    for i in src:
+        if i not in dst:
+            dst.append(i)
+
+
 def get_actions(human_model: str) -> list[str] | None:
     """Gets a list of actions (buttons) using the device human model."""
     if m := re.search(": ([^,]+)", human_model):
@@ -51,15 +57,15 @@ def get_actions(human_model: str) -> list[str] | None:
                     for conv in converters:
                         if conv.attr == "action":
                             if isinstance(conv, ConstConv):
-                                actions.append(conv.value)
+                                append(actions, [conv.value])
                             elif isinstance(conv, MapConv):
-                                actions += list(conv.map.values())
+                                append(actions, conv.map.values())
                             elif isinstance(conv, BLEMapConv):
-                                actions += list(conv.map.values())
+                                append(actions, conv.map.values())
                         elif conv.attr == "button":
-                            actions += BUTTONS
+                            append(actions, BUTTONS)
                         elif conv.attr.startswith("button"):
-                            actions += [f"{conv.attr}_{i}" for i in BUTTONS]
+                            append(actions, [f"{conv.attr}_{i}" for i in BUTTONS])
 
                     return actions
 

@@ -56,17 +56,13 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         self._attr_supported_color_modes = modes if modes else {self._attr_color_mode}
 
     def set_state(self, data: dict):
-        # we turn_on light on any brightness or color_temp data without light state
-        # fix https://github.com/AlexxIT/XiaomiGateway3/issues/1335
+        if self.attr in data:
+            self._attr_is_on = bool(data[self.attr])
         if ATTR_BRIGHTNESS in data:
             self._attr_brightness = data[ATTR_BRIGHTNESS]
-            data.setdefault(self.attr, True)
         if ATTR_COLOR_TEMP in data:
             self._attr_color_temp = data[ATTR_COLOR_TEMP]
             self._attr_color_mode = ColorMode.COLOR_TEMP
-            data.setdefault(self.attr, True)
-        if self.attr in data:
-            self._attr_is_on = bool(data[self.attr])
         if ATTR_HS_COLOR in data:
             self._attr_hs_color = data[ATTR_HS_COLOR]
             self._attr_color_mode = ColorMode.HS
