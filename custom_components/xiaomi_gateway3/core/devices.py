@@ -425,8 +425,8 @@ DEVICES += [{
     "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
     "spec": [
         ConstConv("motion", "binary_sensor", mi="2.e.1", value=True),
-        BaseConv("illuminance", "sensor", mi="2.e.1.p.1"),
-        BaseConv("illuminance", mi="2.p.1"),
+        BaseConv("", "sensor", mi="2.e.1.p.1"),
+        BaseConv("", mi="2.p.1"),
         BatVoltConv("battery", "sensor", mi="3.p.2"),  # voltage, mV
         MapConv("battery_low", "binary_sensor", mi="3.p.1", map={1: False, 2: True}),  # diagnostic
     ],
@@ -3671,6 +3671,17 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
         MapConv("mode", "select", mi="2.p.7", map={0: "none", 1: "warmth", 2: "tv", 3: "reading", 4: "computer", 5: "hospitality", 6: "entertainment", 7: "lighting", 8: "night light"}),
         MapConv("power_on_state", "select", mi="2.p.7", map={0: "default", 2: "on"}),  # config
+    ],
+}, {
+    19653: ["Linptech", "Presence Sensor Light", "LP1-C-3060", "linp.light.LP1-C-3060"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        # main sensors
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
+        MathConv("occupancy_duration", "sensor", mi="5.p.3", entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("not_occupancy_duration", "sensor", mi="5.p.4", entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("illuminance", "sensor", mi="5.p.5", round=2),
     ],
 }, {
     "default": "mesh",  # default Mesh device
