@@ -3684,6 +3684,17 @@ DEVICES += [{
         MathConv("illuminance", "sensor", mi="5.p.5", round=2),
     ],
 }, {
+    19653: ["Linptech", "Presence Sensor Light", "LP1-C-3060", "linp.light.LP1-C-3060"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        # main sensors
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
+        MathConv("occupancy_duration", "sensor", mi="5.p.3", entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("not_occupancy_duration", "sensor", mi="5.p.4", entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("illuminance", "sensor", mi="5.p.5", round=2),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
