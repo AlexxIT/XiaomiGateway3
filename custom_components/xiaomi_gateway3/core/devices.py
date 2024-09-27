@@ -3131,6 +3131,18 @@ DEVICES += [{
         BaseConv("led", "switch", mi="8.p.2"),
     ]
 }, {
+    # https://home.miot-spec.com/spec/linp.light.lp1bc
+    19653: ["Linptech", "Human Presence-Sensing Flat Panel Light", "LP1", "light.lp1bc"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "Reading", 3: " Lighting", 4: "Night light"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        MapConv("occupancy_status", "sensor", mi="5.p.1", map={0: "NoOne", 1: "SomeOne"}),
+        MathConv("illuminance", "sensor", mi="5.p.5"),
+    ],
+
+}, {
     10939: ["Linptech", "Sliding Window Driver WD1", "WD1", "linp.wopener.wd1lb"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
