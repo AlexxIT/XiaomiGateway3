@@ -2038,6 +2038,19 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ]
 }, {
+    # xiaomi.pet_waterer.002 
+    # https://home.miot-spec.com/spec/xiaomi.pet_waterer.002
+    14746: ["Xiaomi", "Pet Drinking Fountain", "xiaomi.pet_waterer.002"],
+    "spec": [
+        MapConv("out_water_mode", "sensor", mi="2.p.1020", map={0: "Pir Mode", 1: "Interval Mode"}),
+        MapConv("out_water_param", "sensor", mi="2.p.2", map={0: "Pir Finish", 1: "Interval Finish", 2: "Manual Finish", 3: "Pir Upper Limit Finish", 4: "Water Consumption Failure", 5: "Pump Blocked Failure", 6: "No Approach Finish"}),
+        BaseConv("device_fault", "sensor", mi="2.p.1048"),
+        BaseConv("day_out_water_times", "sensor", mi="2.p.1056"),
+        BaseConv("water_shortage_status", "sensor", mi="2.p.1067"),
+        BaseConv("filter_life_level", "sensor", mi="3.p.1076"),
+        BaseConv("battery_level", "sensor", mi="5.p.1003"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
