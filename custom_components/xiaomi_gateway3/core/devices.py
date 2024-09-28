@@ -3136,9 +3136,7 @@ DEVICES += [{
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
-        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "Reading", 3: " Lighting", 4: "Night light"}),
-        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
-        MapConv("occupancy_status", "sensor", mi="5.p.1", map={0: "NoOne", 1: "SomeOne"}),
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
         MathConv("illuminance", "sensor", mi="5.p.5"),
     ],
 
