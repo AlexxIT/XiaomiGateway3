@@ -3132,14 +3132,13 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/spec/linp.light.lp1bc
-    19653: ["Linptech", "Human Presence-Sensing Flat Panel Light", "LP1", "light.lp1bc"],
+    19653: ["Linptech", "Human Presence-Sensing Flat Panel Light", "LP1", "linp.light.lp1bc"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
         BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
         MathConv("illuminance", "sensor", mi="5.p.5"),
     ],
-
 }, {
     10939: ["Linptech", "Sliding Window Driver WD1", "WD1", "linp.wopener.wd1lb"],
     "spec": [
