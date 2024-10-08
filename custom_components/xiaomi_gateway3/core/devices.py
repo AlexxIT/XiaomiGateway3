@@ -1933,7 +1933,16 @@ DEVICES += [{
         # small battery sensor
         BaseConv("battery", "sensor", mi="4.p.1003"),
         # charging state
-        BaseConv("changing", "sensor", mi="4.p.1034"),
+        MapConv("changing", "sensor", mi="4.p.1034", map={
+            0: 'All Not Inserted',
+            1: 'Large Inserted',
+            2: 'Small Inserted',
+            3: 'Large And Small Inserted',
+            4: 'USB Inserted',
+            5: 'USB Inserted And Large Inserted',
+            6: 'USB Inserted And Small Inserted',
+            7: 'All Inserted'
+        }),
         # doorbell
         ConstConv("action", mi="5.e.1006", value="doorbell"),
         # doorbell timestamp
