@@ -386,6 +386,22 @@ class ZTuyaButtonConv(ZConverter):
         except:
             pass
 
+@dataclass
+class ZLifeControlHumidity(ZMathConv):
+    cluster_id = TemperatureMeasurement.cluster_id
+    attr_id = TemperatureMeasurement.AttributeDefs.min_measured_value.id
+    multiply: float = 0.01
+
+@dataclass
+class ZLifeControlECO2(ZMathConv):
+    cluster_id = TemperatureMeasurement.cluster_id
+    attr_id = TemperatureMeasurement.AttributeDefs.max_measured_value.id
+
+@dataclass
+class ZLifeControlVOC(ZMathConv):
+    cluster_id = TemperatureMeasurement.cluster_id
+    attr_id = TemperatureMeasurement.AttributeDefs.tolerance.id
+
 
 # Thanks to zigbee2mqtt:
 # https://github.com/Koenkk/zigbee-herdsman/blob/528b7626f2970ba87a0792920590926105a3cb48/src/zcl/definition/cluster.ts#LL460C32-L460C37
