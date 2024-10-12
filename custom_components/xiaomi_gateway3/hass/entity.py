@@ -83,6 +83,9 @@ class XEntity(Entity):
         else:
             self.entity_id = f"{conv.domain}.{device.uid}_{conv.attr}"
 
+        if self._default_to_device_class_name() and str(self.device_class) == conv.attr:
+            delattr(self, "_attr_name")
+
         self.on_init()
 
     @cached_property
