@@ -321,3 +321,10 @@ def test_10249():
         {"siid": 6, "eiid": 1006, "arguments": [{"piid": 1, "value": 1681029598}]}
     )
     assert p == {"action": "doorbell", "timestamp": 1681029598}
+
+
+def test_14523():
+    device = XDevice(14523)
+
+    p = device.decode({"eid": 18956, "edata": ""})
+    assert p == {"action": "single"}

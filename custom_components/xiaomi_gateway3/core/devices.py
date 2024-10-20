@@ -1978,6 +1978,11 @@ DEVICES += [{
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
     "spec": [
         BaseConv("action", "sensor"),
+        # mibeacon2 spec
+        ConstConv("action", mi=18956, value=BUTTON_SINGLE),
+        ConstConv("action", mi=18957, value=BUTTON_DOUBLE),
+        ConstConv("action", mi=18958, value=BUTTON_HOLD),
+        # miot spec
         ConstConv("action", mi="2.e.1012", value=BUTTON_SINGLE),
         ConstConv("action", mi="2.e.1013", value=BUTTON_DOUBLE),
         ConstConv("action", mi="2.e.1014", value=BUTTON_HOLD),
