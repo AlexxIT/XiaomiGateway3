@@ -1318,6 +1318,15 @@ DEVICES += [{
         ZBatteryPercConv("battery", "sensor", multiply=1.0),
     ],
 }, {
+    "VOC_Sensor": ["LifeControl", "Air quality Sensor", "MCLH-08"],
+    "spec": [
+        ZTemperatureConv("temperature", "sensor"),
+        ZLifeControlHumidity("humidity", "sensor"),
+        ZLifeControlECO2("eco_two", "sensor"),
+        ZLifeControlVOC("tvoc", "sensor"),
+        ZBatteryPercConv("battery", "sensor", multiply=1.0),
+    ],
+}, {
     "default": "zigbee",  # default zigbee device
     "spec": [
         ZModelConv("model", "sensor", entity={"category": "diagnostic", "icon": "mdi:information", "lazy": True}),
