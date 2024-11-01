@@ -69,11 +69,16 @@ class XEntity(Entity):
             via_device=via_device,
         )
         self._attr_has_entity_name = True
-        self._attr_name = attr_human_name(conv.attr)
         self._attr_should_poll = False
         self._attr_unique_id = f"{device.uid}_{conv.attr}"
 
         setup_entity_description(self, conv)
+        if (
+            not hasattr(self, "_attr_name")
+            and not hasattr(self, "_attr_translation_key")
+            and not self._default_to_device_class_name()
+        ):  # unnamed
+            self._attr_name = attr_human_name(conv.attr)
 
         if entity_name := device.extra.get("entity_name"):
             if entity_name.endswith(conv.attr):

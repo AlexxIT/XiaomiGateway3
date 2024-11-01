@@ -64,48 +64,240 @@
     }
   },
   "entity": {
-      "select": {
-        "command": {
-          "state": {
-            "info": "Информация об устройстве",
-            "update": "Обновление устройства",
-            "pair": "Сопряжение Zigbee",
-            "force_pair": "Принудительное сопряжение Zigbee",
-            "bind": "Привязка Zigbee",
-            "ota": "Zigbee OTA",
-            "reconfig": "Переконфигурация Zigbee",
-            "parent_scan": "Сканирование родительских устройств Zigbee",
-            "firmware_lock": "Блокировка прошивки шлюза",
-            "reboot": "Перезагрузка шлюза",
-            "run_ftp": "Запуск FTP на шлюзе",
-            "flash_ezsp": "Прошивка EZSP Zigbee",
-            "openmiio_restart": "Перезагрузка OpenmiIO",
-            "disable": "Отключение шлюза",
-            "enable": "Включение шлюза",
-            "rejoin": "Повторное подключение Zigbee",
-            "remove": "Удаление устройства"
-          }
-        },
-        "data": {
-          "state": {
-            "enabled": "Включено",
-            "disabled": "Отключено",
-            "unknown": "Неизвестно",
-            "ok": "OK",
-            "error": "ОШИБКА",
-            "permit_join": "Готов к подключению",
-            "stop_join": "Сопряжение остановлено",
-            "cancel": "Отмена",
-            "key_secure": "Отправить сетевой ключ (безопасный)",
-            "key_legacy": "Отправить сетевой ключ (устаревший)",
-            "no_firmware": "Нет прошивки",
-            "bind": "Привязать",
-            "unbind": "Отвязать",
-            "no_devices": "Нет устройств",
-            "original": "Оригинальный",
-            "custom": "Пользовательский"
-          }
+    "binary_sensor": {
+      "ble": {
+        "name": "BLE"
+      },
+      "contact": {
+        "name": "Contact"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "gateway": {
+        "name": "Gateway"
+      },
+      "latch": {
+        "name": "Latch"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "pressure": {
+        "name": "Pressure"
+      },
+      "reverse": {
+        "name": "Reverse"
+      },
+      "square": {
+        "name": "Square"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "light": {
+      "led": {
+        "name": "LED"
+      }
+    },
+    "number": {
+      "blind_time": {
+        "name": "Blind Time"
+      }
+    },
+    "select": {
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
+      "command": {
+        "name": "Command",
+        "state": {
+          "info": "Информация об устройстве",
+          "update": "Обновление устройства",
+          "pair": "Сопряжение Zigbee",
+          "force_pair": "Принудительное сопряжение Zigbee",
+          "bind": "Привязка Zigbee",
+          "ota": "Zigbee OTA",
+          "reconfig": "Переконфигурация Zigbee",
+          "parent_scan": "Сканирование родительских устройств Zigbee",
+          "firmware_lock": "Блокировка прошивки шлюза",
+          "reboot": "Перезагрузка шлюза",
+          "run_ftp": "Запуск FTP на шлюзе",
+          "flash_ezsp": "Прошивка EZSP Zigbee",
+          "openmiio_restart": "Перезагрузка OpenmiIO",
+          "disable": "Отключение шлюза",
+          "enable": "Включение шлюза",
+          "rejoin": "Повторное подключение Zigbee",
+          "remove": "Удаление устройства"
         }
+      },
+      "data": {
+        "name": "Data",
+        "state": {
+          "enabled": "Включено",
+          "disabled": "Отключено",
+          "unknown": "Неизвестно",
+          "ok": "OK",
+          "error": "ОШИБКА",
+          "permit_join": "Готов к подключению",
+          "stop_join": "Сопряжение остановлено",
+          "cancel": "Отмена",
+          "key_secure": "Отправить сетевой ключ (безопасный)",
+          "key_legacy": "Отправить сетевой ключ (устаревший)",
+          "no_firmware": "Нет прошивки",
+          "bind": "Привязать",
+          "unbind": "Отвязать",
+          "no_devices": "Нет устройств",
+          "original": "Оригинальный",
+          "custom": "Пользовательский"
+        }
+      },
+      "display_unit": {
+        "name": "Display Unit"
+      },
+      "mode": {
+        "name": "Mode"
+      },
+      "mode_n": {
+        "name": "Mode {n}"
+      },
+      "motor_speed": {
+        "name": "Motor Speed"
+      },
+      "power_on_state": {
+        "name": "Power On State"
+      },
+      "power_on_state_n": {
+        "name": "Power On State {n}"
+      },
+      "sensitivity": {
+        "name": "Sensitivity"
+      }
+    },
+    "sensor": {
+      "action": {
+        "name": "Action"
+      },
+      "battery_original": {
+        "name": "Battery Original"
+      },
+      "battery_voltage": {
+        "name": "Battery Voltage"
+      },
+      "ble": {
+        "name": "BLE"
+      },
+      "chip_temperature": {
+        "name": "Chip Temperature"
+      },
+      "conductivity": {
+        "name": "Conductivity"
+      },
+      "e_co2": {
+        "name": "eCO2"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "formaldehyde": {
+        "name": "Formaldehyde"
+      },
+      "gas_density": {
+        "name": "Gas Density"
+      },
+      "idle_time": {
+        "name": "Idle Time"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "power_consumption": {
+        "name": "Power Consumption"
+      },
+      "rssi": {
+        "name": "RSSI"
+      },
+      "smoke_density": {
+        "name": "Smoke Density"
+      },
+      "supply": {
+        "name": "Supply"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "switch": {
+      "alarm_trigger": {
+        "name": "Alarm Trigger"
+      },
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
+      "channel": {
+        "name": "Channel"
+      },
+      "channel_n": {
+        "name": "Channel {n}"
+      },
+      "charge_protect": {
+        "name": "Charge Protect"
+      },
+      "child_lock": {
+        "name": "Child Lock"
+      },
+      "fan": {
+        "name": "Fan"
+      },
+      "flex_switch": {
+        "name": "Flex Switch"
+      },
+      "led": {
+        "name": "LED"
+      },
+      "led_reverse": {
+        "name": "LED Reverse"
+      },
+      "mode": {
+        "name": "Mode"
+      },
+      "motor_reverse": {
+        "name": "Motor Reverse"
+      },
+      "outlet": {
+        "name": "Outlet"
+      },
+      "plug": {
+        "name": "Plug"
+      },
+      "power_off_memory": {
+        "name": "Power Off Memory"
+      },
+      "switch": {
+        "name": "Switch"
+      },
+      "switch_n": {
+        "name": "Switch {n}"
+      },
+      "wireless": {
+        "name": "Wireless"
+      },
+      "wireless_n": {
+        "name": "Wireless {n}"
       }
     }
+  }
 }
