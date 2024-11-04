@@ -2061,6 +2061,20 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ]
 }, {
+    # https://home.miot-spec.com/spec/izq.sensor_occupy.ble
+    18788: ["ZiQing", "IZQ Presence Sensor Loong", "IZQ-BLE", "izq.sensor_occupy.ble"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        MapConv("occupancy_status", "sensor", mi="2.p.1078", map={0: "NoOne", 1: "HasOne"}),
+        MathConv("has_someone_duration", "sensor", mi="2.p.1080", min=0, max=60),
+        MathConv("no_one_duration", "sensor", mi="2.p.1079", min=0, max=60),
+        MathConv("illuminance", "sensor", mi="2.p.1005", min=0, max=60000),
+        BoolConv("indicator_light", "binary_sensor", mi="3.p.1032"),
+        MathConv("battery", "sensor", mi="4.p.1003", min=0, max=100, step=1),
+        MathConv("object_distance", "sensor", mi="5.p.1", min=0, max=80),
+        MapConv("detect_mode", "sensor", mi="5.p.4", map={1: "Fast", 2: "Standard", 3: "Eco"}),
+    ],
+}, {
     # xiaomi.pet_waterer.002 
     # https://home.miot-spec.com/spec/xiaomi.pet_waterer.002
     14746: ["Xiaomi", "Pet Drinking Fountain", "xiaomi.pet_waterer.002"],
