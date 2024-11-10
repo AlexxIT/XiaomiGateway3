@@ -1031,7 +1031,7 @@ DEVICES += [{
         BrightnessConv("brightness", mi="2.p.2"),
         ColorTempKelvin("color_temp", mi="2.p.3"),
         MapConv("mode", "select", mi="2.p.4", map={0: "day", 1: "reading", 2: "warm", 3: "tv", 4: "night"}),
-        MapConv("power_on_state", "select", mi="3.p.2", map={False: "off", True: "previous"}),  # bool
+        MapConv("power_on_state", "select", mi="3.p.2", map={False: "on", True: "previous"}),  # bool
     ],
 }]
 
