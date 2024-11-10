@@ -3648,6 +3648,23 @@ DEVICES += [{
         MathConv("delay", "number", mi="5.p.3", min=0, max=60),
     ]
 }, {
+    # converters same, except qh2db4 has only 4 buttons, but qh2db8 has 8
+    16807: ["Linptech", "Linptech Wall Switch QH2DB4", "linp.switch.qh2db4"],
+    16808: ["Linptech", "Linptech Wall Switch QH2DB8", "linp.switch.qh2db8"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BoolConv("wireless_1", "switch", mi="2.p.2"),
+        BoolConv("wireless_2", "switch", mi="3.p.2"),
+        BoolConv("wireless_3", "switch", mi="4.p.2"),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="10.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
+        MapConv("action", mi="10.e.2.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
+        MapConv("action", mi="10.e.3.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
+        BaseConv("occupy", "binary_sensor", mi="11.p.11"),
+    ],
+}, {
     16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
