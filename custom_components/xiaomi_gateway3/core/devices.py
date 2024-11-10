@@ -1010,6 +1010,9 @@ DEVICES += [{
         ZLumiBrightness("brightness", mi="2.p.2"),
         ZLumiColorTemp("color_temp", mi="2.p.3"),
         ZTransitionConv("transition"),
+        MapConv("power_on_state", "select", mi="3.p.2", map={False: "on", True: "previous"}),  # bool
+        MathConv("power_on_time", "number", mi="3.p.3", min=0, max=65535, entity=ENTITY_CONFIG),
+        MathConv("power_off_time", "number", mi="3.p.4", min=0, max=65535, entity=ENTITY_CONFIG),
     ],
 }, {
     "lumi.remote.b1acn02": ["Aqara", "Button", "WXKG13LM"],
