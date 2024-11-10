@@ -4,7 +4,7 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityFeature,
 )
-from homeassistant.const import STATE_ALARM_TRIGGERED
+from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .hass.entity import XEntity
@@ -15,7 +15,44 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     XEntity.ADD[entry.entry_id + "alarm_control_panel"] = async_add_entities
 
 
-class XAlarmControlPanel(XEntity, AlarmControlPanelEntity, RestoreEntity):
+if (MAJOR_VERSION, MINOR_VERSION) >= (2024, 11):
+    from homeassistant.components.alarm_control_panel import AlarmControlPanelState
+
+    class XAlarmControlBase(XEntity, AlarmControlPanelEntity):
+        mode: str = None
+        trigger: bool = False
+
+        def set_state(self, data: dict):
+            if self.attr in data:
+                self.mode = data[self.attr]
+            if "alarm_trigger" in data:
+                self.trigger = data["alarm_trigger"]
+
+            self._attr_alarm_state = AlarmControlPanelState(
+                "triggered" if self.trigger else self.mode
+            )
+
+        def get_state(self) -> dict:
+            return {self.attr: self._attr_alarm_state}
+
+else:
+    class XAlarmControlBase(XEntity, AlarmControlPanelEntity):
+        mode: str = None
+        trigger: bool = False
+
+        def set_state(self, data: dict):
+            if self.attr in data:
+                self.mode = data[self.attr]
+            if "alarm_trigger" in data:
+                self.trigger = data["alarm_trigger"]
+
+            self._attr_state = "triggered" if self.trigger else self.mode
+
+        def get_state(self) -> dict:
+            return {self.attr: self._attr_state}
+
+
+class XAlarmControlPanel(XAlarmControlBase, RestoreEntity):
     _attr_code_arm_required = False
     _attr_supported_features = (
         AlarmControlPanelEntityFeature.ARM_HOME
@@ -24,23 +61,9 @@ class XAlarmControlPanel(XEntity, AlarmControlPanelEntity, RestoreEntity):
         | AlarmControlPanelEntityFeature.TRIGGER
     )
 
-    mode: str = None
-    trigger: bool = False
-
     def on_init(self):
         # TODO: test alarm disable
         self.listen_attrs.add("alarm_trigger")
-
-    def set_state(self, data: dict):
-        if self.attr in data:
-            self.mode = data[self.attr]
-        if "alarm_trigger" in data:
-            self.trigger = data["alarm_trigger"]
-
-        self._attr_state = STATE_ALARM_TRIGGERED if self.trigger else self.mode
-
-    def get_state(self) -> dict:
-        return {self.attr: self._attr_state}
 
     async def async_alarm_disarm(self, code=None):
         if self.trigger:
