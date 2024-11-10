@@ -1867,91 +1867,18 @@ DEVICES += [{
     9877: ["Loock", "Loock Smart Lock V5 Max", "XFCL201"],
     "spec": [
         BaseConv("action", "sensor"),
-        MapConv("position", "sensor", mi="2.e.1020.p.1", map={
-            1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"
-        }),
-        MapConv("method", "sensor", mi="2.e.1020.p.2", map={
-            1: "mobile_phone", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "finger_vein",
-            7: "palm_print", 8: "lock_key", 9: "one_time_password", 10: "periodic_password",
-            11: "homekit", 12: "coerce", 13: "two_step_verification", 14: "turntable",
-            15: "manual", 16: "auto"
-        }),
-        MapConv("lock_action", "sensor", mi="2.e.1020.p.3", map={
-            1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside",
-            5: "unlock_inside", 6: "enable_child_lock", 7: "disable_child_lock",
-            8: "enable_away", 9: "disable_away"
-        }),
+        MapConv("position", "sensor", mi="2.e.1020.p.1", map={1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"}),
+        MapConv("method", "sensor", mi="2.e.1020.p.2", map={1: "mobile_phone", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "finger_vein", 7: "palm_print", 8: "lock_key", 9: "one_time_password", 10: "periodic_password", 11: "homekit", 12: "coerce", 13: "two_step_verification", 14: "turntable", 15: "manual", 16: "auto"}),
+        MapConv("lock_action", "sensor", mi="2.e.1020.p.3", map={1: "lock", 2: "unlock", 3: "lock_outside", 4: "lock_inside", 5: "unlock_inside", 6: "enable_child_lock", 7: "disable_child_lock", 8: "enable_away", 9: "disable_away"}),
         # Operation ID
         BaseConv("operation_id", "sensor", mi="2.e.1020.p.4"),
         BaseConv("lock_timestamp", "sensor", mi="2.e.1020.p.5"),
-        MapConv("abnormal_type", "sensor", mi="2.e.1007.p.6", map={
-            1: "Frequent Unlocking Failed By Multiple Methods",
-            2: "Frequent Unlocking Failed By Password",
-            3: "Frequent Unlocking Failed By Fingerprint",
-            4: "Frequent Unlocking Failed By NFC",
-            5: "Frequent Unlocking Failed By Face",
-            6: "Frequent Unlocking Failed By Palmprint",
-            7: "Frequent Unlocking Failed By Finger Vein",
-            8: "Frequent Unlocking Failed By Key",
-            9: "Door Lock Was Damaged",
-            10: "Locked Unsuccessfully",
-            11: "Unlock From Inside After Leaving Home",
-            12: "Door Lock Was Reset",
-            13: "Foreign Object Detected In The Keyhole",
-            14: "Key Was Not Removed",
-            15: "Door Lock Fingerprint Sensor Error",
-            16: "Door Lock Mechanical Failure",
-            17: "Door Lock Main Part Failure",
-            18: "The Lithium Battery Temperature Is Too High",
-            19: "Large Batteries Are Low",
-            20: "Small Batteries Are Low",
-            21: "Large And Small Batteries Are Low",
-            22: "Large And Small Deplete",
-            23: "Leaving The Door Open Timed Out",
-            24: "Door Was Ajar",
-            25: "Door Was Opened Forcefully",
-            26: "Small Batteries Are Nearly Depleted",
-            27: "Small Batteries Are Nearly Depleted And Large Batteries Low",
-            28: "Large Batteries Are Nearly Depleted",
-            29: "Large Batteries Are Nearly Depleted And Small Batteries Low",
-            30: "Large Batteries Are Removed",
-            31: "Large Batteries Are Inserted",
-            32: "Small Batteries Are Removed",
-            33: "Small Batteries Are Inserted",
-            34: "Battery Low The Cat Eye Function And The Door Screen Are Suspended",
-            35: "Ultrasonic Sensitivity Decreased"
-        }),
-        MapConv("door_state", "sensor", mi="3.p.1021", map={
-            16: 'Locked',
-            20: 'Locked',
-            24: 'Locked',
-            28: 'Locked',
-            32: 'Unlocked',
-            36: 'Unlocked',
-            40: 'Unlocked',
-            44: 'Unlocked',
-            48: 'Leaving The Door Open Timed Out',
-            52: 'Leaving The Door Open Timed Out',
-            56: 'Leaving The Door Open Timed Out',
-            60: 'Leaving The Door Open Timed Out',
-            64: 'Door Was Ajar',
-            68: 'Door Was Ajar',
-            72: 'Door Was Ajar',
-            76: 'Door Was Ajar'
-        }),
+        MapConv("abnormal_type", "sensor", mi="2.e.1007.p.6", map={1: "Frequent Unlocking Failed By Multiple Methods", 2: "Frequent Unlocking Failed By Password", 3: "Frequent Unlocking Failed By Fingerprint", 4: "Frequent Unlocking Failed By NFC", 5: "Frequent Unlocking Failed By Face", 6: "Frequent Unlocking Failed By Palmprint", 7: "Frequent Unlocking Failed By Finger Vein", 8: "Frequent Unlocking Failed By Key", 9: "Door Lock Was Damaged", 10: "Locked Unsuccessfully", 11: "Unlock From Inside After Leaving Home", 12: "Door Lock Was Reset", 13: "Foreign Object Detected In The Keyhole", 14: "Key Was Not Removed", 15: "Door Lock Fingerprint Sensor Error", 16: "Door Lock Mechanical Failure", 17: "Door Lock Main Part Failure", 18: "The Lithium Battery Temperature Is Too High", 19: "Large Batteries Are Low", 20: "Small Batteries Are Low", 21: "Large And Small Batteries Are Low", 22: "Large And Small Deplete", 23: "Leaving The Door Open Timed Out", 24: "Door Was Ajar", 25: "Door Was Opened Forcefully", 26: "Small Batteries Are Nearly Depleted", 27: "Small Batteries Are Nearly Depleted And Large Batteries Low", 28: "Large Batteries Are Nearly Depleted", 29: "Large Batteries Are Nearly Depleted And Small Batteries Low", 30: "Large Batteries Are Removed", 31: "Large Batteries Are Inserted", 32: "Small Batteries Are Removed", 33: "Small Batteries Are Inserted", 34: "Battery Low The Cat Eye Function And The Door Screen Are Suspended", 35: "Ultrasonic Sensitivity Decreased"}),
+        MapConv("door_state", "sensor", mi="3.p.1021", map={16: "Locked", 20: "Locked", 24: "Locked", 28: "Locked", 32: "Unlocked", 36: "Unlocked", 40: "Unlocked", 44: "Unlocked", 48: "Leaving The Door Open Timed Out", 52: "Leaving The Door Open Timed Out", 56: "Leaving The Door Open Timed Out", 60: "Leaving The Door Open Timed Out", 64: "Door Was Ajar", 68: "Door Was Ajar", 72: "Door Was Ajar", 76: "Door Was Ajar"}),
         # small battery sensor
         BaseConv("battery", "sensor", mi="4.p.1003"),
         # charging state
-        MapConv("changing", "sensor", mi="4.p.1034", map={
-            0: 'All Not Inserted',
-            1: 'Large Inserted',
-            2: 'Small Inserted',
-            3: 'Large And Small Inserted',
-            4: 'USB Inserted',
-            5: 'USB Inserted And Large Inserted',
-            6: 'USB Inserted And Small Inserted',
-            7: 'All Inserted'
-        }),
+        MapConv("changing", "sensor", mi="4.p.1034", map={0: "All Not Inserted", 1: "Large Inserted", 2: "Small Inserted", 3: "Large And Small Inserted", 4: "USB Inserted", 5: "USB Inserted And Large Inserted", 6: "USB Inserted And Small Inserted", 7: "All Inserted"}),
         # doorbell
         ConstConv("action", mi="5.e.1006", value="doorbell"),
         # doorbell timestamp
@@ -3756,9 +3683,7 @@ DEVICES += [{
         BoolConv("auto_fragrance", "switch", mi="4.p.1"),
         # Battery
         BaseConv("battery", "sensor", mi="5.p.1"),
-        MapConv("charging_state", "sensor", mi="5.p.2", map={
-            1: "Charging", 2: "Not Charging", 3: "Not Chargeable"
-        }),
+        MapConv("charging_state", "sensor", mi="5.p.2", map={1: "Charging", 2: "Not Charging", 3: "Not Chargeable"}),
         # Actions
         BaseConv("action", "sensor"),
         ConstConv("action", mi="4.e.1", value="Auto Light"),
