@@ -58,7 +58,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             XDevice.configs = hass_utils.fix_yaml_devices_config(devices_config)
 
         if logger_config := config.get(CONF_LOGGER):
-            logger.init(__name__, logger_config, hass.config.config_dir)
+            _ = hass.async_add_executor_job(
+                logger.init, __name__, logger_config, hass.config.config_dir
+            )
 
         if template := config.get(CONF_ATTRIBUTES_TEMPLATE):
             template.hass = hass
