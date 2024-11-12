@@ -3600,6 +3600,13 @@ DEVICES += [{
         MathConv("delay_time", "number", mi="4.p.2", min=1, max=60),
     ]
 }, {
+    13931: ["ArkFish", "Smart Wall Switch H4 L+N 3-keys", "line.switch.fkgh43"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),  # bool
+        BaseConv("channel_2", "switch", mi="3.p.1"),  # bool
+        BaseConv("channel_3", "switch", mi="4.p.1"),  # bool
+    ],
+}, {
     15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
