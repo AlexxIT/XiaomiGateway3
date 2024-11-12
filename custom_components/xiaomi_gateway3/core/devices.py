@@ -1906,12 +1906,38 @@ DEVICES += [{
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="14.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="15.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="15.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="15.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="16.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="16.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="16.e.3", value=BUTTON_3_HOLD),
     ],
 }, {
     14469: ["LeMesh", "Double Wall Switch", "lemesh.switch.sw2f01"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="14.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="15.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="15.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="15.e.3", value=BUTTON_2_HOLD),
+    ],
+}, {
+    14470: ["LeMesh", "Single Wall Switch", "lemesh.switch.sw1f01"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="14.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_1_HOLD),
     ],
 }, {
     14523: ["PTX", "BLE Wireless Switch", "090615.remote.btsw1"],
@@ -3136,6 +3162,14 @@ DEVICES += [{
         CurtainPosConv("position", mi="2.p.3"),
         BaseConv("motor_reverse", "switch", mi="2.p.4"),  # config
         MapConv("mode", "select", mi="2.p.5", map={0: "default", 1: "doublmode", 2: "leftmode", 3: "rightmode"}),  # config
+    ],
+    "ttl": "7d",
+}, {
+    14020: ["Bean", "Smart Curtain Lemesh V1", "V1", "bean.curtain.ct01"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        BaseConv("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.2"),
     ],
     "ttl": "7d",
 }, {
