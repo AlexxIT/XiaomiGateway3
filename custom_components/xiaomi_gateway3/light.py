@@ -79,7 +79,10 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         }
 
     async def async_turn_on(self, **kwargs):
-        self.device.write(kwargs if kwargs else {self.attr: True})
+        # https://github.com/AlexxIT/XiaomiGateway3/issues/1459
+        if not self._attr_is_on or not kwargs:
+            kwargs[self.attr] = True
+        self.device.write(kwargs)
 
     async def async_turn_off(self, **kwargs):
         self.device.write({self.attr: False})
