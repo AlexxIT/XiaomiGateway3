@@ -3594,6 +3594,8 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec/hoto.light.lamp
     9387: ["Xiaomi", "Multifunctional Camping Lantern", "hoto.light.lamp"],
+    # https://home.miot-spec.com/spec/hoto.light.lamp02
+    12594: ["Xiaomi", "Multifunctional Camping Lantern", "hoto.light.lamp02"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
