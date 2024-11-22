@@ -24,13 +24,18 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.entity import Entity, EntityCategory
 
-if (MAJOR_VERSION, MINOR_VERSION) >= (2024, 7):
+from ..core.converters.base import BaseConv
+
+if (MAJOR_VERSION, MINOR_VERSION) >= (2024, 11):
     from homeassistant.const import UnitOfConductivity
+
+    CONDUCTIVITY = UnitOfConductivity.MICROSIEMENS_PER_CM
+elif (MAJOR_VERSION, MINOR_VERSION) >= (2024, 7):
+    from homeassistant.const import UnitOfConductivity
+
     CONDUCTIVITY = UnitOfConductivity.MICROSIEMENS
 else:
     from homeassistant.const import CONDUCTIVITY
-
-from ..core.converters.base import BaseConv
 
 # just to reduce the code
 CELSIUS = UnitOfTemperature.CELSIUS
