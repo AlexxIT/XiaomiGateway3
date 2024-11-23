@@ -2295,6 +2295,17 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.7", map={0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"})
     ]
 }, {
+    17573: [None, "Night Light Mesh Q1", "hzsj.light.wyra01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        RGBColor("rgb_color", mi="2.p.4"),
+        MapConv("color_mode", mi="2.p.6", map={1: "rgb", 2: "color_temp"}),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 15: "Sleep", 16: "Breath", 17: "Beat", 18: "Streamer", 19: "Gradation", 20: "Jump", 21: "Colorful", 22: "Heartbeat"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+    ],
+}, {
     12455: ["Yeelight", "K Series Single Wall Switch", "YLYKG-0025/0020", "yeelink.switch.ylsw4"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
@@ -3844,7 +3855,7 @@ DEVICES += [{
         BaseConv("light", "light", mi="5.1.1"),
         BrightnessConv("brightness", mi="5.1.3"),
         ColorTempKelvin("color_temp", mi="5.1.5", mink=1000, maxk=10000),
-        MathConv("color", "number", mi="5.1.4", min=1, max=16777215),
+        RGBColor("rgb_color", mi="5.1.4"),
         MapConv("color_mode", mi="5.1.8", map={1: "rgb", 2: "color_temp"}),
         MapConv("power_on_state", "select", mi="5.1.7", map={0: "default", 1: "off", 2: "on"}),
     ],
