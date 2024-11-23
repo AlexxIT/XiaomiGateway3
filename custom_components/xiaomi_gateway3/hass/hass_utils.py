@@ -11,6 +11,8 @@ from homeassistant.helpers.aiohttp_client import (
     async_create_clientsession,
     async_get_clientsession,
 )
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.restore_state import STATE_DUMP_INTERVAL
 from homeassistant.helpers.storage import Store
 
 from .. import XDevice
@@ -38,8 +40,10 @@ async def store_devices(hass: HomeAssistant):
     if data := await store.async_load():
         XDevice.restore = data
 
-    # noinspection PyUnusedLocal
-    async def stop(*args):
+    async def dump_state(*args):
+        if not XDevice.restore:
+            return
+
         # update last_decode_ts for all devices in the store
         for device in XGateway.devices.values():
             store_device = XDevice.restore.setdefault(device.cloud_did, {})
@@ -50,9 +54,15 @@ async def store_devices(hass: HomeAssistant):
                 store_device["last_seen"] = {
                     gw.uid: last_seen for gw, last_seen in device.last_seen.items()
                 }
-        # save store if not empty
-        if XDevice.restore:
-            await store.async_save(XDevice.restore)
+
+        await store.async_save(XDevice.restore)
+
+    # Dump states periodically
+    cancel_interval = async_track_time_interval(hass, dump_state, STATE_DUMP_INTERVAL)
+
+    async def stop(*args):
+        cancel_interval()
+        await dump_state()
 
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
 
