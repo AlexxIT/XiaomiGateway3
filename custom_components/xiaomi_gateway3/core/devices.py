@@ -2241,6 +2241,9 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
         MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "lighting", 5: "night", 7: "warmth", 8: "TV", 9: "reading", 10: "computer", 11: "hospitality", 12: "entertainment", 13: "wakeup", 14: "dusk", 15: "sleep"}),
         MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+        MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),  # config
     ],
 }, {
     17964: ["LeMesh", "Smart downlight Mesh version", "mvs.light.wy0a01"],
@@ -2294,6 +2297,13 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
         MapConv("mode", "select", mi="2.p.7", map={0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"})
     ]
+}, {
+    17048: ["NOVO", "Smart curtain", "novo.curtain.k25"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "close", 1: "open", 2: "stop"}),
+        BaseConv("position", mi="2.p.2"),
+        MapConv("run_state", mi="2.p.4", map={0: "closing", 1: "opening", 2: "stop"}),
+    ],
 }, {
     17573: [None, "Night Light Mesh Q1", "hzsj.light.wyra01"],
     "spec": [
