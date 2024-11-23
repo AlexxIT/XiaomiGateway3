@@ -2044,6 +2044,15 @@ DEVICES += [{
         BaseConv("battery_level", "sensor", mi="5.p.1003"),
     ],
 }, {
+    19209: [None, "Eight Key Twenty-four Scene Switch V1", "cxw.remote.panv01"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
+        BaseConv("battery", "sensor", mi="7.p.1003"),
+    ],
+}, {
     # rhj.sensor_occupy.l730a
     # https://home.miot-spec.com/s/rhj.sensor_occupy.l730a
     20179: ["LeTianPai", "Presence Sensor POP", "rhj.sensor_occupy.l730a"],
@@ -2124,7 +2133,6 @@ DEVICES += [{
 ########################################################################################
 # Mesh
 ########################################################################################
-
 
 DEVICES += [{
     # brightness 1..65535, color_temp 2700..6500
