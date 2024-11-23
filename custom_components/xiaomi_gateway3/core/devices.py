@@ -2043,6 +2043,7 @@ DEVICES += [{
         BaseConv("filter_life_level", "sensor", mi="3.p.1076"),
         BaseConv("battery_level", "sensor", mi="5.p.1003"),
     ],
+}, {
     # rhj.sensor_occupy.l730a
     # https://home.miot-spec.com/s/rhj.sensor_occupy.l730a
     20179: ["LeTianPai", "Presence Sensor POP", "rhj.sensor_occupy.l730a"],
@@ -2050,7 +2051,7 @@ DEVICES += [{
         MathConv("temperature", "sensor", mi="7.p.1001", round=1),
         BaseConv("humidity", "sensor", mi="7.p.1002"),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
-        MapConv("occupancy_status", "sensor", mi="2.p.1078", map={0: "NoOne", 1: "HasSomeone", 2: "MinorMotion", 3: "MovingAway", 4: "Approaching", 5: "StaticMotion", 6: "Moving", 7:"EnterIn"}),
+        MapConv("occupancy_status", "sensor", mi="2.p.1078", map={0: "NoOne", 1: "HasSomeone", 2: "MinorMotion", 3: "MovingAway", 4: "Approaching", 5: "StaticMotion", 6: "Moving", 7: "EnterIn"}),
         BaseConv("no-one-duration", "sensor", mi="2.p.1079"),
         BaseConv("has-someone-duration", "sensor", mi="2.p.1080")
     ]
@@ -2932,7 +2933,7 @@ DEVICES += [{
         BoolConv("wireless", "switch", mi="2.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
-        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2:"Medium", 3:"High"}),
+        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
         ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),  
     ],
 }, {
@@ -2944,7 +2945,7 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="3.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
-        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2:"Medium", 3:"High"}),
+        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
         ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
     ],
@@ -2959,7 +2960,7 @@ DEVICES += [{
         BoolConv("wireless_3", "switch", mi="4.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
-        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2:"Medium", 3:"High"}),
+        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
         ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
@@ -2978,7 +2979,7 @@ DEVICES += [{
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
         MapConv("action", mi="6.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
-        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2:"Medium", 3:"High"}),
+        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
     ],
 }, {
     2274: ["Linptech", "Lingpu Triple Wall Switch", "linp.switch.q3s3"],

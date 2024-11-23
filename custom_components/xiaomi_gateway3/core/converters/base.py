@@ -118,7 +118,7 @@ class BoolConv(BaseConv):
 
 @dataclass
 class MapConv(BaseConv):
-    map: dict[int, bool | str] = None
+    map: dict[int | str, bool | str] = None
 
     def decode(self, device: "XDevice", payload: dict, value: int):
         if value in self.map:
