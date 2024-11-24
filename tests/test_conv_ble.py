@@ -328,3 +328,32 @@ def test_14523():
 
     p = device.decode({"eid": 18956, "edata": ""})
     assert p == {"action": "single"}
+
+
+def test_18639():
+    device = XDevice(18639)
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 260823}]}
+    )
+    assert p == {"weight": 72.7}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1338768096}]}
+    )
+    assert p == {"impedance_high": 510.6, "weight": 73.6}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1234960384}]}
+    )
+    assert p == {"impedance_low": 471.1}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1343068894}]}
+    )
+    assert p == {"impedance_high": 512.3, "weight": 73.4}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1240727552}]}
+    )
+    assert p == {"impedance_low": 473.3}

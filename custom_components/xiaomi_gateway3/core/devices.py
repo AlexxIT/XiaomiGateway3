@@ -2017,6 +2017,16 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ]
 }, {
+    # https://home.miot-spec.com/spec/yunmai.scales.ms107
+    18639: ["Xiaomi", "Body Composition Scale S400", "BHR7793GL", "yunmai.scales.ms103"],
+    "spec": [
+        BaseConv("weight", "sensor", entity={"icon": "mdi:human", "units": "kg"}),
+        BaseConv("heart_rate", "sensor", entity={"icon": "mdi:heart-pulse", "units": "bpm"}),
+        BaseConv("impedance_low", "sensor", entity={"icon": "mdi:omega", "units": "ohm"}),
+        BaseConv("impedance_high", "sensor", entity={"icon": "mdi:omega", "units": "ohm"}),
+        BLEScaleS400("raw_data", mi="11.e.1022.p.2"),
+    ],
+}, {
     # https://home.miot-spec.com/spec/izq.sensor_occupy.ble
     18788: ["ZiQing", "IZQ Presence Sensor Loong", "IZQ-BLE", "izq.sensor_occupy.ble"],
     "spec": [
