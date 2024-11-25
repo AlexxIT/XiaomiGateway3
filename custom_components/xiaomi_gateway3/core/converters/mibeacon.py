@@ -318,7 +318,7 @@ class BLEBattery2691(BaseConv):
 class BLEScaleS400(BaseConv):
     def decode(self, device: "XDevice", payload: dict, value: int):
         weight = value & 0x7FF
-        heart_rate = (value >> 11) & 0xFF
+        heart_rate = (value >> 11) & 0x7F
         impedance = value >> 18
         if weight != 0:
             payload["weight"] = weight / 10

@@ -2018,13 +2018,15 @@ DEVICES += [{
     ]
 }, {
     # https://home.miot-spec.com/spec/yunmai.scales.ms107
-    18639: ["Xiaomi", "Body Composition Scale S400", "BHR7793GL", "yunmai.scales.ms103"],
+    12505: ["Xiaomi", "Body Composition Scale S400", "MJTZC01YM", "BHR7026CN", "yunmai.scales.ms103"],
+    18639: ["Xiaomi", "Body Composition Scale S400 Blue", "MJTZC01YM", "yunmai.scales.ms107"],
     "spec": [
         BaseConv("weight", "sensor", entity={"icon": "mdi:human", "units": "kg"}),
         BaseConv("heart_rate", "sensor", entity={"icon": "mdi:heart-pulse", "units": "bpm"}),
         BaseConv("impedance_low", "sensor", entity={"icon": "mdi:omega", "units": "ohm"}),
         BaseConv("impedance_high", "sensor", entity={"icon": "mdi:omega", "units": "ohm"}),
         BLEScaleS400("raw_data", mi="11.e.1022.p.2"),
+        BaseConv("timestamp", mi="11.e.1022.p.3"),
     ],
 }, {
     # https://home.miot-spec.com/spec/izq.sensor_occupy.ble

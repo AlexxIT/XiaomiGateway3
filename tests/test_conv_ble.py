@@ -349,11 +349,6 @@ def test_18639():
     assert p == {"impedance_low": 471.1}
 
     p = device.decode(
-        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1343068894}]}
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1174444720}]}
     )
-    assert p == {"impedance_high": 512.3, "weight": 73.4}
-
-    p = device.decode(
-        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1240727552}]}
-    )
-    assert p == {"impedance_low": 473.3}
+    assert p == {"heart_rate": 69, "impedance_high": 448.0, "weight": 68.8}
