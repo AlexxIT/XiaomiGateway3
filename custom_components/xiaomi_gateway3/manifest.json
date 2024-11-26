@@ -13,5 +13,5 @@
   "requirements": [
     "zigpy>=0.52.3"
   ],
-  "version": "4.0.6"
+  "version": "4.0.7"
 }
