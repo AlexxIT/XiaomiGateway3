@@ -3847,6 +3847,15 @@ DEVICES += [{
         ConstConv("action", mi="14.e.3", value=BUTTON_HOLD),
     ],
 }, {
+    17182: ["Zemismart", "Smart Curtain", "zemi.curtain.zm85"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        BaseConv("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.4"),
+        MapConv("run_state", mi="2.p.5", map={0: "stop", 1: "opening", 2: "closing"}),
+        BaseConv("motor_reverse", "switch", mi="2.p.6"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
