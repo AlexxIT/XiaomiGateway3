@@ -2242,6 +2242,7 @@ DEVICES += [{
     13471: ["LeMesh", "Mesh Light", "lemesh.light.wy0c14"],
     13525: ["LeMesh", "Mesh Light", "lemesh.light.wy0c15"],
     14335: ["Yeelight", "Yeelight Smart Light", "yeelink.light.wy0a03"],
+    14162: ["Yeelight", "Yeelight Smart Light", "yeelink.light.wy0a01"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
