@@ -2020,6 +2020,7 @@ DEVICES += [{
     # https://home.miot-spec.com/spec/yunmai.scales.ms107
     12505: ["Xiaomi", "Body Composition Scale S400", "MJTZC01YM", "BHR7026CN", "yunmai.scales.ms103"],
     18639: ["Xiaomi", "Body Composition Scale S400 Blue", "MJTZC01YM", "yunmai.scales.ms107"],
+    15317: ["Xiaomi", "Body Composition Scale S400 White", "MJTZC01YM", "yunmai.scales.ms104"],
     "spec": [
         BaseConv("weight", "sensor", entity={"icon": "mdi:human", "units": "kg"}),
         BaseConv("heart_rate", "sensor", entity={"icon": "mdi:heart-pulse", "units": "bpm"}),
