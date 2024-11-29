@@ -1661,6 +1661,19 @@ DEVICES += [{
         BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity=ENTITY_DISABLED),
     ],
 }, {
+    # https://home.miot-spec.com/spec/linp.sensor_occupy.es3
+    20731: ["Linp", "Occupancy Sensor", "ES3", "linp.sensor_occupy.es3"],
+    "spec": [
+        # main sensors
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        # other sensors
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        BaseConv("customized_property", "binary_sensor", mi="5.p.1018"), #customized distance trigger  
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity=ENTITY_DISABLED),
+        BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity=ENTITY_DISABLED),
+    ],
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
     13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS", "xiaomi.motion.pir1"],
     "spec": [
