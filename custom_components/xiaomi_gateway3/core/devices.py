@@ -2019,7 +2019,7 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec/yunmai.scales.ms107
     12505: ["Xiaomi", "Body Composition Scale S400", "MJTZC01YM", "BHR7026CN", "yunmai.scales.ms103"],
-    15317: ["Xiaomi", "Body Composition Scale S400 White", "MJTZC01YM", "yunmai.scales.ms104"],
+    15317: ["Xiaomi", "Body Composition Scale S400 White", "MJTZC01YM", "BHR7793GL", "yunmai.scales.ms104"],
     18639: ["Xiaomi", "Body Composition Scale S400 Blue", "MJTZC01YM", "yunmai.scales.ms107"],
     19205: ["Xiaomi", "Body Composition Scale S400 Pro", "MJTZC03YM", "xiaomi.scales.ms110"],
     "spec": [
