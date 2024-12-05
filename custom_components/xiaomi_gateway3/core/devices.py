@@ -3301,7 +3301,10 @@ DEVICES += [{
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),  # Tested
         MapConv("power_on_state", "select", mi="2.p.2", map={0: "previous", 1: "on", 2: "off"}),  # config
+        BoolConv("led", "switch", mi="3.p.2"),  # uint8, config
+        MapConv("interactive_switch", "select", mi="3.p.3", map={1: "control", 2: "decontrol"}, entity=ENTITY_CONFIG),
         BoolConv("flex_switch", "switch", mi="3.p.4"),  # uint8, config
+        BoolConv("pilot_switch", "switch", mi="3.p.5", entity=ENTITY_CONFIG),  # uint8, config
     ],
 }, {
     # run_state attribute is not available according to the spec
