@@ -2441,7 +2441,6 @@ DEVICES += [{
     2007: ["LeMesh", "Mesh Switch Controller", "lemesh.switch.sw0a01"],
     3150: ["XinGuang", "Mesh Switch", "wainft.switch.sw0a01"],
     3169: ["LeMesh", "Mesh Switch Controller", "lemesh.switch.sw0a02"],
-    3170: ["LeMesh", "Mesh Switch Controller", "lemesh.switch.sw0a04"],
     4252: [None, "Mesh Switch", "dwdz.switch.sw0a01"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
