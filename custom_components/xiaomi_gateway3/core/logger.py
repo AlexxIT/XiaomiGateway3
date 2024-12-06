@@ -24,14 +24,17 @@ xiaomi_gateway3:
 
 Configuration > Xiaomi Gateway 3 > Configure > Debug
 """
+
 import logging
 import os
 from logging import Formatter
 from logging.handlers import RotatingFileHandler
+from queue import SimpleQueue
 
 import voluptuous as vol
 from homeassistant.const import CONF_FILENAME
 from homeassistant.helpers import config_validation as cv
+from homeassistant.util.logging import HomeAssistantQueueHandler
 
 FMT = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
 
@@ -61,7 +64,7 @@ def init(logger_name: str, config: dict, config_dir: str = None):
         if config_dir:
             filename = os.path.join(config_dir, filename)
 
-        handler = RotatingFileHandler(
+        file_handler = RotatingFileHandler(
             filename,
             config["mode"],
             config["max_bytes"],
@@ -69,6 +72,12 @@ def init(logger_name: str, config: dict, config_dir: str = None):
         )
 
         fmt = Formatter(config["format"])
-        handler.setFormatter(fmt)
+        file_handler.setFormatter(fmt)
 
-        logger.addHandler(handler)
+        # copy logic from homeassistant/utils/logging.py
+        queue: SimpleQueue[logging.Handler] = SimpleQueue()
+        queue_handler = HomeAssistantQueueHandler(queue)
+        queue_handler.listener = logging.handlers.QueueListener(queue, file_handler)
+        queue_handler.listener.start()
+
+        logger.addHandler(queue_handler)
