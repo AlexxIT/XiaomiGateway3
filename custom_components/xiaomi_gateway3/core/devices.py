@@ -1738,6 +1738,17 @@ DEVICES += [{
     ],
     # "ttl": "60m",
 }, {
+    20731: ["Linptech", "Presence Sensor ES3", "ES3", "linp.sensor_occupy.es2"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("occupancy_status", "sensor", mi="2.p.1078"),
+        MathConv("has_someone_duration", "sensor", mi="2.p.1080", min=0, max=256, entity={"units": UNIT_MINUTES}), # uint8
+        MathConv("no_one_duration", "sensor", mi="2.p.1079", min=0, max=256, entity={"units": UNIT_MINUTES}), # uint8
+        MathConv("illuminance", "sensor", mi="2.p.1005", min=0, max=10000),
+        BaseConv("battery", "sensor", mi="4.p.1003"),  # uint8
+        BoolConv("indicator_light", "binary_sensor", mi="3.p.1"),  # bool, config
+    ],
+}, {
     6017: ["Xiaomi", "Face Recognition Smart Door Lock", "XMZNMS09LM", "lumi.lock.mcn002"],
     "spec": [
         BaseConv("action", "sensor"),
