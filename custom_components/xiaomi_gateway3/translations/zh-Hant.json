@@ -4,7 +4,7 @@
       "no_servers": "請至少選擇一個伺服器",
       "cant_login": "無法登入，請確認使用者名稱與密碼",
       "cant_connect": "無法連線至網關",
-	    "no_key": "因網關韌體缺少金鑰(Key)而無法支援",
+      "no_key": "因網關韌體缺少金鑰(Key)而無法支援",
       "wrong_model": "網關型號不支援",
       "wrong_token": "網關Token錯誤",
       "wrong_telnet": "開啟 Telnet 指令錯誤",
@@ -50,8 +50,8 @@
         "data": {
           "host": "網關IP",
           "token": "Token",
-          "key": "Key",          
-          "telnet_cmd": "開啟Telnet指令",          
+          "key": "Key",
+          "telnet_cmd": "開啟Telnet指令",
           "ble": "支援的藍牙裝置",
           "stats": "新增統計資料感測器",
           "debug": "偵錯日誌"
@@ -75,13 +75,62 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "ble": {
+        "name": "BLE"
+      },
+      "contact": {
+        "name": "Contact"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "gateway": {
+        "name": "Gateway"
+      },
+      "latch": {
+        "name": "Latch"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "pressure": {
+        "name": "Pressure"
+      },
+      "reverse": {
+        "name": "Reverse"
+      },
+      "square": {
+        "name": "Square"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "light": {
+      "led": {
+        "name": "LED"
+      }
+    },
+    "number": {
+      "blind_time": {
+        "name": "Blind Time"
+      }
+    },
     "select": {
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
       "command": {
+        "name": "Command",
         "state": {
-          "info": "裝置資訊",	
-          "update": "裝置更新",		  
+          "info": "裝置資訊",
+          "update": "裝置更新",
           "pair": "Zigbee配對",
-          "force_pair": "Zigbee強制配對",		  
+          "force_pair": "Zigbee強制配對",
           "bind": "Zigbee绑定",
           "ota": "Zigbee OTA",
           "reconfig": "Zigbee重新設定",
@@ -94,10 +143,11 @@
           "disable": "網關停用",
           "enable": "網關啟用",
           "rejoin": "Zigbee重新加入",
-          "remove": "Zigbee刪除"		  
+          "remove": "Zigbee刪除"
         }
       },
       "data": {
+        "name": "Data",
         "state": {
           "enabled": "已啟用",
           "disabled": "已停用",
@@ -116,6 +166,148 @@
           "original": "原始韌體",
           "custom": "客製韌體"
         }
+      },
+      "display_unit": {
+        "name": "Display Unit"
+      },
+      "mode": {
+        "name": "Mode"
+      },
+      "mode_n": {
+        "name": "Mode {n}"
+      },
+      "motor_speed": {
+        "name": "Motor Speed"
+      },
+      "power_on_state": {
+        "name": "Power On State"
+      },
+      "power_on_state_n": {
+        "name": "Power On State {n}"
+      },
+      "sensitivity": {
+        "name": "Sensitivity"
+      }
+    },
+    "sensor": {
+      "action": {
+        "name": "Action"
+      },
+      "battery_original": {
+        "name": "Battery Original"
+      },
+      "battery_voltage": {
+        "name": "Battery Voltage"
+      },
+      "ble": {
+        "name": "BLE"
+      },
+      "chip_temperature": {
+        "name": "Chip Temperature"
+      },
+      "conductivity": {
+        "name": "Conductivity"
+      },
+      "e_co2": {
+        "name": "eCO2"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "formaldehyde": {
+        "name": "Formaldehyde"
+      },
+      "gas_density": {
+        "name": "Gas Density"
+      },
+      "idle_time": {
+        "name": "Idle Time"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "power_consumption": {
+        "name": "Power Consumption"
+      },
+      "rssi": {
+        "name": "RSSI"
+      },
+      "smoke_density": {
+        "name": "Smoke Density"
+      },
+      "supply": {
+        "name": "Supply"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "switch": {
+      "alarm_trigger": {
+        "name": "Alarm Trigger"
+      },
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
+      "channel": {
+        "name": "Channel"
+      },
+      "channel_n": {
+        "name": "Channel {n}"
+      },
+      "charge_protect": {
+        "name": "Charge Protect"
+      },
+      "child_lock": {
+        "name": "Child Lock"
+      },
+      "fan": {
+        "name": "Fan"
+      },
+      "flex_switch": {
+        "name": "Flex Switch"
+      },
+      "led": {
+        "name": "LED"
+      },
+      "led_reverse": {
+        "name": "LED Reverse"
+      },
+      "mode": {
+        "name": "Mode"
+      },
+      "motor_reverse": {
+        "name": "Motor Reverse"
+      },
+      "outlet": {
+        "name": "Outlet"
+      },
+      "plug": {
+        "name": "Plug"
+      },
+      "power_off_memory": {
+        "name": "Power Off Memory"
+      },
+      "switch": {
+        "name": "Switch"
+      },
+      "switch_n": {
+        "name": "Switch {n}"
+      },
+      "wireless": {
+        "name": "Wireless"
+      },
+      "wireless_n": {
+        "name": "Wireless {n}"
       }
     }
   }
