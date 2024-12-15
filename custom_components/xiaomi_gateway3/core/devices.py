@@ -3326,6 +3326,14 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.5", map={0: "default", 1: "double", 2: "left", 3: "right"}),
     ],
 }, {
+    17659: [None, "Smart Curtain Motor (Mesh)", "zjdh.curtain.xj002"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        BaseConv("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.2"),
+        BaseConv("motor_reverse", "switch", mi="2.p.5")
+    ],
+}, {
     13140: ["GranwinIoT", "Three-Button Switch (Mesh) V5", "giot.switch.v53ksm"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
