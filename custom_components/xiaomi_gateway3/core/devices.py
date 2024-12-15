@@ -2896,6 +2896,17 @@ DEVICES += [{
         MapConv("led", "select", mi="4.p.1", map={0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"})
     ]
 }, {
+    16415: ["GranwinIoT", "Mesh Smart Plug V6", "giot.plug.v6shsm"],
+    "spec": [
+        BaseConv("plug", "switch", mi="2.p.1"),
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "off", 1: "on", 2: "previous"}),
+        # Inching mode
+        BoolConv("inching_mode", "switch", mi="2.p.4"),
+        MapConv("inching_state", "select", mi="6.p.1", map={False: "off", True: "on"}),
+        MathConv("inching_time", "number", mi="6.p.2", multiply=0.5, min=1, max=7200, step=1, round=1),
+        MapConv("led", "select", mi="6.p.3", map={0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"})
+    ]
+}, {
     # A third party module widely used in small brand wall switches
     6514: [None, "Mesh Single Wall Switch (with N)", "babai.switch.201m"],
     # A third party module widely used in small brand wall switches
