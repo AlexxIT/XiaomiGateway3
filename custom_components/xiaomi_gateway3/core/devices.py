@@ -1695,11 +1695,51 @@ DEVICES += [{
         MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
     ]
 }, {
-    16186: ["Smartfrog", "Wireless Button", "giot.remote.v58kwm"],
+    16191: ["GranwinIoT", "V5 One Key Switch (BLE)", "giot.remote.v51kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD}),
+    ]
+}, {
+    16180: ["GranwinIoT", "V5 Two Key Switch (BLE)", "giot.remote.v52kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD}),
+    ]
+}, {
+    16181: ["GranwinIoT", "V5 Three Key Switch (BLE)", "giot.remote.v53kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD}),
+    ]
+}, {
+    16182: ["GranwinIoT", "V5 Four Key Switch (BLE)", "giot.remote.v54kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+    ]
+}, {
+    16184: ["GranwinIoT", "V5 Six Key Switch (BLE)", "giot.remote.v56kwm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single"}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double"}),
+        MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold"}),
+    ]
+}, {
+    16186: ["GranwinIoT", "V5 Eight Key Switch (BLE)", "giot.remote.v58kwm"],
     "spec": [
         BaseConv("action", "sensor"),
         MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
-        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: "button_4_double", 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
+        MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
         MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
     ]
 }, {
