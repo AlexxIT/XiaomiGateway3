@@ -1662,13 +1662,14 @@ DEVICES += [{
     ],
 }, {
     # https://home.miot-spec.com/spec/linp.sensor_occupy.es3
-    20731: ["Linp", "Occupancy Sensor", "ES3", "linp.sensor_occupy.es3"],
+    # https://home.mi.com/views/introduction.html?model=linp.sensor_occupy.es2
+    20731: ["Linptech", "Human Presence Sensor ES3", "ES3BB", "linp.sensor_occupy.es2"],
     "spec": [
         # main sensors
         BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
         # other sensors
-        BaseConv("battery", "sensor", mi="3.p.1003"),
+        BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY),
         BaseConv("customized_property", "binary_sensor", mi="5.p.1018"), #customized distance trigger  
         BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity=ENTITY_DISABLED),
         BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity=ENTITY_DISABLED),
