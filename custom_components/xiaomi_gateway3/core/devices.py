@@ -2250,6 +2250,7 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="4.p.1", map={0: "default", 1: "on"}),
         BoolConv("save_state", "switch", mi="4.p.2"),
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}),
+        BoolConv("flex_switch", "switch", mi="4.p.4"),
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
