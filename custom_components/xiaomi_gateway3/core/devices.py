@@ -3798,6 +3798,7 @@ DEVICES += [{
     ]
 }, {
     17970: ["MVS", "MVS Mesh Light", "mvs.light.wy0a02"],
+    21676: ["WLG", "WLG Mesh Light", "wlg.light.wy0a03"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
