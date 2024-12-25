@@ -996,10 +996,11 @@ DEVICES += [{
     "lumi.sensor_gas.acn02": ["Aqara", "Gas Sensor", "JT-BZ-01AQ/A"],
     "spec": [
         MapConv("status", "sensor", mi="2.p.1", map={0: "Normal Monitoring", 1: "Alarm", 2: "Fault", 3: "Warm Up", 4: "End Of Life"}),
-        BoolConv("fault", "binary_sensor", mi="2.p.2"),  # diagnostic
         BaseConv("gas_density", "sensor", mi="2.p.3"),  # percentage
-        MapConv("sensitivity", "select", mi="5.p.1", map={1: "LEL15", 2: "LEL10"}),  # config
-        BaseConv("remain_days", "sensor", mi="9.p.1"),
+        MapConv("sensitivity", "select", mi="5.p.1", map={1: "LEL15", 2: "LEL10"}, entity=ENTITY_CONFIG),  # config
+        BoolConv("fault", "binary_sensor", mi="2.p.2", entity=ENTITY_DIAGNOSTIC),  # diagnostic
+        BoolConv("silence", "binary_sensor", mi="7.p.1", entity=ENTITY_DIAGNOSTIC),
+        BaseConv("remain_days", "sensor", mi="9.p.1", entity=ENTITY_DIAGNOSTIC),
     ],
 }, {
     "lumi.light.acn014": ["Aqara", "Bulb T1", "ZNLDP14LM"],
