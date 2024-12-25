@@ -4056,6 +4056,17 @@ DEVICES += [{
         ConstConv("action", mi="3.e.3", value=BUTTON_HOLD),
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-x6kw1:1:0000C808
+    11652: ["PTX", "Smart Single Wall Switch", "PTX-X61-NMIMC1", "090615.switch.x6kw1"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="8.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="8.e.2", value=BUTTON_HOLD),
+        BaseConv("switch", "switch", mi="2.p.1"),
+        BaseConv("backlight", "switch", mi="9.p.1"),  # config
+        BoolConv("wireless", "switch", mi="2.p.2"),
+    ]
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-x6kw2:1:0000C809
     11653: ["PTX", "Smart Double Wall Switch", "PTX-X62-NMIMC1", "090615.switch.x6kw2"],
     "spec": [
