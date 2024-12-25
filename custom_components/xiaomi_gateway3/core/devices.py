@@ -4117,6 +4117,7 @@ DEVICES += [{
 
 # Mesh groups
 DEVICES += [{
+    1047: ["Yeelight", "Classic Group", "yeelink.light.dn2grp"],
     1054: ["Yeelight", "Mesh Group", "yeelink.light.mb1grp"],
     68286: ["Xiaomi", "Light Group", "mijia.light.group3"],
     "spec": [
