@@ -1,7 +1,7 @@
 import asyncio
 
 from . import core_utils
-from .const import GATEWAY, ZIGBEE, MESH, GROUP, MATTER
+from .const import GATEWAY, GROUP, MATTER, MESH, ZIGBEE
 from .device import XDevice
 from .gate.base import EVENT_MQTT_PUBLISH, EVENT_TIMER
 from .gate.ble import BLEGateway

@@ -19,11 +19,11 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from .core.const import DOMAIN
 from .core.converters.base import BaseConv, ConstConv, MapConv
 from .core.converters.const import (
-    BUTTON_SINGLE,
     BUTTON_DOUBLE,
-    BUTTON_TRIPLE,
     BUTTON_HOLD,
     BUTTON_RELEASE,
+    BUTTON_SINGLE,
+    BUTTON_TRIPLE,
 )
 from .core.converters.mibeacon import BLEMapConv
 from .core.devices import DEVICES

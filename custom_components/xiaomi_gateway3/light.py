@@ -3,9 +3,6 @@ import time
 from functools import cached_property
 
 from homeassistant.components.light import (
-    ColorMode,
-    LightEntity,
-    LightEntityFeature,
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
@@ -13,6 +10,9 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     ATTR_RGB_COLOR,
     ATTR_TRANSITION,
+    ColorMode,
+    LightEntity,
+    LightEntityFeature,
 )
 from homeassistant.helpers.restore_state import RestoreEntity
 

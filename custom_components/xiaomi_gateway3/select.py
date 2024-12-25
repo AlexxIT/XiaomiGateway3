@@ -2,7 +2,7 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .core import ezsp
-from .core.const import GATEWAY, ZIGBEE, MESH, MATTER
+from .core.const import GATEWAY, MATTER, MESH, ZIGBEE
 from .core.gateway import MultiGateway
 from .hass import hass_utils
 from .hass.entity import XEntity

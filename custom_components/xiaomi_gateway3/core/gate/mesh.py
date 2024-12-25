@@ -1,7 +1,7 @@
 import time
 
 from .base import XGateway
-from ..const import MESH, GROUP
+from ..const import GROUP, MESH
 from ..mini_mqtt import MQTTMessage
 from ..shell.shell_mgw import ShellMGW
 

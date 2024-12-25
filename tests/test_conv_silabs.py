@@ -1,5 +1,4 @@
 from zigpy.zcl.clusters.general import OnOff
-from zigpy.zcl.clusters.homeautomation import ElectricalMeasurement
 
 from custom_components.xiaomi_gateway3.core.converters import silabs
 from custom_components.xiaomi_gateway3.core.converters.silabs import zcl_write

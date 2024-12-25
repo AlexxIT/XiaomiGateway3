@@ -2,7 +2,7 @@ import asyncio
 import re
 
 from .base import ShellBase
-from .const import OPENMIIO_MD5_ARM, OPENMIIO_URL_ARM, OPENMIIO_CMD
+from .const import OPENMIIO_CMD, OPENMIIO_MD5_ARM, OPENMIIO_URL_ARM
 
 
 class ShellE1(ShellBase):

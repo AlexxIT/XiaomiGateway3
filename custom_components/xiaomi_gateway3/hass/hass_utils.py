@@ -6,7 +6,7 @@ from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry, device_registry
+from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.helpers.aiohttp_client import (
     async_create_clientsession,
     async_get_clientsession,
@@ -17,7 +17,7 @@ from homeassistant.helpers.storage import Store
 
 from .. import XDevice
 from ..core import core_utils
-from ..core.const import DOMAIN, ZIGBEE, SUPPORTED_MODELS
+from ..core.const import DOMAIN, SUPPORTED_MODELS, ZIGBEE
 from ..core.gate.base import XGateway
 from ..core.xiaomi_cloud import MiCloud
 

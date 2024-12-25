@@ -1,4 +1,5 @@
 """Set entity attributes based on converter settings."""
+
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.cover import CoverDeviceClass
 from homeassistant.components.number import NumberDeviceClass
@@ -13,8 +14,8 @@ from homeassistant.const import (
     MINOR_VERSION,
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    UnitOfElectricPotential,
     UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
@@ -92,7 +93,11 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     "smoke_density": {"icon": "mdi:google-circles-communities", "units": "% obs/ft"},
     "supply": {"icon": "mdi:gauge", "units": PERCENTAGE},
     "tvoc": {"icon": "mdi:cloud", "units": CONCENTRATION_PARTS_PER_BILLION},
-    "eco_two": {"name": "eCO2", "icon": "mdi:molecule-co2", "units": CONCENTRATION_PARTS_PER_MILLION},
+    "eco_two": {
+        "name": "eCO2",
+        "icon": "mdi:molecule-co2",
+        "units": CONCENTRATION_PARTS_PER_MILLION,
+    },
     ##
     # stats sensors
     "binary_sensor.gateway": {

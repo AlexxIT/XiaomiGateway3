@@ -3,9 +3,9 @@ import logging
 import re
 import time
 from functools import cached_property
-from typing import Callable, TYPE_CHECKING, TypedDict, Optional
+from typing import Callable, Optional, TYPE_CHECKING, TypedDict
 
-from .const import GATEWAY, ZIGBEE, BLE, MESH, GROUP, MATTER
+from .const import BLE, GATEWAY, GROUP, MATTER, MESH, ZIGBEE
 from .converters import silabs
 from .converters.base import BaseConv, decode_time, encode_time
 from .converters.lumi import LUMI_GLOBALS

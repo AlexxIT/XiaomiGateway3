@@ -2,20 +2,20 @@ import logging
 
 from zigpy.zcl import Cluster
 from zigpy.zcl.foundation import (
-    GENERAL_COMMANDS,
     CommandSchema,
+    GENERAL_COMMANDS,
+    GeneralCommand,
     TypeValue,
     ZCLCommandDef,
     ZCLHeader,
 )
-from zigpy.zcl.foundation import GeneralCommand
 from zigpy.zdo import ZDO
 from zigpy.zdo.types import (
-    ZDOCmd,
     Neighbors,
     NodeDescriptor,
     SizePrefixedSimpleDescriptor,
     Status as ZDOStatus,
+    ZDOCmd,
 )
 
 try:

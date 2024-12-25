@@ -2,7 +2,7 @@ import asyncio
 import re
 
 from .base import ShellBase
-from .const import OPENMIIO_MD5_MIPS, OPENMIIO_URL_MIPS, OPENMIIO_CMD
+from .const import OPENMIIO_CMD, OPENMIIO_MD5_MIPS, OPENMIIO_URL_MIPS
 from ..unqlite import SQLite
 
 CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"

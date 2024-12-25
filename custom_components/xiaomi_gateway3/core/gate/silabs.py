@@ -4,7 +4,7 @@ import time
 from logging import DEBUG
 
 from .base import XGateway
-from ..const import ZIGBEE, GATEWAY
+from ..const import GATEWAY, ZIGBEE
 from ..converters import silabs
 from ..converters.zigbee import ZConverter
 from ..device import XDevice, hex_to_ieee

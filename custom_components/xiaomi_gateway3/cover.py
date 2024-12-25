@@ -1,5 +1,5 @@
 from homeassistant.components.cover import CoverEntity
-from homeassistant.const import STATE_OPENING, STATE_CLOSING
+from homeassistant.const import STATE_CLOSING, STATE_OPENING
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .core.gate.base import XGateway

@@ -2,12 +2,12 @@ import asyncio
 import logging
 import time
 from functools import cached_property
-from logging import Logger, DEBUG
+from logging import DEBUG, Logger
 from typing import Callable
 
 from ..const import GATEWAY
 from ..device import XDevice, XDeviceExtra
-from ..mini_mqtt import MiniMQTT, MQTTMessage
+from ..mini_mqtt import MQTTMessage, MiniMQTT
 
 EVENT_ADD_DEVICE = "add_device"
 EVENT_REMOVE_DEVICE = "remove_device"

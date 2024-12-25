@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .base import BaseConv
-from .const import BUTTON, UNKNOWN, BUTTON_BOTH
+from .const import BUTTON, BUTTON_BOTH, UNKNOWN
 
 if TYPE_CHECKING:
     from ..device import XDevice

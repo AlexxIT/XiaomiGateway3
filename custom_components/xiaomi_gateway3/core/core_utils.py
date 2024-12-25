@@ -5,7 +5,7 @@ import hmac
 import random
 import socket
 
-from .const import SUPPORTED_MODELS, PID_BLE
+from .const import PID_BLE, SUPPORTED_MODELS
 from .mini_miio import AsyncMiIO
 from .shell.session import Session
 from .xiaomi_cloud import MiCloud

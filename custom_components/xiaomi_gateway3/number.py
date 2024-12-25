@@ -1,4 +1,4 @@
-from homeassistant.components.number import NumberEntity, DEFAULT_STEP, NumberMode
+from homeassistant.components.number import DEFAULT_STEP, NumberEntity, NumberMode
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .hass.entity import XEntity

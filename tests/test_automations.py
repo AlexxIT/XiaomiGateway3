@@ -1,6 +1,5 @@
-from custom_components.xiaomi_gateway3.device_trigger import get_actions
-
 from custom_components.xiaomi_gateway3.core.device import XDevice
+from custom_components.xiaomi_gateway3.device_trigger import get_actions
 
 
 def test_buttons():

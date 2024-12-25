@@ -5,8 +5,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry, entity_registry
 
 from .entity import XEntity
-from .. import XDevice, MultiGateway
-from ..core.const import DOMAIN, GATEWAY, BLE, MATTER, MESH, ZIGBEE
+from .. import MultiGateway, XDevice
+from ..core.const import BLE, DOMAIN, GATEWAY, MATTER, MESH, ZIGBEE
 from ..core.converters.base import BaseConv
 from ..core.gate.base import EVENT_ADD_DEVICE, EVENT_REMOVE_DEVICE
 

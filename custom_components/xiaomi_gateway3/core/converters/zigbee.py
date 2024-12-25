@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 from zigpy.zcl.clusters.closures import WindowCovering
 from zigpy.zcl.clusters.general import (
     AnalogInput,
+    Basic,
     LevelControl,
     MultistateInput,
     OnOff,
     PowerConfiguration,
-    Basic,
 )
 from zigpy.zcl.clusters.homeautomation import ElectricalMeasurement
 from zigpy.zcl.clusters.lighting import Color
@@ -22,7 +22,7 @@ from zigpy.zcl.clusters.security import IasZone
 from zigpy.zcl.clusters.smartenergy import Metering
 
 from .base import BaseConv, decode_time
-from .const import BUTTON_SINGLE, BUTTON_DOUBLE, BUTTON_HOLD
+from .const import BUTTON_DOUBLE, BUTTON_HOLD, BUTTON_SINGLE
 from .silabs import *
 
 if TYPE_CHECKING:
@@ -386,16 +386,19 @@ class ZTuyaButtonConv(ZConverter):
         except:
             pass
 
+
 @dataclass
 class ZLifeControlHumidity(ZMathConv):
     cluster_id = TemperatureMeasurement.cluster_id
     attr_id = TemperatureMeasurement.AttributeDefs.min_measured_value.id
     multiply: float = 0.01
 
+
 @dataclass
 class ZLifeControlECO2(ZMathConv):
     cluster_id = TemperatureMeasurement.cluster_id
     attr_id = TemperatureMeasurement.AttributeDefs.max_measured_value.id
+
 
 @dataclass
 class ZLifeControlVOC(ZMathConv):

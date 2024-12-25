@@ -1,5 +1,5 @@
 from custom_components.xiaomi_gateway3.core.const import DOMAIN
-from custom_components.xiaomi_gateway3.hass.hass_utils import migrate_uid, migrate_attr
+from custom_components.xiaomi_gateway3.hass.hass_utils import migrate_attr, migrate_uid
 
 
 def test_migrate_uid():
