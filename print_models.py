@@ -1,96 +1,73 @@
-import re
+from custom_components.xiaomi_gateway3.core.devices import DEVICES
 
-from homeassistant.components.sensor import DOMAIN
-
-from custom_components.xiaomi_gateway3.core.converters.devices import DEVICES
-from custom_components.xiaomi_gateway3.core.converters.mibeacon import MiBeacon
-
-assert DOMAIN  # fix circular import
-
-columns = ["Brand", "Name", "Model", "Entities", "S"]
+columns = ["Brand", "Name", "Model", "Entities"]
 header = ["---"] * len(columns)
 
-devices = {
-    "Gateways": [
-        [
-            "Xiaomi",
-            "Multimode Gateway CN",
-            "[ZNDMWG03LM](https://home.miot-spec.com/s/lumi.gateway.mgl03)",
-            "alarm, command, data, gateway",
-            "4",
-        ],
-        [
-            "Xiaomi",
-            "Multimode Gateway EU",
-            "[ZNDMWG02LM](https://home.miot-spec.com/s/lumi.gateway.mgl03)",
-            "alarm, command, data, gateway",
-            "4",
-        ],
-    ]
-}
+devices = {}
+models = set()
 
-for device in DEVICES:
+is_ble = True
+
+for i, device in enumerate(DEVICES):
     # skip devices with bad support
-    if device.get("support", 3) < 3:
+    if device.pop("support", 3) < 3:
         continue
 
-    for k, v in device.items():
-        if not isinstance(v, list) or k in ("spec", "lumi.gateway.aqcn03"):
+    spec = device.pop("spec")
+
+    # skip BLE with unknown spec
+    if "default" not in device:
+        spec = ", ".join([conv.attr for conv in spec if conv.domain])
+    else:
+        spec = "*"
+
+    for model, info in device.items():
+        if not isinstance(info, list):
             continue
 
-        brand, name, model = v if len(v) == 3 else v + [k]
+        if model in models:
+            print("duplicate:", model)
+        else:
+            models.add(model)
 
-        if isinstance(k, str):
-            if "gateway" in k:
+        if isinstance(model, str) and model not in info:
+            info.append(model)
+
+        market_brand = info[0] or "~"
+        market_name = info[1]
+        market_model = ", ".join(info[2:]) if len(info) > 2 else ""
+
+        if isinstance(model, str):
+            if "gateway" in model:
                 kind = "Gateways"
-            elif k.startswith("lumi.") or k.startswith("ikea."):
+            elif model.startswith(("lumi.", "ikea.")):
                 kind = "Xiaomi Zigbee"
+            elif model.startswith("matter."):
+                kind = "Matter"
             else:
                 kind = "Other Zigbee"
-        elif MiBeacon in device["spec"]:
-            kind = "Xiaomi BLE"
+        elif isinstance(model, int):
+            if is_ble:
+                kind = "Xiaomi BLE"
+            else:
+                kind = "Xiaomi Mesh"
         else:
-            kind = "Xiaomi Mesh"
+            kind = "Unknown"
 
-        if kind != "Other Zigbee":
-            link = f"https://home.miot-spec.com/s/{k}"
-        else:
-            link = f"https://www.zigbee2mqtt.io/supported-devices/#s={model}"
+        devices.setdefault(kind, []).append(
+            [market_brand, market_name, market_model, spec]
+        )
 
-        items = devices.setdefault(kind, [])
+    if device.get("default") == "ble":
+        is_ble = False
 
-        # skip if model already exists
-        if any(True for i in items if f"[{model}]" in i[2]):
-            continue
-
-        # skip BLE with unknown spec
-        if "default" not in device:
-            spec = ", ".join(
-                [
-                    conv.attr + "*" if conv.enabled is None else conv.attr
-                    for conv in device["spec"]
-                    if conv.domain
-                ]
-            )
-        else:
-            spec = "*"
-
-        support = str(device.get("support", ""))
-
-        model = f"[{model}]({link})"
-
-        items.append([brand, name, model, spec, support])
-
-out = "<!--supported-->\n"
+out = f"# Supported devices\n\nTotal devices: {len(models)}\n\n"
 for k, v in devices.items():
-    out += f"### Supported {k}\n\nTotal devices: {len(v)}\n\n"
+    out += f"## Supported {k}\n\nTotal devices: {len(v)}\n\n"
     out += "|" + "|".join(columns) + "|\n"
     out += "|" + "|".join(header) + "|\n"
     for line in sorted(v):
         out += "|" + "|".join(line) + "|\n"
     out += "\n"
-out += "<!--supported-->"
 
-raw = open("README.md", "r", encoding="utf-8").read()
-raw = re.sub(r"<!--supported-->(.+?)<!--supported-->", out, raw, flags=re.DOTALL)
-open("README.md", "w", encoding="utf-8").write(raw)
+open("DEVICES.md", "w", encoding="utf-8").write(out)
