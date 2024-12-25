@@ -2035,7 +2035,7 @@ DEVICES += [{
     # "ttl": "6h"  # battery every 6 hours
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
-    17825: ["Unknown", "Eight scene knob switch", "cxw.remote.ble006"],
+    17825: [None, "Eight scene knob switch", "cxw.remote.ble006"],
     "spec": [
         BaseConv("battery", mi="7.p.1003"),  # uint8
         BaseConv("action", "sensor"),
@@ -2107,6 +2107,13 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="7.p.1003"),
     ],
 }, {
+    # https://home.miot-spec.com/spec/shuse.flood.ss05
+    19533: ["Shuse", "Water Leak Sensor", "shuse.flood.ss05"],
+    "spec": [
+        BaseConv("water_leak", "binary_sensor", mi="2.p.1006"),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+    ],
+}, {
     # rhj.sensor_occupy.l730a
     # https://home.miot-spec.com/s/rhj.sensor_occupy.l730a
     20179: ["LeTianPai", "Presence Sensor POP", "rhj.sensor_occupy.l730a"],
@@ -2175,13 +2182,6 @@ DEVICES += [{
         BLELock("lock", mi=11),
         BLEToothbrush("toothbrush", mi=16),
     ],
-}, {
-    # https://home.miot-spec.com/spec/shuse.flood.ss05
-    19533: ["Shuse", "Water Leak Sensor", "shuse.flood.ss05"],
-    "spec": [
-        BaseConv("water_leak", "binary_sensor", mi="2.p.1006"),
-        BaseConv("battery", "sensor", mi="3.p.1003"),
-    ],
 }]
 
 ########################################################################################
@@ -2209,7 +2209,7 @@ DEVICES += [{
     ],
 }, {
     # https://home.miot-spec.com/spec/crzm.light.w00a01
-    2292: ["crzm", "Mesh Light", "crzm.light.w00a01"],
+    2292: [None, "Mesh Light", "crzm.light.w00a01"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
@@ -3300,7 +3300,7 @@ DEVICES += [{
         BaseConv("motor_reverse", "switch", mi="2.p.5"),  # config
     ],
 }, {
-    13804: ["giot", "Curtain Motor", "giot.curtain.v5icm"],
+    13804: ["GranwinIoT", "Curtain Motor", "giot.curtain.v5icm"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
         BaseConv("target_position", mi="2.p.7"),
@@ -3571,8 +3571,8 @@ DEVICES += [{
         BaseConv("child_lock", "switch", mi="5.p.1"),  # config
     ],
 }, {
-    7082: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx340"],
-    6857: ["pmfbj", "Panasonic Ceiling Light", "pmfbj.light.xsx341"],
+    7082: ["Panasonic", "Panasonic Ceiling Light", "pmfbj.light.xsx340"],
+    6857: ["Panasonic", "Panasonic Ceiling Light", "pmfbj.light.xsx341"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
@@ -3593,7 +3593,7 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="8.p.1"),
     ],
 }, {
-    10944: [None, "Mesh Smart Switch V3", "giot.switch.v3oodm"],
+    10944: ["GranwinIoT", "Mesh Smart Switch V3", "giot.switch.v3oodm"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         MapConv("power_on_state", "select", mi="2.p.3", map={0: "off", 1: "on", 2: "previous"}),
@@ -3603,7 +3603,7 @@ DEVICES += [{
         MapConv("led", "select", mi="4.p.1", map={0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"})
     ]
 }, {
-    15461: [None, "V6 Intelligent On-off Device(Mesh)", "giot.switch.v6oodm"],
+    15461: ["GranwinIoT", "V6 Intelligent On-off Device(Mesh)", "giot.switch.v6oodm"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         MapConv("power_on_state", "select", mi="2.p.6", map={0: "OFF", 1: "ON", 2: "Last State"}),
@@ -3665,7 +3665,7 @@ DEVICES += [{
         BaseConv("target_temp", mi="2.p.3"),
     ],
 }, {
-    11971: ["Unknown", "Mesh Light", "shhf.light.slcwb3"],
+    11971: [None, "Mesh Light", "shhf.light.slcwb3"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
@@ -3726,7 +3726,7 @@ DEVICES += [{
         BaseConv("channel_3", "switch", mi="4.p.1"),  # bool
     ],
 }, {
-    15082: ["Unknown", "Smart Quadruple Switch", "topwit.switch.rzw34"],
+    15082: [None, "Smart Quadruple Switch", "topwit.switch.rzw34"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
@@ -3784,7 +3784,7 @@ DEVICES += [{
         BoolConv("pilot_switch", "switch", mi="3.p.6", entity=ENTITY_CONFIG),
     ],
 }, {
-    17725: ["Unknown", "Intelligent On-off Device(Mesh)", "iot.switch.tdq3"],
+    17725: [None, "Intelligent On-off Device(Mesh)", "iot.switch.tdq3"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         BoolConv("fault", "binary_sensor", mi="2.p.3", entity=ENTITY_DISABLED),
