@@ -3601,8 +3601,14 @@ DEVICES += [{
         MapConv("effect", mi="2.p.4", map={0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"})
     ]
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-sk4k:1:0000C810
     6435: ["PTX", "PTX Smart Quadruple Switch", "090615.switch.sk4k"],
     "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="6.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="6.e.4", value=BUTTON_4_SINGLE),
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
         BaseConv("switch_3", "switch", mi="4.p.1"),
