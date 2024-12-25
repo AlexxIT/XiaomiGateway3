@@ -4056,6 +4056,22 @@ DEVICES += [{
         ConstConv("action", mi="3.e.3", value=BUTTON_HOLD),
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-x6kw3:1:0000C810
+    11654: ["PTX", "Smart Tripl Wall Switch", "PTX-X62-NMIMC1", "090615.switch.x6kw3"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="8.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="8.e.2", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="8.e.3", value=BUTTON_3_SINGLE),
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        BaseConv("backlight", "switch", mi="9.p.1"),  # config
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
