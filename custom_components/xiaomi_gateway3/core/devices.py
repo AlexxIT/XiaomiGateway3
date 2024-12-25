@@ -4103,6 +4103,12 @@ DEVICES += [{
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
     ],
 }, {
+    2448: [None, "Two-Button Switch ", "ydhome.switch.s2"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("right_switch", "switch", mi="3.p.1"),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
