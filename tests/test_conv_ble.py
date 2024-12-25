@@ -352,3 +352,18 @@ def test_18639():
         {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1174444720}]}
     )
     assert p == {"heart_rate": 69, "impedance_high": 448.0, "weight": 68.8}
+
+
+def test_18051():
+    device = XDevice(18051)
+
+    p = device.decode({"eid": 22038, "edata": "05"})
+    assert p == {"unknown": "05"}
+    p = device.decode({"eid": 18437, "edata": "00c01e44"})
+    assert p == {"illuminance": 635}
+    p = device.decode({"eid": 18510, "edata": "02"})
+    assert p == {"occupancy": True}
+    p = device.decode({"eid": 18510, "edata": "01"})
+    assert p == {"occupancy": True}
+    p = device.decode({"eid": 18513, "edata": "0000"})
+    assert p == {"has_someone_duration": 0}

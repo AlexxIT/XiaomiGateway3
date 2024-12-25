@@ -1652,10 +1652,16 @@ DEVICES += [{
     # https://home.miot-spec.com/spec/xiaomi.sensor_occupy.03
     18051: ["Xiaomi", "Occupancy Sensor", "XMOSB01XS", "xiaomi.sensor_occupy.03"],
     "spec": [
-        # main sensors
+        # mibeacon2 spec
+        BLEMapConv("occupancy", mi=18510, map={"00": False, "01": True, "02": True}),
+        BLEFloatConv("illuminance", mi=18437, round=0),  # float
+        BLEByteConv("battery", mi=19459),  # uint8
+        BLEByteConv("has_someone_duration", mi=18513),  # uint8
+        BLEByteConv("no_one_duration", mi=18514),  # uint8
+        BaseConv("unknown", mi=22038),
+        # miot spec
         BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
-        # other sensors
         BaseConv("battery", "sensor", mi="3.p.1003", entity=ENTITY_LAZY),
         BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity=ENTITY_DISABLED),
         BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity=ENTITY_DISABLED),
