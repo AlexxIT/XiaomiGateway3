@@ -72,52 +72,51 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    if config_entry.data:
-        return await hass_utils.setup_cloud(hass, config_entry)
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    if entry.data:
+        return await hass_utils.setup_cloud(hass, entry)
 
-    await hass_utils.store_gateway_key(hass, config_entry)
+    await hass_utils.store_gateway_key(hass, entry)
 
-    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    gw = MultiGateway(**config_entry.options)
-    handle_add_entities(hass, config_entry, gw)
+    gw = MultiGateway(**entry.options)
+    handle_add_entities(hass, entry, gw)
     gw.start()
 
-    hass.data[DOMAIN][config_entry.entry_id] = gw
+    hass.data[DOMAIN][entry.entry_id] = gw
 
-    if not config_entry.update_listeners:
-        config_entry.add_update_listener(async_update_options)
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
     async def hass_stop(event):
         await gw.stop()
 
-    config_entry.async_on_unload(
+    entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, hass_stop)
     )
 
     return True
 
 
-async def async_update_options(hass: HomeAssistant, config_entry: ConfigEntry):
-    await hass.config_entries.async_reload(config_entry.entry_id)
-
-
-async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    if config_entry.data:
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    if entry.data:
         return True  # skip unload for cloud config entry
 
     # remove all stats entities if disable stats
-    hass_utils.remove_stats_entities(hass, config_entry)
+    hass_utils.remove_stats_entities(hass, entry)
 
     # important to remove entities before stop gateway
-    ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
-    gw: MultiGateway = hass.data[DOMAIN][config_entry.entry_id]
+    gw: MultiGateway = hass.data[DOMAIN][entry.entry_id]
     await gw.stop()
     gw.remove_all_devices()
 
     return ok
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):

@@ -129,13 +129,15 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry):
-        return CloudOptionsandler(config_entry)
+        return OptionsFlowHandler()
 
 
-class CloudOptionsandler(OptionsFlow):
-    def __init__(self, config_entry: ConfigEntry):
-        self.config_entry = config_entry
-        self.cloud_devices = None
+class OptionsFlowHandler(OptionsFlow):
+    cloud_devices = None
+
+    @property
+    def config_entry(self):
+        return self.hass.config_entries.async_get_entry(self.handler)
 
     @property
     def cloud(self) -> MiCloud:
