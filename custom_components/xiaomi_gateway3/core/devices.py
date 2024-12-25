@@ -1676,10 +1676,11 @@ DEVICES += [{
         BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
         # other sensors
-        BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY),
-        BaseConv("customized_property", "binary_sensor", mi="5.p.1018"), #customized distance trigger  
-        BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity=ENTITY_DISABLED),
-        BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity=ENTITY_DISABLED),
+        BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY),  # uint8
+        BaseConv("customized_property", "binary_sensor", mi="5.p.1018"),  # customized distance trigger
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
+        BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
+        BoolConv("led", "binary_sensor", mi="3.p.1"),  # bool, config
     ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
