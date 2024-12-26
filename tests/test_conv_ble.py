@@ -367,3 +367,10 @@ def test_18051():
     assert p == {"occupancy": True}
     p = device.decode({"eid": 18513, "edata": "0000"})
     assert p == {"has_someone_duration": 0}
+
+
+def test_2691():
+    device = XDevice(2691)
+
+    p = device.decode({"eid": 4119, "edata": "3C000000"})
+    assert p == {"idle_time": 60}

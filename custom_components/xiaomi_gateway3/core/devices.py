@@ -1508,7 +1508,7 @@ DEVICES += [{
         BLEMathConv("illuminance", "sensor", mi=15),  # moving with illuminance data
         BLEMathConv("illuminance", mi=4103),  # uint24
         BLEBattery2691("battery", "sensor", mi=4106, entity=ENTITY_LAZY),  # battery data with bug
-        BaseConv("idle_time", "sensor", mi=4119),  # diagnostic
+        BLEMathConv("idle_time", "sensor", mi=4119),  # diagnostic
         BLEMapConv("light", "binary_sensor", mi=4120, map={"00": False, "01": True}),
     ],
     # "ttl": "60m",  # battery every 11 min
