@@ -4156,6 +4156,19 @@ DEVICES += [{
         MapConv("anti_pinch_sensitivity", "select", mi="4.p.2", map={0: "Very Low", 1: "Low", 2: "Medium", 3: "High"}, entity=ENTITY_CONFIG),
     ],
 }, {
+    8154: ["Xiaomi", "Door Lock M20", "loock.lock.t2v1"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        BaseConv("contact", "binary_sensor"),  # from mi=7
+        BLEFinger("fingerprint", mi=6),
+        BLEDoor("door", mi=7),
+        BLEMapConv("action", mi=8, map={"00": "disarmed", "01": "armed"}),
+        BLELock("lock", mi=11),
+        BLEByteConv("battery", "sensor", mi=4106),
+        BLEMapConv("lock", "binary_sensor", mi=4110, map={"00": True, "01": False}),  # reverse
+        BLEMapConv("door", "binary_sensor", mi=4111, map={"00": True, "01": False}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool

@@ -374,3 +374,29 @@ def test_2691():
 
     p = device.decode({"eid": 4119, "edata": "3C000000"})
     assert p == {"idle_time": 60}
+
+
+def test_8154():
+    device = XDevice(8154)
+
+    p = device.decode({"eid": 11, "edata": "2000000180777B2C66"})
+    assert p == {
+        "action": "lock",
+        "action_id": 0,
+        "error": None,
+        "key_id": 0,
+        "message": "Unlock outside the door",
+        "method": "biological",
+        "method_id": 2,
+        "timestamp": "2024-04-27T07:13:43",
+    }
+    p = device.decode({"eid": 7, "edata": "017F7B2C66"})
+    assert p == {
+        "action": "door",
+        "action_id": 1,
+        "contact": False,
+        "message": "Door is closed",
+        "timestamp": "2024-04-27T07:13:51",
+    }
+    p = device.decode({"eid": 4111, "edata": "01"})
+    assert p == {"door": False}
