@@ -507,6 +507,8 @@ You can use this mode with thanks to [@kirovilya](https://github.com/kirovilya) 
 
 ## Zigbee custom firmware
 
+### Firmwares 6.6.2.0 and 6.7.10.0
+
 **Xiaomi Multimode Gateway** support flashing custom firmware for Zigbee chip. It works only with ZHA/z2m modes. And it can increase the stability of the network, because this gateway uses pretty glitchy hardware. The other gateways have no hardware problems and do not require custom zigbee firmware.
 
 You can flash custom firmware from Gateway select entity.
@@ -516,7 +518,11 @@ To return to MiHome mode - be sure to flash the default firmware!
 It is possible because of these people:
 
 - [@CODeRUS](https://github.com/CODeRUS) and [@zvldz](https://github.com/zvldz) - adapted the script to flash the chip
-- [@faronov](https://github.com/faronov) - complied a new version of firmware 
+- [@faronov](https://github.com/faronov) - complied a new version of firmware
+
+### Firmware 7.3.1.0 MultiPAN RCP
+
+[Read more](https://github.com/AlexxIT/XiaomiGateway3/issues/1328)
 
 ## Handle Button Actions
 
