@@ -1911,7 +1911,8 @@ DEVICES += [{
     ],
     # "ttl": "25h"
 }, {
-    13121: ["Xiaomi", "Smart Door Lock E20 (Video Monitor)", "loock.lock.r2"],
+    12934: ["Xiaomi", "Smart Door Lock E20 WIFI", "XMZNMS201LM", "lumi.lock.mcn008"],
+    13121: ["Xiaomi", "Smart Door Lock E20 (Video Monitor)", "lumi.lock.mcn009"],
     "spec": [
         # lock action
         BaseConv("action", "sensor"),
@@ -1924,7 +1925,7 @@ DEVICES += [{
         MapConv("method", mi="2.e.1020.p.5", map={1: "mobile_phone", 2: "fingerprint", 3: "password", 4: "nfc", 5: "face", 6: "finger_vein", 7: "palm_print", 8: "lock_key", 9: "one_time_password", 10: "periodic_password", 11: "homekit", 12: "coerce", 13: "two_step_verification", 14: "turntable", 15: "manual", 16: "auto"}),
         MapConv("door", "sensor", mi="3.p.1021", map={1: "locked", 2: "unlocked", 3: "timeout", 4: "ajar"}),
         MapConv("position", mi="2.e.1020.p.6", map={1: "indoor", 2: "outdoor", 3: "unknown"}),
-        BaseConv("battery", "sensor", mi="7.p.1003"),
+        BaseConv("battery", "sensor", mi="4.p.1003"),
         ConstConv("action", mi="5.e.1006", value="doorbell"),
         BaseConv("timestamp", mi="5.e.1006.p.1"),
     ],
