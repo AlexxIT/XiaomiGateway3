@@ -1541,8 +1541,7 @@ DEVICES += [{
         BaseConv("battery", mi="2.p.1003"),
     ],
 }, {
-    # linp.remote.k9b1
-    5480: ["Linptech", "Wireless Button", "k9b1"],
+    5480: ["Linptech", "Wireless Button", "linp.remote.k9b1"],
     "spec": [  
         # mibeacon2 spec
         BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE, "000001": BUTTON_1_HOLD, "000002": BUTTON_1_DOUBLE}),
@@ -1555,8 +1554,7 @@ DEVICES += [{
     ],
     # "ttl": "6h"  # battery every 6 hours
 }, {
-    # linp.remote.k9b11
-    5481: ["Linptech", "Wireless Button", "k9b11"],
+    5481: ["Linptech", "Wireless Button", "linp.remote.k9b11"],
     "spec": [
         # mibeacon2 spec
         BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE, "000001": BUTTON_1_DOUBLE, "000002": BUTTON_1_HOLD, "010000": BUTTON_2_SINGLE, "010001": BUTTON_2_DOUBLE, "010002": BUTTON_2_HOLD}),
