@@ -271,6 +271,7 @@ uid: 649e31xxxxxx                    # hass UID - "12 hex mac" for BLE and Mesh,
 4. Add new Lovelace card:
    - [example 1](https://gist.github.com/AlexxIT/120f20eef4f39071e67f698207490db9)
    - [example 2](https://github.com/avbor/HomeAssistantConfig/blob/master/lovelace/views/vi_radio_quality_gw3.yaml)
+   - [example 3](https://gist.github.com/DJTerentjev/c8733478c616524a8db539565c2d669e)
 
 **Gateway binary sensor**
 
