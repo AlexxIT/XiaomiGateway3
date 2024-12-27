@@ -4128,6 +4128,15 @@ DEVICES += [{
         BaseConv("channel_4", "switch", mi="10.p.1"),
     ]
 }, {
+    9507: ["Qdhkl", "AC Indoor Unit Controller", "qdhkl.aircondition.b25"],
+    "spec": [
+        BaseConv("climate", "climate", mi="2.p.1"),
+        MapConv("hvac_mode", mi="2.p.2", map={1: "cool", 2: "dry", 3: "fan_only", 4: "heat"}),
+        MapConv("fan_mode", mi="3.p.1", map={0: "auto", 1: "low", 2: "medium", 3: "high"}),
+        BaseConv("current_temp", mi="4.p.1"),
+        BaseConv("target_temp", mi="2.p.3"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
