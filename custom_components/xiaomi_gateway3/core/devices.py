@@ -3294,8 +3294,9 @@ DEVICES += [{
     14020: ["Bean", "Smart Curtain Lemesh V1", "V1", "bean.curtain.ct01"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
-        BaseConv("target_position", mi="2.p.3"),
         CurtainPosConv("position", mi="2.p.2"),
+        BaseConv("target_position", mi="2.p.3"),
+        MapConv("speed_level", "select", mi="4.p.5", map={1: "low", 2: "medium", 3: "high"}, entity=ENTITY_CONFIG),
     ],
     "ttl": "7d",
 }, {
@@ -4107,6 +4108,24 @@ DEVICES += [{
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
         BaseConv("right_switch", "switch", mi="3.p.1"),
+    ]
+}, {
+    15888: ["Babai", "Curtain BLE11S", "babai.curtain.ble11s"],
+    "spec": [
+        MapConv("motor_control", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        CurtainPosConv("position", mi="2.p.2"),
+        BaseConv("target_position", mi="2.p.3"),
+        MapConv("mode", "select", mi="2.p.4", map={0: "normal", 1: "reversal", 2: "calibrate"}, entity=ENTITY_CONFIG),
+        MapConv("speed_level", "select", mi="2.p.5", map={0: "low", 1: "medium", 2: "high"}, entity=ENTITY_CONFIG),
+    ],
+    "ttl": "7d",
+}, {
+    20449: ["GranwinIoT", "Wall Button", "giot.remote.v58kwm"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("channel_4", "switch", mi="10.p.1"),
     ]
 }, {
     "default": "mesh",  # default Mesh device
