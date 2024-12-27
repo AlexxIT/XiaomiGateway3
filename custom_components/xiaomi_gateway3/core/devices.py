@@ -3052,8 +3052,10 @@ DEVICES += [{
         BoolConv("wireless", "switch", mi="2.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
         BaseConv("action", "sensor"),
-        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
         ConstConv("action", mi="3.e.1", value=BUTTON_SINGLE),
+        MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
+        MathConv("brightness_white", "number", mi="12.p.5", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="12.p.6", min=0, max=100, entity=ENTITY_CONFIG),
     ],
 }, {
     15659: ["Linptech", "Double Wall Switch QT1", "linp.switch.qt1db2"],
@@ -3063,10 +3065,12 @@ DEVICES += [{
         BoolConv("wireless_1", "switch", mi="2.p.2"),
         BoolConv("wireless_2", "switch", mi="3.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
-        BaseConv("action", "sensor"),
         MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
+        BaseConv("action", "sensor"),
         ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+        MathConv("brightness_white", "number", mi="12.p.5", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="12.p.6", min=0, max=100, entity=ENTITY_CONFIG),
     ],
 }, {
     15660: ["Linptech", "Triple Wall Switch QT1", "linp.switch.qt1db3"],
@@ -3078,11 +3082,13 @@ DEVICES += [{
         BoolConv("wireless_2", "switch", mi="3.p.2"),
         BoolConv("wireless_3", "switch", mi="4.p.2"),
         BaseConv("led", "switch", mi="11.p.1"),
-        BaseConv("action", "sensor"),
         MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
+        BaseConv("action", "sensor"),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
         ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        MathConv("brightness_white", "number", mi="12.p.5", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="12.p.6", min=0, max=100, entity=ENTITY_CONFIG),
     ],
 }, {
     15661: ["Linptech", "Quadruple Wall Switch QT1", "linp.switch.qt1db4"],
@@ -3099,6 +3105,8 @@ DEVICES += [{
         BaseConv("action", "sensor"),
         MapConv("action", mi="6.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
         MapConv("touch", "select", mi="12.p.1", map={0: "Off", 1: "Low", 2: "Medium", 3: "High"}),
+        MathConv("brightness_white", "number", mi="12.p.5", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="12.p.6", min=0, max=100, entity=ENTITY_CONFIG),
     ],
 }, {
     2274: ["Linptech", "Lingpu Triple Wall Switch", "linp.switch.q3s3"],
@@ -4136,6 +4144,16 @@ DEVICES += [{
         MapConv("fan_mode", mi="3.p.1", map={0: "auto", 1: "low", 2: "medium", 3: "high"}),
         BaseConv("current_temp", mi="4.p.1"),
         BaseConv("target_temp", mi="2.p.3"),
+    ],
+}, {
+    13203: ["Linptech", "Casement Window Driver WD2", "linp.wopener.wd2lb"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        CurtainPosConv("position", mi="2.p.2"),
+        BaseConv("target_position", mi="2.p.3"),
+        BaseConv("battery", "sensor", mi="3.p.1", entity=ENTITY_LAZY),
+        MapConv("battery_status", "sensor", mi="3.p.3", map={0: "Idle", 1: "Adapter", 2: "Solar", 3: "Protected", 4: "Adapter-float"}, entity=ENTITY_DIAGNOSTIC),
+        MapConv("anti_pinch_sensitivity", "select", mi="4.p.2", map={0: "Very Low", 1: "Low", 2: "Medium", 3: "High"}, entity=ENTITY_CONFIG),
     ],
 }, {
     "default": "mesh",  # default Mesh device
