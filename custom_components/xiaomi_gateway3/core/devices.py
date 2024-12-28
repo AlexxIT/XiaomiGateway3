@@ -2827,7 +2827,7 @@ DEVICES += [{
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BoolConv("wireless", "switch", mi="2.p.2"),  # config
         BoolConv("wireless", "switch", mi="3.p.2"),  # config
-        BoolConv("led", "switch", mi="9.p.1"),  # config
+        BaseConv("led", "switch", mi="9.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="6.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="7.e.1", value=BUTTON_2_SINGLE),
@@ -2837,7 +2837,7 @@ DEVICES += [{
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         BoolConv("wireless", "switch", mi="2.p.2"),  # config
-        BoolConv("led", "switch", mi="9.p.1"),  # config
+        BaseConv("led", "switch", mi="9.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="6.e.1", value=BUTTON_SINGLE),
     ],
