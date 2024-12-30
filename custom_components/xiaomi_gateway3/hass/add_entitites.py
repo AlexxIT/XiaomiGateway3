@@ -120,7 +120,8 @@ def handle_lazy_entities(
     def add_lazy_entity(attr: str) -> XEntity:
         lazy_attrs.remove(attr)
 
-        conv = next(i for i in device.converters if i.attr == attr)
+        # important to check non empty domain for some BLE devices
+        conv = next(i for i in device.converters if i.attr == attr and i.domain)
         entity = create_entity(device, conv)
 
         gw = CONFIG_ENTRIES.get(device.did)
