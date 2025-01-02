@@ -2333,6 +2333,7 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="4.p.5"),
     ]
 }, {
+    16685: ["LeMesh", "Mesh Light", "lemesh.light.wy0a19"],
     16697: ["LeMesh", "Mesh Light", "lemesh.light.wy0a20"],
     16873: ["KOEY", "Y1 Ceiling Lamp", "koey.light.wy0a02"],
     "spec": [
