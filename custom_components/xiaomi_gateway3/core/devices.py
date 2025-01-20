@@ -2372,6 +2372,17 @@ DEVICES += [{
         MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),  # config
     ]
 }, {
+    17687:  ["LeMesh", "Scene Mesh Light V2S Pro", "lemesh.light.wy0c24"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "My Mode-Scene 1", 17: "My Mode-Scene 2", 18: "My Mode-Scene 3", 19: "My Mode-Scene 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+    ]
+}, {
     10729: [None, "Mesh Light", "jymc.light.falmp"],
     12066: [None, "Mesh Light", "ftd.light.ftdlmp"],
     "spec": [
