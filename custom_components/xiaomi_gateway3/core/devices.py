@@ -4170,6 +4170,14 @@ DEVICES += [{
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:090615-xw:1:0000C824
+    18736: ["PTX", "Human Body Presence Sensor (Top Mounted)", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        BaseConv("illuminance", "sensor", mi="2.p.5"),
+        BaseConv("light", "light", mi="5.p.1"),
+    ],
+}, {
     2448: [None, "Two-Button Switch ", "ydhome.switch.s2"],
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
