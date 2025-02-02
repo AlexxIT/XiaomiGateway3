@@ -1540,7 +1540,62 @@ DEVICES += [{
         MathConv("humidity", mi="3.p.1008", round=1),
         BaseConv("battery", mi="2.p.1003"),
     ],
-}, {
+}, 
+    {
+    16400: ["SmartFrog", "V6 Double Wall Switch", "giot.switch.v62ksm"],
+    "spec": [
+        BaseConv("Left switch", "switch", mi="2.p.1"),
+        BaseConv("Right switch", "switch", mi="3.p.1"),
+        MapConv("Left switch mode", "select", mi="2.p.2", map={
+            0: "普通开关", 
+            1: "无线开关", 
+            2: "快速断通", 
+            3: "点动开关", 
+            4: "普通+无线"
+        }),
+        MapConv("Right switch mode", "select", mi="3.p.2", map={
+            0: "普通开关", 
+            1: "无线开关", 
+            2: "快速断通", 
+            3: "点动开关", 
+            4: "普通+无线"
+        }),
+        MapConv("power_on_state_left_switch", "select", mi="2.p.3", map={0: "Off", 1: "On", 2: "Default"}),  
+        MapConv("power_on_state_right_switch", "select", mi="3.p.3", map={0: "Off", 1: "On", 2: "Default"}), 
+#        BaseConv("Left switch", "sensor", mi="12.p"),
+#        BaseConv("Right switch", "sensor", mi="13.p"),
+        BaseConv("Left switch action", "sensor"),
+        ConstConv("Left switch action", mi="12.e.1", value=BUTTON_SINGLE),
+        ConstConv("Left switch action", mi="12.e.2", value=BUTTON_DOUBLE),
+        ConstConv("Left switch action", mi="12.e.3", value=BUTTON_HOLD),
+        BaseConv("Right switch action", "sensor"),
+        ConstConv("Right switch action", mi="13.e.1", value=BUTTON_SINGLE),
+        ConstConv("Right switch action", mi="13.e.2", value=BUTTON_DOUBLE),
+        ConstConv("Right switch action", mi="13.e.3", value=BUTTON_HOLD),
+        MapConv("Left switch indicator-light mode", "select", mi="16.p.1", map={
+            0: "Follow", 
+            1: "Opposite", 
+            2: "Off", 
+            3: "On"
+        }),
+        MapConv("Right switch indicator-light mode", "select", mi="16.p.2", map={
+            0: "Follow", 
+            1: "Opposite", 
+            2: "Off", 
+            3: "On"
+        }),
+        BaseConv("ambient-light", "switch", mi="17.p.1"), ]
+        }, {
+    20809: ["LeMesh", "Scene Wireless Button S", "lemesh.remote.ts00"],
+    "spec": [
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        MapConv("Button_mode", "select", mi="5.p.1020", map={0: "Quick Single Click", 1: "Multiple Click"}),  
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD}),
+        ]
+        }, {
     5480: ["Linptech", "Wireless Button", "linp.remote.k9b1"],
     "spec": [  
         # mibeacon2 spec
