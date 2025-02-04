@@ -5,7 +5,6 @@ from functools import cached_property
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
     ATTR_EFFECT,
     ATTR_HS_COLOR,
     ATTR_RGB_COLOR,
@@ -15,9 +14,13 @@ from homeassistant.components.light import (
     LightEntityFeature,
 )
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util import color as color_util
 
 from .core.gate.base import XGateway
 from .hass.entity import XEntity
+
+
+ATTR_COLOR_TEMP = "color_temp"
 
 
 # noinspection PyUnusedLocal
@@ -39,11 +42,11 @@ class XLight(XEntity, LightEntity, RestoreEntity):
                 self._attr_color_mode = ColorMode.COLOR_TEMP
                 modes.add(ColorMode.COLOR_TEMP)
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
-                    self._attr_min_mireds = conv.minm
-                    self._attr_max_mireds = conv.maxm
+                    self._attr_max_color_temp_kelvin = color_util.color_temperature_mired_to_kelvin(conv.minm)
+                    self._attr_min_color_temp_kelvin = color_util.color_temperature_mired_to_kelvin(conv.maxm)
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
-                    self._attr_min_mireds = int(1000000 / conv.maxk)
-                    self._attr_max_mireds = int(1000000 / conv.mink)
+                    self._attr_max_color_temp_kelvin = conv.maxk
+                    self._attr_min_color_temp_kelvin = conv.mink
             elif conv.attr == ATTR_HS_COLOR:
                 self.listen_attrs.add(conv.attr)
                 modes.add(ColorMode.HS)
@@ -65,7 +68,7 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         if ATTR_BRIGHTNESS in data:
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
-            self._attr_color_temp = data[ATTR_COLOR_TEMP]
+            self._attr_color_temp_kelvin = color_util.color_temperature_mired_to_kelvin(data[ATTR_COLOR_TEMP])
             self._attr_color_mode = ColorMode.COLOR_TEMP
         if ATTR_HS_COLOR in data:
             self._attr_hs_color = data[ATTR_HS_COLOR]
@@ -82,7 +85,7 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         return {
             self.attr: self._attr_is_on,
             ATTR_BRIGHTNESS: self._attr_brightness,
-            ATTR_COLOR_TEMP: self._attr_color_temp,
+            ATTR_COLOR_TEMP: color_util.color_temperature_kelvin_to_mired(self._attr_color_temp_kelvin) if self._attr_color_temp_kelvin is not None else None,
         }
 
     async def async_turn_on(self, **kwargs):
