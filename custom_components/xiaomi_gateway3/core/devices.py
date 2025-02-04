@@ -3510,6 +3510,37 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="6.p.3"),
     ]
 }, {
+    16400: ["SmartFrog", "V6 Double Wall Switch", "giot.switch.v62ksm"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("right_switch", "switch", mi="3.p.1"),
+        BaseConv("left_switch_action", "sensor"),
+        ConstConv("left_switch_action", mi="12.e.1", value=BUTTON_SINGLE),
+        ConstConv("left_switch_action", mi="12.e.2", value=BUTTON_DOUBLE),
+        ConstConv("left_switch_action", mi="12.e.3", value=BUTTON_HOLD),
+        BaseConv("right_switch_action", "sensor"),
+        ConstConv("right_switch_action", mi="13.e.1", value=BUTTON_SINGLE),
+        ConstConv("right_switch_action", mi="13.e.2", value=BUTTON_DOUBLE),
+        ConstConv("right_switch_action", mi="13.e.3", value=BUTTON_HOLD),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Normal",  1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("right_switch_mode", "select", mi="3.p.2", map={ 0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("power_on_state_left_switch", "select", mi="2.p.3", map={0: "Off", 1: "On", 2: "Default"}), 
+        MapConv("power_on_state_right_switch", "select", mi="3.p.3", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("left_switch_indicator_light_mode", "select", mi="16.p.1", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        MapConv("right_switch_indicator_light_mode", "select", mi="16.p.2", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        BaseConv("ambient_light", "switch", mi="17.p.1"), 
+    ]
+}, {
+    20809: ["LeMesh", "Scene Wireless Button S", "lemesh.remote.ts00"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD}),
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        MapConv("button_mode", "select", mi="5.p.1020", map={0: "Quick Single Click", 1: "Multiple Click"}),
+    ]
+}, {    
     9609: ["Bean", "Mesh Single Wall Switch (L)", "bean.switch.bl01"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
