@@ -1560,7 +1560,7 @@ DEVICES += [{
         MapConv("left_switch_indicator_light_mode", "select", mi="16.p.1", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
         MapConv("right_switch_indicator_light_mode", "select", mi="16.p.2", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
         BaseConv("ambient_light", "switch", mi="17.p.1"), 
-    ]
+    ],
 }, {
     20809: ["LeMesh", "Scene Wireless Button S", "lemesh.remote.ts00"],
     "spec": [
@@ -1570,7 +1570,7 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD}),
         BaseConv("battery", "sensor", mi="4.p.1003"),
         MapConv("button_mode", "select", mi="5.p.1020", map={0: "Quick Single Click", 1: "Multiple Click"}),
-    ]
+    ],
 }, {
     5480: ["Linptech", "Wireless Button", "linp.remote.k9b1"],
     "spec": [  
