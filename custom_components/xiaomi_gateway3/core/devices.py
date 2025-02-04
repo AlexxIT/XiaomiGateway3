@@ -1570,7 +1570,7 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD}),
         BaseConv("battery", "sensor", mi="4.p.1003"),
         MapConv("button_mode", "select", mi="5.p.1020", map={0: "Quick Single Click", 1: "Multiple Click"}),
-        ]
+    ]
 }, {
     5480: ["Linptech", "Wireless Button", "linp.remote.k9b1"],
     "spec": [  
