@@ -4272,9 +4272,15 @@ DEVICES += [{
 
 # Mesh groups
 DEVICES += [{
+    68286: ["Xiaomi", "Light Group", "mijia.light.group3"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1", entity={"icon": "mdi:lightbulb-group"}),  # bool
+        BrightnessConv("brightness", mi="2.p.2", max=100), 
+        ColorTempKelvin("color_temp", mi="2.p.3"),  # uint32, 2700..6500
+    ]
+}, {
     1047: ["Yeelight", "Classic Group", "yeelink.light.dn2grp"],
     1054: ["Yeelight", "Mesh Group", "yeelink.light.mb1grp"],
-    68286: ["Xiaomi", "Light Group", "mijia.light.group3"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1", entity={"icon": "mdi:lightbulb-group"}),  # bool
         BrightnessConv("brightness", mi="2.p.2", max=65535),  # uint16
