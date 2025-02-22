@@ -1680,6 +1680,16 @@ DEVICES += [{
         BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity=ENTITY_DISABLED),
     ],
 }, {
+    # https://home.miot-spec.com/spec/linp.motion.hs1bb2
+    20692: ["Linptech", "Motion Sensor 3", "HS3BB", "blt.3.1kgrbasoo4k03"],
+    "spec": [
+        # main sensors
+        ConstConv("motion", "binary_sensor", mi="2.e.1008", value=True),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        # other sensors
+        BaseConv("battery", "sensor", mi="3.p.1003"),  # uint8
+    ],
+}, {
     # https://home.miot-spec.com/spec/linp.sensor_occupy.es3
     # https://home.mi.com/views/introduction.html?model=linp.sensor_occupy.es2
     20731: ["Linptech", "Human Presence Sensor ES3", "ES3BB", "linp.sensor_occupy.es2"],
