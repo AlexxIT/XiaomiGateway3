@@ -4274,6 +4274,17 @@ DEVICES += [{
         BLEMapConv("door", "binary_sensor", mi=4111, map={"00": True, "01": False}),
     ],
 }, {
+    19733: ["Lemesh", "Color Temperature Lights Ultra", "lemesh.light.wy0d02"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "My Mode-Scenario 1", 17: "My Mode-Scenario 2", 18: "My Mode-Scenario 3", 19: "My Mode-Scenario 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
