@@ -4285,6 +4285,16 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
     ],
 }, {
+    # https://home.miot-spec.com/spec/ykcn.valve.cbcs
+    19951: ["YKCN", "Din-Rail Circuit Breaker", "ykcn.valve.cbcs"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.01),
+        MathConv("current", "sensor", mi="3.p.2", multiply=0.001),
+        MathConv("voltage", "sensor", mi="3.p.3", multiply=0.1),
+        MathConv("power", "sensor", mi="3.p.6", multiply=1),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
