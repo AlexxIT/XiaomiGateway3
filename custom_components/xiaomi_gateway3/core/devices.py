@@ -4295,6 +4295,34 @@ DEVICES += [{
         MathConv("power", "sensor", mi="3.p.6", multiply=1),
     ],
 }, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw3g03
+    19093: ["LeMesh", "Scene Mesh three key V2S version", "lemesh.switch.sw3g03"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("wireless_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state_3", "select", mi="4.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("wireless_2_3", "select", mi="4.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        BaseConv("led", "switch", mi=11.p.1"),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
