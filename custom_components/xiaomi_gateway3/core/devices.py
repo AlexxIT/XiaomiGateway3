@@ -4349,9 +4349,9 @@ DEVICES += [{
     # https://home.miot-spec.com/spec/lemesh.switch.sw3g01
     19816: ["LeMesh", "Scene Mesh one key V2S version", "lemesh.switch.sw3g01"],
     "spec": [
-        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel", "switch", mi="2.p.1"),
         # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
-        MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config 
         BaseConv("led", "switch", mi="11.p.1"),  # config
