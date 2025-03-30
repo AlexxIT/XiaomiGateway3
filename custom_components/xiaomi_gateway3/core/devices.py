@@ -4310,6 +4310,7 @@ DEVICES += [{
         # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         # MapConv("wireless_2_3", "select", mi="4.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
@@ -4334,6 +4335,7 @@ DEVICES += [{
         MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
@@ -4351,6 +4353,7 @@ DEVICES += [{
         # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
         MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config 
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
