@@ -4301,15 +4301,15 @@ DEVICES += [{
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
-        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
-        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
-        MapConv("wireless_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
         MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         MapConv("power_on_state_3", "select", mi="4.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
-        MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
-        MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
-        MapConv("wireless_2_3", "select", mi="4.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_3", "select", mi="4.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
@@ -4328,12 +4328,12 @@ DEVICES += [{
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
-        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
-        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
         MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
         MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
-        MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
-        MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
@@ -4348,9 +4348,9 @@ DEVICES += [{
     19816: ["LeMesh", "Scene Mesh one key V2S version", "lemesh.switch.sw3g01"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
-        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
         MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
-        MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
         BaseConv("led", "switch", mi="11.p.1"),  # config
         BaseConv("action", "sensor", entity=ENTITY_DISABLED),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
