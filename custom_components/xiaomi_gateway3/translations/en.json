@@ -31,7 +31,8 @@
         "data": {
           "host": "Host",
           "token": "Token",
-          "key": "Key"
+          "key": "Key",
+          "telnet_password": "Telnet Password"
         }
       }
     }
