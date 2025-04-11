@@ -2400,6 +2400,13 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.7", map={0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"})
     ]
 }, {
+    22809: ["seomsh", "星月影智能筒射灯", "wy0a01", "seomsh.light.wy0a01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
+    ]
+}, {
     17048: ["NOVO", "Smart curtain", "novo.curtain.k25"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "close", 1: "open", 2: "stop"}),
