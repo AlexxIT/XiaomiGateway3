@@ -1557,7 +1557,7 @@ DEVICES += [{
     5481: ["Linptech", "Wireless Button", "linp.remote.k9b11"],
     "spec": [
         # mibeacon2 spec
-        BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE, "000001": BUTTON_1_DOUBLE, "000002": BUTTON_1_HOLD, "010000": BUTTON_2_SINGLE, "010001": BUTTON_2_DOUBLE, "010002": BUTTON_2_HOLD}),
+        BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE, "000001": BUTTON_1_HOLD, "000002": BUTTON_1_DOUBLE, "010000": BUTTON_2_SINGLE, "010001": BUTTON_2_HOLD, "010002": BUTTON_2_DOUBLE}),
         BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),  # uint8
         # miot spec
         ConstConv("action", mi="2.e.1", value=BUTTON_1_SINGLE),
@@ -1678,6 +1678,16 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="3.p.1003", entity=ENTITY_LAZY),
         BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity=ENTITY_DISABLED),
         BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity=ENTITY_DISABLED),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/linp.motion.hs1bb2
+    20692: ["Linptech", "Motion Sensor 3", "HS3BB", "blt.3.1kgrbasoo4k03"],
+    "spec": [
+        # main sensors
+        ConstConv("motion", "binary_sensor", mi="2.e.1008", value=True),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        # other sensors
+        BaseConv("battery", "sensor", mi="3.p.1003"),  # uint8
     ],
 }, {
     # https://home.miot-spec.com/spec/linp.sensor_occupy.es3
@@ -1807,7 +1817,9 @@ DEVICES += [{
 }, {
     6281: ["Linptech", "Door/Window Sensor", "MS1BB", "linp.magnet.m1"],
     "spec": [
-        MapConv("contact", "binary_sensor", mi="2.p.1004", map={1: True, 2: False}),
+        MapConv("contact", "binary_sensor", mi="2.e.1018.p.1004", map={1: True, 2: False}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1019.p.1004", value=BUTTON_SINGLE),
         BaseConv("battery", "sensor", mi="3.p.1003"),
     ],
     # "ttl": "60m",
@@ -2371,6 +2383,17 @@ DEVICES += [{
         BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
         BoolConv("save_state", "switch", mi="5.p.1", entity=ENTITY_CONFIG),  # config
         MapConv("dimming", "select", mi="5.p.2", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),  # config
+    ]
+}, {
+    17687:  ["LeMesh", "Scene Mesh Light V2S Pro", "lemesh.light.wy0c24"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "My Mode-Scene 1", 17: "My Mode-Scene 2", 18: "My Mode-Scene 3", 19: "My Mode-Scene 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
     ]
 }, {
     10729: [None, "Mesh Light", "jymc.light.falmp"],
@@ -3175,6 +3198,60 @@ DEVICES += [{
         BaseConv("led", "switch", mi="5.p.1"),
     ],
 }, {
+    23308: ["Linptech", "Single Wall Switch T1", "linp.switch.t2dbw1"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MapConv("mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        BaseConv("led", "switch", mi="8.p.1"),
+        MathConv("brightness_white", "number", mi="10.p.3", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="10.p.4", min=0, max=100, entity=ENTITY_CONFIG),
+    ],
+}, {
+    23309: ["Linptech", "Double Wall Switch T1", "linp.switch.t2dbw2"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        BaseConv("led", "switch", mi="8.p.1"),
+        MathConv("brightness_white", "number", mi="10.p.3", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="10.p.4", min=0, max=100, entity=ENTITY_CONFIG),
+    ],
+}, {
+    23310: ["Linptech", "Triple Wall Switch T1", "linp.switch.t2dbw3"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+        BaseConv("led", "switch", mi="8.p.1"),
+        MathConv("brightness_white", "number", mi="10.p.3", min=0, max=100, entity=ENTITY_CONFIG),
+        MathConv("brightness_orange", "number", mi="10.p.4", min=0, max=100, entity=ENTITY_CONFIG),
+    ],
+}, {
     1350: ["Chuangmi", "Single Wall Switch K1-A (with N)", "chuangmi.switch.mesh"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
@@ -3507,6 +3584,36 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="6.p.3"),
     ]
 }, {
+    16400: ["SmartFrog", "V6 Double Wall Switch", "giot.switch.v62ksm"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("right_switch", "switch", mi="3.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="12.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="12.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="12.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="13.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="13.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="13.e.3", value=BUTTON_2_HOLD),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Normal",  1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("right_switch_mode", "select", mi="3.p.2", map={ 0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("power_on_state_left_switch", "select", mi="2.p.3", map={0: "Off", 1: "On", 2: "Default"}), 
+        MapConv("power_on_state_right_switch", "select", mi="3.p.3", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("left_switch_indicator_light_mode", "select", mi="16.p.1", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        MapConv("right_switch_indicator_light_mode", "select", mi="16.p.2", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        BaseConv("ambient_light", "switch", mi="17.p.1"), 
+    ]
+}, {
+    20809: ["LeMesh", "Scene Wireless Button S", "lemesh.remote.ts00"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_SINGLE}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_DOUBLE}),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_HOLD}),
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        MapConv("button_mode", "select", mi="5.p.1020", map={0: "Quick Single Click", 1: "Multiple Click"}),
+    ]
+}, {    
     9609: ["Bean", "Mesh Single Wall Switch (L)", "bean.switch.bl01"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
@@ -4185,6 +4292,14 @@ DEVICES += [{
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:090615-xw:1:0000C824
+    18736: ["PTX", "Human Body Presence Sensor (Top Mounted)", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        BaseConv("illuminance", "sensor", mi="2.p.5"),
+        BaseConv("light", "light", mi="5.p.1"),
+    ],
+}, {
     2448: [None, "Two-Button Switch ", "ydhome.switch.s2"],
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
@@ -4239,6 +4354,93 @@ DEVICES += [{
         BLEByteConv("battery", "sensor", mi=4106),
         BLEMapConv("lock", "binary_sensor", mi=4110, map={"00": True, "01": False}),  # reverse
         BLEMapConv("door", "binary_sensor", mi=4111, map={"00": True, "01": False}),
+    ],
+}, {
+    19733: ["Lemesh", "Color Temperature Lights Ultra", "lemesh.light.wy0d02"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "My Mode-Scenario 1", 17: "My Mode-Scenario 2", 18: "My Mode-Scenario 3", 19: "My Mode-Scenario 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
+        BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+    ],
+}, {
+    # https://home.miot-spec.com/spec/ykcn.valve.cbcs
+    19951: ["YKCN", "Din-Rail Circuit Breaker", "ykcn.valve.cbcs"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=0.01),
+        MathConv("current", "sensor", mi="3.p.2", multiply=0.001),
+        MathConv("voltage", "sensor", mi="3.p.3", multiply=0.1),
+        MathConv("power", "sensor", mi="3.p.6", multiply=1),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw3g03
+    19093: ["LeMesh", "Scene Mesh three key V2S version", "lemesh.switch.sw3g03"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state_3", "select", mi="4.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_3", "select", mi="4.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw3g02
+    19815: ["LeMesh", "Scene Mesh two key V2S version", "lemesh.switch.sw3g02"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        # MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        # MapConv("wireless_2_2", "select", mi="3.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+    ],
+}, {
+    # https://home.miot-spec.com/spec/lemesh.switch.sw3g01
+    19816: ["LeMesh", "Scene Mesh one key V2S version", "lemesh.switch.sw3g01"],
+    "spec": [
+        BaseConv("channel", "switch", mi="2.p.1"),
+        # MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),  # config
+        MapConv("power_on_state", "select", mi="2.p.5", map={1: "On", 2: "Off", 3: "Default"}),  # config
+        # MapConv("wireless_2_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless", 2: "Wireless", 3: "Wireless"}),  # config
+        MapConv("scene_speed", "select", mi="12.p.1", map={1: "Top Speed", 2:"Standard"}), #config 
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
     ],
 }, {
     "default": "mesh",  # default Mesh device
