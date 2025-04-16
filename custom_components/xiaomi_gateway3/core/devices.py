@@ -4351,6 +4351,52 @@ DEVICES += [{
         MathConv("power", "sensor", mi="3.p.6", multiply=1),
     ],
 }, {
+    #https://github.com/AlexxIT/XiaomiGateway3/issues/1581
+    13784: ["iCLICK", "Mi Bridge", "best.remote.mi001"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1",value="button_1_single"),
+        ConstConv("action", mi="2.e.2",value="button_1_double"),
+        ConstConv("action", mi="2.e.3",value="button_1_hold"),
+        ConstConv("action", mi="3.e.1",value="button_2_single"),
+        ConstConv("action", mi="3.e.2",value="button_2_double"),
+        ConstConv("action", mi="3.e.3",value="button_2_hold"),
+        ConstConv("action", mi="4.e.1",value="button_3_single"),
+        ConstConv("action", mi="4.e.2",value="button_3_double"),
+        ConstConv("action", mi="4.e.3",value="button_3_hold"),
+        ConstConv("action", mi="5.e.1",value="button_4_single"),
+        ConstConv("action", mi="5.e.2",value="button_4_double"),
+        ConstConv("action", mi="5.e.3",value="button_4_hold"),
+        ConstConv("action", mi="6.e.1",value="button_5_single"),
+        ConstConv("action", mi="6.e.2",value="button_5_double"),
+        ConstConv("action", mi="6.e.3",value="button_5_hold"),
+        ConstConv("action", mi="7.e.1",value="button_6_single"),
+        ConstConv("action", mi="7.e.2",value="button_6_double"),
+        ConstConv("action", mi="7.e.3",value="button_6_hold"),
+        ConstConv("action", mi="8.e.1",value="button_left_single"),
+        ConstConv("action", mi="8.e.2",value="button_left_double"),
+        ConstConv("action", mi="8.e.3",value="button_left_hold"),
+        ConstConv("action", mi="9.e.1",value="button_middle_single"),
+        ConstConv("action", mi="9.e.2",value="button_middle_double"),
+        ConstConv("action", mi="9.e.3",value="button_middle_hold"),
+        ConstConv("action", mi="10.e.1",value="button_right_single"),
+        ConstConv("action", mi="10.e.2",value="button_right_double"),
+        ConstConv("action", mi="10.e.3",value="button_right_hold"),
+        ConstConv("action", mi="11.e.1",value="button_up_single"),
+        ConstConv("action", mi="11.e.2",value="button_up_double"),
+        ConstConv("action", mi="11.e.3",value="button_up_hold"),
+        ConstConv("action", mi="12.e.1",value="button_down_single"),
+        ConstConv("action", mi="12.e.2",value="button_down_double"),
+        ConstConv("action", mi="12.e.3",value="button_down_hold"),
+        MapConv(
+            "scene",
+            "sensor",
+            mi="13.p.4",
+            map={0: "scene_00",1: "scene_01",2: "scene_02",3: "scene_03",4: "scene_04",5: "scene_05",6: "scene_06",7: "scene_07",8: "scene_08",9: "scene_09",10: "scene_10",11: "scene_11",12: "scene_12",13: "scene_13",14: "scene_14",15: "scene_15",16: "scene_16",17: "scene_17",18: "scene_18",19: "scene_19",20: "scene_20",21: "scene_21",22: "scene_22",23: "scene_23",24: "scene_24",25: "scene_25",26: "scene_26",27: "scene_27",28: "scene_28",29: "scene_29",30: "scene_30",31: "scene_31",32: "scene_32",33: "scene_33",34: "scene_34",35: "scene_35",36: "scene_36",37: "scene_37",38: "scene_38",39: "scene_39",40: "scene_40",41: "scene_41",42: "scene_42",43: "scene_43",44: "scene_44",45: "scene_45",46: "scene_46",47: "scene_47",48: "scene_48",49: "scene_49",
+                 50: "scene_50",51: "scene_51",52: "scene_52",53: "scene_53",54: "scene_54",55: "scene_55",56: "scene_56",57: "scene_57",58: "scene_58",59: "scene_59",60: "scene_60",61: "scene_61",62: "scene_62",63: "scene_63",64: "scene_64",65: "scene_65",66: "scene_66",67: "scene_67",68: "scene_68",69: "scene_69",70: "scene_70",71: "scene_71",72: "scene_72",73: "scene_73",74: "scene_74",75: "scene_75",76: "scene_76",77: "scene_77",78: "scene_78",79: "scene_79",80: "scene_80",81: "scene_81",82: "scene_82",83: "scene_83",84: "scene_84",85: "scene_85",86: "scene_86",87: "scene_87",88: "scene_88",89: "scene_89",90: "scene_90",91: "scene_91",92: "scene_92",93: "scene_93",94: "scene_94",95: "scene_95",96: "scene_96",97: "scene_97",98: "scene_98",99: "scene_99",100: "scene_100"}
+        )
+    ]
+},{
     # https://home.miot-spec.com/spec/lemesh.switch.sw3g03
     19093: ["LeMesh", "Scene Mesh three key V2S version", "lemesh.switch.sw3g03"],
     "spec": [
