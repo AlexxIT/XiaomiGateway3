@@ -1682,12 +1682,14 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec/linp.motion.hs1bb2
     20692: ["Linptech", "Motion Sensor 3", "HS3BB", "blt.3.1kgrbasoo4k03"],
+    # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
+    13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS", "xiaomi.motion.pir1"],
     "spec": [
-        # main sensors
         ConstConv("motion", "binary_sensor", mi="2.e.1008", value=True),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
-        # other sensors
-        BaseConv("battery", "sensor", mi="3.p.1003"),  # uint8
+        MathConv("no_motion_duration", "sensor", mi="2.p.1024",  entity={"enabled": False, "units": UNIT_SECONDS, "icon": "mdi:timer"}),
+        BaseConv("custom_no_motion_time", "sensor", mi="2.p.1053", entity={"units": UNIT_MINUTES, "icon": "mdi:timer"}),
+        BaseConv("battery", "sensor", mi="3.p.1003"),        
     ],
 }, {
     # https://home.miot-spec.com/spec/linp.sensor_occupy.es3
@@ -1703,17 +1705,6 @@ DEVICES += [{
         BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
         BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
         BoolConv("led", "binary_sensor", mi="3.p.1"),  # bool, config
-    ],
-}, {
-    # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
-    13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS", "xiaomi.motion.pir1"],
-    "spec": [
-        # miot format
-        ConstConv("motion", "binary_sensor", mi="2.e.1008", value=True),
-        BaseConv("illuminance", "sensor", mi="2.p.1005"),
-        BaseConv("battery", "sensor", mi="3.p.1003"),
-        BaseConv("idle_time", "sensor", mi="2.p.1024"),  # no-motion-duration
-        # BaseConv("idle_time", mi="2.p.1053"),  # custom-no-motion-time
     ],
 }, {
     8613: ["H+", "Double Wall Switch", "huca.switch.dh2"],
@@ -2080,6 +2071,21 @@ DEVICES += [{
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
     ],
     # "ttl": "6h"  # battery every 6 hours
+}, {
+    21003: ["Linptech", "Temperature Humidity Sensor KS2", "KS2BB", "linp.sensor_ht.ks2bb"],
+    "spec": [
+        # main sensors
+        BLEFloatConv("temperature", "sensor", mi=18433, round=1),  # float
+        BLEFloatConv("humidity", "sensor", mi=18440, round=1),  # float
+        BLEByteConv("battery", "sensor", mi=20483),  # uint8
+        MathConv("temperature", mi="2.p.1001", round=1),
+        MathConv("humidity", mi="2.p.1002", round=1),
+        BaseConv("battery", mi="4.p.1003", entity=ENTITY_LAZY),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1012", value=BUTTON_SINGLE),
+        ConstConv("action", mi="5.e.1013", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="5.e.1014", value=BUTTON_HOLD),
+    ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
     17825: [None, "Eight scene knob switch", "cxw.remote.ble006"],
@@ -3392,6 +3398,29 @@ DEVICES += [{
         BaseConv("backlight", "switch", mi="8.p.1"),
         BaseConv("led", "switch", mi="8.p.2"),
     ]
+}, {
+    # https://home.miot-spec.com/spec/linp.light.lx2bcw
+    23071: ["Linptech", "Linp Human presence smart light", "LP2", "linp.light.lx2bcw"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "TV", 2: "Reading", 3: "Computer", 4: "Guest", 5: "Entertainment", 6: "Lighting", 7: "Night Light", 8: "Warm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}, entity=ENTITY_CONFIG),
+        MathConv("light_off_gradient_time", "number", mi="2.p.10", min=0, max=10, entity={"category": "config", "enabled": False, "units": UNIT_SECONDS}),
+        MathConv("light_on_gradient_time", "number", mi="2.p.11", min=0, max=10, entity={"category": "config", "enabled": False, "units": UNIT_SECONDS}),
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
+        MathConv("no_one_determine_time", "number", mi="5.p.2", min=0, max=10000, entity={"category": "config", "units": UNIT_SECONDS}),
+        MathConv("has_one_duration", "sensor", mi="5.p.3", min=0, max=30, entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("no_one_duration", "sensor", mi="5.p.4", min=0, max=30, entity={"category": "diagnostic", "enabled": False, "units": UNIT_MINUTES}),
+        MathConv("illuminance", "sensor", mi="5.p.5", min=0, max=1000),
+        BaseConv("link_human_sensor", "switch", mi="4.p.2"),
+        MathConv("link_human_lux_threshold", "number", mi="4.p.3", min=0, max=1000, entity={"category": "config", "units": "lx"}),
+        MapConv("human_trigger_lv", "select", mi="4.p.4", map={0: "One Region", 1: "Two Region", 2: "Three Region"}, entity=ENTITY_CONFIG),
+        MapConv("sensitivity", "select", mi="6.p.6", map={0: "Low", 1: "Middle", 2: "High", 3: "User-defined"}, entity=ENTITY_CONFIG),
+        MapConv("radar_function_onoff", "select", mi="6.p.12", map={0: "RADAR ON", 1: "RADAR OFF"}),
+        MathConv("shielding_distance", "number", mi="6.p.2", min=0, max=255, entity={"category": "config", "enabled": False, "mode": "slider"}),
+    ],
 }, {
     # https://home.miot-spec.com/spec/linp.light.lp1bc
     19653: ["Linptech", "Human Presence-Sensing Flat Panel Light", "LP1", "linp.light.lp1bc"],
