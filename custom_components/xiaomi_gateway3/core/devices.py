@@ -1685,10 +1685,12 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1118
     13617: ["xiaomi", "Motion Sensor 2s", "XMPIRO25XS", "xiaomi.motion.pir1"],
     "spec": [
+        # main sensors
         ConstConv("motion", "binary_sensor", mi="2.e.1008", value=True),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
-        MathConv("no_motion_duration", "sensor", mi="2.p.1024",  entity={"enabled": False, "units": UNIT_SECONDS, "icon": "mdi:timer"}),
         BaseConv("custom_no_motion_time", "sensor", mi="2.p.1053", entity={"units": UNIT_MINUTES, "icon": "mdi:timer"}),
+        # other sensors
+        MathConv("no_motion_duration", "sensor", mi="2.p.1024",  entity={"enabled": False, "units": UNIT_SECONDS, "icon": "mdi:timer"}),
         BaseConv("battery", "sensor", mi="3.p.1003"),        
     ],
 }, {
