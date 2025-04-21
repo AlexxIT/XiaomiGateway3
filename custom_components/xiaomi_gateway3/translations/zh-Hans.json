@@ -72,8 +72,57 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "ble": {
+        "name": "BLE"
+      },
+      "contact": {
+        "name": "Contact"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "gateway": {
+        "name": "Gateway"
+      },
+      "latch": {
+        "name": "Latch"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "pressure": {
+        "name": "压力"
+      },
+      "reverse": {
+        "name": "Reverse"
+      },
+      "square": {
+        "name": "Square"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "light": {
+      "led": {
+        "name": "LED"
+      }
+    },
+    "number": {
+      "blind_time": {
+        "name": "Blind Time"
+      }
+    },
     "select": {
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
       "command": {
+        "name": "Command",
         "state": {
           "pair": "Zigbee配对",
           "bind": "Zigbee绑定",
@@ -88,6 +137,7 @@
         }
       },
       "data": {
+        "name": "Data",
         "state": {
           "enabled": "已启用",
           "disabled": "已禁用",
@@ -106,6 +156,148 @@
           "original": "原始固件",
           "custom": "自定义固件"
         }
+      },
+      "display_unit": {
+        "name": "显示单位"
+      },
+      "mode": {
+        "name": "模式"
+      },
+      "mode_n": {
+        "name": "模式 {n}"
+      },
+      "motor_speed": {
+        "name": "Motor Speed"
+      },
+      "power_on_state": {
+        "name": "断电后通电状态"
+      },
+      "power_on_state_n": {
+        "name": "第{n}路断电后通电状态"
+      },
+      "sensitivity": {
+        "name": "灵敏度"
+      }
+    },
+    "sensor": {
+      "action": {
+        "name": "Action"
+      },
+      "battery_original": {
+        "name": "Battery Original"
+      },
+      "battery_voltage": {
+        "name": "电池电压"
+      },
+      "ble": {
+        "name": "BLE"
+      },
+      "chip_temperature": {
+        "name": "芯片温度"
+      },
+      "conductivity": {
+        "name": "电导率"
+      },
+      "e_co2": {
+        "name": "eCO2"
+      },
+      "fault": {
+        "name": "Fault"
+      },
+      "formaldehyde": {
+        "name": "甲醛"
+      },
+      "gas_density": {
+        "name": "Gas Density"
+      },
+      "idle_time": {
+        "name": "Idle Time"
+      },
+      "mesh": {
+        "name": "Mesh"
+      },
+      "power": {
+        "name": "功率"
+      },
+      "power_consumption": {
+        "name": "功耗"
+      },
+      "rssi": {
+        "name": "RSSI"
+      },
+      "smoke_density": {
+        "name": "Smoke Density"
+      },
+      "supply": {
+        "name": "Supply"
+      },
+      "tvoc": {
+        "name": "TVOC"
+      },
+      "zigbee": {
+        "name": "Zigbee"
+      }
+    },
+    "switch": {
+      "alarm_trigger": {
+        "name": "Alarm Trigger"
+      },
+      "backlight": {
+        "name": "Backlight"
+      },
+      "backlight_n": {
+        "name": "Backlight {n}"
+      },
+      "channel": {
+        "name": "开关"
+      },
+      "channel_n": {
+        "name": "第{n}路开关"
+      },
+      "charge_protect": {
+        "name": "Charge Protect"
+      },
+      "child_lock": {
+        "name": "童锁"
+      },
+      "fan": {
+        "name": "风扇"
+      },
+      "flex_switch": {
+        "name": "Flex Switch"
+      },
+      "led": {
+        "name": "LED"
+      },
+      "led_reverse": {
+        "name": "LED反转"
+      },
+      "mode": {
+        "name": "Mode"
+      },
+      "motor_reverse": {
+        "name": "电机反转"
+      },
+      "outlet": {
+        "name": "插座"
+      },
+      "plug": {
+        "name": "插座"
+      },
+      "power_off_memory": {
+        "name": "断电记忆"
+      },
+      "switch": {
+        "name": "开关"
+      },
+      "switch_n": {
+        "name": "第{n}路开关"
+      },
+      "wireless": {
+        "name": "转无线开关"
+      },
+      "wireless_n": {
+        "name": "第{n}路转无线开关"
       }
     }
   }
