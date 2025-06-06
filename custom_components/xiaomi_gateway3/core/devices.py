@@ -4064,6 +4064,28 @@ DEVICES += [{
         ConstConv("action", mi="4.e.4", value="Nobody Move"),
     ],
 }, {
+    # https://home.miot-spec.com/spec/xiaomi.diffuser.xw2iv
+    20199: ["Xiaomi", "Xiaomi Smart Scent Diffuser", "xiaomi.diffuser.xw2iv"],
+    "spec": [
+        BaseConv("diffuser", "switch", mi="2.p.2"),
+        MathConv("fragrance_duration", "number", mi="2.p.3", min=2, max=6, step=1, entity={"units": UNIT_SECONDS}),
+        MathConv("fragrance_interval", "number", mi="2.p.4", min=10, max=20, step=5, entity={"units": UNIT_MINUTES}),
+        # Ambient Light
+        BaseConv("ambient_light", "light", mi="3.p.1"),
+        BrightnessConv("brightness", mi="3.p.2", max=100),
+        MathConv("color", "number", mi="3.p.3", min=1, max=16777215),
+        BoolConv("auto_fragrance", "switch", mi="4.p.1"),
+        # Battery
+        BaseConv("battery", "sensor", mi="5.p.1"),
+        MapConv("charging_state", "sensor", mi="5.p.2", map={1: "Charging", 2: "Not Charging", 3: "Not Chargeable"}),
+        # Actions
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1", value="Auto Light"),
+        ConstConv("action", mi="4.e.2", value="Auto Fragrance"),
+        ConstConv("action", mi="4.e.3", value="Someone Move"),
+        ConstConv("action", mi="4.e.4", value="Nobody Move"),
+    ],
+}, {
     20066: [None, "Mesh Light", "yankon.light.ykmesh"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
