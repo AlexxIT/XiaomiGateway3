@@ -4508,6 +4508,18 @@ DEVICES += [{
         BaseConv("target_position", mi="2.p.2"),  # percentage, 0..100
         CurtainPosConv("position"),
     ],
+},{
+    8038: ["Panasonic", "Panasonic Ceiling Fan Light", "pmfbj.light.lz8321"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("light_mode", "select", mi="2.p.4", map={0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"}),
+        BaseConv("fan", "switch", mi="3.p.1"),  # uint8, config
+        MapConv("speed", "select", mi="3.p.2", map={1: "Level1", 2: "Level2", 3: "Level3", 4: "Level4"}),  # config
+        BaseConv("reverse", "switch", mi="3.p.12"),  # uint8, config
+        MapConv("switch_mode", "select", mi="4.p.1", map={1: "Mode1", 2: "Mode2"}),  # config
+    ],
 }]
 
 # Matter
