@@ -2173,6 +2173,16 @@ DEVICES += [{
         BaseConv("has-someone-duration", "sensor", mi="2.p.1080")
     ]
 }, {
+    22888: ["Xiaomi", "Double Wall Button", "xiaomi.remote.mcn002"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.2", map={0: BUTTON_1_SINGLE, 1: BUTTON_2_SINGLE, 2: BUTTON_BOTH_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.2", map={0: BUTTON_1_DOUBLE, 1: BUTTON_2_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.2", map={0: BUTTON_1_HOLD, 1: BUTTON_2_HOLD}),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        ConstConv("low_bat", "sensor", mi="3.e.1001", value="low_battery"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
