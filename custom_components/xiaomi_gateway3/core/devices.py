@@ -4497,6 +4497,16 @@ DEVICES += [{
         MapConv("switch_mode", "select", mi="4.p.1", map={1: "Mode1", 2: "Mode2"}),  # config
     ],
 }, {
+    22777: ["Xiaomi", "Xiaomi Smart Wall Outlet", "XMZNCZ02LM", "xiaomi.plug.mcn004"],
+    "spec": [
+        BaseConv("outlet", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=1, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=0),
+        BoolConv("power_consumption_accumulation_way", "binary_sensor", mi="3.p.3"),
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8, config
+        MapConv("power_on_state", "select", mi="2.p.2", map={0: "Default", 1: "Off", 2: "On"}),  # config
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
