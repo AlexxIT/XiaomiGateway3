@@ -2201,6 +2201,16 @@ DEVICES += [{
         BaseConv("has-someone-duration", "sensor", mi="2.p.1080")
     ]
 }, {
+    22888: ["Xiaomi", "Double Wall Button", "xiaomi.remote.mcn002"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.2", map={0: BUTTON_1_SINGLE, 1: BUTTON_2_SINGLE, 2: BUTTON_BOTH_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.2", map={0: BUTTON_1_DOUBLE, 1: BUTTON_2_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.2", map={0: BUTTON_1_HOLD, 1: BUTTON_2_HOLD}),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        ConstConv("low_bat", "sensor", mi="3.e.1001", value="low_battery"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
@@ -4511,6 +4521,28 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
         ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+    ],
+}, {
+    8038: ["Panasonic", "Panasonic Ceiling Fan Light", "pmfbj.light.lz8321"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("light_mode", "select", mi="2.p.4", map={0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"}),
+        BaseConv("fan", "switch", mi="3.p.1"),  # uint8, config
+        MapConv("speed", "select", mi="3.p.2", map={1: "Level1", 2: "Level2", 3: "Level3", 4: "Level4"}),  # config
+        BaseConv("reverse", "switch", mi="3.p.12"),  # uint8, config
+        MapConv("switch_mode", "select", mi="4.p.1", map={1: "Mode1", 2: "Mode2"}),  # config
+    ],
+}, {
+    22777: ["Xiaomi", "Xiaomi Smart Wall Outlet", "XMZNCZ02LM", "xiaomi.plug.mcn004"],
+    "spec": [
+        BaseConv("outlet", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=1, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=0),
+        BoolConv("power_consumption_accumulation_way", "binary_sensor", mi="3.p.3"),
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8, config
+        MapConv("power_on_state", "select", mi="2.p.2", map={0: "Default", 1: "Off", 2: "On"}),  # config
     ],
 }, {
     "default": "mesh",  # default Mesh device
