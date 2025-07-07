@@ -1232,6 +1232,34 @@ DEVICES += [{
         ZBatteryPercConv("battery", "sensor"),
     ],
 }, {
+    "SNZB-01P": ["Sonoff", "Button", "SNZB-01P"],
+    "spec": [
+        ZSonoffButtonConv("action", "sensor", bind=True),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-04P": ["Sonoff", "Door/Window Sensor", "SNZB-04P"],
+    # tamper is not implemented
+    "spec": [
+        ZIASZoneConv("contact", "binary_sensor"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-02LD": ["Sonoff", "Temperature Sensor", "SNZB-02LD"],
+    # temperature_calibration is not implemented
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 20"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-02WD": ["Sonoff", "TH Sensor", "SNZB-02WD"],
+    # temperature_calibration and humidity_calibration are not implemented
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 20"),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
