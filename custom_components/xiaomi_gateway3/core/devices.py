@@ -1260,6 +1260,19 @@ DEVICES += [{
         ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
     ],
 }, {
+    "S60ZBTPF": ["Sonoff", "Smart Plug", "S60ZBTPF"],
+    # Initial support for S60ZBTPF
+    # Energy-related data is only updated when the switch is turned on — possibly a device firmware-related issue
+    # This device does not provide a total energy sensor; only "yesterday", "today", and "month" energy values are available (not yet implemented)
+    # Many other features are also not implemented
+    "spec": [
+        ZOnOffConv("plug", "switch", report="0s 5m 0"),
+        ZCurrentConv("current", "sensor", report="12s 57m 10"),
+        ZPowerConv("power", "sensor", report="10s 10m 3"),
+        ZVoltageConv("voltage", "sensor", report="11s 55m 10", multiply=0.01), # need changes in ZVoltageConv class
+        ZPowerOnConv("power_on_state", "select")
+    ],
+}, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
