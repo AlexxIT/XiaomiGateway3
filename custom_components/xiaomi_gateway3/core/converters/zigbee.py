@@ -216,7 +216,8 @@ class ZTransitionConv(BaseConv):
         payload[self.attr] = value
 
 
-class ZVoltageConv(ZConverter):
+@dataclass
+class ZVoltageConv(ZMathConv):
     cluster_id = ElectricalMeasurement.cluster_id
     attr_id = ElectricalMeasurement.AttributeDefs.rms_voltage.id
 
