@@ -58,7 +58,7 @@ class ShellBase:
 
     async def reboot(self):
         # should not wait for response
-        self.writer.write(b"reboot\n")
+        self.writer.write(b"reboot\r\n")
         await self.writer.drain()
         # have to wait or the magic won't happen
         await asyncio.sleep(1)

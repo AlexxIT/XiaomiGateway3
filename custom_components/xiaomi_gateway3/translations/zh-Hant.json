@@ -4,7 +4,7 @@
       "no_servers": "請至少選擇一個伺服器",
       "cant_login": "無法登入，請確認使用者名稱與密碼",
       "cant_connect": "無法連線至網關",
-	    "no_key": "因網關韌體缺少金鑰(Key)而無法支援",
+      "no_key": "因網關韌體缺少金鑰(Key)而無法支援",
       "wrong_model": "網關型號不支援",
       "wrong_token": "網關Token錯誤",
       "wrong_telnet": "開啟 Telnet 指令錯誤",
@@ -64,8 +64,8 @@
         "data": {
           "host": "網關IP",
           "token": "Token",
-          "key": "Key",          
-          "telnet_cmd": "開啟Telnet指令",          
+          "key": "Key",
+          "custom_password": "自訂Telnet密碼",
           "ble": "支援的藍牙裝置",
           "stats": "新增統計資料感測器",
           "debug": "偵錯日誌"
@@ -92,10 +92,10 @@
     "select": {
       "command": {
         "state": {
-          "info": "裝置資訊",	
-          "update": "裝置更新",		  
+          "info": "裝置資訊",
+          "update": "裝置更新",
           "pair": "Zigbee配對",
-          "force_pair": "Zigbee強制配對",		  
+          "force_pair": "Zigbee強制配對",
           "bind": "Zigbee绑定",
           "ota": "Zigbee OTA",
           "reconfig": "Zigbee重新設定",
@@ -108,7 +108,7 @@
           "disable": "網關停用",
           "enable": "網關啟用",
           "rejoin": "Zigbee重新加入",
-          "remove": "Zigbee刪除"		  
+          "remove": "Zigbee刪除"
         }
       },
       "data": {
