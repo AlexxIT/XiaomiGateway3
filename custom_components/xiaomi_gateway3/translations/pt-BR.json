@@ -48,7 +48,7 @@
         "data": {
           "host": "Host",
           "token": "Token",
-          "telnet_cmd": "Abra o comando Telnet",
+          "custom_password": "Senha customizada do Telnet",
           "ble": "Suporta dispositivos Bluetooth",
           "stats": "Adicionar sensores estatísticos",
           "debug": "Debug"
