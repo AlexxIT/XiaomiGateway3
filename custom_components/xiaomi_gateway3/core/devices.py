@@ -4558,6 +4558,29 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.2", map={0: "Default", 1: "Off", 2: "On"}),  # config
     ],
 }, {
+    25137: ["Linptech", "Human Presence Downlight", "LD6B-CW-T8R", "linp.light.ld6bcw"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "TV", 2: "Reading", 3: "Computer", 4: "Hospitality", 5: "Entertainment", 6: "Lighting", 7: "Night light", 8: "Warmth"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
+        BaseConv("occupancy_status", "sensor", mi="5.p.1", entity=ENTITY_DIAGNOSTIC),
+        BaseConv("no_one_duration", "sensor", mi="5.p.2"),
+        BaseConv("has_someone_duration", "sensor", mi="2.p.3"),
+        BaseConv("illuminance", "sensor", mi="5.p.5"),
+    ],
+}, {
+    25417: ["Linptech", "Smart Downlight", "LD6B-CW-T8", "linp.light.ld5bcw"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "TV", 2: "Reading", 3: "Computer", 4: "Hospitality", 5: "Entertainment", 6: "Lighting", 7: "Night light", 8: "Warmth"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
