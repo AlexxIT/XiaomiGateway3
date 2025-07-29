@@ -1372,6 +1372,13 @@ DEVICES += [{
         ZBatteryPercConv("battery", "sensor", multiply=1.0),
     ],
 }, {
+    "MHO-C401N-z": ["Xiaomi", "ZenMeasure TH", "MHO-C401N"],
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 100"),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
     "default": "zigbee",  # default zigbee device
     "spec": [
         ZModelConv("model", "sensor", entity={"category": "diagnostic", "icon": "mdi:information", "lazy": True}),
