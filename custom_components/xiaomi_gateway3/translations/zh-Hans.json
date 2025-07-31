@@ -30,7 +30,8 @@
         "data": {
           "host": "网关IP",
           "token": "Token",
-          "key": "Key"
+          "key": "Key",
+          "telnet_password": "Telnet密码"
         }
       }
     }
