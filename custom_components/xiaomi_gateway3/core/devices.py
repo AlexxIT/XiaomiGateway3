@@ -3864,6 +3864,19 @@ DEVICES += [{
         MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200, step=1, round=1, entity=ENTITY_CONFIG)
     ]
 }, {
+    16401: ["GranwinIoT", "V6 Intelligent One-way Switch(Mesh)", "giot.switch.v61ksm"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        # MapConv("mode", "select", mi="2.p.2", map={0: "Normal mode", 1: "Wireless switch", 2: "Agile switch", 3: "Jog switch"}),
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "OFF", 1: "ON", 2: "Last State"}),
+        # MapConv("indicator_normal_led", "select", mi="16.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally OFF", 3: "Normally ON"}),
+        # MapConv("indicator_not_normal_led", "select", mi="16.p.2", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally OFF", 3: "Normally ON"}),
+        # MathConv("indicator_brightness", "number", mi="16.p.3", min=1, max=100, step=1, entity=ENTITY_CONFIG),
+        # BoolConv("ambient_light_switch_status", "switch", mi="17.p.1"),
+        # MathConv("ambient_light_brightness", "number", mi="17.p.2", min=1, max=100, step=1, entity=ENTITY_CONFIG),
+        # BoolConv("parameter", "switch", mi="18.p.2"),
+    ]
+}, {
     13139: ["GranwinIoT", "Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
