@@ -15,12 +15,14 @@ from .shell.session import Session
 _LOGGER = logging.getLogger(__name__)
 
 
-async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
+async def update_zigbee_firmware(
+    hass: HomeAssistant, host: str, custom: bool, custom_password: str | None
+):
     tar_fw = "6.7.10.0" if custom else "6.6.2.0"
 
     _LOGGER.info(f"{host} [FWUP] Target zigbee firmware v{tar_fw}")
 
-    session = Session(host)
+    session = Session(host, custom_password)
 
     try:
         await session.connect()
