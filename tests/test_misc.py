@@ -5,6 +5,7 @@ from bellows.uart import Gateway
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 
 from custom_components.xiaomi_gateway3.core.converters.base import BaseConv
+from custom_components.xiaomi_gateway3.core.devices import DEVICES
 
 
 def test_bellows():
@@ -59,3 +60,13 @@ def test_copy():
     conv2 = copy.copy(conv1)
     conv2.domain = "light"
     assert conv1.domain != conv2.domain
+
+
+def test_unique_models():
+    models = set()
+    for device in DEVICES:
+        for model in device.keys():
+            if model in ("default", "spec", "support", "ttl"):
+                continue
+            assert model not in models, model
+            models.add(model)
