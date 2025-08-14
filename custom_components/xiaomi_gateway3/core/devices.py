@@ -2239,6 +2239,26 @@ DEVICES += [{
         ConstConv("low_bat", "sensor", mi="3.e.1001", value="low_battery"),
     ],
 }, {
+    # https://github.com/AlexxIT/XiaomiGateway3/issues/1636
+    18628: ["Xiaomi", "Smart Door Lock E30", "loock.lock.h01lyk"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        # lock events
+        MapConv("position", mi="2.e.1020.p.1", map={1: "indoor", 2: "outdoor", 3: "unknown"}),
+        MapConv("method", mi="2.e.1020.p.2", map={1: "mobile", 2: "password", 3: "fingerprint", 4: "nfc", 8: "key", 9: "one_time_password", 10: "periodic_password", 12: "coerce", 14: "turntable", 15: "manual", 16: "auto", 20: "member"}),
+        MapConv("action", mi="2.e.1020.p.3", map={1: "lock", 2: "unlock", 3: "lock_outside", 8: "enable_away", 9: "disable_away", 10: "add_object", 11: "delete_object", 12: "add_object", 13: "delete_object", 14: "cannel_share"}),
+        BaseConv("method_id", mi="2.e.1020.p.2"),
+        BaseConv("action_id", mi="2.e.1020.p.3"),
+        BaseConv("key_id", mi="2.e.1020.p.4"),
+        BaseConv("timestamp", mi="2.e.1020.p.5"),
+        # exceptions
+        BaseConv("error", mi="2.e.1007.p.6"),
+        # others
+        MapConv("door", "sensor", mi="3.p.1021", map={16: "locked", 32: "unlocked", 64: "ajar"}),
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        ConstConv("action", mi="5.e.1006", value="doorbell"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
