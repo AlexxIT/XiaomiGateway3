@@ -2334,6 +2334,7 @@ DEVICES += [{
     4945: ["PTX", "Mesh Lightstrip", "090615.light.mdd02"],
     7057: ["PTX", "Mesh Light", "090615.light.cxlg01"],
     15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
+    18776: ["PTX", "Mesh Downlight", "090615.light.milg05"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
@@ -2486,6 +2487,13 @@ DEVICES += [{
         BrightnessConv("brightness", mi="2.p.2", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
         MapConv("mode", "select", mi="2.p.7", map={0: "WY", 4: "Lighting", 5: "Night Light", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep", 16: "Mode-1", 17: "Mode-2", 18: "Mode-3", 19: "Mode-4"})
+    ]
+}, {
+    22809: ["seomsh", "星月影智能筒射灯", "wy0a01", "seomsh.light.wy0a01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
     ]
 }, {
     17048: ["NOVO", "Smart curtain", "novo.curtain.k25"],
@@ -4122,6 +4130,27 @@ DEVICES += [{
         BaseConv("occupy", "binary_sensor", mi="11.p.11"),
     ],
 }, {
+    15864: ["Linptech", "Linptech Wall Switch E2", "linp.switch.e2db3"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+        BaseConv("occupy", "binary_sensor", mi="10.p.13"),
+    ],
+}, {
     16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
@@ -4263,14 +4292,11 @@ DEVICES += [{
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
         BaseConv("action", "sensor"),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
-        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
-        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_HOLD),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
-        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
-        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_HOLD),
         ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
-        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
-        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_HOLD),
     ],
 }, {
     17944: ["PTX", "PTX Wall Switch", "090615.switch.akpro2"],
