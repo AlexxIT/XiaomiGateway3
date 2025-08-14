@@ -4556,6 +4556,25 @@ DEVICES += [{
         ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
     ],
 }, {
+    # https://home.miot-spec.com/spec/xiaomi.switch.w2
+    21607: ["Xiaomi", "Xiaomi Smart Wall Switch (2 Gang)", "XMS01BXS", "xiaomi.switch.w2"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_2_HOLD),
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("indicator_light", "switch", mi="7.p.1"),
+        MapConv("switch_mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("switch_mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("sensor_mode_1", "select", mi="4.p.1", map={0: "Quick Singel Click", 1: "Multiple Click"}),
+        MapConv("sensor_mode_2", "select", mi="5.p.1", map={0: "Quick Singel Click", 1: "Multiple Click"}),
+    ],
+}, {
     8038: ["Panasonic", "Panasonic Ceiling Fan Light", "pmfbj.light.lz8321"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
