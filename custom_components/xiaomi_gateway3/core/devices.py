@@ -1232,6 +1232,47 @@ DEVICES += [{
         ZBatteryPercConv("battery", "sensor"),
     ],
 }, {
+    "SNZB-01P": ["Sonoff", "Button", "SNZB-01P"],
+    "spec": [
+        ZSonoffButtonConv("action", "sensor", bind=True),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-04P": ["Sonoff", "Door/Window Sensor", "SNZB-04P"],
+    # tamper is not implemented
+    "spec": [
+        ZIASZoneConv("contact", "binary_sensor"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-02LD": ["Sonoff", "Temperature Sensor", "SNZB-02LD"],
+    # temperature_calibration is not implemented
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 20"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "SNZB-02WD": ["Sonoff", "TH Sensor", "SNZB-02WD"],
+    # temperature_calibration and humidity_calibration are not implemented
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 20"),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
+    ],
+}, {
+    "S60ZBTPF": ["Sonoff", "Smart Plug", "S60ZBTPF"],
+    # Initial support for S60ZBTPF
+    # Energy-related data is only updated when the switch is turned on — possibly a device firmware-related issue
+    # This device does not provide a total energy sensor; only "yesterday", "today", and "month" energy values are available (not yet implemented)
+    # Many other features are also not implemented
+    "spec": [
+        ZOnOffConv("plug", "switch", report="0s 5m 0"),
+        ZCurrentConv("current", "sensor", report="12s 57m 10"),
+        ZPowerConv("power", "sensor", report="10s 10m 3"),
+        ZVoltageConv("voltage", "sensor", report="11s 55m 10", multiply=0.01), # need changes in ZVoltageConv class
+        ZPowerOnConv("power_on_state", "select")
+    ],
+}, {
     "SML001": ["Philips", "Hue motion sensor", "9290012607"],
     "support": 4,  # @AlexxIT TODO: sensitivity, led
     "spec": [
@@ -1329,6 +1370,13 @@ DEVICES += [{
         ZLifeControlECO2("eco_two", "sensor"),
         ZLifeControlVOC("tvoc", "sensor"),
         ZBatteryPercConv("battery", "sensor", multiply=1.0),
+    ],
+}, {
+    "MHO-C401N-z": ["Xiaomi", "ZenMeasure TH", "MHO-C401N"],
+    "spec": [
+        ZTemperatureConv("temperature", "sensor", report="10s 1h 100"),
+        ZHumidityConv("humidity", "sensor", report="10s 1h 100"),
+        ZBatteryPercConv("battery", "sensor", report="1h 12h 0", multiply=0.5),
     ],
 }, {
     "default": "zigbee",  # default zigbee device
@@ -2172,6 +2220,16 @@ DEVICES += [{
         BaseConv("no-one-duration", "sensor", mi="2.p.1079"),
         BaseConv("has-someone-duration", "sensor", mi="2.p.1080")
     ]
+}, {
+    22888: ["Xiaomi", "Double Wall Button", "xiaomi.remote.mcn002"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.2", map={0: BUTTON_1_SINGLE, 1: BUTTON_2_SINGLE, 2: BUTTON_BOTH_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.2", map={0: BUTTON_1_DOUBLE, 1: BUTTON_2_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.2", map={0: BUTTON_1_HOLD, 1: BUTTON_2_HOLD}),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        ConstConv("low_bat", "sensor", mi="3.e.1001", value="low_battery"),
+    ],
 }, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
@@ -3806,6 +3864,19 @@ DEVICES += [{
         MathConv("inching_time", "number", mi="3.p.2", multiply=0.5, min=1, max=7200, step=1, round=1, entity=ENTITY_CONFIG)
     ]
 }, {
+    16401: ["GranwinIoT", "V6 Intelligent One-way Switch(Mesh)", "giot.switch.v61ksm"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        # MapConv("mode", "select", mi="2.p.2", map={0: "Normal mode", 1: "Wireless switch", 2: "Agile switch", 3: "Jog switch"}),
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "OFF", 1: "ON", 2: "Last State"}),
+        # MapConv("indicator_normal_led", "select", mi="16.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally OFF", 3: "Normally ON"}),
+        # MapConv("indicator_not_normal_led", "select", mi="16.p.2", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally OFF", 3: "Normally ON"}),
+        # MathConv("indicator_brightness", "number", mi="16.p.3", min=1, max=100, step=1, entity=ENTITY_CONFIG),
+        # BoolConv("ambient_light_switch_status", "switch", mi="17.p.1"),
+        # MathConv("ambient_light_brightness", "number", mi="17.p.2", min=1, max=100, step=1, entity=ENTITY_CONFIG),
+        # BoolConv("parameter", "switch", mi="18.p.2"),
+    ]
+}, {
     13139: ["GranwinIoT", "Two-Button Switch (Mesh) V5", "giot.switch.v52ksm"],
     "spec": [
         BaseConv("left_switch", "switch", mi="2.p.1"),
@@ -4502,6 +4573,51 @@ DEVICES += [{
         MapConv("switch_mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
         MapConv("sensor_mode_1", "select", mi="4.p.1", map={0: "Quick Singel Click", 1: "Multiple Click"}),
         MapConv("sensor_mode_2", "select", mi="5.p.1", map={0: "Quick Singel Click", 1: "Multiple Click"}),
+    ],
+}, {
+    8038: ["Panasonic", "Panasonic Ceiling Fan Light", "pmfbj.light.lz8321"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("light_mode", "select", mi="2.p.4", map={0: "Default", 1: "Daily", 2: "Leisure", 3: "Comfortable", 4: "Night", 5: "SY"}),
+        BaseConv("fan", "switch", mi="3.p.1"),  # uint8, config
+        MapConv("speed", "select", mi="3.p.2", map={1: "Level1", 2: "Level2", 3: "Level3", 4: "Level4"}),  # config
+        BaseConv("reverse", "switch", mi="3.p.12"),  # uint8, config
+        MapConv("switch_mode", "select", mi="4.p.1", map={1: "Mode1", 2: "Mode2"}),  # config
+    ],
+}, {
+    22777: ["Xiaomi", "Xiaomi Smart Wall Outlet", "XMZNCZ02LM", "xiaomi.plug.mcn004"],
+    "spec": [
+        BaseConv("outlet", "switch", mi="2.p.1"),
+        MathConv("energy", "sensor", mi="3.p.1", multiply=1, round=2),
+        MathConv("power", "sensor", mi="3.p.2", round=0),
+        BoolConv("power_consumption_accumulation_way", "binary_sensor", mi="3.p.3"),
+        BoolConv("led", "switch", mi="4.p.1"),  # uint8, config
+        MapConv("power_on_state", "select", mi="2.p.2", map={0: "Default", 1: "Off", 2: "On"}),  # config
+    ],
+}, {
+    25137: ["Linptech", "Human Presence Downlight", "LD6B-CW-T8R", "linp.light.ld6bcw"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "TV", 2: "Reading", 3: "Computer", 4: "Hospitality", 5: "Entertainment", 6: "Lighting", 7: "Night light", 8: "Warmth"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("occupancy", "binary_sensor", mi="5.p.1"),
+        BaseConv("occupancy_status", "sensor", mi="5.p.1", entity=ENTITY_DIAGNOSTIC),
+        BaseConv("no_one_duration", "sensor", mi="5.p.2"),
+        BaseConv("has_someone_duration", "sensor", mi="2.p.3"),
+        BaseConv("illuminance", "sensor", mi="5.p.5"),
+    ],
+}, {
+    25417: ["Linptech", "Smart Downlight", "LD6B-CW-T8", "linp.light.ld5bcw"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "TV", 2: "Reading", 3: "Computer", 4: "Hospitality", 5: "Entertainment", 6: "Lighting", 7: "Night light", 8: "Warmth"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
     ],
 }, {
     "default": "mesh",  # default Mesh device
