@@ -56,8 +56,8 @@ class MiCloud:
 
     async def login(self, username: str, password: str) -> bool:
         try:
-            payload = await self._login_step1()
-            data = await self._login_step2(username, password, payload)
+            #payload = await self._login_step1()
+            data = await self._login_step2(username, password)
             self.verify = data.get("notificationUrl")
             if not data["location"]:
                 return False
@@ -90,7 +90,8 @@ class MiCloud:
             k: v for k, v in resp.items() if k in ("sid", "qs", "callback", "_sign")
         }
 
-    async def _login_step2(self, username: str, password: str, payload: dict) -> dict:
+    async def _login_step2(self, username: str, password: str) -> dict:
+        payload = {}
         payload["user"] = username
         payload["hash"] = hashlib.md5(password.encode()).hexdigest().upper()
 
@@ -108,7 +109,7 @@ class MiCloud:
 
     async def _login_step3(self, location) -> str:
         r = await self.session.get(location, headers={"User-Agent": UA})
-        service_token = r.cookies["serviceToken"].value
+        service_token = r.cookies.get("serviceToken")
         _LOGGER.debug(f"MiCloud step3")
         return service_token
 
