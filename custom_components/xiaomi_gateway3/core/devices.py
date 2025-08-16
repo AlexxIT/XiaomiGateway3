@@ -4523,14 +4523,30 @@ DEVICES += [{
     ],
 }, {
     19733: ["Lemesh", "Color Temperature Lights Ultra", "lemesh.light.wy0d02"],
+    23517: [None, "ZB Mesh Light MESH2.0", "zbmesh.light.wy0a02"],
     "spec": [
+        # ----- Basic Light Control (Service 2) -----
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        # ----- Light Mode Selection (Service 2) -----
         MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "TV", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "My Mode-Scenario 1", 17: "My Mode-Scenario 2", 18: "My Mode-Scenario 3", 19: "My Mode-Scenario 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        # ----- Default Power State (Service 2) -----
         MapConv("power_on_state", "select", mi="2.p.9", map={0: "default", 1: "on", 2: "off"}),
+        # ----- Special Function Switches (Service 2) -----
         BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),  # uint8, config
         BoolConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),  # config
+        # ----- Professional Settings (Service 5) -----
+        MathConv("fade_time", "number", mi="5.p.4", min=0, max=4294967295, multiply=0.001, entity={"category": "config", "units": UNIT_SECONDS}),
+        MathConv("lowest_brightness", "number", mi="5.p.5", min=0, max=100, entity=ENTITY_CONFIG),
+        # ----- Master-Slave Mode (Service 5) -----
+        BaseConv("master_slave_switch", "switch", mi="5.p.19", entity=ENTITY_CONFIG),
+        # ----- Dynamic Lighting Effects (Service 5) -----
+        MathConv("breathing_speed", "number", mi="5.p.15", min=0, max=4294967295, multiply=0.001, entity={"category": "config", "units": UNIT_SECONDS}),
+        MathConv("beat_speed", "number", mi="5.p.16", min=0, max=4294967295, multiply=0.001, entity={"category": "config", "units": UNIT_SECONDS}),
+        # ----- Rhythm Functions (Service 7) -----
+        BoolConv("rhythm_switch", "switch", mi="7.p.1", entity=ENTITY_CONFIG),
+        MathConv("rhythm_speed", "number", mi="7.p.2", min=0, max=4294967295, multiply=0.001, entity={"category": "config", "units": UNIT_SECONDS}),
     ],
 }, {
     # https://home.miot-spec.com/spec/ykcn.valve.cbcs
