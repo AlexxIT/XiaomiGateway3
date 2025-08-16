@@ -582,6 +582,12 @@ DEVICES += [{
         BaseConv("chip_temperature", "sensor", mi="8.0.2006"),
     ],
 }, {
+    "lumi.curtain.acn04": ["Aqara", "Curtain Motor C3", "ZNCLDJ01LM"],
+    "spec": [
+        MapConv("motor", "cover", mi="14.2.85", map={0: "close", 1: "open", 2: "stop"}),
+        BaseConv("position", mi="1.1.85"),
+    ],
+}, {
     "lumi.airrtc.vrfegl01": ["Xiaomi", "VRF Air Conditioning EU"],
     "support": 1,
     "spec": [
