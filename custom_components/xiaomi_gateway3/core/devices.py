@@ -4951,6 +4951,20 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),
     ],
 }, {
+    13138: ["GranwinIoT", "One-Button Switch (Mesh) V5", "giot.switch.v51ksm"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="2.e.1", value=BUTTON_SINGLE),
+        MapConv("mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Smart Switch Mode", 3: "Toggle Switch Mode"}),
+        MapConv("power_on_state", "select", mi="2.p.3", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("led_mode_normal", "select", mi="6.p.1", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Often Out State", 3: "Normally On State"}, entity=ENTITY_CONFIG),
+        BaseConv("backlight", "switch", mi="6.p.3"),
+        BoolConv("black_led_valid", "binary_sensor", mi="6.p.4"),
+        BaseConv("switch_sensor_on", "switch", mi="11.p.1"),
+        MathConv("switch_sensor_mode", "number", mi="11.p.2", min=1, max=7200),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
