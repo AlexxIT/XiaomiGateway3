@@ -4697,6 +4697,24 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
     ],
 }, {
+    20447: ["GranwinIoT", "Mesh Smart Two-Button Switch", "giot.switch.v82ksm"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("right_switch", "switch", mi="3.p.1"),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Normal Switch", 1: "Wireless Switch", 2: "Flex Switch", 3: "Inching Switch", 4: "Normal + Wireless Switch"}),
+        MapConv("right_switch_mode", "select", mi="3.p.2", map={0: "Normal Switch", 1: "Wireless Switch", 2: "Flex Switch", 3: "Inching Switch", 4: "Normal + Wireless Switch"}),
+        MapConv("led_mode_normal", "select", mi="16.p.1", map={0: "Follow Switch Status", 1: "Opposite To The Switch State", 2: "Often Out State", 3: "Normally On State"}),
+        MapConv("led_mode_special", "select", mi="16.p.2", map={0: "Follow Switch Status", 1: "Opposite To The Switch State", 2: "Often Out State", 3: "Normally On State"}),
+        BaseConv("led", "switch", mi="22.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="12.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="12.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="12.e.3", value=BUTTON_HOLD),
+        ConstConv("action", mi="13.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="13.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="13.e.3", value=BUTTON_HOLD),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
