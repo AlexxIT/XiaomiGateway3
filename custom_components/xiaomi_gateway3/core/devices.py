@@ -4851,6 +4851,18 @@ DEVICES += [{
         MapConv("standby_display", "select", mi="23.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}),
     ],
 }, {
+    14495: ["ZiQing", "IZQ Presence Sensor Ceiling", "IZQ-24n", "izq.sensor_occupy.24n"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        MapConv("occupancy_status", "sensor", mi="2.p.1", map={0: "No One", 1: "Has One", 2: "Move", 3: "Moveless", 4: "Static"}),
+        MathConv("illuminance", "sensor", mi="2.p.2"),
+        MathConv("has_someone_duration", "sensor", mi="2.p.3"),
+        MathConv("no_one_duration", "sensor", mi="2.p.4", multiply=60),
+        BaseConv("led", "switch", mi="3.p.1", entity=ENTITY_CONFIG),
+        BaseConv("relay_switch", "switch", mi="4.p.1"),
+        MathConv("fault", "sensor", mi="5.p.3")
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
