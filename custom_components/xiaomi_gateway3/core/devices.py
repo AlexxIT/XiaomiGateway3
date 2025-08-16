@@ -2259,6 +2259,27 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1006", value="doorbell"),
     ],
 }, {
+    3581: ["Linptech", "Wireless Button", "linp.remote.k9b"],
+    "spec": [
+        # mibeacon2 spec
+        BLEMapConv("action", "sensor", mi=4097, map={"000000": BUTTON_1_SINGLE,"000001": BUTTON_1_DOUBLE,"000002": BUTTON_1_HOLD,"010000": BUTTON_2_SINGLE,"010001": BUTTON_2_DOUBLE,"010002": BUTTON_2_HOLD,"020000": BUTTON_3_SINGLE,"020001": BUTTON_3_DOUBLE,"020002": BUTTON_3_HOLD,}),
+        BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),
+        # Left button (iid=2)
+        ConstConv("action", mi="2.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="2.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="2.e.3", value=BUTTON_1_HOLD),
+        # Middle button (iid=4)
+        ConstConv("action", mi="4.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_2_HOLD),
+        # Right button (iid=5)
+        ConstConv("action", mi="5.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_3_HOLD),
+        # Battery (iid=3)
+        BaseConv("battery", mi="3.p.1"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
