@@ -18,11 +18,25 @@
       },
       "cloud": {
         "title": "Adicionar conta Mi Cloud",
-        "description": "Selecione apenas os servidores em que você possui dispositivos{verify}",
+        "description": "Selecione apenas os servidores em que você possui dispositivos",
         "data": {
           "username": "E-mail / ID da conta Mi",
           "password": "Senha",
           "servers": "Servidores"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from image: {image}",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_email": {
+        "title": "Verify account",
+        "description": "Enter code from email: {email}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

@@ -18,11 +18,25 @@
       },
       "cloud": {
         "title": "Adauga un cont Mi Cloud",
-        "description": "Selecteaza doar serverul unde ai dispozitivele{verify}",
+        "description": "Selecteaza doar serverul unde ai dispozitivele",
         "data": {
           "username": "Email / ID-ul contului Mi",
           "password": "Parola",
           "servers": "Servere"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from image: {image}",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_email": {
+        "title": "Verify account",
+        "description": "Enter code from email: {email}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {
