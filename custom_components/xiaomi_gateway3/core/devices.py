@@ -5037,6 +5037,19 @@ DEVICES += [{
         MapConv("action", mi="6.e.3.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
     ],
 }, {
+    15365: [None, "Mesh Fan Light Series V1", "cxw.light.wyfv01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("light_mode", "select", mi="2.p.5", map={0: "None", 1: "Lighting", 2: "Tv", 3: "Warmth", 4: "Reading", 5: "Sleep", 6: "Eat", 7: "Candlelight", 8: "GoHome", 9: "LeaveHome"}),
+        BaseConv("fan", "switch", mi="5.p.1"),
+        MapConv("fan_level", "number", mi="5.p.2", min=1, max=6),
+        BaseConv("horizontal_swing", "switch", mi="5.p.3"),
+        BaseConv("wind_reverse", "switch", mi="5.p.4"),
+        BoolConv("natural_wind", "switch", mi="5.p.5"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
