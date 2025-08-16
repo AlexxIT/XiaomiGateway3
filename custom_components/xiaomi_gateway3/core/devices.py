@@ -4738,6 +4738,51 @@ DEVICES += [{
         BoolConv("on", "switch", mi="2.p.3"),
     ],
 }, {
+    11572: [None, "Mesh Single Wall Switch (no N)", "babai.switch.301ml"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MapConv("wireless", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}), # config
+        MapConv("power_on_state", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}), # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="6.e.2", value=BUTTON_SINGLE),
+        BaseConv("Indicator Light Backlight", "switch", mi="6.p.1"),
+        BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
+    ],
+}, {
+    11574: [None, "Mesh Double Wall Switch (no N)", "babai.switch.302ml"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}),  # config
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="6.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_SINGLE),
+        BaseConv("Indicator Light Backlight", "switch", mi="6.p.1"),
+        BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
+    ],
+}, {
+    11575: [None, "Mesh Triple Wall Switch (no N)", "babai.switch.303ml"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}),  # config
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}),  # config
+        MapConv("wireless_3", "select", mi="4.p.2", map={0: "Normal", 1: "Wireless", 2: "Atom", 3: "Scene"}),  # config
+        MapConv("power_on_state_1", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_2", "select", mi="3.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state_3", "select", mi="4.p.3", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="6.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_3_SINGLE),
+        BaseConv("Indicator Light Backlight", "switch", mi="6.p.1"),
+        BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
