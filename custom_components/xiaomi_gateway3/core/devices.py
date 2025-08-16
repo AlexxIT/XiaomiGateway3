@@ -4716,6 +4716,19 @@ DEVICES += [{
         ConstConv("action", mi="13.e.3", value=BUTTON_HOLD),
     ],
 }, {
+    14136: [None, "Mesh Light", "shhf.light.slcwb8"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=3000, maxk=6400),
+        MapConv("mode", "select", mi="2.p.4", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "Reading", 5: "Tv", 6: "Computer"}),
+        BoolConv("flex_switch", "switch", mi="2.p.5"),
+        MapConv("power_on_state", "select", mi="2.p.6", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("wake_up_mode", "switch", mi="2.p.7", entity=ENTITY_CONFIG),
+        BoolConv("sleep_aid_mode", "switch", mi="2.p.8", entity=ENTITY_CONFIG),
+        MapConv("flow", "select", mi="2.p.9", map={0: "Auto", 1: "Immediately"}, entity=ENTITY_CONFIG),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
