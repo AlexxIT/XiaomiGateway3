@@ -5010,6 +5010,33 @@ DEVICES += [{
         MathConv("switch_sensor_mode", "number", mi="11.p.2", min=1, max=7200),
     ],
 }, {
+    21145: ["PTX", "AK4 Pro Mesh2.0", "090615.switch.akpro4"],
+    "spec": [
+        BaseConv("сhannel_1", "switch", mi="2.p.1"),
+        BaseConv("сhannel_2", "switch", mi="3.p.1"),
+        BaseConv("сhannel_3", "switch", mi="4.p.1"),
+        BaseConv("сhannel_4", "switch", mi="5.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        BaseConv("led", "switch", mi="11.p.1", entity=ENTITY_CONFIG),
+        MapConv("diandong_1", "select", mi="12.p.1", map={0: "None", 1: "Wireless", 2: "Diandong", 3: "Localscene", 5: "Smarcurtain"}, entity=ENTITY_CONFIG),
+        MapConv("diandong_2", "select", mi="13.p.1", map={0: "None", 1: "Wireless", 2: "Diandong", 3: "Localscene", 5: "Smarcurtain"}, entity=ENTITY_CONFIG),
+        MapConv("diandong_3", "select", mi="14.p.1", map={0: "None", 1: "Wireless", 2: "Diandong", 3: "Localscene", 5: "Smarcurtain"}, entity=ENTITY_CONFIG),
+        MapConv("diandong_4", "select", mi="15.p.1", map={0: "None", 1: "Wireless", 2: "Diandong", 3: "Localscene", 5: "Smarcurtain"}, entity=ENTITY_CONFIG),
+        BaseConv("jdq_status_1", "switch", mi="12.p.11"),
+        BaseConv("jdq_status_2", "switch", mi="13.p.11"),
+        BaseConv("jdq_status_3", "switch", mi="14.p.11"),
+        BaseConv("jdq_status_4", "switch", mi="15.p.11"),
+        MapConv("power_on_status", "select", mi="2.p.5", map={0: "off", 1: "on", 2: "Default"}, entity=ENTITY_CONFIG),
+        MapConv("key_mode", "select", mi="16.p.1", map={0: "Standard Mode", 1: "High Speed Mode"}, entity=ENTITY_CONFIG),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="6.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
+        MapConv("action", mi="6.e.2.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+        MapConv("action", mi="6.e.3.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
