@@ -4924,6 +4924,33 @@ DEVICES += [{
         BoolConv("ambient_light", "switch", mi="3.p.1"),
     ],
 }, {
+    15109:  ["H+", "H+ zero fire single key switch", "huca.switch.lh1"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        MapConv("mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("power_on_state", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),
+    ],
+}, {
+    15110:  ["H+", "HH+ zero fire double key switch", "huca.switch.lh2"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("right_switch", "switch", mi="3.p.1"),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("right_switch_mode", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("power_on_state", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),
+    ],
+}, {
+    15111:  ["H+", "H+ zero fire three-button switch", "huca.switch.lh3"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("middle_switch", "switch", mi="3.p.1"),
+        BaseConv("right_switch", "switch", mi="4.p.1"),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("middle_switch_mode", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("right_switch_mode", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless", 2: "Flex", 3: "Jog"}),
+        MapConv("power_on_state", "select", mi="2.p.3", map={0: "Default", 1: "Off", 2: "On"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
