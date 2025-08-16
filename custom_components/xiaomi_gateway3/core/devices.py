@@ -4914,6 +4914,16 @@ DEVICES += [{
         ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
     ],
 }, {
+    20557:  ["NOVO", "N31 ambient light curtains", "novo.curtain.n31"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "open", 1: "close", 2: "pause"}),
+        BaseConv("target_position", mi="2.p.4"),
+        CurtainPosConv("position", mi="2.p.3"),
+        MapConv("run_state", mi="2.p.2", map={0: "opening", 1: "closing", 2: "stop"}),
+        BoolConv("motor_reverse", "switch", mi="2.p.10", entity=ENTITY_CONFIG),  # config
+        BoolConv("ambient_light", "switch", mi="3.p.1"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
