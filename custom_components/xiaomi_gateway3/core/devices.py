@@ -4729,6 +4729,15 @@ DEVICES += [{
         MapConv("flow", "select", mi="2.p.9", map={0: "Auto", 1: "Immediately"}, entity=ENTITY_CONFIG),
     ],
 }, {
+    7222: ["LeMesh", "Curtain Motor", "lemesh.curtain.cura01"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={1: "stop", 2: "open", 0: "close"}),
+        BaseConv("target_position", mi="2.p.6"),
+        CurtainPosConv("position", mi="2.p.5"),
+        BaseConv("motor_reverse", "switch", mi="2.p.4"),
+        BoolConv("on", "switch", mi="2.p.3"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
