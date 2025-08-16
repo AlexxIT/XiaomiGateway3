@@ -4783,6 +4783,43 @@ DEVICES += [{
         BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
     ],
 }, {
+    21667: ["PTX", "Smart Wall Switch Panel", "PTX-X1TPM", "090615.switch.x1tpm"],
+    "spec": [
+        # Three Basic Switch Services (iid=2/3/4)
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+
+        # Four Lighting Channels (iid=10/11/12/13)
+        BrightnessConv("light_1", mi="10.3"),
+        MathConv("color_temp_1", "number", mi="10.5", min=2700, max=6500),
+        MapConv("light_mode_1", "select", mi="10.2", map={1: "Warmth", 2: "Hospitality", 3: "Night", 4: "Lighting", 5: "Walk", 6: "Sleep"}),
+        BrightnessConv("light_2", mi="11.3"),
+        MathConv("color_temp_2", "number", mi="11.5", min=2700, max=6500),
+        BrightnessConv("light_3", mi="12.3"),
+        MathConv("color_temp_3", "number", mi="12.5", min=2700, max=6500),
+        BrightnessConv("light_4", mi="13.3"),
+        ColorTempKelvin("light_color", mi="13.4"),
+        MapConv("light_mode_4", "select", mi="13.2", map={1: "Color", 2: "Warm", 3: "Dreamlike", 4: "Midsummer", 5: "Walk", 6: "Sleep"}),
+
+        # Air Conditioner Service (iid=18)
+        MapConv("ac_mode", "select", mi="18.2", map={0: "Cool", 1: "Heat", 2: "Fan", 3: "Dry"}),
+        MathConv("target_temp", "number", mi="18.4", min=16, max=32),
+        MapConv("fan_speed", "select", mi="18.12", map={0: "Auto", 1: "Low", 2: "Medium", 3: "High"}),
+
+        # Display Settings (iid=23)
+        MathConv("screen_brightness", "number", mi="23.1", min=1, max=100),
+        MapConv("auto_lock", "select", mi="23.2", map={0: "15s", 1: "30s", 2: "1m", 3: "2m", 4: "5m", 5: "10m", 255: "Never"}),
+        MapConv("standby_display", "select", mi="23.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
