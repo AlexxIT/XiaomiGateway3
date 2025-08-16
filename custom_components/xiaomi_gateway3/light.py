@@ -1,11 +1,11 @@
 import asyncio
+import math
 import time
 from functools import cached_property
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
     ATTR_EFFECT,
     ATTR_HS_COLOR,
     ATTR_RGB_COLOR,
@@ -25,7 +25,19 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     XEntity.ADD[entry.entry_id + "light"] = async_add_entities
 
 
+ATTR_COLOR_TEMP = "color_temp"
+ATTR_COLOR_TEMP_KELVIN = "color_temp_kelvin"
+
+
+def color_temp(value: int) -> int:
+    return math.floor(1000000 / value)
+
+
 class XLight(XEntity, LightEntity, RestoreEntity):
+    _attr_color_temp_kelvin: int | None = None
+    _attr_max_color_temp_kelvin: int | None = 2700
+    _attr_min_color_temp_kelvin: int | None = 6500
+
     def on_init(self):
         self._attr_color_mode = ColorMode.ONOFF
         modes = set()
@@ -39,11 +51,11 @@ class XLight(XEntity, LightEntity, RestoreEntity):
                 self._attr_color_mode = ColorMode.COLOR_TEMP
                 modes.add(ColorMode.COLOR_TEMP)
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
-                    self._attr_min_mireds = conv.minm
-                    self._attr_max_mireds = conv.maxm
+                    self._attr_max_color_temp_kelvin = color_temp(conv.minm)
+                    self._attr_min_color_temp_kelvin = color_temp(conv.maxm)
                 elif hasattr(conv, "mink") and hasattr(conv, "maxk"):
-                    self._attr_min_mireds = int(1000000 / conv.maxk)
-                    self._attr_max_mireds = int(1000000 / conv.mink)
+                    self._attr_max_color_temp_kelvin = conv.maxk
+                    self._attr_min_color_temp_kelvin = conv.mink
             elif conv.attr == ATTR_HS_COLOR:
                 self.listen_attrs.add(conv.attr)
                 modes.add(ColorMode.HS)
@@ -65,7 +77,7 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         if ATTR_BRIGHTNESS in data:
             self._attr_brightness = data[ATTR_BRIGHTNESS]
         if ATTR_COLOR_TEMP in data:
-            self._attr_color_temp = data[ATTR_COLOR_TEMP]
+            self._attr_color_temp_kelvin = color_temp(data[ATTR_COLOR_TEMP])
             self._attr_color_mode = ColorMode.COLOR_TEMP
         if ATTR_HS_COLOR in data:
             self._attr_hs_color = data[ATTR_HS_COLOR]
@@ -82,13 +94,15 @@ class XLight(XEntity, LightEntity, RestoreEntity):
         return {
             self.attr: self._attr_is_on,
             ATTR_BRIGHTNESS: self._attr_brightness,
-            ATTR_COLOR_TEMP: self._attr_color_temp,
+            ATTR_COLOR_TEMP: color_temp(self._attr_color_temp_kelvin),
         }
 
     async def async_turn_on(self, **kwargs):
         # https://github.com/AlexxIT/XiaomiGateway3/issues/1459
         if not self._attr_is_on or not kwargs:
             kwargs[self.attr] = True
+        if ATTR_COLOR_TEMP_KELVIN in kwargs:
+            kwargs[ATTR_COLOR_TEMP] = color_temp(kwargs.pop(ATTR_COLOR_TEMP_KELVIN))
         self.device.write(kwargs)
 
     async def async_turn_off(self, **kwargs):
@@ -114,6 +128,9 @@ class XZigbeeLight(XLight):
         if transition is not None:
             # important to sort args in right order, transition should be first
             kwargs = {ATTR_TRANSITION: transition} | kwargs
+
+        if ATTR_COLOR_TEMP_KELVIN in kwargs:
+            kwargs[ATTR_COLOR_TEMP] = color_temp(kwargs.pop(ATTR_COLOR_TEMP_KELVIN))
 
         self.device.write(kwargs if kwargs else {self.attr: True})
 
