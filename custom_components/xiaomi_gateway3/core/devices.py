@@ -5032,7 +5032,7 @@ DEVICES += [{
         ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
         MapConv("light_mode", "select", mi="2.p.5", map={0: "None", 1: "Lighting", 2: "Tv", 3: "Warmth", 4: "Reading", 5: "Sleep", 6: "Eat", 7: "Candlelight", 8: "GoHome", 9: "LeaveHome"}),
         BaseConv("fan", "switch", mi="5.p.1"),
-        MapConv("fan_level", "number", mi="5.p.2", min=1, max=6),
+        MathConv("fan_level", "number", mi="5.p.2", min=1, max=6),
         BaseConv("horizontal_swing", "switch", mi="5.p.3"),
         BaseConv("wind_reverse", "switch", mi="5.p.4"),
         BoolConv("natural_wind", "switch", mi="5.p.5"),
