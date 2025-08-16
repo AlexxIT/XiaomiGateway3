@@ -2305,6 +2305,20 @@ DEVICES += [{
         BaseConv("doorbell_timestamp", "sensor", mi="5.e.1006.p.1")
     ],
 }, {
+    17213: [None, "Smart Door Lock S5", "line.lock.fms5"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("lock_action", "sensor", mi="3.e.1020.p.1", map={1: "lock", 0: "unlock"}),
+        MapConv("method", "sensor", mi="3.e.1020.p.2", map={0: "ble", 1:"password",2: "fingerprint", 3: "lock key", 4: "Turntable", 5: "NFC", 6: "One Time Password", 7: "Periodic Password", 8: "Coerce"}),
+        # Operation ID
+        BaseConv("operation_id", "sensor", mi="3.e.1020.p.3"),
+        BaseConv("lock_timestamp", "sensor", mi="3.e.1020.p.4"),
+        MapConv("abnormal_type", "sensor", mi="3.e.1007.p.5", map={0: "Frequent Unlocking Failed By Password", 1: "Frequent Unlocking Failed By Fingerprint", 2: "Bell", 3: "Door Was Opened Forcefully", 4: "System Lock", 6: "Door Lock Batteries Are Low", 7: "Door Open Mode", 21: "Open Set CLose", 22: "ACTIVATE BACKLOCK", 23: "Eliminate Anti-Lock"}),
+        MapConv("door_state", "sensor", mi="3.p.1021", map={16: "Locked", 20: "Locked", 24: "Locked", 28: "Locked", 32: "Unlocked", 36: "Unlocked", 40: "Unlocked", 44: "Unlocked", 48: "Leaving The Door Open Timed Out", 52: "Leaving The Door Open Timed Out", 56: "Leaving The Door Open Timed Out", 60: "Leaving The Door Open Timed Out", 64: "Door Was Ajar", 68: "Door Was Ajar", 72: "Door Was Ajar", 76: "Door Was Ajar"}),
+        # small battery sensor
+        BaseConv("battery", "sensor", mi="5.p.1003"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
