@@ -2280,6 +2280,31 @@ DEVICES += [{
         BaseConv("battery", mi="3.p.1"),
     ],
 }, {
+    17601: ["Xiaomi", "Xiaomi Smart Door Lock 2 (Finger Vein Unlock)", "XMZNMS03OD", "xiaomi.lock.b03"],
+    "spec": [
+        # Battery Level
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        # # Lock Status
+        MapConv("lock", "binary_sensor", mi="3.p.1021", map={1: False, 2: True, 17: False, 18: True,33: False, 34: True, 49: False, 50: True}),
+        # Door Status (multi-state)
+        MapConv("door", "sensor", mi="3.p.1021", map={1: "closed", 2: "open", 3: "closed_after_ajar", 4: "ajar", 5: "open_timeout", 6: "improper_closure", 17: "closed", 18: "open", 19: "closed_after_ajar", 20: "ajar", 21: "open_timeout", 22: "improper_closure", 33: "closed", 34: "open", 35: "closed_after_ajar", 36: "ajar", 37: "open_timeout", 38: "improper_closure", 49: "closed", 50: "open", 51: "closed_after_ajar", 52: "ajar", 53: "open_timeout", 54: "improper_closure"}),
+        # Event Parameters
+        # Lock Operation Event
+        MapConv("method", "sensor", mi="2.e.1020.p.2", map={1: "smart_device", 2: "fingerprint", 3: "password",4: "nfc", 5: "physical_Key", 6: "one_time_password",7: "periodic_password", 8: "emergency_override",9: "button_inside", 10: "vein_recognition"}),
+        MapConv("action", mi="2.e.1020.p.2", map={1: "smart_device_unlock", 2: "fingerprint_unlock", 3: "password_unlock",4: "nfc_unlock", 5: "physical_Key_unlock", 6: "one_time_password_unlock",7: "periodic_password_unlock", 8: "emergency_override_unlock",9: "button_inside_unlock", 10: "vein_recognition_unlock"}),
+        BaseConv("action_id", mi="2.e.1020.p.3"),
+        BaseConv("operation_timestamp", "sensor", mi="2.e.1020.p.4"),
+        MapConv("position", "sensor", mi="2.e.1020.p.5", map={1: "indoor", 2: "outdoor"}),
+        MapConv("action", mi="2.e.1020.p.6", map={1: "lock", 2: "unlock", 3: "internal_lock", 4: "internal_unlock", 5: "child_lock_on", 6: "child_lock_off", 7: "away_mode_on", 8: "away_mode_off", 9: "close_the_door", 10: "child_lock_inside_on", 11: "child_lock_inside_off"}),
+        MapConv("lock_action","sensor",mi="2.e.1020.p.6",map={1: "lock", 2: "unlock", 3: "internal_lock",4: "internal_unlock", 5: "child_lock_on",6: "child_lock_off", 7: "away_mode_on",8: "away_mode_off", 9: "close_the_door",10: "child_lock_inside_on", 11: "child_lock_inside_off"}),
+        # Exception Event
+        MapConv("action",mi="2.e.1007.p.1", map={1: "multiple_failures", 2: "damaged", 3: "reset", 4: "low_battery", 5: "critical_battery", 6: "inside_after_away", 7: "ajar_warning", 9: "ajar_timeout", 10: "ajar_closed", 11: "poor_closing", 12: "unlock_error"}),
+        BaseConv("abnormal_condition_timestamp", "sensor", mi="2.e.1007.p.4"),
+        # Doorbell Event
+        ConstConv("action", mi="5.e.1006", value="doorbell"),
+        BaseConv("doorbell_timestamp", "sensor", mi="5.e.1006.p.1")
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
