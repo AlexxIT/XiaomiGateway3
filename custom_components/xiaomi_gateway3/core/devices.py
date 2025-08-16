@@ -1757,7 +1757,7 @@ DEVICES += [{
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
         # other sensors
         BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY),  # uint8
-        BaseConv("customized_property", "binary_sensor", mi="5.p.1018"),  # customized distance trigger
+        MathConv("customized_property", "sensor", mi="5.p.1018", min=0, max=255),  # customized distance trigger
         BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
         BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
         BoolConv("led", "binary_sensor", mi="3.p.1"),  # bool, config
