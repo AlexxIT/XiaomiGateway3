@@ -4863,6 +4863,57 @@ DEVICES += [{
         MathConv("fault", "sensor", mi="5.p.3")
     ],
 }, {
+    17292: ["Yeelight", "Yeelight Lingdong Smart Switch (One Key)", "N5-ZNMB-1AC", "yeelink.switch.sw3"],
+    23396: ["Yeelight", "Yeelight K Smart Switch (One Key) Mesh 2.0", "YLYKG-0178", "yeelink.switch.sw11"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless"}),  # config
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="3.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="3.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="3.e.3", value=BUTTON_1_HOLD),
+    ],
+}, {
+    17293: ["Yeelight", "Yeelight Lingdong Smart Switch (Two Keys)", "N5-ZNMB-2AC", "yeelink.switch.sw4"],
+    23397: ["Yeelight", "Yeelight K Smart Switch (Two Keys) Mesh 2.0", "YLYKG-0179", "yeelink.switch.sw12"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless"}),  # config
+        MapConv("wireless_2", "select", mi="3.p.4", map={0: "default", 1: "Wireless"}),  # config
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="4.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="4.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="5.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_2_HOLD),
+    ],
+}, {
+    17294: ["Yeelight", "Yeelight Lingdong Smart Switch (Three Keys)", "N5-ZNMB-3AC", "yeelink.switch.sw5"],
+    23398: ["Yeelight", "Yeelight K Smart Switch (Three Keys) Mesh 2.0", "YLYKG-0180", "yeelink.switch.sw13"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.6", map={0: "default", 1: "Wireless"}),  # config
+        MapConv("wireless_2", "select", mi="3.p.4", map={0: "default", 1: "Wireless"}),  # config
+        MapConv("wireless_3", "select", mi="4.p.4", map={0: "default", 1: "Wireless"}),  # config
+        BaseConv("led", "switch", mi="11.p.1"),  # config
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="5.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
