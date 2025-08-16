@@ -1,6 +1,6 @@
 # Supported devices
 
-Total devices: 447
+Total devices: 509
 
 ## Supported Gateways
 
@@ -16,7 +16,7 @@ Total devices: 5
 
 ## Supported Xiaomi Zigbee
 
-Total devices: 102
+Total devices: 103
 
 |Brand|Name|Model|Entities|
 |---|---|---|---|
@@ -31,6 +31,7 @@ Total devices: 102
 |Aqara|Cube EU|MFKZQ01LM, lumi.sensor_cube.aqgl01|action, battery|
 |Aqara|Curtain|ZNCLDJ11LM, lumi.curtain|motor|
 |Aqara|Curtain B1 EU|ZNCLDJ12LM, lumi.curtain.hagl04|motor, battery|
+|Aqara|Curtain Motor C3|ZNCLDJ01LM, lumi.curtain.acn04|motor|
 |Aqara|Door Lock S1|ZNMS11LM, lumi.lock.aq1|square, reverse, latch, battery, key_id, action|
 |Aqara|Door Lock S2 CN|ZNMS12LM, lumi.lock.acn02|square, reverse, latch, battery, key_id, action|
 |Aqara|Door Lock S2 Pro CN|ZNMS13LM, lumi.lock.acn03|lock, square, reverse, latch, battery, action|
@@ -125,7 +126,7 @@ Total devices: 102
 
 ## Supported Xiaomi BLE
 
-Total devices: 101
+Total devices: 108
 
 |Brand|Name|Model|Entities|
 |---|---|---|---|
@@ -149,12 +150,15 @@ Total devices: 101
 |LeMesh|Triple Wall Switch|lemesh.switch.sw3f01|channel_1, channel_2, channel_3, action|
 |LeMesh|Wireless Button|lemesh.remote.ts1|action|
 |LeTianPai|Presence Sensor POP|rhj.sensor_occupy.l730a|temperature, humidity, illuminance, occupancy_status, no-one-duration, has-someone-duration|
-|Linptech|Door/Window Sensor|MS1BB, linp.magnet.m1|contact, battery|
+|Linptech|Door/Window Sensor|MS1BB, linp.magnet.m1|contact, action, battery|
 |Linptech|Human Presence Sensor ES3|ES3BB, linp.sensor_occupy.es2|occupancy, illuminance, battery, customized_property, has_someone_duration, no_one_duration, led|
 |Linptech|Motion Sensor 2|HS1BB, linp.motion.hs1bb1|motion, illuminance, idle_time, battery|
+|Linptech|Motion Sensor 3|HS3BB, blt.3.1kgrbasoo4k03|motion, illuminance, custom_no_motion_time, no_motion_duration, battery|
 |Linptech|Pressure Sensor|PS1BB, linp.senpres.ps1bb|pressure, battery|
 |Linptech|Submersion Sensor|RS1BB, linp.flood.rs1bb|water_leak, battery|
+|Linptech|Temperature Humidity Sensor KS2|KS2BB, linp.sensor_ht.ks2bb|temperature, humidity, battery, action|
 |Linptech|Wireless Button|K11, linp.remote.k9b01|action, battery|
+|Linptech|Wireless Button|linp.remote.k9b|action, battery|
 |Linptech|Wireless Button|linp.remote.k9b1|action, battery|
 |Linptech|Wireless Button|linp.remote.k9b11|action, battery|
 |Linptech|Wireless Button KS1|linp.remote.ks1|action|
@@ -184,6 +188,7 @@ Total devices: 101
 |Xiaomi|Door Lock 1S|XMZNMS08LM, lumi.lock.bmcn04|*|
 |Xiaomi|Door Lock E10|XMZNMS01OD, oms.lock.dl01|action, door, battery|
 |Xiaomi|Door/Window Sensor 2|MCCGQ02HL, isa.magnet.dw2hl|contact, action, light, battery|
+|Xiaomi|Double Wall Button|xiaomi.remote.mcn002|action, battery, low_bat|
 |Xiaomi|Face Recognition Smart Door Lock|XMZNMS09LM, lumi.lock.mcn002|action, battery, lock|
 |Xiaomi|Face Recognition Smart Door Lock X|XMZNMS06LM, lumi.lock.bmcn05|*|
 |Xiaomi|Flower Care|HHCCJCY01, hhcc.plantmonitor.v1|temperature, illuminance, moisture, conductivity, battery|
@@ -206,6 +211,7 @@ Total devices: 101
 |Xiaomi|Safe Cayo Anno 30Z|lcrmcr.safe.ms30b|action, battery|
 |Xiaomi|Smart Door Lock E20 (Video Monitor)|lumi.lock.mcn009|action, method, key_id, door, battery|
 |Xiaomi|Smart Door Lock E20 WIFI|XMZNMS201LM, lumi.lock.mcn008|action, method, key_id, door, battery|
+|Xiaomi|Smart Door Lock E30|loock.lock.h01lyk|action, door, battery|
 |Xiaomi|TH Clock|LYWSD02MMC, miaomiaoce.sensor_ht.o2|temperature, humidity, battery|
 |Xiaomi|TH Clock|LYWSD02MMC, miaomiaoce.sensor_ht.t1|temperature, humidity, battery|
 |Xiaomi|TH Clock Pro|LYWSD02MMC, miaomiaoce.sensor_ht.t8|temperature, humidity, battery|
@@ -219,6 +225,7 @@ Total devices: 101
 |Xiaomi|Viomi Kettle|V-SK152, yunmi.kettle.v7|power, state, temperature|
 |Xiaomi|Water Leak Sensor|SJWS01LM, lumi.flood.bmcn01|water_leak, battery, action|
 |Xiaomi|Wireless Button|XMWXKG01LM, lumi.remote.mcn001|action, battery|
+|Xiaomi|Xiaomi Smart Door Lock 2 (Finger Vein Unlock)|XMZNMS03OD, xiaomi.lock.b03|battery, lock, door, method, operation_timestamp, position, lock_action, abnormal_condition_timestamp, doorbell_timestamp|
 |Xiaomi|ZenMeasure Clock|MHO-C303, miaomiaoce.clock.ht02|temperature, humidity, battery|
 |Xiaomi|ZenMeasure TH|MHO-C401, miaomiaoce.sensor_ht.h1|temperature, humidity, battery|
 |Xijia|Curtain Motor|xijia1.curtain.x3|motor, battery, motor_reverse, battery_charging|
@@ -226,14 +233,15 @@ Total devices: 101
 |Yeelight|Double Button|XMWXKG01YL, yeelink.remote.contrl|battery, action|
 |ZXFANS|ZXFANS F2 smart knob remote control|ailol.remote.ts4|battery, action|
 |ZiQing|IZQ Presence Sensor Loong|IZQ-BLE, izq.sensor_occupy.ble|occupancy, occupancy_status, has_someone_duration, no_one_duration, illuminance, indicator_light, battery, object_distance, detect_mode|
-|xiaomi|Motion Sensor 2s|XMPIRO25XS, xiaomi.motion.pir1|motion, illuminance, battery, idle_time|
+|xiaomi|Motion Sensor 2s|XMPIRO25XS, xiaomi.motion.pir1|motion, illuminance, custom_no_motion_time, no_motion_duration, battery|
 |~|Eight Key Twenty-four Scene Switch V1|cxw.remote.panv01|action, battery|
 |~|Eight scene knob switch|cxw.remote.ble006|action|
 |~|Lock M2|ydhome.lock.m2silver|*|
+|~|Smart Door Lock S5|line.lock.fms5|action, lock_action, method, operation_id, lock_timestamp, abnormal_type, door_state, battery|
 
 ## Supported Other Zigbee
 
-Total devices: 35
+Total devices: 41
 
 |Brand|Name|Model|Entities|
 |---|---|---|---|
@@ -253,11 +261,16 @@ Total devices: 35
 |Philips|Hue Color 600 lm|9290012573A, LCT001|light|
 |Philips|Hue motion sensor|9290012607, SML001|occupancy, illuminance, temperature, battery, occupancy_timeout|
 |Sonoff|Button|SNZB-01, WB01|action, battery|
+|Sonoff|Button|SNZB-01P|action, battery|
 |Sonoff|Door/Window Sensor|SNZB-04, DS01|contact, battery|
+|Sonoff|Door/Window Sensor|SNZB-04P|contact, battery|
 |Sonoff|Mini|ZBMINI, 01MINIZB|switch|
 |Sonoff|Mini L2 (no N)|ZBMINIL2|switch, power_on_state|
 |Sonoff|Motion Sensor|SNZB-03, MS01|occupancy, battery, battery_voltage|
+|Sonoff|Smart Plug|S60ZBTPF|plug, current, power, voltage, power_on_state|
 |Sonoff|TH Sensor|SNZB-02, TH01|temperature, humidity, battery|
+|Sonoff|TH Sensor|SNZB-02WD|temperature, humidity, battery|
+|Sonoff|Temperature Sensor|SNZB-02LD|temperature, battery|
 |Tuya|Double Switch|TS0012|channel_1, channel_2, power_on_state, mode|
 |Tuya|Motion Sensor|IH012-RT01, TS0202|occupancy|
 |Tuya|Motion Sensor|TYZPIR-02, RH3040|occupancy, battery|
@@ -270,12 +283,13 @@ Total devices: 35
 |Tuya|TH sensor|TT001ZAV20, RH3052|temperature, humidity|
 |Tuya|Wireless Four Button|RSH-Zigbee-SC04, TS004F|action, battery, mode|
 |UseeLink|Power Strip|SM-SO306E, TS0115|channel_1, channel_2, channel_3, channel_4, usb, power_on_state|
+|Xiaomi|ZenMeasure TH|MHO-C401N, MHO-C401N-z|temperature, humidity, battery|
 |eWeLink|Zigbee OnOff Controller|SA-003-Zigbee|switch|
 |~|Dimmer|LXZ8-02A, FNB56-ZSC01LX1.2|light|
 
 ## Supported Xiaomi Mesh
 
-Total devices: 202
+Total devices: 250
 
 |Brand|Name|Model|Entities|
 |---|---|---|---|
@@ -304,13 +318,21 @@ Total devices: 202
 |GranwinIoT|Mesh Smart Plug V6|giot.plug.v6shsm|plug, power_on_state, inching_mode, inching_state, inching_time, led|
 |GranwinIoT|Mesh Smart Switch V3|giot.switch.v3oodm|switch, power_on_state, inching_mode, inching_state, inching_time, led|
 |GranwinIoT|Mesh Smart Three-Button Switch|giot.switch.v83ksm|left_switch, middle_switch, right_switch, left_switch_mode, middle_switch_mode, right_switch_mode, led_mode_normal, led_mode_special, Backlight, action|
+|GranwinIoT|Mesh Smart Two-Button Switch|giot.switch.v82ksm|left_switch, right_switch, left_switch_mode, right_switch_mode, led_mode_normal, led_mode_special, led, action|
+|GranwinIoT|One-Button Switch (Mesh) V5|giot.switch.v51ksm|switch, action, mode, power_on_state, led_mode_normal, backlight, black_led_valid, switch_sensor_on, switch_sensor_mode|
 |GranwinIoT|Three-Button Switch (Mesh) V5|giot.switch.v53ksm|channel_1, channel_2, channel_3, switch_status_1, switch_status_2, switch_status_3, mode_1, mode_2, mode_3|
 |GranwinIoT|Two-Button Switch (Mesh) V5|giot.switch.v52ksm|left_switch, right_switch, left_switch_mode, right_switch_mode|
 |GranwinIoT|V6 Intelligent On-off Device(Mesh)|giot.switch.v6oodm|switch, power_on_state, led, flex_switch, rocker_switch, inching_mode, inching_state, inching_time|
+|GranwinIoT|V6 Intelligent One-way Switch(Mesh)|giot.switch.v61ksm|switch, power_on_state|
 |GranwinIoT|Wall Button|giot.remote.v58kwm|channel_1, channel_2, channel_3, channel_4|
+|H+|H+ zero fire single key switch|huca.switch.lh1|switch, mode, power_on_state|
+|H+|H+ zero fire three-button switch|huca.switch.lh3|left_switch, middle_switch, right_switch, left_switch_mode, middle_switch_mode, right_switch_mode, power_on_state|
+|H+|HH+ zero fire double key switch|huca.switch.lh2|left_switch, right_switch, left_switch_mode, right_switch_mode, power_on_state|
 |KOEY|Mesh Downlight|koey.light.wy0a01|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
 |KOEY|Y1 Ceiling Lamp|koey.light.wy0a02|light, mode, power_on_state, flex_switch, night_light, dimming|
+|LeMesh|Curtain Motor|lemesh.curtain.cura01|motor, motor_reverse, on|
 |LeMesh|Mesh Downlight|lemesh.light.wy0c05|light|
+|LeMesh|Mesh Light|lemesh.light.wy0a19|light, mode, power_on_state, flex_switch, night_light, dimming|
 |LeMesh|Mesh Light|lemesh.light.wy0a20|light, mode, power_on_state, flex_switch, night_light, dimming|
 |LeMesh|Mesh Light|lemesh.light.wy0c08|light, mode, power_on_state, save_state, dimming, flex_switch, night_light|
 |LeMesh|Mesh Light|lemesh.light.wy0c14|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
@@ -323,40 +345,57 @@ Total devices: 202
 |LeMesh|Mesh Switch Controller|lemesh.switch.sw0a01|switch|
 |LeMesh|Mesh Switch Controller|lemesh.switch.sw0a02|switch|
 |LeMesh|Mesh Switch Controller V2S|lemesh.switch.sw0a04|switch, power_on_state, led, interactive_switch, flex_switch, pilot_switch|
+|LeMesh|Scene Mesh Light V2S Pro|lemesh.light.wy0c24|light, mode, power_on_state, flex_switch, night_light|
 |LeMesh|Scene Mesh four key Switch Pro|lemesh.switch.sw4f01|channel_1, channel_2, channel_3, channel_4, power_on_state_1, power_on_state_2, power_on_state_3, power_on_state_4, wireless_1, wireless_2, wireless_3, wireless_4, led, mode, action|
 |LeMesh|Scene Mesh monochrome light V2S series|lemesh.light.w00a02|light, mode, power_on_state, flex_switch, night_light, save_state, dimming|
+|LeMesh|Scene Mesh one key V2S version|lemesh.switch.sw3g01|channel, power_on_state, scene_speed, led, action|
+|LeMesh|Scene Mesh three key V2S version|lemesh.switch.sw3g03|channel_1, channel_2, channel_3, power_on_state_1, power_on_state_2, power_on_state_3, scene_speed, led, action|
+|LeMesh|Scene Mesh two key V2S version|lemesh.switch.sw3g02|channel_1, channel_2, power_on_state_1, power_on_state_2, scene_speed, led, action|
+|LeMesh|Scene Wireless Button S|lemesh.remote.ts00|action, battery, button_mode|
 |LeMesh|Smart downlight Mesh version|mvs.light.wy0a01|light, mode, power_on_state, flex_switch, night_light, save_state, dimming|
 |LeMesh|Switch Sensor|lemesh.switch.sw1a02|switch, led|
 |Leishi|NVC Smart Light Source Module Switch|leishi.light.wy0a09|light|
+|Lemesh|Color Temperature Lights Ultra|lemesh.light.wy0d02|light, mode, power_on_state, flex_switch, night_light, fade_time, lowest_brightness, master_slave_switch, breathing_speed, beat_speed, rhythm_switch, rhythm_speed|
 |LianXun|Switch 8-key Mesh|lxun.switch.sw08|switch_1, switch_2, switch_3, switch_4, backlight, backlight_1, backlight_2, backlight_3, backlight_4, backlight_5, backlight_6, backlight_7, backlight_8, mode_1, mode_2, mode_3, mode_4, action|
 |LianXun|Switch Four-key Mesh|lxun.switch.lxswm4|switch_1, switch_2, switch_3, switch_4, backlight, backlight_1, backlight_2, backlight_3, backlight_4, mode_1, mode_2, mode_3, mode_4, action|
 |Lingju|Bluetooth Mesh Switch|linju.switch.sw0a01|switch, power_on_state, led, interactive_switch, flex_switch, icon_style, pilot_switch|
 |Linptech|Casement Window Driver WD2|linp.wopener.wd2lb|motor, battery, battery_status, anti_pinch_sensitivity|
 |Linptech|Double Wall Switch QT1|linp.switch.qt1db2|channel_1, channel_2, wireless_1, wireless_2, led, touch, action, brightness_white, brightness_orange|
+|Linptech|Double Wall Switch T1|linp.switch.t2dbw2|switch_1, switch_2, mode_1, mode_2, action, led, brightness_white, brightness_orange|
+|Linptech|Human Presence Downlight|LD6B-CW-T8R, linp.light.ld6bcw|light, mode, power_on_state, occupancy, occupancy_status, no_one_duration, has_someone_duration, illuminance|
 |Linptech|Human Presence-Sensing Flat Panel Light|LP1, linp.light.lp1bc|light, occupancy, illuminance|
 |Linptech|Lingpu Double Wall Switch|linp.switch.q3s2|channel_1, channel_2, wireless_1, wireless_2, led, compatible_mode, action|
 |Linptech|Lingpu Double Wall Switch|linp.switch.q4s2|channel_1, channel_2, wireless_1, wireless_2, led, compatible_mode, action|
 |Linptech|Lingpu Single Wall Switch|linp.switch.q3s1|channel_1, action, led|
 |Linptech|Lingpu Single Wall Switch|linp.switch.q4s1|channel_1, action, led|
 |Linptech|Lingpu Triple Wall Switch|linp.switch.q3s3|channel_1, channel_2, channel_3, action, led|
+|Linptech|Linp Human presence smart light|LP2, linp.light.lx2bcw|light, mode, power_on_state, light_off_gradient_time, light_on_gradient_time, occupancy, no_one_determine_time, has_one_duration, no_one_duration, illuminance, link_human_sensor, link_human_lux_threshold, human_trigger_lv, sensitivity, radar_function_onoff, shielding_distance|
 |Linptech|Linp Smart Curtain Motor|linp.curtain.c2|motor, motor_reverse, mode|
+|Linptech|Linptech Wall Switch E2|linp.switch.e2db3|channel_1, channel_2, channel_3, mode_1, mode_2, mode_3, action, occupy|
 |Linptech|Linptech Wall Switch QH2DB4|linp.switch.qh2db4|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, action, occupy|
 |Linptech|Linptech Wall Switch QH2DB8|linp.switch.qh2db8|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, action, occupy|
 |Linptech|Mesh Triple Wall Switch (no N)|QE1SB-W3(MI), linp.switch.q4s3|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, led, compatible_mode, action|
 |Linptech|Presence Sensor ES1|ES1ZB, linp.sensor_occupy.hb01|occupancy, distance, illuminance, action, occupancy_duration, not_occupancy_duration, occupancy_timeout, induction_range, approach_distance, led|
 |Linptech|Quadruple Wall Switch QT1|linp.switch.qt1db4|channel_1, channel_2, channel_3, channel_4, wireless_1, wireless_2, wireless_3, wireless_4, led, action, touch, brightness_white, brightness_orange|
 |Linptech|Single Wall Switch QT1|linp.switch.qt1db1|switch, wireless, led, action, touch, brightness_white, brightness_orange|
+|Linptech|Single Wall Switch T1|linp.switch.t2dbw1|switch, mode, action, led, brightness_white, brightness_orange|
 |Linptech|Sliding Window Driver WD1|WD1, linp.wopener.wd1lb|motor, battery, security_mode, power_replenishment, realtime_current_in|
+|Linptech|Smart Downlight|LD6B-CW-T8, linp.light.ld5bcw|light, mode, power_on_state|
 |Linptech|Triple Wall Switch QT1|linp.switch.qt1db3|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, led, touch, action, brightness_white, brightness_orange|
+|Linptech|Triple Wall Switch T1|linp.switch.t2dbw3|switch_1, switch_2, switch_3, mode_1, mode_2, mode_3, action, led, brightness_white, brightness_orange|
 |MVS|MVS Mesh Light|mvs.light.wy0a02|light, mode, power_on_state, flex_switch, night_light, user_save, dimming, delay|
+|NOVO|N31 ambient light curtains|novo.curtain.n31|motor, motor_reverse, ambient_light|
 |NOVO|Smart curtain|novo.curtain.k25|motor|
 |Opple|Bare Light Panel|opple.light.barelp|light, mode|
+|PTX|AK4 Pro Mesh2.0|090615.switch.akpro4|сhannel_1, сhannel_2, сhannel_3, сhannel_4, mode_1, mode_2, mode_3, mode_4, led, diandong_1, diandong_2, diandong_3, diandong_4, jdq_status_1, jdq_status_2, jdq_status_3, jdq_status_4, power_on_status, key_mode, action|
 |PTX|Curtain Motor|090615.curtain.crus6|motor, motor_reverse, mode, fault|
 |PTX|Curtain Motor|090615.curtain.s2mesh|motor, motor_reverse|
+|PTX|Human Body Presence Sensor (Top Mounted)|PTX-MMW-MIM, 090615.sensor_occupy.xw|occupancy, illuminance, light|
 |PTX|Mesh Double Wall Switch|090615.switch.aksk2|channel_1, channel_2, wireless, wireless, action|
 |PTX|Mesh Double Wall Switch|090615.switch.meshk2|channel_1, channel_2|
 |PTX|Mesh Double Wall Switch|PTX-SK2M, 090615.switch.mesw2|channel_1, channel_2, led, wireless_1, wireless_2|
 |PTX|Mesh Double Wall Switch (no N)|090615.switch.aidh2|channel_1, channel_2, wireless, wireless, led, action|
+|PTX|Mesh Downlight|090615.light.milg05|light|
 |PTX|Mesh Downlight|090615.light.mlig01|light|
 |PTX|Mesh Downlight|090615.light.mlig02|light|
 |PTX|Mesh Downlight|090615.light.mylg04|light|
@@ -380,15 +419,19 @@ Total devices: 202
 |PTX|Smart Double Wall Switch|PTX-X62-NMIMC1, 090615.switch.x6kw2|action, switch_1, switch_2, backlight, mode_1, mode_2|
 |PTX|Smart Single Wall Switch|PTX-X61-NMIMC1, 090615.switch.x6kw1|action, switch, backlight, wireless|
 |PTX|Smart Tripl Wall Switch|PTX-X62-NMIMC1, 090615.switch.x6kw3|action, switch_1, switch_2, switch_3, backlight, mode_1, mode_2, mode_3|
+|PTX|Smart Wall Switch Panel|PTX-X1TPM, 090615.switch.x1tpm|action, switch_1, switch_2, switch_3, mode_1, mode_2, mode_3, color_temp_1, light_mode_1, color_temp_2, color_temp_3, light_mode_4, ac_mode, target_temp, fan_speed, screen_brightness, auto_lock, standby_display|
+|Panasonic|Panasonic Ceiling Fan Light|pmfbj.light.lz8321|light, light_mode, fan, speed, reverse, switch_mode|
 |Panasonic|Panasonic Ceiling Light|pmfbj.light.xsx340|light|
 |Panasonic|Panasonic Ceiling Light|pmfbj.light.xsx341|light|
 |Philips|Mi Smart Desk Lamp Lite|philips.light.lite|light, mode, delay, notify_switch, notify_time, night_light_enable|
 |Qdhkl|AC Indoor Unit Controller|qdhkl.aircondition.b25|climate|
 |Scdvb|Air Conditioner|scdvb.aircondition.acm|climate|
+|SmartFrog|V6 Double Wall Switch|giot.switch.v62ksm|left_switch, right_switch, action, left_switch_mode, right_switch_mode, power_on_state_left_switch, power_on_state_right_switch, left_switch_indicator_light_mode, right_switch_indicator_light_mode, ambient_light|
 |Symi|Mesh Light|symi.light.wy0a01|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
 |Unkown|Mesh Four-Key Wall Switch|bean.switch.bln04|switch_1, switch_2, switch_3, switch_4, mode_1, mode_2, mode_3, mode_4, action|
 |WLG|Smart Light|wlg.light.wy0a01|light|
 |WLG|WLG Mesh Light|wlg.light.wy0a03|light, mode, power_on_state, flex_switch, night_light, user_save, dimming, delay|
+|WLG|WLG Mesh Light|wlg.light.wy0a05|light, mode, power_on_state, flex_switch, night_light, user_save, dimming, delay|
 |Xiaomi|Curtain Group|lumi.curtain.hmcn04|motor|
 |Xiaomi|Curtain Motor|MJSGCLBL01LM, lumi.curtain.hmcn02|motor, battery, light, motor_reverse, battery_charging|
 |Xiaomi|Curtain Motor|MJZNCL02LM, lumi.curtain.acn006|motor, battery, battery_charging, motor_reverse|
@@ -411,8 +454,11 @@ Total devices: 202
 |Xiaomi|Multifunctional Camping Lantern|hoto.light.lamp|light, mode, battery, main_ charging_state, sub_ charging_state, delay_switch, delay_time|
 |Xiaomi|Multifunctional Camping Lantern|hoto.light.lamp02|light, mode, battery, main_ charging_state, sub_ charging_state, delay_switch, delay_time|
 |Xiaomi|Xiaomi Smart Diffuser|xiaomi.diffuser.xw002|diffuser, fragrance_duration, fragrance_interval, ambient_light, color, auto_fragrance, battery, charging_state, action|
+|Xiaomi|Xiaomi Smart Scent Diffuser|xiaomi.diffuser.xw2iv|diffuser, fragrance_duration, fragrance_interval, ambient_light, color, auto_fragrance, battery, charging_state, action|
+|Xiaomi|Xiaomi Smart Wall Outlet|XMZNCZ02LM, xiaomi.plug.mcn004|outlet, energy, power, power_consumption_accumulation_way, led, power_on_state|
 |Xiaomi|Xiaomi Smart Wall Outlet Pro|XMZNCZ01LM, xiaomi.plug.mcn001|outlet, power_on_state, fault, energy, power, power_consumption_accumulation_way, led, child_lock|
 |Xiaomi|Xiaomi Smart Wall Outlet Pro|XMZNCZ01LM, xiaomi.plug.mcn003|outlet, power_on_state, fault, energy, power, power_consumption_accumulation_way, led, child_lock|
+|Xiaomi|Xiaomi Smart Wall Switch (2 Gang)|XMS01BXS, xiaomi.switch.w2|action, switch_1, switch_2, indicator_light, switch_mode_1, switch_mode_2, sensor_mode_1, sensor_mode_2|
 |Xiaomi|Xiaomi Smart Wall Switch Pro (1 Gang)|XMQBKG04LM, xiaomi.switch.pro1|switch, action, fault, power, led|
 |Xiaomi|Xiaomi Smart Wall Switch Pro (1 Gang)|XMQBKG04LM, xiaomi.switch.wpro1|switch, action, fault, power, led|
 |Xiaomi|Xiaomi Smart Wall Switch Pro (2 Gang)|XMQBKG05LM, xiaomi.switch.pro2|channel_1, channel_2, action, fault, power, led|
@@ -421,6 +467,7 @@ Total devices: 202
 |Xiaomi|Xiaomi Smart Wall Switch Pro (3 Gang)|XMQBKG06LM, xiaomi.switch.pro3|channel_1, channel_2, channel_3, action, fault, power, led|
 |XinGuang|Light|LIBMDA09X, wainft.light.wy0a01|light|
 |XinGuang|Mesh Switch|wainft.switch.sw0a01|switch|
+|YKCN|Din-Rail Circuit Breaker|ykcn.valve.cbcs|switch, energy, current, voltage, power|
 |YKGC|LS Smart Curtain Motor|LSCL, lonsam.curtain.lscl|motor, motor_reverse, on|
 |Yeelight|Charging Table Lamp|MJTD04YL, yeelink.light.lamp21|light, battery, battery_charging|
 |Yeelight|Classic Group|yeelink.light.dn2grp|light|
@@ -444,6 +491,12 @@ Total devices: 202
 |Yeelight|Mesh Light Strip C1|yeelink.light.stripf|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
 |Yeelight|Mesh Night Light|MJYD05YL, yeelink.light.nl2|switch, light|
 |Yeelight|Mesh Spotlight|YLSD04YL, yeelink.light.spot1|light, flex_switch, power_on_state|
+|Yeelight|Yeelight K Smart Switch (One Key) Mesh 2.0|YLYKG-0178, yeelink.switch.sw11|channel_1, wireless_1, led, action|
+|Yeelight|Yeelight K Smart Switch (Three Keys) Mesh 2.0|YLYKG-0180, yeelink.switch.sw13|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, led, action|
+|Yeelight|Yeelight K Smart Switch (Two Keys) Mesh 2.0|YLYKG-0179, yeelink.switch.sw12|channel_1, channel_2, wireless_1, wireless_2, led, action|
+|Yeelight|Yeelight Lingdong Smart Switch (One Key)|N5-ZNMB-1AC, yeelink.switch.sw3|channel_1, wireless_1, led, action|
+|Yeelight|Yeelight Lingdong Smart Switch (Three Keys)|N5-ZNMB-3AC, yeelink.switch.sw5|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, led, action|
+|Yeelight|Yeelight Lingdong Smart Switch (Two Keys)|N5-ZNMB-2AC, yeelink.switch.sw4|channel_1, channel_2, wireless_1, wireless_2, led, action|
 |Yeelight|Yeelight Smart Light|yeelink.light.wy0a01|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
 |Yeelight|Yeelight Smart Light|yeelink.light.wy0a03|light, mode, flex_switch, power_on_state, save_state, dimming, night_light|
 |Yeelink|Curtain Motor C1|YCCBCI008, yeelink.curtain.crc1|motor, motor_reverse, mode|
@@ -454,26 +507,34 @@ Total devices: 202
 |ZNSN|Mesh Triple Wall Switch|znsn.switch.zg3m|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, power_on_state_1, power_on_state_2, power_on_state_3, action|
 |ZNSN|Mesh Wall Switch ML3|znsn.switch.zm3d|channel_1, channel_2, channel_3|
 |Zemismart|Smart Curtain|zemi.curtain.zm85|motor, motor_reverse|
+|ZiQing|IZQ Presence Sensor Ceiling|IZQ-24n, izq.sensor_occupy.24n|occupancy, occupancy_status, illuminance, has_someone_duration, no_one_duration, led, relay_switch, fault|
 |ZiQing|IZQ Presence Sensor Lite|IZQ-24, izq.sensor_occupy.24|occupancy, no_one_determine_time, has_someone_duration, idle_time, illuminance, distance, led, pir, detect_range, enterin_confirm_time, occupancy_status|
 |Zxgs|Mesh Two Color Scene Light|zxgs.light.bdcl01|light|
+|iCLICK|Mi Bridge|best.remote.mi001|action, scene|
+|seomsh|星月影智能筒射灯|wy0a01, seomsh.light.wy0a01|light|
 |~|Intelligent On-off Device(Mesh)|iot.switch.tdq3|switch, fault, power_on_state, led, double_click_close, local_timing, jog_mode, child_lock, rocker_switch|
 |~|Mesh Ceiling Fan Light|xingh.light.fsd2|light, light_mode, fan, horizontal_swing, wind_reverse, natural_wind, fan_level|
 |~|Mesh Double Wall Switch (no N)|babai.switch.202ml|channel_1, channel_2, wireless_1, wireless_2|
+|~|Mesh Double Wall Switch (no N)|babai.switch.302ml|channel_1, channel_2, wireless_1, wireless_2, power_on_state_1, power_on_state_2, action, Indicator Light Backlight, Indicator Light Power Light|
 |~|Mesh Double Wall Switch (no N)|frfox.switch.bl02|channel_1, channel_2, mode_1, mode_2, action, backlight, led|
 |~|Mesh Double Wall Switch (with N)|babai.switch.202m|channel_1, channel_2, wireless_1, wireless_2|
+|~|Mesh Fan Light Series V1|cxw.light.wyfv01|light, light_mode, fan, fan_level, horizontal_swing, wind_reverse, natural_wind|
 |~|Mesh Light|crzm.light.w00a01|light|
 |~|Mesh Light|ftd.light.dsplmp|light, mode|
 |~|Mesh Light|ftd.light.ftdlmp|light, flex_switch, mode|
 |~|Mesh Light|jymc.light.falmp|light, flex_switch, mode|
 |~|Mesh Light|shhf.light.slcwb3|light, mode, flex_switch, power_on_state, wake_up_mode, sleep_aid_mode, flow|
+|~|Mesh Light|shhf.light.slcwb8|light, mode, flex_switch, power_on_state, wake_up_mode, sleep_aid_mode, flow|
 |~|Mesh Light|yankon.light.ykmesh|light, mode, power_on_state|
 |~|Mesh Lightstrip (RF ready)|crzm.light.wy0a01|light|
 |~|Mesh Single Wall Switch (no N)|babai.switch.201ml|channel, wireless|
+|~|Mesh Single Wall Switch (no N)|babai.switch.301ml|switch, wireless, power_on_state, action, Indicator Light Backlight, Indicator Light Power Light|
 |~|Mesh Single Wall Switch (no N)|frfox.switch.bl01|switch, mode, action, backlight, led|
 |~|Mesh Single Wall Switch (with N)|babai.switch.201m|channel, wireless|
 |~|Mesh Smart Plug V3|giot.plug.v3shsm|plug, power_on_state, inching_mode, inching_state, inching_time, led|
 |~|Mesh Switch|dwdz.switch.sw0a01|switch|
 |~|Mesh Triple Wall Switch (no N)|babai.switch.203ml|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3|
+|~|Mesh Triple Wall Switch (no N)|babai.switch.303ml|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3, power_on_state_1, power_on_state_2, power_on_state_3, action, Indicator Light Backlight, Indicator Light Power Light|
 |~|Mesh Triple Wall Switch (no N)|frfox.switch.bl03|channel_1, channel_2, channel_3, mode_1, mode_2, mode_3, action, backlight, led|
 |~|Mesh Triple Wall Switch (with N)|babai.switch.203m|channel_1, channel_2, channel_3, wireless_1, wireless_2, wireless_3|
 |~|Night Light Mesh Q1|hzsj.light.wyra01|light, mode, power_on_state|
@@ -481,6 +542,7 @@ Total devices: 202
 |~|Smart Quadruple Switch|topwit.switch.rzw34|switch_1, switch_2, switch_3, switch_4, mode_1, mode_2, mode_3, mode_4, action|
 |~|Two Key Mesh Switch|topwit.switch.rzw02|switch_1, switch_2, mode_1, mode_2, action|
 |~|Two-Button Switch |ydhome.switch.s2|left_switch, right_switch|
+|~|ZB Mesh Light MESH2.0|zbmesh.light.wy0a02|light, mode, power_on_state, flex_switch, night_light, fade_time, lowest_brightness, master_slave_switch, breathing_speed, beat_speed, rhythm_switch, rhythm_speed|
 
 ## Supported Matter
 
