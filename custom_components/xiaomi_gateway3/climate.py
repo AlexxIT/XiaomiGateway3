@@ -8,7 +8,12 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import PRECISION_WHOLE, UnitOfTemperature
+from homeassistant.const import (
+    MAJOR_VERSION,
+    MINOR_VERSION,
+    PRECISION_WHOLE,
+    UnitOfTemperature,
+)
 
 from .hass.entity import XEntity
 
@@ -27,6 +32,14 @@ ACTIONS = {
 }
 
 
+# https://developers.home-assistant.io/blog/2024/01/24/climate-climateentityfeatures-expanded
+ONOFF = (
+    (ClimateEntityFeature.TURN_ON | ClimateEntityFeature.TURN_OFF)
+    if (MAJOR_VERSION, MINOR_VERSION) >= (2024, 2)
+    else 0
+)
+
+
 class XAqaraS2(XEntity, ClimateEntity):
     _attr_fan_mode = None
     _attr_fan_modes = [FAN_LOW, FAN_MEDIUM, FAN_HIGH, FAN_AUTO]
@@ -34,7 +47,7 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.COOL, HVACMode.HEAT]
     _attr_precision = PRECISION_WHOLE
     _attr_supported_features = (
-        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ONOFF
     )
     _attr_target_temperature = 0
     _attr_target_temperature_step = 1
@@ -83,7 +96,7 @@ class XAqaraS2(XEntity, ClimateEntity):
 class XAqaraE1(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
-    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+    _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ONOFF
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 30
     _attr_min_temp = 5
@@ -137,7 +150,7 @@ class XScdvbHAVC(XEntity, ClimateEntity):
     ]
     _attr_precision = PRECISION_WHOLE
     _attr_supported_features = (
-        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ONOFF
     )
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 32
