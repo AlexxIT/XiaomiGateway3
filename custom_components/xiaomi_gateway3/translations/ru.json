@@ -27,14 +27,14 @@
       },
       "cloud_captcha": {
         "title": "Проверка аккаунта",
-        "description": "Введите код с картинки: {image}",
+        "description": "Введите код из: ![]({image})",
         "data": {
           "code": "Код"
         }
       },
-      "cloud_email": {
+      "cloud_verify": {
         "title": "Проверка аккаунта",
-        "description": "Введите код из e-mail: {email}",
+        "description": "Введите код из: {address}",
         "data": {
           "code": "Код"
         }

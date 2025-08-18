@@ -28,14 +28,14 @@
       },
       "cloud_captcha": {
         "title": "Verify account",
-        "description": "Enter code from image: {image}",
+        "description": "Enter code from: ![]({image})",
         "data": {
           "code": "Code"
         }
       },
-      "cloud_email": {
+      "cloud_verify": {
         "title": "Verify account",
-        "description": "Enter code from email: {email}",
+        "description": "Enter code from: {address}",
         "data": {
           "code": "Code"
         }

@@ -15,11 +15,14 @@ SDK_VERSION = "4.2.29"
 SERVERS = ["cn", "de", "i2", "ru", "sg", "us"]
 SID = "xiaomiio"
 
+FLAG_PHONE = 4
+FLAG_EMAIL = 8
+
 
 class AuthResult(TypedDict, total=False):
     ok: bool
     captcha: bytes | None
-    email: str | None
+    verify: str | None  # phone or email address
     token: str | None
     exception: Exception | None
 
@@ -54,9 +57,7 @@ class MiCloud:
                 return {"ok": False, "captcha": data["image"]}
 
             if notification_url := res1.get("notificationUrl"):
-                data = await self._send_email_ticket(notification_url)
-                self.auth = {"identity_session": data["identity_session"]}
-                return {"ok": False, "email": data["email"]}
+                return await self._get_notification_url(notification_url)
 
             res2 = await self._get_location(res1["location"])
 
@@ -90,15 +91,23 @@ class MiCloud:
             return {"ok": False, "exception": e}
 
     async def login_captcha(self, code: str) -> AuthResult:
+        if "flag" in self.auth and "identity_session" in self.auth:
+            return await self._send_ticket(
+                self.auth["flag"], self.auth["identity_session"], code
+            )
+
         return await self.login(
             self.auth["username"], self.auth["password"], captcha_code=code
         )
 
-    async def verify_email(self, ticket: str) -> AuthResult:
+    async def login_verify(self, ticket: str) -> AuthResult:
+        flag = self.auth["flag"]
+        key = "Phone" if flag == FLAG_PHONE else "Email"
+
         r = await self.session.post(
-            "https://account.xiaomi.com/identity/auth/verifyEmail",
+            f"https://account.xiaomi.com/identity/auth/verify{key}",
             cookies={"identity_session": self.auth["identity_session"]},
-            params={"_flag": 8, "ticket": ticket, "trust": "false", "_json": "true"},
+            params={"_flag": flag, "ticket": ticket, "trust": "false", "_json": "true"},
         )
         res1 = parse_auth_response(await r.read())
         assert res1["code"] == 0, res1
@@ -162,7 +171,7 @@ class MiCloud:
         body = await r.read()
         return {"image": body, "ick": r.cookies["ick"]}
 
-    async def _send_email_ticket(self, notification_url: str) -> dict:
+    async def _get_notification_url(self, notification_url: str) -> AuthResult:
         assert "/identity/authStart" in notification_url, notification_url
         notification_url = notification_url.replace("authStart", "list")
 
@@ -170,25 +179,48 @@ class MiCloud:
         res1 = parse_auth_response(await r.read())
         assert res1["code"] == 2, res1
 
-        identity_session = r.cookies["identity_session"]
+        flag = res1["flag"]
+        assert flag in (FLAG_EMAIL, FLAG_PHONE), res1
+
+        return await self._send_ticket(flag, r.cookies["identity_session"])
+
+    async def _send_ticket(
+        self, flag: int, identity_session, captcha_code: str = None
+    ) -> AuthResult:
+        key = "Phone" if flag == FLAG_PHONE else "Email"
 
         r = await self.session.get(
-            "https://account.xiaomi.com/identity/auth/verifyEmail",
+            f"https://account.xiaomi.com/identity/auth/verify{key}",
             cookies={"identity_session": identity_session},
-            params={"_flag": 8, "_json": "true"},
+            params={"_flag": flag, "_json": "true"},
         )
-        res2 = parse_auth_response(await r.read())
-        assert res2["code"] == 0, res2
+        res1 = parse_auth_response(await r.read())
+        assert res1["code"] == 0, res1
+
+        if captcha_code:
+            cookies = {"identity_session": identity_session, "ick": self.auth["ick"]}
+            data = {"retry": 0, "icode": captcha_code, "_json": "true"}
+        else:
+            cookies = {"identity_session": identity_session}
+            data = {"retry": 0, "icode": "", "_json": "true"}
 
         r = await self.session.post(
-            "https://account.xiaomi.com/identity/auth/sendEmailTicket",
-            cookies={"identity_session": identity_session},
-            data={"retry": 0, "icode": "", "_json": "true"},
+            f"https://account.xiaomi.com/identity/auth/send{key}Ticket",
+            cookies=cookies,
+            data=data,
         )
-        res3 = parse_auth_response(await r.read())
-        assert res3["code"] == 0, res3
+        res2 = parse_auth_response(await r.read())
 
-        return {"email": res2["maskedEmail"], "identity_session": identity_session}
+        self.auth = {"flag": flag, "identity_session": identity_session}
+
+        if captcha_url := res2.get("captchaUrl"):
+            data = await self._get_captcha_url(captcha_url)
+            self.auth["ick"] = data["ick"]
+            return {"ok": False, "captcha": data["image"]}
+
+        assert res2["code"] == 0, res2
+
+        return {"ok": False, "verify": res1[f"masked{key}"]}
 
     async def request(self, server: str, path: str, params: dict) -> dict:
         form: dict[str, str] = {"data": json.dumps(params, separators=(",", ":"))}
