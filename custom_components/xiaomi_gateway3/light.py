@@ -29,7 +29,11 @@ ATTR_COLOR_TEMP = "color_temp"
 ATTR_COLOR_TEMP_KELVIN = "color_temp_kelvin"
 
 
-def color_temp(value: int) -> int:
+def color_temp(value: int | None) -> int | None:
+    if value is None:
+        return None
+    if value == 0:
+        return 0
     return math.floor(1000000 / value)
 
 
