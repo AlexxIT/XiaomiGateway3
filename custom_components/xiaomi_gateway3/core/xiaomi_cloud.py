@@ -12,8 +12,14 @@ from aiohttp import ClientSession
 
 COOKIES = ("userId", "cUserId", "serviceToken")
 SDK_VERSION = "4.2.29"
-SERVERS = ["cn", "de", "i2", "ru", "sg", "us"]
-SID = "xiaomiio"
+BASE = {
+    "cn": "https://api.io.mi.com/app",
+    "de": "https://de.api.io.mi.com/app",
+    "i2": "https://i2.api.io.mi.com/app",
+    "ru": "https://ru.api.io.mi.com/app",
+    "sg": "https://sg.api.io.mi.com/app",
+    "us": "https://us.api.io.mi.com/app",
+}
 
 FLAG_PHONE = 4
 FLAG_EMAIL = 8
@@ -34,14 +40,20 @@ class MiCloud:
 
     devices: list[dict] = None
 
-    def __init__(self, session: ClientSession, servers: list = None):
-        self.session = session
+    def __init__(
+        self, session: ClientSession = None, servers: list = None, sid: str = None
+    ):
+        self.session = session or ClientSession()
         self.servers = servers or ["cn"]
+        self.sid = sid or "xiaomiio"
         self.device_id = get_random_string(16)
 
     @property
     def ok(self):
         return self.cookies is not None and self.ssecurity is not None
+
+    async def close(self):
+        return await self.session.close()
 
     async def login(self, username: str, password: str, **kwargs) -> AuthResult:
         try:
@@ -76,7 +88,7 @@ class MiCloud:
             r = await self.session.get(
                 "https://account.xiaomi.com/pass/serviceLogin",
                 cookies={"userId": user_id, "passToken": pass_token},
-                params={"_json": "true", "sid": SID},
+                params={"_json": "true", "sid": self.sid},
             )
             res1 = parse_auth_response(await r.read())
 
@@ -125,7 +137,7 @@ class MiCloud:
         r = await self.session.get(
             "https://account.xiaomi.com/pass/serviceLogin",
             cookies={"sdkVersion": SDK_VERSION, "deviceId": self.device_id},
-            params={"_json": "true", "sid": SID},
+            params={"_json": "true", "sid": self.sid},
         )
         res1 = parse_auth_response(await r.read())
 
@@ -242,11 +254,8 @@ class MiCloud:
         # 4. add nonce
         form["_nonce"] = base64.b64encode(nonce).decode()
 
-        dom = "" if server == "cn" else server + "."
-
-        r = await self.session.post(
-            f"https://{dom}api.io.mi.com/app{path}", cookies=self.cookies, data=form
-        )
+        url = BASE.get(server, server) + path
+        r = await self.session.post(url, cookies=self.cookies, data=form)
         assert r.ok, r.status
 
         ciphertext: bytes = base64.b64decode(await r.read())
