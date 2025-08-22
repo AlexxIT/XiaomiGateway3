@@ -3739,7 +3739,6 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec/giot.switch.v54ksm
     13141: ["GranwinIoT", "Four-Button Switch (Mesh) V5", "giot.switch.v54ksm"],
-    16359: ["GranwinIoT", "Four-Button Switch (Mesh) V6", "giot.switch.v64ksm"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
@@ -3758,6 +3757,40 @@ DEVICES += [{
         MapConv("led_mode_special", "select", mi="6.p.2", map={0: "Follow Switch State", 1: "Opposite To Switch State", 2: "Normally Off", 3: "Normally On"}, entity=ENTITY_CONFIG),  # config
         BaseConv("backlight", "switch", mi="6.p.3"),
     ]
+}, {
+    16359: ["GranwinIoT", "V6 Smart Four-Way Switch (Mesh)", "giot.switch.v64ksm"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}), # config
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={0: "Off", 1: "On", 2: "Default"}), # config
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}), # config
+        MapConv("power_on_state_2", "select", mi="3.p.5", map={0: "Off", 1: "On", 2: "Default"}), # config
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}), # config
+        MapConv("power_on_state_3", "select", mi="4.p.5", map={0: "Off", 1: "On", 2: "Default"}), # config
+        BaseConv("channel_4", "switch", mi="10.p.1"),
+        MapConv("mode_4", "select", mi="10.p.2", map={0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}), # config
+        MapConv("power_on_state_4", "select", mi="10.p.5", map={0: "Off", 1: "On", 2: "Default"}), # config
+
+        ConstConv("action", mi="12.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="12.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="12.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="13.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="13.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="13.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="14.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_3_HOLD),
+        ConstConv("action", mi="15.e.1", value=BUTTON_4_SINGLE),
+        ConstConv("action", mi="15.e.2", value=BUTTON_4_DOUBLE),
+        ConstConv("action", mi="15.e.3", value=BUTTON_4_HOLD),
+
+        MapConv("indicator_light_mode_normal", "select", mi="16.p.1", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}, entity=ENTITY_CONFIG), # config
+        MapConv("indicator_light_mode_special", "select", mi="16.p.2", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}, entity=ENTITY_CONFIG), # config
+        BoolConv("backlight", "switch", mi="17.p.1", entity=ENTITY_CONFIG), # config
+    ],
 }, {
     16400: ["SmartFrog", "V6 Double Wall Switch", "giot.switch.v62ksm"],
     "spec": [
@@ -5036,6 +5069,15 @@ DEVICES += [{
         BaseConv("horizontal_swing", "switch", mi="5.p.3"),
         BaseConv("wind_reverse", "switch", mi="5.p.4"),
         BoolConv("natural_wind", "switch", mi="5.p.5"),
+    ],
+}, {
+    23564: ["Dooya", "Smart Curtain DT98", "dooya.curtain.dt98"],
+    "spec": [
+        MapConv("curtain", "cover", mi="2.p.1", map={0: "open", 1: "close", 2: "stop"}, entity={"class": "curtain"}),
+        MapConv("run_state", mi="2.p.2", map={0: "opening", 1: "closing", 2: "stop"}),
+        CurtainPosConv("position", mi="2.p.3"),
+        BaseConv("target_position", mi="2.p.4"),
+        BoolConv("motor_reverse", "switch", mi="2.p.5", entity=ENTITY_CONFIG), # config
     ],
 }, {
     "default": "mesh",  # default Mesh device
