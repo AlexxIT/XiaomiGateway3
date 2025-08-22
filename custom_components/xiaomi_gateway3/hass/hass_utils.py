@@ -83,7 +83,7 @@ async def setup_cloud(hass: HomeAssistant, config_entry: ConfigEntry):
     if token := data.get("token"):
         await cloud.login_token(token)
     else:
-        await cloud.login(data["username"], data["password"])
+        await cloud.login_password(data["username"], data["password"])
 
     if cloud.ok:
         cloud.devices = await cloud.get_devices()  # load devices from cloud

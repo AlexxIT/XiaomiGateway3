@@ -10,7 +10,6 @@ from typing import TypedDict
 from Crypto.Cipher import ARC4
 from aiohttp import ClientSession
 
-COOKIES = ("userId", "cUserId", "serviceToken")
 SDK_VERSION = "4.2.29"
 BASE = {
     "cn": "https://api.io.mi.com/app",
@@ -71,13 +70,17 @@ class MiCloud:
             if notification_url := res1.get("notificationUrl"):
                 return await self._get_notification_url(notification_url)
 
-            res2 = await self._get_location(res1["location"])
+            return await self._get_credentials(res1)
 
-            self.ssecurity = base64.b64decode(res1["ssecurity"])
-            self.cookies = {k: res2[k] for k in COOKIES}
+        except Exception as e:
+            return {"ok": False, "exception": e}
 
-            return {"ok": True, "token": f"{res1['userId']}:{res1['passToken']}"}
+    async def login_password(self, username: str, password: str) -> AuthResult:
+        try:
+            res1 = await self._service_login(username, password)
+            assert res1["code"] == 0, res1
 
+            return await self._get_credentials(res1)
         except Exception as e:
             return {"ok": False, "exception": e}
 
@@ -91,13 +94,9 @@ class MiCloud:
                 params={"_json": "true", "sid": self.sid},
             )
             res1 = parse_auth_response(await r.read())
+            assert res1["code"] == 0, res1
 
-            res2 = await self._get_location(res1["location"])
-
-            self.ssecurity = base64.b64decode(res1["ssecurity"])
-            self.cookies = {k: res2[k] for k in COOKIES}
-
-            return {"ok": True}
+            return await self._get_credentials(res1)
 
         except Exception as e:
             return {"ok": False, "exception": e}
@@ -124,12 +123,7 @@ class MiCloud:
         res1 = parse_auth_response(await r.read())
         assert res1["code"] == 0, res1
 
-        res2 = await self._get_location(res1["location"])
-
-        self.ssecurity = base64.b64decode(res2["ssecurity"])
-        self.cookies = {k: res2[k] for k in COOKIES}
-
-        return {"ok": True, "token": f"{res2['userId']}:{res2['passToken']}"}
+        return await self._get_credentials(res1)
 
     async def _service_login(
         self, username: str, password: str, captcha_code: str = None
@@ -163,25 +157,32 @@ class MiCloud:
         )
         return parse_auth_response(await r.read())
 
-    async def _get_location(self, location: str) -> dict:
-        r1 = await self.session.get(location)
-        assert await r1.read() == b"ok"
-
-        # this is useful for all steps
-        response = {k: v.value for k, v in r1.cookies.items()}
-
-        # this is useful for verify_email step
-        for r2 in r1.history:
-            response.update({k: v.value for k, v in r2.cookies.items()})
-            if ext := r2.headers.get("extension-pragma"):
-                response.update(json.loads(ext))
-
-        return response
-
     async def _get_captcha_url(self, captcha_url: str) -> dict:
         r = await self.session.get("https://account.xiaomi.com" + captcha_url)
         body = await r.read()
         return {"image": body, "ick": r.cookies["ick"]}
+
+    async def _get_credentials(self, data: dict) -> AuthResult:
+        # For `login_password` and `login_token` steps `data` has keys:
+        # `ssecurity`, `passToken`, `userId`.
+        assert data.get("location"), data
+
+        r1 = await self.session.get(data["location"])
+        assert await r1.read() == b"ok"
+
+        # For all steps `r1.cookies` has keys: `userId`, `cUserId`, `serviceToken`.
+        self.cookies = {k: v.value for k, v in r1.cookies.items()}
+
+        for r2 in r1.history:
+            # For `login_verify` step `r2.cookies` has keys: `passToken`, `userId`.
+            data.update({k: v.value for k, v in r2.cookies.items()})
+            if ext := r2.headers.get("extension-pragma"):
+                # For `login_verify` step `r2.headers` has key `ssecurity`.
+                data.update(json.loads(ext))
+
+        self.ssecurity = base64.b64decode(data["ssecurity"])
+
+        return {"ok": True, "token": f"{data['userId']}:{data['passToken']}"}
 
     async def _get_notification_url(self, notification_url: str) -> AuthResult:
         assert "/identity/authStart" in notification_url, notification_url
