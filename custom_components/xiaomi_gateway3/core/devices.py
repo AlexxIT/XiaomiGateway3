@@ -5090,11 +5090,18 @@ DEVICES += [{
 DEVICES += [{
     1047: ["Yeelight", "Classic Group", "yeelink.light.dn2grp"],
     1054: ["Yeelight", "Mesh Group", "yeelink.light.mb1grp"],
-    68286: ["Xiaomi", "Light Group", "mijia.light.group3"],
-    "spec": [
+     "spec": [
         BaseConv("light", "light", mi="2.p.1", entity={"icon": "mdi:lightbulb-group"}),  # bool
         BrightnessConv("brightness", mi="2.p.2", max=65535),  # uint16
         ColorTempKelvin("color_temp", mi="2.p.3"),  # uint32, 2700..6500
+    ]
+}, {    
+    68286: ["Xiaomi", "Light Group", "mijia.light.group3"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1", entity={"icon": "mdi:lightbulb-group"}),  # bool
+        BrightnessConv("brightness", mi="2.p.2", max=100),  # uint8
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=1700, maxk=7000),  # uint32, 1700..7000
+        MapConv("mode", mi="2.p.6", map={3: "tv",4: "hospitality", 5: "night",6: "computer"}, entity={"icon": "mdi:theme-light-dark"})
     ]
 }, {
     71017: ["Xiaomi", "Curtain Group", "lumi.curtain.hmcn04"],
