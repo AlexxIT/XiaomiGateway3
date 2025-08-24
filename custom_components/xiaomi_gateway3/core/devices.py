@@ -5080,6 +5080,16 @@ DEVICES += [{
         BoolConv("motor_reverse", "switch", mi="2.p.5", entity=ENTITY_CONFIG), # config
     ],
 }, {
+    19534: ["Mean Well", "Smart Chromatic Controller", "ftd.light.nomain"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=3000, maxk=6500),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG), 
+        MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
+        BaseConv("default_onoff_state",mi="4.p.29", entity=ENTITY_CONFIG),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
