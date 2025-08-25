@@ -1,6 +1,7 @@
 """Set entity attributes based on converter settings."""
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.cover import CoverDeviceClass
 from homeassistant.components.number import NumberDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -195,6 +196,7 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     # DIAGNOSTIC controls
     "command": {"category": DIAGNOSTIC, "icon": "mdi:apple-keyboard-command"},
     "data": {"category": DIAGNOSTIC, "icon": "mdi:information-box"},
+    "button.identify": {"class": ButtonDeviceClass.IDENTIFY, "category": DIAGNOSTIC},
     ##
     # CONFIG and DIAGNOSTIC sensors
     "sensor.chip_temperature": {

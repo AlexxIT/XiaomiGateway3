@@ -22,6 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [
     "alarm_control_panel",
     "binary_sensor",
+    "button",
     "climate",
     "cover",
     "light",

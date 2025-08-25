@@ -2969,6 +2969,7 @@ DEVICES += [{
         BoolConv("motor_reverse", "switch", mi="2.p.5"),  # uint8, config
         MapConv("battery_charging", "binary_sensor", mi="5.p.2", map={1: True, 2: False, 3: False}),  # diagnostic
         BaseConv("battery_temp_warning", mi="3.p.16"),
+        BaseConv("identify", "button", mi="4.a.1")
     ],
 }, {
     3789: ["PTX", "Mesh Double Wall Switch", "090615.switch.meshk2"],
