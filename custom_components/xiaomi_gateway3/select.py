@@ -57,7 +57,6 @@ class XCommandSelect(XEntity, SelectEntity):
     def on_init(self):
         self._attr_current_option = CMD_NONE
         self._attr_options = [CMD_NONE, CMD_INFO]
-        self._attr_translation_key = self.attr
 
         # noinspection PyTypeChecker
         self.gw = self.device.gateways[0]
@@ -176,7 +175,6 @@ class XDataSelect(XEntity, SelectEntity):
     def on_init(self):
         self._attr_current_option = None
         self._attr_options = []
-        self._attr_translation_key = self.attr
 
         self.listen_attrs = {
             "data",
