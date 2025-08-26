@@ -4295,49 +4295,33 @@ DEVICES += [{
         MapConv("action", mi="6.e.1.p.2", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single"}),
     ],
 }, {
-    # https://home.miot-spec.com/spec/xiaomi.diffuser.xw002
-    18462: ["Xiaomi", "Xiaomi Smart Diffuser", "xiaomi.diffuser.xw002"],
+    18462: ["Xiaomi", "Smart Aroma Diffuser", "MJXFJ03XW", "xiaomi.diffuser.xw002"],
+    20199: ["Xiaomi", "Smart Scent Diffuser", "xiaomi.diffuser.xw2iv"],
+    24876: ["Xiaomi", "Smart Aroma Diffuser", "MJXFJ03XW", "xiaomi.diffuser.02wh"],
     "spec": [
         BaseConv("diffuser", "switch", mi="2.p.2"),
-        MathConv("fragrance_duration", "number", mi="2.p.3", min=2, max=6, step=1, entity={"units": UNIT_SECONDS}),
-        MathConv("fragrance_interval", "number", mi="2.p.4", min=10, max=20, step=5, entity={"units": UNIT_MINUTES}),
+        MathConv("fragrance_duration", "number", mi="2.p.3", min=2, max=6, step=1, entity={"category": "config", "units": UNIT_SECONDS}),
+        MathConv("fragrance_interval", "number", mi="2.p.4", min=10, max=20, step=5, entity={"category": "config", "units": UNIT_MINUTES}),
         # Ambient Light
-        BaseConv("ambient_light", "light", mi="3.p.1"),
-        BrightnessConv("brightness", mi="3.p.2", max=100),
-        MathConv("color", "number", mi="3.p.3", min=1, max=16777215),
-        BoolConv("auto_fragrance", "switch", mi="4.p.1"),
+        BaseConv("light", "light", mi="3.p.1"),
+        BrightnessConv("brightness", mi="3.p.2"),
+        RGBColor("rgb_color", mi="3.p.3"),
         # Battery
         BaseConv("battery", "sensor", mi="5.p.1"),
-        MapConv("charging_state", "sensor", mi="5.p.2", map={1: "Charging", 2: "Not Charging", 3: "Not Chargeable"}),
+        MapConv("battery_charging", "binary_sensor", mi="5.p.2", map={1: True, 2: False, 3: False}, entity=ENTITY_DIAGNOSTIC),
+        # Settings
+        BaseConv("auto_fragrance", "switch", mi="4.p.1", entity=ENTITY_CONFIG),
+        BaseConv("auto_light", "switch", mi="4.p.2", entity=ENTITY_CONFIG),
+        # 18462 and 20199 don't have this setting, only 24876 has it
+        BaseConv("auto_light_off", "switch", mi="4.p.3", entity=ENTITY_CONFIG),
         # Actions
         BaseConv("action", "sensor"),
-        ConstConv("action", mi="4.e.1", value="Auto Light"),
-        ConstConv("action", mi="4.e.2", value="Auto Fragrance"),
-        ConstConv("action", mi="4.e.3", value="Someone Move"),
-        ConstConv("action", mi="4.e.4", value="Nobody Move"),
-    ],
-}, {
-    # https://home.miot-spec.com/spec/xiaomi.diffuser.xw2iv
-    20199: ["Xiaomi", "Xiaomi Smart Scent Diffuser", "xiaomi.diffuser.xw2iv"],
-    "spec": [
-        BaseConv("diffuser", "switch", mi="2.p.2"),
-        MathConv("fragrance_duration", "number", mi="2.p.3", min=2, max=6, step=1, entity={"units": UNIT_SECONDS}),
-        MathConv("fragrance_interval", "number", mi="2.p.4", min=10, max=20, step=5, entity={"units": UNIT_MINUTES}),
-        # Ambient Light
-        BaseConv("ambient_light", "light", mi="3.p.1"),
-        BrightnessConv("brightness", mi="3.p.2", max=100),
-        MathConv("color", "number", mi="3.p.3", min=1, max=16777215),
-        BoolConv("auto_fragrance", "switch", mi="4.p.1"),
-        # Battery
-        BaseConv("battery", "sensor", mi="5.p.1"),
-        MapConv("charging_state", "sensor", mi="5.p.2", map={1: "Charging", 2: "Not Charging", 3: "Not Chargeable"}),
-        # Actions
-        BaseConv("action", "sensor"),
-        ConstConv("action", mi="4.e.1", value="Auto Light"),
-        ConstConv("action", mi="4.e.2", value="Auto Fragrance"),
-        ConstConv("action", mi="4.e.3", value="Someone Move"),
-        ConstConv("action", mi="4.e.4", value="Nobody Move"),
-    ],
+        ConstConv("action", mi="4.e.1", value="auto_light"),
+        ConstConv("action", mi="4.e.2", value="auto_fragrance"),
+        ConstConv("action", mi="4.e.3", value="someone_move"),
+        ConstConv("action", mi="4.e.4", value="nobody_move"),
+        BaseConv("fragrance_delivery", "button", mi="4.a.1"),
+    ]
 }, {
     20066: [None, "Mesh Light", "yankon.light.ykmesh"],
     "spec": [
