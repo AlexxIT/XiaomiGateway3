@@ -1,3 +1,6 @@
+import base64
+import logging
+
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
@@ -6,8 +9,10 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .core import core_utils
 from .core.const import DOMAIN, PID_BLE, PID_WIFI, PID_WIFI_BLE
-from .core.xiaomi_cloud import MiCloud
+from .core.xiaomi_cloud import AuthResult, MiCloud
 from .hass import hass_utils
+
+_LOGGER = logging.getLogger(__name__)
 
 SERVERS = {
     "cn": "China",
@@ -19,7 +24,7 @@ SERVERS = {
 }
 
 
-def vol_schema(schema: dict, defaults: dict | None) -> vol.Schema:
+def vol_schema(schema: dict, defaults: dict = None) -> vol.Schema:
     if defaults:
         for key in schema:
             if (value := defaults.get(key.schema)) is not None:
@@ -29,6 +34,9 @@ def vol_schema(schema: dict, defaults: dict | None) -> vol.Schema:
 
 class FlowHandler(ConfigFlow, domain=DOMAIN):
     VERSION = 4
+
+    cloud: MiCloud = None
+    cloud_user_input: dict = None
 
     cloud_gateways: list[dict] = None
 
@@ -66,36 +74,76 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             ),
         )
 
-    async def async_step_cloud(self, user_input: dict = None):
-        kwargs = {"description_placeholders": {"verify": ""}}
-
-        if user_input:
-            if user_input["servers"]:
-                session = async_create_clientsession(self.hass)
-                cloud = MiCloud(session)
-                if await cloud.login(user_input["username"], user_input["password"]):
-                    return self.async_create_entry(
-                        title=user_input["username"], data=user_input
-                    )
-                elif cloud.verify:
-                    msg = f"\n[Verify url]({cloud.verify})"
-                    kwargs["description_placeholders"]["verify"] = msg
-                    kwargs["errors"] = {"base": "verify"}
-                else:
-                    kwargs["errors"] = {"base": "cant_login"}
-            else:
-                kwargs["errors"] = {"base": "no_servers"}
-
-        data = vol_schema(
-            {
-                vol.Required("username"): str,
-                vol.Required("password"): str,
-                vol.Required("servers", default=["cn"]): cv.multi_select(SERVERS),
-            },
-            user_input,
+    def _show_cloud_form(self, defaults: dict, errors: dict = None):
+        return self.async_show_form(
+            step_id="cloud",
+            data_schema=vol_schema(
+                {
+                    vol.Required("username"): str,
+                    vol.Required("password"): str,
+                    vol.Required("servers", default=["cn"]): cv.multi_select(SERVERS),
+                },
+                defaults,
+            ),
+            errors=errors,
         )
 
-        return self.async_show_form(step_id="cloud", data_schema=data, **kwargs)
+    async def _process_cloud_result(self, result: AuthResult):
+        if result["ok"]:
+            return self.async_create_entry(
+                title=self.cloud_user_input["username"],
+                data={
+                    "username": self.cloud_user_input["username"],
+                    "servers": self.cloud_user_input["servers"],
+                    "token": result["token"],
+                },
+            )
+
+        if image := result.get("captcha"):
+            image = "data:image/jpeg;base64," + base64.b64encode(image).decode()
+            return self.async_show_form(
+                step_id="cloud_captcha",
+                data_schema=vol_schema({vol.Required("code"): str}),
+                description_placeholders={"image": image},
+            )
+
+        if verify := result.get("verify"):
+            return self.async_show_form(
+                step_id="cloud_verify",
+                data_schema=vol_schema({vol.Required("code"): str}),
+                description_placeholders={"address": verify},
+            )
+
+        _LOGGER.error("Can't login", exc_info=result["exception"])
+
+        return self._show_cloud_form(
+            self.cloud_user_input, errors={"base": "cant_login"}
+        )
+
+    async def async_step_cloud(self, user_input: dict = None):
+        if not user_input:
+            return self._show_cloud_form(user_input)
+
+        if not user_input["servers"]:
+            return self._show_cloud_form(user_input, {"base": "no_servers"})
+
+        if not self.cloud:
+            self.cloud = MiCloud(async_create_clientsession(self.hass))
+
+        self.cloud_user_input = user_input
+
+        result = await self.cloud.login(
+            user_input["username"], self.cloud_user_input["password"]
+        )
+        return await self._process_cloud_result(result)
+
+    async def async_step_cloud_captcha(self, user_input: dict = None):
+        result = await self.cloud.login_captcha(user_input["code"])
+        return await self._process_cloud_result(result)
+
+    async def async_step_cloud_verify(self, user_input: dict = None):
+        result = await self.cloud.login_verify(user_input["code"])
+        return await self._process_cloud_result(result)
 
     async def async_step_token(self, user_input: dict = None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""

@@ -19,11 +19,25 @@
       },
       "cloud": {
         "title": "Add Mi Cloud Account",
-        "description": "Select only those servers where you have devices{verify}",
+        "description": "Select only those servers where you have devices",
         "data": {
           "username": "Email / Mi Account ID",
           "password": "Password",
           "servers": "Servers"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from: ![]({image})",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_verify": {
+        "title": "Verify account",
+        "description": "Enter code from: {address}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

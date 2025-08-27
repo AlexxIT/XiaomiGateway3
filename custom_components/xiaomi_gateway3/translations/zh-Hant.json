@@ -19,11 +19,25 @@
       },
       "cloud": {
         "title": "新增小米雲服務帳號",
-        "description": "選擇有綁定設備的伺服器{verify}",
+        "description": "選擇有綁定設備的伺服器",
         "data": {
           "username": "Email / 小米帳號 ID",
           "password": "密碼",
           "servers": "伺服器"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from: ![]({image})",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_verify": {
+        "title": "Verify account",
+        "description": "Enter code from: {address}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

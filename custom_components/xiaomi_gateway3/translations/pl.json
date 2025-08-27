@@ -18,11 +18,25 @@
       },
       "cloud": {
         "title": "Dodaj konto Xiaomi Home",
-        "description": "Wybierz tylko te serwery na której masz urządzenia{verify}",
+        "description": "Wybierz tylko te serwery na której masz urządzenia",
         "data": {
           "username": "Email / ID konta Xiaomi",
           "password": "Hasło",
           "servers": "Serwery"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from: ![]({image})",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_verify": {
+        "title": "Verify account",
+        "description": "Enter code from: {address}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

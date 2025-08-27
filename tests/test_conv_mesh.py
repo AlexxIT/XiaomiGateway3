@@ -41,3 +41,13 @@ def test_17573():
 
     p = device.encode({"rgb_color": (255, 255, 0)})
     assert p["params"] == [{"did": None, "piid": 4, "siid": 2, "value": 16776960}]
+
+
+def test_3129():
+    device = XDevice(3129, did=123)
+
+    p = device.encode({"identify": True})
+    assert p == {
+        "method": "action",
+        "params": {"aiid": 1, "did": 123, "in": [], "siid": 4},
+    }

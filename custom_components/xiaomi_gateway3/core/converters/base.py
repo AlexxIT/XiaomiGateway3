@@ -61,6 +61,11 @@ class BaseConv:
                     "value": value,
                 }
                 payload.setdefault("params", []).append(params)
+        elif ".a." in self.mi:
+            s, a = self.mi.split(".a.")
+            payload["method"] = "action"
+            params = {"did": device.did, "siid": int(s), "aiid": int(a), "in": []}
+            payload["params"] = params
         elif device.type == MATTER:
             payload["method"] = "set_properties_v3"
             params = {"did": device.did, "iid": self.mi, "value": value}
@@ -72,7 +77,7 @@ class BaseConv:
             payload.setdefault("params", []).append(params)
 
     def encode_read(self, device: "XDevice", payload: dict):
-        if not self.mi or device.type == BLE or ".e." in self.mi:
+        if not self.mi or device.type == BLE or ".e." in self.mi or ".a." in self.mi:
             return
         if ".p." in self.mi:
             s, p = self.mi.split(".p.")

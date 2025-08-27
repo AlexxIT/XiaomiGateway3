@@ -18,11 +18,25 @@
       },
       "cloud": {
         "title": "Додати Mi Cloud аккаунт",
-        "description": "Вибирайте тільки ті сервери, на яких у вас є пристрої{verify}",
+        "description": "Вибирайте тільки ті сервери, на яких у вас є пристрої",
         "data": {
           "username": "Email / Mi Account ID",
           "password": "Пароль",
           "servers": "сервери"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from: ![]({image})",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_verify": {
+        "title": "Verify account",
+        "description": "Enter code from: {address}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

@@ -18,11 +18,25 @@
       },
       "cloud": {
         "title": "添加小米云账号",
-        "description": "选择设备所属的服务器 {verify}",
+        "description": "选择设备所属的服务器",
         "data": {
           "username": "邮箱/小米 ID",
           "password": "密码",
           "servers": "服务器"
+        }
+      },
+      "cloud_captcha": {
+        "title": "Verify account",
+        "description": "Enter code from: ![]({image})",
+        "data": {
+          "code": "Code"
+        }
+      },
+      "cloud_verify": {
+        "title": "Verify account",
+        "description": "Enter code from: {address}",
+        "data": {
+          "code": "Code"
         }
       },
       "token": {

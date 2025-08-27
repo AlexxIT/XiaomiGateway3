@@ -77,7 +77,11 @@ class MIoTGateway(XGateway):
             device.dispatch({device.type: ts})
 
     async def miot_send(self, device: XDevice, payload: dict):
-        assert payload["method"] in ("set_properties", "get_properties"), payload
+        assert payload["method"] in (
+            "set_properties",
+            "get_properties",
+            "action",
+        ), payload
 
         # check if we can send command via any second gateway
         gw2 = next((gw for gw in device.gateways if gw != self and gw.available), None)
