@@ -62,7 +62,7 @@
         "data": {
           "host": "Hoszt",
           "token": "Token",
-          "telnet_cmd": "Nyissa meg a Telnet parancshoz",
+          "custom_password": "Testreszabott Telnet jelszó",
           "ble": "Bluetooth eszközök támogatása",
           "stats": "Statisztikai szenzorok hozzáadása",
           "debug": "Fejlesztői naplózás"

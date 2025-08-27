@@ -5,6 +5,9 @@ from .base import ShellBase
 from .const import OPENMIIO_CMD, OPENMIIO_MD5_MIPS, OPENMIIO_URL_MIPS
 from ..unqlite import SQLite
 
+PASSWORD_PROMPT = b"Password: "
+ADMIN_LINE = b"admin\r\n"
+
 CHECK_FIRMWARE = "/data/busybox lsattr /data/firmware/firmware_ota.bin"
 LOCK_FIRMWARE = "mkdir -p /data/firmware && touch /data/firmware/firmware_ota.bin && /data/busybox chattr +i /data/firmware/firmware_ota.bin"
 UNLOCK_FIRMWARE = "/data/busybox chattr -i /data/firmware/firmware_ota.bin"
@@ -14,18 +17,23 @@ BUSYBOX_MD5 = "099137899ece96f311ac5ab554ea6fec"
 
 
 class ShellMGW(ShellBase):
-    async def login(self):
-        self.writer.write(b"admin\n")
-        raw = await asyncio.wait_for(self.reader.readuntil(b"\r\n# "), 3)
+    async def login(self, custom_password: str | None):
+        self.writer.write(ADMIN_LINE)
+
+        raw = await asyncio.wait_for(
+            self.reader.readuntil((b"\r\n# ", PASSWORD_PROMPT)), 3
+        )
         # OK if gateway without password
-        if b"Password:" not in raw:
+        if not raw.endswith(PASSWORD_PROMPT):
             return
         # check if gateway has default password
-        self.writer.write(b"admin\n")
+        self.writer.write(
+            f"{custom_password}\r\n".encode() if custom_password else ADMIN_LINE
+        )
         raw = await asyncio.wait_for(self.reader.readuntil(b"\r\n# "), 3)
         # can't continue without password
-        if b"Password:" in raw:
-            raise Exception("Telnet with password don't supported")
+        if PASSWORD_PROMPT in raw:
+            raise Exception("Telnet with unknown password is not supported")
 
     async def prepare(self):
         await self.exec("stty -echo")
