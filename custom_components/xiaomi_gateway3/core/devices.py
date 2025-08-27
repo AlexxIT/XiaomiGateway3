@@ -2421,6 +2421,7 @@ DEVICES += [{
     7057: ["PTX", "Mesh Light", "090615.light.cxlg01"],
     15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
     18776: ["PTX", "Mesh Downlight", "090615.light.milg05"],
+    24665: ["PTX", "Mesh Lightstrip", "090615.light.dd20"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
@@ -2576,6 +2577,7 @@ DEVICES += [{
     ]
 }, {
     22809: ["seomsh", "星月影智能筒射灯", "wy0a01", "seomsh.light.wy0a01"],
+    22856: ["seomsh", "星月影智能磁吸灯", "wy0a03", "seomsh.light.wy0a03"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
