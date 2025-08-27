@@ -2425,6 +2425,7 @@ DEVICES += [{
     ]
 }, {
     22809: ["seomsh", "星月影智能筒射灯", "wy0a01", "seomsh.light.wy0a01"],
+    22856: ["seomsh", "星月影智能磁吸灯", "wy0a03", "seomsh.light.wy0a03"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
