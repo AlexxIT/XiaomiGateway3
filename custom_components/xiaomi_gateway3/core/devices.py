@@ -2269,6 +2269,7 @@ DEVICES += [{
     7057: ["PTX", "Mesh Light", "090615.light.cxlg01"],
     15169: ["PTX", "Mesh Downlight", "090615.light.mylg04"],
     18776: ["PTX", "Mesh Downlight", "090615.light.milg05"],
+    24665: ["PTX", "Mesh Lightstrip", "090615.light.dd20"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", max=100),
