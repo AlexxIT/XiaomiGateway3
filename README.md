@@ -524,6 +524,10 @@ It is possible because of these people:
 
 [Read more](https://github.com/AlexxIT/XiaomiGateway3/issues/1328)
 
+### Firmware 7.5.0.0 Zigbee NCP
+
+[Read more](https://github.com/Sergey1Fox/mgl03-Zigbee-NCP-firmware)
+
 ## Handle Button Actions
 
 Buttons, vibration sensor, cube, locks and other - create an action entity. The entity changes its **state** for half a second and returns to an empty state. The **attributes** contain useful data, they are not cleared after the event is triggered.
