@@ -1786,6 +1786,26 @@ DEVICES += [{
         MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
     ]
 }, {
+    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:remote-control:0000A021:lemesh-ts10:1
+    17658: ["LeMesh", "Remote Control TS10", "lemesh.remote.ts10"], 
+    "spec": [
+        BaseConv("action", "sensor"),
+        # --- Handle directional button events using MapConv ---
+        MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE,2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE,4: BUTTON_4_SINGLE,}),
+        MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE,3: BUTTON_3_DOUBLE,4: BUTTON_4_DOUBLE, }),
+        MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD,2: BUTTON_2_HOLD,3: BUTTON_3_HOLD,4: BUTTON_4_HOLD,}),
+       # --- Knob operation ---
+        # First use a generic value, then determine direction via another sensor
+        ConstConv("action", mi="5.e.1036", value="knob_rotate"),        
+        # The value of this sensor is a number: positive for right, negative for left rotation.
+        BaseConv("knob_rotation_amplitude", "sensor", mi="5.e.1036.p.2"),
+        # --- Combined operation events ---
+        # Both "Down Button Press Right/Left Rotation" and "Press To Turn Right/Left" correspond to eiid: 1028        
+        ConstConv("action", mi="5.e.1028", value="button_3_press_rotate"),
+        # --- Battery level support ---
+        BaseConv("battery", "sensor", mi="1.p.1"),
+    ]        
+}, {
     16191: ["GranwinIoT", "V5 One Key Switch (BLE)", "giot.remote.v51kwm"],
     "spec": [
         BaseConv("action", "sensor"),
