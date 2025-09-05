@@ -1147,6 +1147,12 @@ DEVICES += [{
         ZTuyaButtonModeConv("mode", "select"),  # config
     ],
 }, {
+    "TS0041": ["Tuya", "Wireless switch with 1 button", "TS0041"],
+    "spec": [
+        ZTuyaButtonConfig("action", "sensor"),
+        ZTuyaButtonConv("button", ep=1, bind=True),
+    ],
+}, {
     # very simple relays with binding
     "TS0011": ["Tuya", "Single Switch (no N)", "TS0011"],
     "support": 5,

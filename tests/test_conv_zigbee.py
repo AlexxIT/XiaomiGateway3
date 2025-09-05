@@ -187,3 +187,16 @@ def test_error():
     device = XDevice("dummy", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa")
     p = decode(device, payload)
     assert p == {}
+
+
+def test_tuya_button():
+    device = XDevice("TS0041", nwk="0x1234")
+
+    p = device.decode(
+        {
+            "clusterId": "0x0006",
+            "sourceEndpoint": "0x01",
+            "APSPlayload": "0x0135FD00",
+        }
+    )
+    assert p == {"action": "button_single", "button": "single"}
