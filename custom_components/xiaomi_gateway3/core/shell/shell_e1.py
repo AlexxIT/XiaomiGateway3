@@ -6,10 +6,12 @@ from .const import OPENMIIO_CMD, OPENMIIO_MD5_ARM, OPENMIIO_URL_ARM
 
 
 class ShellE1(ShellBase):
-    async def login(self):
-        self.writer.write(b"root\n")
+    async def login(self, custom_password: str | None):
+        self.writer.write(b"root\r\n")
         await asyncio.sleep(0.1)
-        self.writer.write(b"\n")  # empty password
+        self.writer.write(
+            f"{custom_password or ''}\r\n".encode()
+        )  # custom or empty password
 
         coro = self.reader.readuntil(b" # ")
         await asyncio.wait_for(coro, timeout=3)
@@ -40,7 +42,7 @@ class ShellE1(ShellBase):
             "model": props["model"],
             "token": props["miio_dtoken"].encode().hex(),
             "lan_mac": props.get("lan_mac"),
-            "version": await self.get_version()
+            "version": await self.get_version(),
         }
 
     async def read_xiaomi_did(self) -> dict[str, str]:
