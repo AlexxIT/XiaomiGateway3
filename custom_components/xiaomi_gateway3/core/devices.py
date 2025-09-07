@@ -4556,6 +4556,32 @@ DEVICES += [{
         MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
     ],
+# MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-akult4:2:0000D010
+    24360: ["PTX", "Ultra-thin display screen switch","PTX-X1 MAX", "090615.switch.akult4"],
+    "spec": [
+        BaseConv("switch_1", "switch", mi="2.p.1"),
+        BaseConv("switch_2", "switch", mi="3.p.1"),
+        BaseConv("switch_3", "switch", mi="4.p.1"),
+        BaseConv("switch_4", "switch", mi="5.p.1"),
+        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_4", "select", mi="5.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("backlight_level", "select", mi="17.p.2", map={0: "Level 0", 1: "Level 1", 2: "Level 2"}, entity=ENTITY_CONFIG),
+        MapConv("backlight_mode", "select", mi="17.p.3", map={0: "Default", 1: "auto", 2: "Not-disturb"}, entity=ENTITY_CONFIG),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="6.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
+        MapConv("action", mi="6.e.3.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="6.e.2.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+        ConstConv("action", mi="18.e.1", value="scene_one"),
+        ConstConv("action", mi="18.e.2", value="scene_two"),
+        ConstConv("action", mi="18.e.3", value="scene_three"),
+        ConstConv("action", mi="18.e.4", value="scene_four"),
+        BoolConv("occupancy", "binary_sensor", mi="16.p.100", entity=ENTITY_LAZY),  # uint8
+        ConstConv("occupancy", mi="16.e.1", value=True),
+        ConstConv("occupancy", mi="16.e.2", value=False),
+    ],        
 }, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:090615-xw:1:0000C824
     18736: ["PTX", "Human Body Presence Sensor (Top Mounted)", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
