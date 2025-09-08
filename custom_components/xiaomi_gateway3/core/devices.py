@@ -1483,6 +1483,19 @@ DEVICES += [{
         BLEToothbrush("toothbrush", mi=16),
     ],
 }, {
+    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:printer:0000A060:xiaomi-label:1
+    13566: ["Xiaomi", "Label printer", "MJBQDYJ1-WC","xiaomi.printer.label"], 
+    "spec": [
+        MapConv("printer_state", "sensor", mi="2.p.1", map={ 0: "standby", 1: "working", 2: "complete", 3: "suspend"}),
+        BaseConv("copies", "sensor", mi="2.p.3"),
+        MapConv("paper_lack", "binary_sensor", mi="2.p.4", map={ True: "True", False: "False"}),
+        MapConv("cover_open", "binary_sensor", mi="2.p.5", map={ True: "True", False: "False"}),
+        MapConv("fault", "sensor", mi="2.p.6", map={ 0: "normal",1: "paper_lack", 2: "cover_open", 3: "overheat"}),
+        BaseConv("battery", "sensor", mi="3.p.1"),
+        MathConv("battery_low", "binary_sensor", mi="3.p.1", multiply=0.01, min=0, max=0.2 )
+    ],
+    "ttl": 600  
+}, {
     1249: ["Xiaomi", "Magic Cube", "XMMF01JQD", "jiqid.robot.cube"],  # 4097
     "spec": [
         BLEMapConv("action", "sensor", mi=4097, map={"000000": "right", "010000": "left"}),
