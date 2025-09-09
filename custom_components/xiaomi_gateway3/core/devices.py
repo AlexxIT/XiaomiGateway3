@@ -4893,9 +4893,9 @@ DEVICES += [{
         BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-x1tpm:1:0000D042
     21667: ["PTX", "Smart Wall Switch Panel", "PTX-X1TPM", "090615.switch.x1tpm"],
     "spec": [
-        # Three Basic Switch Services (iid=2/3/4)
         BaseConv("action", "sensor"),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
@@ -4906,29 +4906,37 @@ DEVICES += [{
         MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
         MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
         MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-
-        # Four Lighting Channels (iid=10/11/12/13)
-        BrightnessConv("light_1", mi="10.3"),
-        MathConv("color_temp_1", "number", mi="10.5", min=2700, max=6500),
-        MapConv("light_mode_1", "select", mi="10.2", map={1: "Warmth", 2: "Hospitality", 3: "Night", 4: "Lighting", 5: "Walk", 6: "Sleep"}),
-        BrightnessConv("light_2", mi="11.3"),
-        MathConv("color_temp_2", "number", mi="11.5", min=2700, max=6500),
-        BrightnessConv("light_3", mi="12.3"),
-        MathConv("color_temp_3", "number", mi="12.5", min=2700, max=6500),
-        BrightnessConv("light_4", mi="13.3"),
-        ColorTempKelvin("light_color", mi="13.4"),
-        MapConv("light_mode_4", "select", mi="13.2", map={1: "Color", 2: "Warm", 3: "Dreamlike", 4: "Midsummer", 5: "Walk", 6: "Sleep"}),
-
-        # Air Conditioner Service (iid=18)
-        MapConv("ac_mode", "select", mi="18.2", map={0: "Cool", 1: "Heat", 2: "Fan", 3: "Dry"}),
-        MathConv("target_temp", "number", mi="18.4", min=16, max=32),
-        MapConv("fan_speed", "select", mi="18.12", map={0: "Auto", 1: "Low", 2: "Medium", 3: "High"}),
-
-        # Display Settings (iid=23)
-        MathConv("screen_brightness", "number", mi="23.1", min=1, max=100),
-        MapConv("auto_lock", "select", mi="23.2", map={0: "15s", 1: "30s", 2: "1m", 3: "2m", 4: "5m", 5: "10m", 255: "Never"}),
-        MapConv("standby_display", "select", mi="23.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}),
-    ],
+        BaseConv("light_1", "light", mi="10.p.1"),
+        BrightnessConv("brightness", mi="10.p.3"),
+        ColorTempKelvin("color_temp", mi="10.p.5"),
+        MapConv("mode", "select", mi="10.p.2", map={1: "Warmth", 2: "Hospitality", 3: "Night", 4: "Lighting", 5: "Walk", 6: "Sleep"}),
+        BaseConv("light_2", "light", mi="11.p.1"),
+        BrightnessConv("brightness", mi="11.p.3"),
+        ColorTempKelvin("color_temp", mi="11.p.5"),
+        BaseConv("light_3", "light", mi="12.p.1"),
+        BrightnessConv("brightness", mi="12.p.3"),
+        ColorTempKelvin("color_temp", mi="12.p.5"),
+        BaseConv("light_4", "light", mi="13.p.1"),
+        BrightnessConv("brightness", mi="13.p.3"),
+        RGBColor("rgb_color", mi="13.p.4"),
+        MapConv("mode", "select", mi="13.p.2", map={1: "Color", 2: "Warm", 3: "Dreamlike", 4: "Midsummer", 5: "Walk", 6: "Sleep"}),
+        MapConv("ac_mode", "select", mi="18.p.2", map={0: "Cool", 1: "Heat", 2: "Fan", 3: "Dry"}),
+        MathConv("target_temp", "number", mi="18.p.4", min=16, max=32),
+        MapConv("fan_speed", "select", mi="18.p.12", map={0: "Auto", 1: "Low", 2: "Medium", 3: "High"}),
+        MathConv("screen_brightness", "number", mi="23.p.1", min=1, max=100, entity={"icon": "mdi:brightness-5"}),
+        MapConv("auto_into_standby", "select", mi="23.p.2", map={0: "15s", 1: "30s", 2: "1m", 3: "2m", 4: "5m", 5: "10m", 255: "Never"}, entity={"icon": "mdi:timer-outline"}),
+        MapConv("standby_display", "select", mi="23.p.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}, entity={"icon": "mdi:monitor"}),
+        BaseConv("sleep_mode", "switch", mi="23.p.4", entity={"icon": "mdi:sleep"}), 
+        BaseConv("sleep_time_slot", "number", mi="23.p.5", entity={"category": "config", "enabled": False}),
+        MapConv("proximity_wakeup", "select", mi="23.p.6", map={0: "Off", 1: "Near", 2: "Medium", 3: "Far"}, entity={"icon": "mdi:human-greeting-proximity"}),
+        ConstConv("action", mi="19.e.1", value="scene_a"),
+        ConstConv("action", mi="19.e.2", value="scene_b"),
+        ConstConv("action", mi="19.e.3", value="scene_c"),
+        ConstConv("action", mi="19.e.4", value="scene_d"),
+        ConstConv("action", mi="19.e.5", value="scene_e"),
+        ConstConv("action", mi="19.e.6", value="scene_f"),
+        ConstConv("action", mi="19.e.7", value="scene_g"),
+        ConstConv("action", mi="19.e.8", value="scene_h"),
 }, {
     14495: ["ZiQing", "IZQ Presence Sensor Ceiling", "IZQ-24n", "izq.sensor_occupy.24n"],
     "spec": [
