@@ -4937,6 +4937,7 @@ DEVICES += [{
         ConstConv("action", mi="19.e.6", value="scene_f"),
         ConstConv("action", mi="19.e.7", value="scene_g"),
         ConstConv("action", mi="19.e.8", value="scene_h"),
+    ],
 }, {
     14495: ["ZiQing", "IZQ Presence Sensor Ceiling", "IZQ-24n", "izq.sensor_occupy.24n"],
     "spec": [
