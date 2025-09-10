@@ -91,9 +91,12 @@ class XEntity(Entity):
 
     @property
     def extra_restore_state_data(self) -> ExtraStoredData | None:
-        # filter None values
-        if state := {k: v for k, v in self.get_state().items() if v is not None}:
-            return RestoredExtraData(state)
+    # filter None values
+        state_data = self.get_state()
+        if state_data is not None:
+            state = {k: v for k, v in state_data.items() if v is not None}
+            if state:
+                return RestoredExtraData(state)
         return None
 
     def debug(self, msg: str):
