@@ -4973,41 +4973,82 @@ DEVICES += [{
         BaseConv("Indicator Light Power Light", "switch", mi="6.p.2"),
     ],
 }, {
+    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:switch:0000A003:090615-x1tpm:1:0000D042
     21667: ["PTX", "Smart Wall Switch Panel", "PTX-X1TPM", "090615.switch.x1tpm"],
     "spec": [
-        # Three Basic Switch Services (iid=2/3/4)
+        # ========== Button and Scene Events ==========
         BaseConv("action", "sensor"),
+        # Physical button click events
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="6.e.1", value=BUTTON_2_SINGLE),
         ConstConv("action", mi="7.e.1", value=BUTTON_3_SINGLE),
+        # Scene button click events
+        ConstConv("action", mi="19.e.1", value="scene_a"),
+        ConstConv("action", mi="19.e.2", value="scene_b"),
+        ConstConv("action", mi="19.e.3", value="scene_c"),
+        ConstConv("action", mi="19.e.4", value="scene_d"),
+        ConstConv("action", mi="19.e.5", value="scene_e"),
+        ConstConv("action", mi="19.e.6", value="scene_f"),
+        ConstConv("action", mi="19.e.7", value="scene_g"),
+        ConstConv("action", mi="19.e.8", value="scene_h"),
+        # ========== Switches ==========
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
         BaseConv("switch_3", "switch", mi="4.p.1"),
-        MapConv("mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-        MapConv("mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-        MapConv("mode_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-
-        # Four Lighting Channels (iid=10/11/12/13)
-        BrightnessConv("light_1", mi="10.3"),
-        MathConv("color_temp_1", "number", mi="10.5", min=2700, max=6500),
-        MapConv("light_mode_1", "select", mi="10.2", map={1: "Warmth", 2: "Hospitality", 3: "Night", 4: "Lighting", 5: "Walk", 6: "Sleep"}),
-        BrightnessConv("light_2", mi="11.3"),
-        MathConv("color_temp_2", "number", mi="11.5", min=2700, max=6500),
-        BrightnessConv("light_3", mi="12.3"),
-        MathConv("color_temp_3", "number", mi="12.5", min=2700, max=6500),
-        BrightnessConv("light_4", mi="13.3"),
-        ColorTempKelvin("light_color", mi="13.4"),
-        MapConv("light_mode_4", "select", mi="13.2", map={1: "Color", 2: "Warm", 3: "Dreamlike", 4: "Midsummer", 5: "Walk", 6: "Sleep"}),
-
-        # Air Conditioner Service (iid=18)
-        MapConv("ac_mode", "select", mi="18.2", map={0: "Cool", 1: "Heat", 2: "Fan", 3: "Dry"}),
-        MathConv("target_temp", "number", mi="18.4", min=16, max=32),
-        MapConv("fan_speed", "select", mi="18.12", map={0: "Auto", 1: "Low", 2: "Medium", 3: "High"}),
-
-        # Display Settings (iid=23)
-        MathConv("screen_brightness", "number", mi="23.1", min=1, max=100),
-        MapConv("auto_lock", "select", mi="23.2", map={0: "15s", 1: "30s", 2: "1m", 3: "2m", 4: "5m", 5: "10m", 255: "Never"}),
-        MapConv("standby_display", "select", mi="23.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}),
+        MapConv("switch_1_mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("switch_2_mode", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("switch_3_mode", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        # --- Additional note: Default power-on state---
+        MapConv("power_on_state_1", "select", mi="2.p.5", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("power_on_state_2", "select", mi="3.p.5", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("power_on_state_3", "select", mi="4.p.5", map={0: "Off", 1: "On", 2: "Default"}),
+        # Light 1 (Adjustable Color Temperature)
+        BaseConv("light_1", "light", mi="10.p.1"),
+        BrightnessConv("brightness_1", mi="10.p.3"),
+        ColorTempKelvin("color_temp_1", mi="10.p.5"),
+        MapConv("mode_1", "select", mi="10.p.2", map={1: "Warmth", 2: "Hospitality", 3: "Night", 4: "Lighting", 5: "Walk", 6: "Sleep"}, entity={"icon": "mdi:theme-light-dark"}),
+        # Light 2 (Adjustable Color Temperature)
+        BaseConv("light_2", "light", mi="11.p.1"),
+        BrightnessConv("brightness_2", mi="11.p.3"),
+        ColorTempKelvin("color_temp_2", mi="11.p.5"),
+        # Light 3 (Adjustable Color Temperature)
+        BaseConv("light_3", "light", mi="12.p.1"),
+        BrightnessConv("brightness_3", mi="12.p.3"),
+        ColorTempKelvin("color_temp_3", mi="12.p.5"),
+        # Light 4 (RGB Color Light)
+        BaseConv("light_4", "light", mi="13.p.1"),
+        BrightnessConv("brightness_4", mi="13.p.3"),
+        RGBColor("rgb_color_4", mi="13.p.4"),
+        MapConv("mode_4", "select", mi="13.p.2", map={1: "Color", 2: "Warm", 3: "Dreamlike", 4: "Midsummer", 5: "Walk", 6: "Sleep"}, entity={"icon": "mdi:theme-light-dark"}),
+        # ========== Air Conditioner Control ==========
+        MapConv("ac_mode", "select", mi="18.p.2", map={0: "Cool", 1: "Heat", 2: "Fan", 3: "Dry"}),
+        MathConv("target_temp", "number", mi="18.p.4", min=16, max=32),
+        # Fix: Removed ac_soft_wind, only kept fan_speed, because they conflict in the device spec (same IID), and fan-level is the standard property.
+        MapConv("fan_speed", "select", mi="18.p.12", map={0: "Auto", 1: "Low", 2: "Medium", 3: "High"}),
+        # ========== Curtain Control ==========
+        # Curtain 1
+        MapConv("curtain_1_motor_control", "cover", mi="14.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        MathConv("curtain_1_target_position", "number", mi="14.p.6", min=0, max=100),
+        MapConv("curtain_1_status", mi="14.p.3", map={0: "stopped", 1: "opening", 2: "closing"}), # Added: Curtain running status
+        # Curtain 2
+        MapConv("curtain_2_motor_control", "cover", mi="15.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        MathConv("curtain_2_target_position", "number", mi="15.p.6", min=0, max=100),
+        MapConv("curtain_2_status", mi="15.p.3", map={0: "stopped", 1: "opening", 2: "closing"}), # Added: Curtain running status
+        # Curtain 3
+        MapConv("curtain_3_motor_control", "cover", mi="16.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        MathConv("curtain_3_target_position", "number", mi="16.p.6", min=0, max=100),
+        MapConv("curtain_3_status", mi="16.p.3", map={0: "stopped", 1: "opening", 2: "closing"}), # Added: Curtain running status
+        # Curtain 4
+        MapConv("curtain_4_motor_control", "cover", mi="17.p.1", map={0: "stop", 1: "open", 2: "close"}),
+        MathConv("curtain_4_target_position", "number", mi="17.p.6", min=0, max=100),
+        MapConv("curtain_4_status", mi="17.p.3", map={0: "stopped", 1: "opening", 2: "closing"}), # Added: Curtain running status
+        # ========== Display Settings ==========
+        MathConv("screen_brightness", "number", mi="23.p.1", min=1, max=100, entity={"icon": "mdi:brightness-5"}),
+        MapConv("auto_into_standby", "select", mi="23.p.2", map={0: "15s", 1: "30s", 2: "1m", 3: "2m", 4: "5m", 5: "10m", 255: "Never"}, entity={"icon": "mdi:timer-outline"}),
+        MapConv("standby_display", "select", mi="23.p.3", map={0: "Off", 1: "Screensaver", 2: "Scene", 3: "Switch", 4: "Device", 5: "Light", 6: "Curtain"}, entity={"icon": "mdi:monitor"}),
+        BaseConv("sleep_mode", "switch", mi="23.p.4", entity={"icon": "mdi:sleep"}), 
+        BaseConv("sleep_time_slot", "number", mi="23.p.5", entity={"category": "config", "enabled": False}),
+        MapConv("proximity_wakeup", "select", mi="23.p.6", map={0: "Off", 1: "Near", 2: "Medium", 3: "Far"}, entity={"icon": "mdi:human-greeting-proximity"}),
     ],
 }, {
     14495: ["ZiQing", "IZQ Presence Sensor Ceiling", "IZQ-24n", "izq.sensor_occupy.24n"],
