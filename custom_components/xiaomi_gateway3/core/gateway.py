@@ -63,7 +63,10 @@ class MultiGateway(
             return False
         try:
             resp = await core_utils.enable_telnet(
-                self.host, token, self.options.get("key")
+                self.host,
+                token,
+                self.options.get("key"),
+                self.options.get("custom_password"),
             )
             self.debug("enable_telnet", data=resp)
             return resp == "ok"
@@ -73,7 +76,7 @@ class MultiGateway(
 
     async def prepare_gateway(self) -> bool:
         try:
-            async with Session(self.host) as sh:
+            async with Session(self.host, self.options.get("custom_password")) as sh:
                 if not await sh.only_one():
                     self.debug("Connection from a second Hass detected")
                     return False
@@ -167,7 +170,7 @@ class MultiGateway(
     async def telnet_command(self, cmd: str) -> bool | None:
         self.debug("telnet_command", data=cmd)
         try:
-            async with Session(self.host) as sh:
+            async with Session(self.host, self.options.get("custom_password")) as sh:
                 if cmd == "run_ftp":
                     await sh.run_ftp()
                     return True
