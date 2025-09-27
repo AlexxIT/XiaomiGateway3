@@ -185,8 +185,8 @@ class MiCloud:
         return {"ok": True, "token": f"{data['userId']}:{data['passToken']}"}
 
     async def _get_notification_url(self, notification_url: str) -> AuthResult:
-        assert "/identity/authStart" in notification_url, notification_url
-        notification_url = notification_url.replace("authStart", "list")
+        assert "fe/service/identity/authStart" in notification_url, notification_url
+        notification_url = notification_url.replace("fe/service/identity/authStart", "identity/list")
 
         r = await self.session.get(notification_url)
         res1 = parse_auth_response(await r.read())
