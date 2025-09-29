@@ -2206,6 +2206,11 @@ DEVICES += [{
         BaseConv("timestamp", mi="11.e.1022.p.3"),
     ],
 }, {
+    20962: ["Xiaomi", "8-electrode Body Fat Scale S800", "MJTZC04YM", "xiaomi.scales.ms116"],
+    "spec": [
+        MapConv("battery_low", "binary_sensor", mi="4.e.1001.p.1", map={0: False, 1: True, 2: True}),
+    ],
+}, {
     # https://home.miot-spec.com/spec/izq.sensor_occupy.ble
     18788: ["ZiQing", "IZQ Presence Sensor Loong", "IZQ-BLE", "izq.sensor_occupy.ble"],
     "spec": [

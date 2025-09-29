@@ -400,3 +400,33 @@ def test_8154():
     }
     p = device.decode({"eid": 4111, "edata": "01"})
     assert p == {"door": False}
+
+
+def test_20962():
+    device = XDevice(20962)
+
+    p = device.decode({"siid": 4, "eiid": 1001, "arguments": [{"piid": 1, "value": 0}]})
+    assert p == {"battery_low": False}
+
+    p = device.decode(
+        {
+            "siid": 3,
+            "eiid": 1022,
+            "arguments": [
+                {"piid": 1, "value": 144},
+                {"piid": 2, "value": 201654272},
+                {"piid": 3, "value": 293955796},
+            ],
+        }
+    )
+
+    for i in (202718212, 203751424, 204800000, 205848576, 206897152):
+        payload = {
+            "siid": 3,
+            "eiid": 1022,
+            "arguments": [
+                {"piid": 1, "value": 144},
+                {"piid": 2, "value": i},
+                {"piid": 3, "value": 0},
+            ],
+        }
