@@ -43,16 +43,15 @@ class XLight(XEntity, LightEntity, RestoreEntity):
     _attr_min_color_temp_kelvin: int | None = 6500
 
     def on_init(self):
-        self._attr_color_mode = ColorMode.ONOFF
+        only_mode = ColorMode.ONOFF
         modes = set()
 
         for conv in self.device.converters:
             if conv.attr == ATTR_BRIGHTNESS:
                 self.listen_attrs.add(conv.attr)
-                self._attr_color_mode = ColorMode.BRIGHTNESS
+                only_mode = ColorMode.BRIGHTNESS
             elif conv.attr == ATTR_COLOR_TEMP:
                 self.listen_attrs.add(conv.attr)
-                self._attr_color_mode = ColorMode.COLOR_TEMP
                 modes.add(ColorMode.COLOR_TEMP)
                 if hasattr(conv, "minm") and hasattr(conv, "maxm"):
                     self._attr_max_color_temp_kelvin = color_temp(conv.minm)
@@ -73,7 +72,12 @@ class XLight(XEntity, LightEntity, RestoreEntity):
                 self._attr_supported_features |= LightEntityFeature.EFFECT
                 self._attr_effect_list = list(conv.map.values())
 
-        self._attr_supported_color_modes = modes if modes else {self._attr_color_mode}
+        if modes:
+            self._attr_color_mode = next(iter(modes))
+            self._attr_supported_color_modes = modes
+        else:
+            self._attr_color_mode = only_mode
+            self._attr_supported_color_modes = {only_mode}
 
     def set_state(self, data: dict):
         if self.attr in data:
