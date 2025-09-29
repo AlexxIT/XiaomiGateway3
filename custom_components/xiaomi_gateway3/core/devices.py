@@ -2356,6 +2356,11 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="5.p.1003"),
     ],
 }, {
+    26197: [None, "SO Smart Aroma Diffuser S5", "bwj.diffuser.s5"],
+    "spec": [
+        # BoolConv("status", "binary_sensor", mi="2.p.1004"),
+    ]
+}, {
     # BLE devices can be supported witout spec. New spec will be added "on the fly" when
     # device sends them. But better to rewrite right spec for each device
     "default": "ble",  # default BLE device
