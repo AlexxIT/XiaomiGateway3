@@ -15,8 +15,14 @@ from .shell.session import Session
 _LOGGER = logging.getLogger(__name__)
 
 
+FIRMWARES = {
+    "6.6.2.0": "https://github.com/stas336/mgl03_fw/raw/refs/heads/main/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl",
+    "7.5.0.0": "https://github.com/stas336/mgl03_fw/raw/refs/heads/main/zigbee/ncp-uart-sw_mgl03_7_5_0_z2m.gbl",
+}
+
+
 async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
-    tar_fw = "6.7.10.0" if custom else "6.6.2.0"
+    tar_fw = "7.5.0.0" if custom else "6.6.2.0"
 
     _LOGGER.info(f"{host} [FWUP] Target zigbee firmware v{tar_fw}")
 
@@ -64,11 +70,7 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
         await async_process_requirements(hass, DOMAIN, ["xmodem==0.4.6"])
 
         client = async_create_clientsession(hass)
-        r = await client.get(
-            "https://master.dl.sourceforge.net/project/mgl03/zigbee/mgl03_ncp_6_7_10_b38400_sw.gbl?viasf=1"
-            if custom
-            else "https://master.dl.sourceforge.net/project/mgl03/zigbee/ncp-uart-sw_mgl03_6_6_2_stock.gbl?viasf=1"
-        )
+        r = await client.get(FIRMWARES[tar_fw])
         content = await r.read()
 
         ok = await hass.async_add_executor_job(flash_firmware, host, content)
@@ -100,9 +102,11 @@ async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
 async def read_firmware(host: str) -> str | None:
     version = None
     try:
-        from bellows.ezsp import EZSP
+        from bellows import ezsp
 
-        ezsp = EZSP(
+        ezsp.NETWORK_COORDINATOR_STARTUP_RESET_WAIT = 3
+
+        ezsp = ezsp.EZSP(
             {"path": f"socket://{host}:8889", "baudrate": 0, "flow_control": None}
         )
         await ezsp.connect(use_thread=False)

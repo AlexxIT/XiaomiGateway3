@@ -496,7 +496,7 @@ Unlike the ZHA you should install to your host or Hass.io system: [Mosquitto bro
 ```yaml
 serial:
   port: tcp://{gatewayIP}:8888
-  adapter: ezsp
+  adapter: ember
 ```
 
 When you turn on Zigbee2MQTT mode - Zigbee devices in Mi Home will stop working. BLE and Mesh will continue to work in Mi Home and Hass.
