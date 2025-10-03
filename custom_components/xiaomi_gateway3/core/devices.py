@@ -3851,6 +3851,33 @@ DEVICES += [{
         BaseConv("ambient_light", "switch", mi="17.p.1"), 
     ]
 }, {
+    16366: ["SmartFrog", "V6 Triple Wall Switch", "giot.switch.v63ksm"],
+    "spec": [
+        BaseConv("left_switch", "switch", mi="2.p.1"),
+        BaseConv("middle_switch", "switch", mi="3.p.1"),
+        BaseConv("right_switch", "switch", mi="4.p.1"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="12.e.1", value=BUTTON_1_SINGLE),
+        ConstConv("action", mi="12.e.2", value=BUTTON_1_DOUBLE),
+        ConstConv("action", mi="12.e.3", value=BUTTON_1_HOLD),
+        ConstConv("action", mi="13.e.1", value=BUTTON_2_SINGLE),
+        ConstConv("action", mi="13.e.2", value=BUTTON_2_DOUBLE),
+        ConstConv("action", mi="13.e.3", value=BUTTON_2_HOLD),
+        ConstConv("action", mi="14.e.1", value=BUTTON_3_SINGLE),
+        ConstConv("action", mi="14.e.2", value=BUTTON_3_DOUBLE),
+        ConstConv("action", mi="14.e.3", value=BUTTON_3_HOLD),
+        MapConv("left_switch_mode", "select", mi="2.p.2", map={0: "Normal",  1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("middle_switch_mode", "select", mi="3.p.2", map={0: "Normal",  1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("right_switch_mode", "select", mi="4.p.2", map={ 0: "Normal", 1: "Wireless", 2: "Flex", 3: "Toggle", 4: "Normal+Wireless"}),
+        MapConv("power_on_state_left_switch", "select", mi="2.p.3", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("power_on_state_middle_switch", "select", mi="3.p.3", map={0: "Off", 1: "On", 2: "Default"}), 
+        MapConv("power_on_state_right_switch", "select", mi="4.p.3", map={0: "Off", 1: "On", 2: "Default"}),
+        MapConv("left_switch_indicator_light_mode", "select", mi="16.p.1", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        MapConv("middle_switch_indicator_light_mode", "select", mi="16.p.2", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        MapConv("right_switch_indicator_light_mode", "select", mi="16.p.3", map={0: "Follow", 1: "Opposite", 2: "Off", 3: "On"}),
+        BaseConv("ambient_light", "switch", mi="17.p.1"), 
+    ]
+},{
     20809: ["LeMesh", "Scene Wireless Button S", "lemesh.remote.ts00"],
     "spec": [
         BaseConv("action", "sensor"),
