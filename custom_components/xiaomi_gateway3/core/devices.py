@@ -5091,9 +5091,9 @@ DEVICES += [{
     21478: ["GranwinIoT", "Gra Electricity Metering Controller V8 (Mesh)", "giot.plug.v8icm"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
-        MathConv("power_consumption", "sensor", mi="4.p.1", multiply=0.001, round=3, entity={"units": UnitOfEnergy.KILO_WATT_HOUR}),
+        MathConv("power_consumption", "sensor", mi="4.p.1", multiply=0.0001, round=3, entity={"units": UnitOfEnergy.KILO_WATT_HOUR}),
         MathConv("electric_power", "sensor", mi="4.p.2", round=3, entity={"units": UnitOfPower.WATT}),
-        MathConv("voltage", "sensor", mi="4.p.3", multiply=0.001, round=2, entity={"units": UnitOfElectricPotential.VOLT}),
+        MathConv("voltage", "sensor", mi="4.p.3", entity={"units": UnitOfElectricPotential.VOLT}),
         MathConv("electric_current", "sensor", mi="4.p.4", multiply=0.001, round=3, entity={"units": UnitOfElectricCurrent.AMPERE}),
         # BaseConv("auxiliary_switch", "switch", mi="7.p.1"),
         # BaseConv("voice_disable", "switch", mi="7.p.2"),
