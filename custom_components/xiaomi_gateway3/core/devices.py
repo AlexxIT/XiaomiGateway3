@@ -1769,6 +1769,17 @@ DEVICES += [{
         BoolConv("led", "binary_sensor", mi="3.p.1"),  # bool, config
     ],
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:linp-es4b:1
+    28377: ["Linptech", "Human Presence Sensor ES5(Top Mounted)", "ES5DB", "linp.sensor_occupy.es4b"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity={"units": UNIT_MINUTES, "icon": "mdi:timer"}),
+        MathConv("no_one_duration", "sensor", mi="2.p.1082", min=1, max=120, entity={"units": UNIT_MINUTES, "icon": "mdi:timer-off"}),
+        MapConv("no_one_duration", mi="2.p.1078", map={1: 0}),
+        MapConv("has_someone_duration", mi="2.p.1078", map={0: 0}),
+    ],        
+}, {
     8613: ["H+", "Double Wall Switch", "huca.switch.dh2"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
