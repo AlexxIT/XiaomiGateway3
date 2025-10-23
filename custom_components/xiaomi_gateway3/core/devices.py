@@ -1707,6 +1707,19 @@ DEVICES += [{
         BaseConv("battery", mi="2.p.1003"),
     ]
 }, {
+    # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:xiaomi-mini:1:0000D063
+    21941: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.mini"],
+    "spec": [
+        # MiBeacon2 spec 
+        BLEFloatConv("temperature", "sensor", mi=19457, round=1),
+        BLEByteConv("humidity", "sensor", mi=19458),
+        BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),
+        # MIoT spec
+        BaseConv("temperature", "sensor", mi="2.p.1001"),
+        BaseConv("humidity", "sensor", mi="2.p.1002"),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+    ],       
+}, {
     10987: ["Linptech", "Motion Sensor 2", "HS1BB", "linp.motion.hs1bb1"],
     "spec": [
         # mibeacon2 spec
