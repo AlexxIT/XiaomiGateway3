@@ -2803,6 +2803,28 @@ DEVICES += [{
         MathConv("power_value", "number", mi="7.p.2", multiply=0.01, min=0, max=163840000, entity=ENTITY_CONFIG),
     ],
 }, {
+    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:outlet:0000A002:shuse-v7icm:1:0000C816
+    26225: ["Shuse", "Mesh Smart Controller", "shuse.plug.v7icm"],
+    "spec": [
+        BaseConv("outlet", "switch", mi="2.p.1"),
+        BaseConv("aux_switch", "switch", mi="7.p.1", entity={"name": "Auxiliary Switch"}),
+        BaseConv("aux_disable", "switch", mi="7.p.2", entity={"name": "Voice Off Switch"}),
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="8.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="8.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="8.e.3", value=BUTTON_HOLD),
+        BaseConv("normal_mode", "button", mi="7.a.1", entity=ENTITY_CONFIG),
+        BaseConv("wireless_mode", "button", mi="7.a.2", entity=ENTITY_CONFIG),
+        BaseConv("jog_mode", "button", mi="7.a.3", entity=ENTITY_CONFIG),
+        BaseConv("mixed_mode", "button", mi="7.a.16", entity=ENTITY_CONFIG),
+        BaseConv("follow_led", "button", mi="7.a.4", entity=ENTITY_CONFIG),
+        BaseConv("opposition_led", "button", mi="7.a.5", entity=ENTITY_CONFIG),
+        BaseConv("on_led", "button", mi="7.a.6", entity=ENTITY_CONFIG),
+        BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
+        BaseConv("toggle", "button", mi="2.a.1"),
+        BaseConv("restore_factory", "button", mi="5.a.3", entity=ENTITY_CONFIG),
+    ],       
+}, {
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M", "090615.switch.mesw3"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M", "090615.switch.mets3"],
     "spec": [
