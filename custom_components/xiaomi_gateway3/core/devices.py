@@ -2265,6 +2265,20 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="3.p.1003"),
     ],
 }, {
+    # https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+    25461: ["Xiaomi", "Water Leak Detector 2", "xiaomi.flood.oh83w"],
+    "spec": [
+        BoolConv("water_leak_bottom", "binary_sensor", mi="2.p.1006", entity={"class": "moisture"}),
+        BoolConv("water_leak_top", "binary_sensor", mi="2.p.1123", entity={"class": "moisture"}),
+        MapConv("status", "sensor", mi="2.p.1004", map={0: "In Monitoring", 1: "Idle", 2: "Busy", 3: "Delay"}),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        
+        ### below sensors are not very useful and are disabled by default. 
+        MapConv("event_type", "sensor", mi="2.e.1104.p.4", map={0: "Water Immersion Alarm", 1: "Flood Relief", 2: "Water Alarm", 3: "Water Removal"}, entity={"enabled": False}),
+        BaseConv("cus_event_1", "sensor", mi="6.e.1022.p.1", entity={"enabled": False}),
+        BaseConv("cus_event_2", "sensor", mi="6.e.1022.p.2", entity={"enabled": False}),
+    ],
+}, {
     # rhj.sensor_occupy.l730a
     # https://home.miot-spec.com/s/rhj.sensor_occupy.l730a
     20179: ["LeTianPai", "Presence Sensor POP", "rhj.sensor_occupy.l730a"],
