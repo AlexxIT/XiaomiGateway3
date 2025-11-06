@@ -3449,7 +3449,7 @@ DEVICES += [{
         MathConv("brightness_orange", "number", mi="10.p.4", min=0, max=100, entity=ENTITY_CONFIG),
     ],
 }, {
-    23309: ["Linptech", "Double Wall Switch T1", "linp.switch.t2dbw2"],
+    23473: ["Linptech", "Double Wall Switch T1", "linp.switch.t2dbw2"],
     "spec": [
         BaseConv("switch_1", "switch", mi="2.p.1"),
         BaseConv("switch_2", "switch", mi="3.p.1"),
