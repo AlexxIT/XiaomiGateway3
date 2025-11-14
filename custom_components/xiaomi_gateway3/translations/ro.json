@@ -62,7 +62,7 @@
         "data": {
           "host": "IP Gateway",
           "token": "Token",
-          "telnet_cmd": "Comanda de deschidere Telnet",
+          "custom_password": "Parolă Telnet personalizată",
           "ble": "Dispozitive BLE suportate",
           "stats": "Date despre performanta dispozitivelor Zigbee si BLE",
           "debug": "Debug"

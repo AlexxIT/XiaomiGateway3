@@ -242,10 +242,14 @@ class XDataSelect(XEntity, SelectEntity):
             ok = await self.gw.telnet_command("unlock_firmware")
             self.set_result(ok)
         elif option == OPT_ORIGINAL:
-            ok = await ezsp.update_zigbee_firmware(self.hass, self.gw.host, False)
+            ok = await ezsp.update_zigbee_firmware(
+                self.hass, self.gw.host, False, self.gw.options.get("custom_password")
+            )
             self.set_result(ok)
         elif option == OPT_CUSTOM:
-            ok = await ezsp.update_zigbee_firmware(self.hass, self.gw.host, True)
+            ok = await ezsp.update_zigbee_firmware(
+                self.hass, self.gw.host, True, self.gw.options.get("custom_password")
+            )
             self.set_result(ok)
 
 
