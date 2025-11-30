@@ -74,6 +74,9 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     "sensor.pressure": {"class": SENSOR.PRESSURE, "units": UnitOfPressure.HPA},
     "sensor.temperature": {"class": SENSOR.TEMPERATURE, "units": CELSIUS},
     "sensor.voltage": {"class": SENSOR.VOLTAGE, "units": UnitOfElectricPotential.VOLT},
+    "sensor.pm25": {"class": SENSOR.PM25, "units": "'µg/m³"},
+    "sensor.pm10": {"class": SENSOR.PM10, "units": "'µg/m³"},
+    "sensor.pm1": {"class": SENSOR.PM1, "units": "'µg/m³"},
     ##
     # binary sensors with device class
     "binary_sensor.contact": {"class": BinarySensorDeviceClass.DOOR},
