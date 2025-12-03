@@ -4707,8 +4707,11 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:090615-xw:1:0000C824
     18736: ["PTX", "Human Body Presence Sensor (Top Mounted)", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
+    16168: ["PTX", "Human Body Presence Sensor", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
     "spec": [
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
+        BaseConv("has-someone-duration", "sensor", mi="2.p.3"),
+        BaseConv("no-one-duration", "sensor", mi="2.p.4"),
         BaseConv("illuminance", "sensor", mi="2.p.5"),
         BaseConv("light", "light", mi="5.p.1"),
     ],
