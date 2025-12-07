@@ -1833,7 +1833,7 @@ DEVICES += [{
         # Both "Down Button Press Right/Left Rotation" and "Press To Turn Right/Left" correspond to eiid: 1028        
         ConstConv("action", mi="5.e.1028", value="button_3_press_rotate"),
         # --- Battery level support ---
-        BaseConv("battery", "sensor", mi="1.p.1"),
+        BaseConv("battery", "sensor", mi="4.p.1003"),
     ]
 }, {
     16191: ["GranwinIoT", "V5 One Key Switch (BLE)", "giot.remote.v51kwm"],
