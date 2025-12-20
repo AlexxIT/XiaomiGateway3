@@ -3315,6 +3315,42 @@ DEVICES += [{
         MapConv("led", "select", mi="6.p.3", map={0: "follow_switch", 1: "opposite_to_switch", 2: "off", 3: "on"})
     ]
 }, {
+    26160: ["YuTai", "Mesh Smart Plug V7", "yutai.plug.fsov7m"],
+    "spec": [
+        BaseConv("plug", "switch", mi="2.p.1"),
+        BaseConv("toggle", "button", mi="2.a.1"),
+        BaseConv("normal_mode", "button", mi="7.a.1", entity=ENTITY_CONFIG),
+        BaseConv("wireless_mode", "button", mi="7.a.2", entity=ENTITY_CONFIG),
+        BaseConv("jog_mode", "button", mi="7.a.3", entity=ENTITY_CONFIG),
+        BaseConv("mixed_mode", "button", mi="7.a.16", entity=ENTITY_CONFIG),
+        BaseConv("follow_led", "button", mi="7.a.4", entity=ENTITY_CONFIG),
+        BaseConv("opposition_led", "button", mi="7.a.5", entity=ENTITY_CONFIG),
+        BaseConv("on_led", "button", mi="7.a.6", entity=ENTITY_CONFIG),
+        BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
+        BaseConv("overcharging-on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
+        BaseConv("overcharging-off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
+    ]
+}, {
+    26162: ["YuTai", "Mesh Smart Plug V8", "yutai.plug.fsov8m"],
+    "spec": [
+        BaseConv("plug", "switch", mi="2.p.1"),
+        BaseConv("toggle", "button", mi="2.a.1"),
+        MathConv("energy", "sensor", mi="4.p.1", multiply=0.0001, round=3),
+        MathConv("power", "sensor", mi="4.p.2", round=3),
+        MathConv("voltage", "sensor", mi="4.p.3"),
+        MathConv("current", "sensor", mi="4.p.4", multiply=0.001, round=3),
+        BaseConv("normal_mode", "button", mi="7.a.1", entity=ENTITY_CONFIG),
+        BaseConv("wireless_mode", "button", mi="7.a.2", entity=ENTITY_CONFIG),
+        BaseConv("jog_mode", "button", mi="7.a.3", entity=ENTITY_CONFIG),
+        BaseConv("mixed_mode", "button", mi="7.a.16", entity=ENTITY_CONFIG),
+        BaseConv("follow_led", "button", mi="7.a.4", entity=ENTITY_CONFIG),
+        BaseConv("opposition_led", "button", mi="7.a.5", entity=ENTITY_CONFIG),
+        BaseConv("on_led", "button", mi="7.a.6", entity=ENTITY_CONFIG),
+        BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
+        BaseConv("overcharging-on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
+        BaseConv("overcharging-off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
+    ]
+}, {
     # A third party module widely used in small brand wall switches
     6514: [None, "Mesh Single Wall Switch (with N)", "babai.switch.201m"],
     # A third party module widely used in small brand wall switches
