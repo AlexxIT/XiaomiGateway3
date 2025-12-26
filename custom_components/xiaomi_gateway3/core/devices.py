@@ -639,6 +639,7 @@ DEVICES += [{
         MathConv("blind_time", "number", mi="10.p.1", min=2, max=180),  # config
         MapConv("battery_low", "binary_sensor", mi="5.p.1", map={1: False, 2: True}),  # diagnostic
         BaseConv("idle_time", "sensor", mi="6.p.1"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
     ],
 }, {
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
@@ -1710,7 +1711,7 @@ DEVICES += [{
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:xiaomi-mini:1:0000D063
     21941: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.mini"],
     "spec": [
-        # MiBeacon2 spec 
+        # MiBeacon2 spec
         BLEFloatConv("temperature", "sensor", mi=19457, round=1),
         BLEByteConv("humidity", "sensor", mi=19458),
         BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),
@@ -1718,7 +1719,7 @@ DEVICES += [{
         BaseConv("temperature", "sensor", mi="2.p.1001"),
         BaseConv("humidity", "sensor", mi="2.p.1002"),
         BaseConv("battery", "sensor", mi="3.p.1003"),
-    ],       
+    ],
 }, {
     10987: ["Linptech", "Motion Sensor 2", "HS1BB", "linp.motion.hs1bb1"],
     "spec": [
@@ -1791,7 +1792,7 @@ DEVICES += [{
         MathConv("no_one_duration", "sensor", mi="2.p.1082", min=1, max=120, entity={"units": UNIT_MINUTES, "icon": "mdi:timer-off"}),
         MapConv("no_one_duration", mi="2.p.1078", map={1: 0}),
         MapConv("has_someone_duration", mi="2.p.1078", map={0: 0}),
-    ],        
+    ],
 }, {
     8613: ["H+", "Double Wall Switch", "huca.switch.dh2"],
     "spec": [
@@ -1830,7 +1831,7 @@ DEVICES += [{
         # The value of this sensor is a number: positive for right, negative for left rotation.
         BaseConv("knob_rotation_amplitude", "sensor", mi="5.e.1036.p.2"),
         # --- Combined operation events ---
-        # Both "Down Button Press Right/Left Rotation" and "Press To Turn Right/Left" correspond to eiid: 1028        
+        # Both "Down Button Press Right/Left Rotation" and "Press To Turn Right/Left" correspond to eiid: 1028
         ConstConv("action", mi="5.e.1028", value="button_3_press_rotate"),
         # --- Battery level support ---
         BaseConv("battery", "sensor", mi="1.p.1"),
@@ -2172,7 +2173,7 @@ DEVICES += [{
     "spec": [
         BaseConv("action", "sensor"),
         MapConv("action", mi="3.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
-        MapConv("action", mi="3.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),       
+        MapConv("action", mi="3.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
         MapConv("action", mi="3.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
         # Humidity (uint8)
         BaseConv("humidity", "sensor", mi="8.p.1018"),
@@ -2181,7 +2182,7 @@ DEVICES += [{
         # Battery level
         BaseConv("battery", "sensor", mi="6.p.1003"),
     ],
-    # "ttl": "7d"     
+    # "ttl": "7d"
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1294
     14945: ["Linptech", "Wireless Button KS1", "linp.remote.ks1"],
@@ -2301,8 +2302,8 @@ DEVICES += [{
         BoolConv("water_leak_top", "binary_sensor", mi="2.p.1123", entity={"class": "moisture"}),
         MapConv("status", "sensor", mi="2.p.1004", map={0: "In Monitoring", 1: "Idle", 2: "Busy", 3: "Delay"}),
         BaseConv("battery", "sensor", mi="3.p.1003"),
-        
-        ### below sensors are not very useful and are disabled by default. 
+
+        ### below sensors are not very useful and are disabled by default.
         MapConv("event_type", "sensor", mi="2.e.1104.p.4", map={0: "Water Immersion Alarm", 1: "Flood Relief", 2: "Water Alarm", 3: "Water Removal"}, entity={"enabled": False}),
         BaseConv("cus_event_1", "sensor", mi="6.e.1022.p.1", entity={"enabled": False}),
         BaseConv("cus_event_2", "sensor", mi="6.e.1022.p.2", entity={"enabled": False}),
@@ -2866,7 +2867,7 @@ DEVICES += [{
         BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
         BaseConv("toggle", "button", mi="2.a.1"),
         BaseConv("restore_factory", "button", mi="5.a.3", entity=ENTITY_CONFIG),
-    ],       
+    ],
 }, {
     2093: ["PTX", "Mesh Triple Wall Switch", "PTX-TK3/M", "090615.switch.mesw3"],
     3878: ["PTX", "Mesh Triple Wall Switch", "PTX-SK3M", "090615.switch.mets3"],
@@ -4677,7 +4678,7 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.5", map={0: "Off", 1: "On", 2: "Default"}),
         MapConv("backlight_level", "select", mi="17.p.2", map={0: "Level 0", 1: "Level 1", 2: "Level 2"}, entity=ENTITY_CONFIG),
         MapConv("backlight_mode", "select", mi="17.p.3", map={0: "Default", 1: "auto", 2: "Not-disturb"}, entity=ENTITY_CONFIG),
-        BaseConv("action", "sensor"),     
+        BaseConv("action", "sensor"),
         # Button press events
         MapConv("action", mi="6.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}), # Single press
         MapConv("action", mi="6.e.3.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}), # Double press
@@ -4696,14 +4697,14 @@ DEVICES += [{
         # Standby clock display switch (controlled via mode selection)
         MapConv("no_one_screen", "select", mi="17.p.10", map={0: "Off", 1: "Low-energy", 2: "Digit-clock"}, entity=ENTITY_CONFIG),
         # Auto standby time (screen off delay)
-        MathConv("screen_off_delay", "number", mi="17.p.4", min=3, max=180, entity=ENTITY_CONFIG),        
+        MathConv("screen_off_delay", "number", mi="17.p.4", min=3, max=180, entity=ENTITY_CONFIG),
         # Occupancy/Vacancy detection binary sensor
         ConstConv("action", mi="16.e.1", value="someone"), # Someone detected
         ConstConv("action", mi="16.e.2", value="no_one"),  # No one detected
         BaseConv("occupancy", "binary_sensor", entity=ENTITY_LAZY),
         ConstConv("occupancy", mi="16.e.1", value=True),   # Occupied
         ConstConv("occupancy", mi="16.e.2", value=False),  # Vacant
-    ],      
+    ],
 }, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:occupancy-sensor:0000A0BF:090615-xw:1:0000C824
     18736: ["PTX", "Human Body Presence Sensor (Top Mounted)", "PTX-MMW-MIM", "090615.sensor_occupy.xw"],
@@ -5358,4 +5359,1401 @@ DEVICES += [{
         MapConv("color_mode", mi="5.1.8", map={1: "rgb", 2: "color_temp"}),
         MapConv("power_on_state", "select", mi="5.1.7", map={0: "default", 1: "off", 2: "on"}),
     ],
+}]
+
+# Gateway (aiot)
+DEVICES_AIOT_GATEWAY = [{
+    "lumi.gateway.acn01": ["Aqara", "Gateway M1S CN", "ZHWG15LM"],
+    "spec": [
+        # write pair=60 => report discovered_mac => report 8.0.2166? => write pair_command => report added_device => write pair=0
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),
+
+        BaseConv("z3_version", mi="8.0.2080"),  # can be read
+        BaseConv("z3_info", mi="8.0.2166"),
+        BaseConv("ota", mi="8.0.2091"),  # percent
+
+        # support change with remote.send_command
+        BaseConv("power_tx", mi="8.0.2012"),
+        BaseConv("channel", mi="8.0.2024"),
+        BaseConv("illuminance", "sensor", mi="0.3.85"),
+        BoolConv("light", "light", mi="2.p.1"),
+        ZLumiBrightness("brightness", mi="2.p.3"),
+        ZTransitionConv("transition"),
+        RGBColor("rgb_color", mi="2.p.4"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("alarm", "alarm_control_panel", mi="3.p.1", map={0: "disarmed", 1: "armed_home", 2: "armed_away", 3: "armed_night"}),
+        BoolConv("alarm_trigger", "switch", mi="3.p.22"),
+    ],
+}, {
+    "lumi.gateway.iragl5": ["Aqara", "Gateway M2 CN", "ZHWG12LM"],
+    "spec": [
+        # write pair=60 => report discovered_mac => report 8.0.2166? => write pair_command => report added_device => write pair=0
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),
+
+        BaseConv("z3_version", mi="8.0.2080"),  # can be read
+        BaseConv("z3_info", mi="8.0.2166"),
+        BaseConv("ota", mi="8.0.2091"),  # percent
+
+        # support change with remote.send_command
+        BaseConv("power_tx", mi="8.0.2012"),
+        BaseConv("channel", mi="8.0.2024"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.gateway.agl010": ["Aqara", "Hub M100 CN", "ZHWG25LM"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        MapConv("alarm", "alarm_control_panel", mi="8.0.2242", map={0: "armed_home", 1: "armed_away", 2: "armed_night", 3: "disarmed"}),
+        MapConv("indicator_light_dnd", "switch", mi="14.21.85", map={5162040: True, 5162041: False}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.gateway.iragl8": ["Aqara", "Gateway M2 2022 CN", "ZHWG19LM"],
+    "lumi.gateway.agl011": ["Aqara", "Gateway M200", "AG047GLB02"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English"}),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("indicator_light_dnd", "switch", mi="14.21.85", map={5162040: True, 5162041: False}),
+        MapConv("alarm", "alarm_control_panel", mi="8.0.2242", map={0: "armed_home", 1: "armed_away", 2: "armed_night", 3: "disarmed"}),
+        #BoolConv("alarm_trigger", "switch", mi="3.p.22"),
+        #BaseConv("control_ir_by_prod", "text", mi="14.27.85", entity={"icon": "mdi:remote"}),  # brand_id, remote_id, ac_mode, ac_type
+        BaseConv("control_ir", "text", mi="8.0.2092", entity={"icon": "mdi:remote"}),
+        BaseConv("ir_send", "text", mi="8.0.2093", entity={"icon": "mdi:remote"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.gateway.acn004": ["Aqara", "Gateway M1S 2022 CN", "ZHWG20LM"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        BaseConv("illuminance", "sensor", mi="0.3.85"),
+        MathConv("alarm_index", "number", mi="14.1.85", min=0, max=8, entity={"icon": "mdi:alarm-panel"}),
+        BoolConv("play_music", "button", mi="14.3.111", entity={"icon": "mdi:music"}),
+        MathConv("music_index", "number", mi="14.3.85", min=0, max=29, entity={"icon": "mdi:playlist-music"}),
+        BoolConv("alarm_status", "button", mi="14.1.111", entity={"icon": "mdi:alarm"}),
+        BoolConv("doorbell", "button", mi="14.2.111", entity={"icon": "mdi:doorbell"}),
+        BoolConv("light", "light", mi="14.7.111"),
+        ZLumiBrightness("brightness", mi="14.7.1006"),
+        ZTransitionConv("transition"),
+        RGBColor("rgb_color", mi="14.7.85"),
+        MathConv("doorbell_volume", "number", mi="14.2.1000", min=0, max=100, entity={"icon": "mdi:volume-source"}),  # config
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English"}),
+
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("indicator_light_dnd", "switch", mi="14.21.85", map={5162040: True, 5162041: False}),
+        MapConv("alarm", "alarm_control_panel", mi="8.0.2242", map={0: "armed_home", 1: "armed_away", 2: "armed_night", 3: "disarmed"}),
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.gateway.acn012": ["Aqara", "Gateway M3 CN", "ZHWG24LM"],
+    "lumi.gateway.agl004": ["Aqara", "Gateway M3", "HM-G01D"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+#        MathConv("alarm_index", "number", mi="14.1.85", min=0, max=8, entity={"icon": "mdi:alarm-panel"}),
+        BoolConv("alarm_status", "button", mi="14.1.111", entity={"icon": "mdi:alarm"}),
+        MathConv("alarm_volume", "number", mi="14.1.1000", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+#        MathConv("doorbell_index", "number", mi="14.2.85", min=0, max=8, entity={"icon": "mdi:doorbell"}),
+        MathConv("doorbell_volume", "number", mi="14.2.1000", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+#        MathConv("music_index", "number", mi="14.3.85", min=0, max=29, entity={"icon": "mdi:playlist-music"}),
+        BoolConv("play_music", "button", mi="14.3.111", entity={"icon": "mdi:music"}),
+        MathConv("music_volume", "number", mi="14.3.1000", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        BoolConv("doorbell", "button", mi="14.2.111", entity={"icon": "mdi:doorbell"}),
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English", 3: "Cantonese"}),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("indicator_light_dnd", "switch", mi="14.21.85", map={5162040: True, 5162041: False}),
+        MapConv("alarm", "alarm_control_panel", mi="8.0.2242", map={0: "armed_home", 1: "armed_away", 2: "armed_night", 3: "disarmed"}),
+        BaseConv("control_ir", "text", mi="8.0.2092", entity={"icon": "mdi:remote"}),
+        BaseConv("ir_send", "text", mi="8.0.2093", entity={"icon": "mdi:remote"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+        #BoolConv("alarm_trigger", "switch", mi="3.p.22"),
+    ],
+}, {
+    "lumi.camera.gwpagl01": ["Aqara", "Camera Hub G3 CN", "ZNSXJ13LM"],
+    "lumi.camera.gwpgl1": ["Aqara", "Camera Hub G3", "CH-H03"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+
+        #BaseConv("sdcard_info", "sensor", mi="13.25.85")
+        BaseConv("detect_face", "sensor", mi="13.95.85", entity={"icon": "mdi:face-recognition"}),
+        MapConv("detect_gesture", "sensor", mi="13.96.85", map=GESTURE_MAP, entity={"icon": "mdi:gesture-pinch"}),
+        BaseConv("detect_human", "sensor", mi="13.97.85", entity={"icon": "mdi:motion-outline"}),
+        MapConv("detect_pets", "sensor", mi="13.98.85", map=PETS_MAP, entity={"icon": "mdi:paw"}),
+#        BaseConv("rtsp_url", "sensor", mi="13.168.85", entity={"icon": "mdi:webcam"}),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English"}),
+        BoolConv("motion_detect", "switch", mi="14.70.85", entity={"icon": "mdi:motion-sensor"}),
+        BoolConv("Active Video", "switch", mi="14.74.85", entity={"icon": "mdi:cctv"}),
+        BoolConv("face_detect", "switch", mi="14.75.85", entity={"icon": "mdi:face-recognition"}),
+        BoolConv("gesture_detect", "switch", mi="14.76.85", entity={"icon": "mdi:gesture-pinch"}),
+        BoolConv("human_detect", "switch", mi="14.77.85", entity={"icon": "mdi:motion-outline"}),
+        BoolConv("pets_detect", "switch", mi="14.78.85", entity={"icon": "mdi:paw"}),
+        BaseConv("current_x_y", "sensor", mi="14.88.85", entity={"icon": "mdi:axis-arrow-info"}),
+        BaseConv("new_x_y", "text", mi="14.88.85", entity={"icon": "mdi:axis-arrow"}),
+        ButtonConv("ptz_calibrate", "button", mi="14.90.85"),
+        BoolConv("sound_trigger", "switch", mi="14.119.85", entity={"icon": "mdi:speaker-wireless"}),
+        BoolConv("humans_track", "switch", mi="14.123.85", entity={"icon": "mdi:motion-sensor"}),
+        BoolConv("pets_track", "switch", mi="14.123.85", entity={"icon": "mdi:paw"}),
+        BaseConv("control_ir", "text", mi="8.0.2092", entity={"icon": "mdi:remote"}),
+        BaseConv("ir_send", "text", mi="8.0.2093", entity={"icon": "mdi:remote"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.gateway.acn011": ["Aqara", "Outlet Hub V1 CN", "AHWG11LM"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("indicator_light_dnd", "switch", mi="14.21.85", map={5162040: True, 5162041: False}),
+        BaseConv("control_ir", "text", mi="8.0.2092", entity={"icon": "mdi:remote"}),
+        BaseConv("ir_send", "text", mi="8.0.2093", entity={"icon": "mdi:remote"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.camera.acn008": ["Aqara", "Camera Hub G5 Pro (WiFi)", "ZNSXJ21LM"],
+    "lumi.camera.acn009": ["Aqara", "Camera Hub G5 Pro (PoE)", "ZNSXJ18LM"],
+    "lumi.camera.acn010": ["Aqara", "Camera Hub G5 Pro (PoE) CN", "CH-C03D/E"],
+    "lumi.camera.acn011": ["Aqara", "Camera Hub G5 Pro (WiFi) CN", "CH-C07D/E"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+        BoolConv("white_led", "switch", mi="14.158.85", entity={"icon": "mdi:car-light-high"}),
+        MathConv("brightness", "number", mi="1.25.85", min=0, max=100),  # config
+
+        MapConv("package_detect", "sensor", mi="3.73.85", map={1: "package appear", 2: "package disappear"}, entity={"icon": "mdi:package-variant-closed-check"}),
+        BoolConv("camera_timelapse", "switch", mi="4.27.85", entity={"icon": "mdi:timelapse"}),
+#        BoolConv("cry_record", "switch", mi="4.52.85", entity={"icon": "mdi:emoticon-cry-outline"}),
+        BoolConv("face_push", "switch", mi="4.55.85", entity={"icon": "mdi:face-recognition"}),
+        BoolConv("block_camera", "switch", mi="4.88.85", entity={"icon": "mdi:block-helper"}),
+        BoolConv("pir_detect", "switch", mi="4.85.85", entity={"icon": "mdi:wall-sconce-round"}),
+        BoolConv("package_detect_record", "switch", mi="4.92.85", entity={"icon": "mdi:package-variant"}),
+        BaseConv("detect_face", "sensor", mi="13.95.85", entity={"icon": "mdi:face-recognition"}),
+#        MapConv("detect_gesture", "sensor", mi="13.96.85", map=GESTURE_MAP, entity={"icon": "mdi:gesture-pinch"}),
+        BaseConv("detect_human", "sensor", mi="13.97.85", entity={"icon": "mdi:motion-outline"}),
+        MapConv("detect_pets", "sensor", mi="13.98.85", map=PETS_MAP, entity={"icon": "mdi:paw"}),
+        BaseConv("detect_vehicle", "sensor", mi="13.107.85", entity={"icon": "mdi:car-estate"}),
+#        BaseConv("rtsp_url", "sensor", mi="13.168.85", entity={"icon": "mdi:webcam"}),
+        BaseConv("detect_alarm_sound", "sensor", mi="13.173.85", entity={"icon": "mdi:surround-sound"}),
+#        BoolConv("baby_sound", "sensor", mi="13.174.85", entity={"icon": "mdi:baby"}),
+        BaseConv("pets_sound", "sensor", mi="13.175.85", entity={"icon": "mdi:paw"}),
+#        BaseConv("cough_sound", "sensor", mi="13.176.85", entity={"icon": "mdi:emoticon-remove"}),
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English", 3: "Cantonese", 4: "Español", 5: "Русский", 6: "Korean", 8: "Deutsch", 9: "Français", 10: "Italiano", 11: "Japanense"}),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("image_flip", "select", mi="14.68.85", map={0: "Normal", 1: "horizontal", 2: "vertical", 3: "both"}),  # config
+        BoolConv("motion_detect", "switch", mi="14.70.85", entity={"icon": "mdi:motion-sensor"}),
+        BoolConv("Active Video", "switch", mi="14.74.85", entity={"icon": "mdi:cctv"}),
+        BoolConv("face_detect", "switch", mi="14.75.85", entity={"icon": "mdi:face-recognition"}),
+#        BoolConv("gesture_detect", "switch", mi="14.76.85", entity={"icon": "mdi:gesture-pinch"}),
+        BoolConv("human_detect", "switch", mi="14.77.85", entity={"icon": "mdi:motion-outline"}),
+        BoolConv("pets_detect", "switch", mi="14.78.85", entity={"icon": "mdi:paw"}),
+        BoolConv("sound_trigger", "switch", mi="14.119.85", entity={"icon": "mdi:speaker-wireless"}),
+#        BoolConv("humans_track", "switch", mi="14.123.85", entity={"icon": "mdi:motion-sensor"}),
+#        BoolConv("pets_track", "switch", mi="14.123.85", entity={"icon": "mdi:paw"}),
+        BoolConv("car_detect", "switch", mi="14.159.85", entity={"icon": "mdi:car-side"}),
+#        BoolConv("baby_sound", "switch", mi="14.173.85", entity={"icon": "mdi:baby"}),
+#        BoolConv("cough_detect", "switch", mi="14.174.85", entity={"icon": "mdi:emoticon-remove"}),
+#        BoolConv("pets_sound", "switch", mi="14.175.85", entity={"icon": "mdi:paw"}),
+        BoolConv("ai_sound", "switch", mi="14.176.85", entity={"icon": "mdi:soundcloud"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.camera.acn003": ["Aqara", "Camera Hub G2H Pro CN", "ZNSXJ15LM"],
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}, {
+    "lumi.camera.acn017": ["Aqara", "Doorbell G410 CN", "ZNKSML05"],
+    "lumi.camera.agl006": ["Aqara", "Doorbell G410", "CH-C09D"],   # Global version
+    "spec": [
+        MapConv("pair", mi="8.0.2109", map={60: True, 0: False}),
+
+        BaseConv("discovered_mac", mi="8.0.2110"),
+        BaseConv("pair_command", mi="8.0.2111"),
+        BaseConv("added_device", mi="8.0.2084"),
+        BaseConv("remove_did", mi="8.0.2082"),  # support change
+
+        BaseConv("power_tx", mi="8.0.2012"),  # support change
+        BaseConv("channel", mi="8.0.2024"),  # support change
+        BaseConv("pan_id", mi="8.0.2157"),
+
+        BaseConv("command", "select"),
+        BaseConv("data", "select"),
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+
+        #BaseConv("sdcard_info", "sensor", mi="13.25.85")
+        BaseConv("detect_face", "sensor", mi="13.95.85", entity={"icon": "mdi:face-recognition"}),
+        MapConv("detect_gesture", "sensor", mi="13.96.85", map=GESTURE_MAP, entity={"icon": "mdi:gesture-pinch"}),
+        BaseConv("detect_human", "sensor", mi="13.97.85", entity={"icon": "mdi:motion-outline"}),
+        MapConv("detect_pets", "sensor", mi="13.98.85", map=PETS_MAP, entity={"icon": "mdi:paw"}),
+#        BaseConv("rtsp_url", "sensor", mi="13.168.85", entity={"icon": "mdi:webcam"}),
+        MathConv("system_volume", "number", mi="14.11.85", min=0, max=100, entity={"icon": "mdi:volume-medium"}),  # config
+        MapConv("language", "select", mi="14.10.85", map={1: "Chinese", 2: "English"}),
+        BoolConv("motion_detect", "switch", mi="14.70.85", entity={"icon": "mdi:motion-sensor"}),
+        BoolConv("Active Video", "switch", mi="14.74.85", entity={"icon": "mdi:cctv"}),
+        BoolConv("face_detect", "switch", mi="14.75.85", entity={"icon": "mdi:face-recognition"}),
+        BoolConv("gesture_detect", "switch", mi="14.76.85", entity={"icon": "mdi:gesture-pinch"}),
+        BoolConv("human_detect", "switch", mi="14.77.85", entity={"icon": "mdi:motion-outline"}),
+        BoolConv("pets_detect", "switch", mi="14.78.85", entity={"icon": "mdi:paw"}),
+        BaseConv("current_x_y", "sensor", mi="14.88.85", entity={"icon": "mdi:axis-arrow-info"}),
+        BaseConv("new_x_y", "text", mi="14.88.85", entity={"icon": "mdi:axis-arrow"}),
+        ButtonConv("ptz_calibrate", "button", mi="14.90.85"),
+        BoolConv("sound_trigger", "switch", mi="14.119.85", entity={"icon": "mdi:speaker-wireless"}),
+        BoolConv("humans_track", "switch", mi="14.123.85", entity={"icon": "mdi:motion-sensor"}),
+        BoolConv("pets_track", "switch", mi="14.123.85", entity={"icon": "mdi:paw"}),
+        BoolConv("ark_mode_2", "switch", mi="8.0.2327", entity={"icon": "mdi:ferry"}),
+    ],
+}]
+
+# Zigbee (lumi spec, aiot)
+DEVICES_AIOT_ZIGBEE = [{
+    "lumi.switch.n1acn1": ["Aqara", "Single Wall Switch H1 Pro", "QBKG30LM"],
+    "lumi.switch.acn020": ["Aqara", "Single Wall Switch H1L", ""],
+    "lumi.switch.acn029": ["Aqara", "Single Wall Switch H1M", "ZNQBKG24LM"],
+    "lumi.switch.b1nacn01": ["Aqara", "Single Wall Switch T1", "QBKG19LM"],
+    "lumi.plug.sacn02": ["Aqara", "Wall Outlet T1", "QBCZ14LM"],
+    "lumi.switch.b1naus01": ["Aqara", "Single Wall Switch US", "WS-USC03"],
+    "lumi.switch.n1aeu1": ["Aqara", "Single Wall Switch EU H1", "WS-EUK03"],
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    "lumi.switch.n2acn1": ["Aqara", "Double Wall Switch H1 Pro", "QBKG31LM"],
+    "lumi.switch.acn019": ["Aqara", "Double Wall Switch H1L", ""],
+    "lumi.switch.acn030": ["Aqara", "Double Wall Switch H1M", "ZNQBKG25LM"],
+    "lumi.switch.b2nacn01": ["Aqara", "Double Wall Switch T1", "QBKG20LM"],
+    "lumi.switch.acn045": ["Aqara", "Double Wall Switch J1", ""],
+    "lumi.switch.acn049": ["Aqara", "Two-way Control module T2", "ZNQBKG39LM"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_both", mi="13.5.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    "lumi.switch.n3acn1": ["Aqara", "Triple Wall Switch H1 Pro", "QBKG32LM"],  # @Kris
+    "lumi.switch.acn015": ["Aqara", "Triple Wall Switch D1L", ""],
+    "lumi.switch.acn021": ["Aqara", "Triple Wall Switch H1L", ""],
+    "lumi.switch.acn031": ["Aqara", "Triple Wall Switch H1M", "ZNQBKG26LM"],
+    "lumi.switch.b3n01": ["Aqara", "Triple Wall Switch T1", "QBKG34LM"],
+    "lumi.switch.acn046": ["Aqara", "Triple Wall Switch J1", ""],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_3", mi="13.3.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    # triple channel on/off, no neutral wire
+    "lumi.switch.acn039": ["Aqara", "Triple Wall Switch E1", ""],
+    "lumi.switch.acn043": ["Aqara", "Triple Wall Switch J1", ""],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_3", mi="13.3.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    # triple channel on/off, with neutral wire
+    'lumi.switch.acn040': ["Aqara", "Triple Wall Switch E1", "ZNQBKG31LM"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_3", mi="13.3.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    # with neutral wire
+    "lumi.switch.acn048": ["Aqara", "Single Wall Switch Z1", "ZNQBKG38LM"], # @justbin95
+    "lumi.switch.acn056": ["Aqara", "Canon Smart Wall Switch Z1 Pro (Single-button Version)", "ZNQBKG42LM"],
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        MathConv("current", "sensor", mi="0.14.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+    ],
+}, {
+    "lumi.switch.agl004": ["Aqara", "Single Wall Switch H2 US", "WS-K02E"],
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        BoolConv("switch_lock", "switch", mi="4.4.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    "lumi.switch.b1lacn01": ["Aqara", "Single Wall Switch T1", "QBKG17LM"],
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+    ],
+}, {
+    # with neutral wire
+    "lumi.switch.acn047": ["Aqara", "Two-way Control module T2", "LLKZMK12LM"],
+    "lumi.switch.acn057": ["Aqara", "Canon Smart Wall Switch Z1 Pro (Double-button Version)", "ZNQBKG43LM"],
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+    ],
+}, {
+    "lumi.switch.agl005": ["Aqara", "Double Wall Switch H2 US", "WS-K03E"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_1_lock", "switch", mi="4.4.85"),
+        BoolConv("channel_2_lock", "switch", mi="4.5.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        ButtonConv("button_3", mi="13.23.85"),
+        ButtonConv("button_4", mi="13.24.85"),
+        ButtonConv("button_both", mi="13.5.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+    ],
+}, {
+    # with neutral wire
+    "lumi.switch.acn054": ["Aqara", "Triple Wall Switch Z1", "ZNQBKG40LM"], # @justbin95
+    "lumi.switch.acn058": ["Aqara", "Canon Smart Wall Switch Z1 Pro (Triple-button Version)", "ZNQBKG44LM"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        ButtonConv("button_3", mi="13.23.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+    ],
+}, {
+    # with neutral wire
+    "lumi.switch.acn059": ["Aqara", "Canon Smart Wall Switch Z1 Pro (Four-button Version)", "ZNQBKG45LM"],
+    "lumi.switch.agl006": ["Aqara", "Smart Wall Switch H2 (Four-button Version)", ""],
+    "lumi.switch.acn055": ["Aqara", "Four Wall Switch Z1", "ZNQBKG41LM"], # @justbin95
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.2.85"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        ButtonConv("button_3", mi="13.23.85"),
+        ButtonConv("button_4", mi="13.24.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        BoolConv("wireless_4", "switch", mi="4.13.85"),  # config
+    ],
+}, {
+	# with neutral wire
+    "lumi.switch.acn051": ["Aqara", "Fanxing Smart Switch V1 (Four-button Version)", "CJKG15LM"], # @justbin95
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.2.85"),
+        ButtonConv("button_1", mi="13.21.85"),
+        ButtonConv("button_2", mi="13.22.85"),
+        ButtonConv("button_3", mi="13.23.85"),
+        ButtonConv("button_4", mi="13.24.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        BoolConv("wireless_4", "switch", mi="4.13.85"),  # config
+        BoolConv("motion", "binary_sensor", mi="3.1.85"),
+    ],
+}, {
+    # with neutral wire
+    "lumi.switch.n4acn4": ["Aqara", "Scene Panel", "ZNCJMB14LM"],  # @miniknife88
+    "spec": [
+        MathConv("brightness", "number", mi="1.1.85", min=0, max=100),  # config
+        MathConv("standby_brightness", "number", mi="1.2.85", min=0, max=100),  # config
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        BoolConv("auto_brightness", "switch", mi="4.9.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_3", mi="13.3.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        MapConv("language", "select", mi="14.6.85", map={0: "ch", 1: "en"}),  # config
+        MapConv("prompt_voice", "select", mi="14.7.85", map={0: "Beep", 1: "Boo"}),  # config
+        MapConv("screen_saver_styles", "select", mi="14.8.85", map={0: "Styles 0", 1: "Styles 1"}),  # config
+        MapConv("theme", "select", mi="14.9.85", map={0: "Theme 0", 1: "Theme 1"}),  # config
+        MapConv("standby_times", "select", mi="14.10.85", map={0: "60", 1: "90"}),  # config
+        MapConv("font_size", "select", mi="14.11.85", map={0: "small", 1: "middle", 2: "big"}),  # config
+        MapConv("homepage", "select", mi="14.12.85", map={0: "Home 1", 1: "Home 1"}),  # config
+        MapConv("screen_saver", "select", mi="14.13.85", map={0: "Screen Saver 0", 1: "Screen Saver 1"}),  # config
+        MapConv("channel_number", "select", mi="14.21.85", map={0: "Channel Number 0", 1: "Channel Number 1"}),  # config
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+        BaseConv("sync", "button", mi="20.4.85", entity=ENTITY_CONFIG),
+    ],
+}, {
+    "lumi.switch.b1lc04": ["Aqara", "Single Wall Switch E1", "QBKG38LM"],
+    "lumi.switch.b1laus01": ["Aqara", "Single Wall Switch US", "WS-USC01"],
+    "lumi.switch.l1aeu1": ["Aqara", "Single Wall Switch EU H1", "WS-EUK01"],
+    # with neutral wire, not support power measurement
+    "lumi.switch.b1nc01": ["Aqara", "Single Wall Switch E1", "QBKG40LM"],
+    "lumi.switch.acn041": ["Aqara", "Single Wall Switch J1", ""],  # No Neutral
+    "lumi.switch.acn044": ["Aqara", "Single Wall Switch J1", ""],  # With Neutral
+    "spec": [
+        BoolConv("switch", "switch", mi="4.1.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    "lumi.switch.b2lc04": ["Aqara", "Double Wall Switch E1", "QBKG39LM"],
+    "lumi.switch.b2laus01": ["Aqara", "Double Wall Switch US", "WS-USC02"],
+    "lumi.switch.l2aeu1": ["Aqara", "Double Wall Switch EU H1", "WS-EUK02"],
+    # with neutral wire, not support power measurement
+    "lumi.switch.b2nc01": ["Aqara", "Double Wall Switch E1", "QBKG41LM"],
+    "lumi.switch.acn042": ["Aqara", "Double Wall Switch J1", ""],  # No Neutral
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_both", mi="13.5.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    "lumi.switch.b2naus01": ["Aqara", "Double Wall Switch US", "WS-USC04"],
+    "lumi.switch.n2aeu1": ["Aqara", "Double Wall Switch EU H1", "WS-EUK04"],
+    "spec": [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_both", mi="13.5.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+    ],
+}, {
+    # no N, https://www.aqara.com/en/single_switch_T1_no-neutral.html
+    "lumi.switch.l0agl1": ["Aqara", "Relay T1", "SSM-U02"],
+    "lumi.switch.l0acn1": ["Aqara", "Relay T1", "DLKZMK12LM"],  # @Kris
+    "spec": [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        BoolConv("switch", "switch", mi="4.1.85"),
+        MapConv("channel_loading_type", mi="14.5.85", map={1: "adapter", 3: "battery", 4: "charging"}),
+    ],
+}, {
+    # with N, https://www.aqara.com/en/single_switch_T1_with-neutral.html
+    "lumi.switch.n0agl1": ["Aqara", "Relay T1", "SSM-U01"],
+    "lumi.switch.n0acn1": ["Aqara", "Relay T1", "DLKZMK11LM"],
+    "lumi.switch.n0acn2": ["Aqara", "Relay T1", "DLKZMK11LM"],
+    "lumi.plug.maeu01": ["Aqara", "Plug", "SP-EUC01"],
+    "spec": [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BoolConv("switch", "switch", mi="4.1.85"),
+    ],
+}, {
+    "lumi.relay.c4acn01": ["Aqara", "Relay", "LLKZMK14LM"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        BoolConv("channel_4", "switch", mi="4.4.85"),
+        MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="0.22.85", round=2),
+        MathConv("energy", "sensor", mi="0.23.85", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="0.32.85", round=2),
+        MathConv("energy", "sensor", mi="0.33.85", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="0.42.85", round=2),
+        MathConv("energy", "sensor", mi="0.43.85", multiply=0.001, round=2),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_both", mi="13.5.85"),
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+}, {
+    "lumi.plug.sacn03": ["Aqara", "Socket H1 USB", "QBCZ15LM"],  # @miniknife88
+    "lumi.plug.acn003": ["Aqara", "Socket X1 USB", "QBCZ16LM"],
+    "lumi.plug.acn005": ["Aqara", "Socket H2", "ZNQBCZ11LM"],  # @kiminih
+    "spec": [
+        BoolConv("outlet", "switch", mi="4.1.85"),
+        BoolConv("usb", "switch", mi="4.1.85"),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("charge_protect", "switch", mi="8.0.2031"),  # config
+        BoolConv("led", "switch", mi="8.0.2032"),  # config
+        BoolConv("wireless", "switch", mi="4.10.85"),  # config
+    ],
+}, {
+    # with neutral wire
+    'lumi.controller.a4acn1': ["Aqara", "Smart Scene Panel Switch S1", "ZNCJMB14LM"],
+    'spec': [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        BaseConv("action", "sensor"),
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_3", mi="13.3.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        BoolConv("wireless_1", "switch", mi="4.10.85"),  # config
+        BoolConv("wireless_2", "switch", mi="4.11.85"),  # config
+        BoolConv("wireless_3", "switch", mi="4.12.85"),  # config
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("auto_brightness", "switch", mi="4.14.85"),
+        BoolConv("mute", "switch", mi="4.23.85"),
+        BoolConv("screensaver", "switch", mi="4.46.85"),
+        BaseConv("turn_off_light_as_time", "sensor", mi="8.0.2207"),
+        BaseConv("alarm_status", "sensor", mi="14.1.111"),
+    ],
+}, {
+    # light with brightness and color temp
+    "lumi.light.cwacn1": ["Aqara", "0-10V Dimmer", "ZNTGMK12LM"],  # @miniknife88
+    "lumi.light.cwjwcn01": ["Aqara", "Jiawen 0-12V Dimmer", "Z204"],  # @Kris
+    "lumi.light.acn004": ["Aqara", "Smart Dimmer Controller T1 Pro", "SSWQD02LM"],
+    "lumi.light.wjwcn01": ["Aqara", "Spot Light (Adjustable Brightness)", ""],
+    "lumi.light.acn026": ["Aqara", "Downlight T2", "LTSZNSD04LM"],
+    "lumi.light.acn025": ["Aqara", "Spotlight T2 (36 degree)", "LTSZNSD03LM"],
+    "lumi.light.acn024": ["Aqara", "Spotlight T2 (24 degree)", "LTSZNSD02LM"],
+    "lumi.light.acn023": ["Aqara", "Spotlight T2 (15 degree)", "LTSZNSD01LM"],
+    "lumi.light.acn131": ["Aqara", "Downlight T3", "LGYCDD02LM"],
+    "lumi.light.acn132": ["Aqara", "Colorful Light Strip T3", "LGYCDD01LM"],
+    "lumi.light.acn130": ["Aqara", "Spotlight T3 (36 degree)", "LGYCDD03LM"],
+    "lumi.light.acn129": ["Aqara", "Spotlight T3 (24 degree)", "LGYCDD04LM"],
+    "lumi.light.acn128": ["Aqara", "Spotlight T3", "LGYCDD05LM"],
+    "aqara.light.acn004": ["Aqara", "Downlight T3", ""],
+    "aqara.light.acn003": ["Aqara", "Spotlight T3 (36 degree)", ""],
+    "aqara.light.acn002": ["Aqara", "Spotlight T3 (24 degree)", ""],
+    "aqara.light.acn001": ["Aqara", "Spotlight T3 (15 degree)", ""],
+    "lumi.light.acn006": ["Aqara", "Smart Spot Light (24 Degree)", "ZNCXGDD01LM"],
+    "lumi.light.acn007": ["Aqara", "Smart Grille Light (6-Lamp)", "ZNCXGDD02LM"],
+    "lumi.light.acn008": ["Aqara", "Smart Grille Light (12-Lamp)", "ZNCXGDD03LM"],
+    "lumi.light.acn009": ["Aqara", "Smart Light (30cm)", "ZNCXGDD04LM"],
+    "lumi.light.acn010": ["Aqara", "Smart Light (60cm)", "ZNCXGDD05LM"],
+    "lumi.light.acn011": ["Aqara", "Smart Pendant Light", "ZNCXGDD06LM"],
+    "lumi.light.acn012": ["Aqara", "Smart Foldable Grille Light (6-Lamp)", "ZNCXGDD07LM"],
+    "spec": [
+        BoolConv("light", "light", mi="4.1.85"),
+        ZLumiBrightness("brightness", mi="14.1.85"),
+        ZLumiColorTemp("color_temp", mi="14.2.85"),
+    ],
+}, {
+    # light with brightness and color temp
+    "lumi.dimmer.rcbac1": ["Aqara", "RGBW LED Dimmer", "ZNDDMK11LM"],  # @Kris
+    "lumi.dimmer.acn005": ["Aqara", "RGBW LED Dimmer T1 (240W)", "AL010CNW03"],
+    "lumi.dimmer.acn004": ["Aqara", "RGBW LED Dimmer T1 (120W)", "AL010CNW02"],
+    "lumi.dimmer.acn003": ["Aqara", "RGBW LED Dimmer T1 (60W)", "AL010CNW01"],
+    "lumi.dimmer.acn002": ["Aqara", "RGBW LED Dimmer T2 (24W)", ""],
+    "lumi.dimmer.acn001": ["Aqara", "RGBW LED Dimmer T2", ""],
+    "lumi.light.acn132": ["Aqara", "LED Strip T1", "LGYCDD01LM"],
+    "spec": [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        BoolConv("present_mode", "switch", mi="1.10.85"),
+        BoolConv("light_0", "light", mi="4.1.85"),
+        BoolConv("light_1", "light", mi="4.2.85"),
+        ZLumiBrightness("brightness", mi="14.1.85"),
+        ZLumiColorTemp("color_temp", mi="14.2.85"),
+        ZTransitionConv("transition"),
+        ZLumiBrightness("brightness", mi="14.12.85"),
+        ZLumiColorTemp("color_temp", mi="14.16.85"),
+        ZTransitionConv("transition"),
+        RGBColor("rgb_color", mi="14.5.85"),
+        BoolConv("dual_color_temperature_mode", "switch", mi="14.46.85"),
+        BoolConv("ambilight", "sensor", mi="8.0.2022"),
+        BoolConv("dynamic", "sensor", mi="8.0.2150"),
+    ],
+}, {    # light with brightness and color temp
+    "lumi.light.acn031": ["Aqara", "Ceiling Lamp T1 ", "HCXDD11LM"],
+    "lumi.light.acn032": ["Aqara", "Ceiling Lamp T1 (40W)", "HCXDD12LM"],
+    "spec": [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        BoolConv("light", "light", mi="4.1.85"),
+        ZLumiBrightness("brightness", mi="14.1.85"),
+        ZLumiColorTemp("color_temp", mi="14.2.85"),
+        ZTransitionConv("transition"),
+        ZLumiBrightness("brightness", mi="1.7.85"),
+        ZLumiColorTemp("color_temp", mi="1.9.85"),
+        BoolConv("present_mode", "switch", mi="1.10.85"),
+    ],
+}, {
+    # light with brightness and color temp
+    "lumi.light.acn033": ["Aqara", "Ceiling Lamp H1", "HXCDD13LM"],
+    "spec": [
+        BoolConv("light", "light", mi="4.1.85"),
+        ZLumiBrightness("brightness", mi="14.1.85"),
+        ZTransitionConv("transition"),
+        ZLumiBrightness("brightness", mi="1.7.85"),
+        ZLumiColorTemp("color_temp", mi="1.9.85"),
+        BoolConv("present_mode", "switch", mi="1.10.85"),
+    ],
+}, {
+    # light with brightness and color temp, rgb color
+    "lumi.light.rgbac1": ["Aqara", "RGBW LED Controller T1", "ZNTGMK11LM"],  # @miniknife88
+    'spec': [
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        BoolConv("light", "light", mi="4.1.85"),
+        ZLumiBrightness("brightness", mi="14.1.85"),
+        ZLumiColorTemp("color_temp", mi="14.2.85"),
+        ZTransitionConv("transition"),
+        RGBColor("rgb_color", mi="14.8.85"),
+    ],
+}, {
+    # button switch, no retain
+    "lumi.remote.b18ac1": ["Aqara", "Single Wall Button H1", "WXKG14LM"],
+    "lumi.remote.acn003": ["Aqara", "Single Wall Button E1", "WXKG16LM"],
+    "lumi.remote.acn007": ["Aqara", "Button E1", "WXKG20LM"],
+    "spec": [
+        ButtonConv("button", mi="13.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2001"),  # voltage, mV
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+    ],
+}, {
+    # multi button switch, no retain
+    "lumi.remote.b286acn03": ["Aqara", "Double Wall Button T1", "WXKG04LM"],   # @darkbao
+    "lumi.remote.b28ac1": ["Aqara", "Double Wall Button H1", "WXKG15LM"],
+    "lumi.remote.acn004": ["Aqara", "Double Wall Button E1", "WXKG17LM"],
+    "lumi.remote.acn009": ["Aqara", "Double Wall Button H1M", "WXKG22LM"],
+    "spec": [
+        ButtonConv("button_1", mi="13.1.85"),
+        ButtonConv("button_2", mi="13.2.85"),
+        ButtonConv("button_both_12", mi="13.5.85"),
+        ButtonConv("button_both_13", mi="13.6.85"),
+        ButtonConv("button_both_23", mi="13.7.85"),
+        #MapConv("sensitivity", "select", mi="4.13.85, map={1: "low", 2: "medium", 3: "high"}),  # config
+        BatVoltConv("battery", "sensor", mi="8.0.2001"),  # voltage, mV
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+    ],
+}, {
+    # button action, no retain
+    "lumi.remote.b186acn03": ["Aqara", "Single Wall Button T1", "WXKG05LM"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BoolConv("battery_low", "binary_sensor", mi="8.0.9001"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+}, {
+    # button rotation
+    "lumi.remote.rkba01": ["Aqara", "Smart Knob H1", "ZNXNKG02LM"],  # @miniknife88
+    "lumi.switch.agl001": ["Aqara", "Dimming knob H1 EU (No Neutral version)", ""],
+    "lumi.switch.agl002": ["Aqara", "Dimming knob H1 EU (With Neutral version)", ""],
+    "lumi.switch.acn052": ["Aqara", "Smart switch (Wheel Version)", "ZNXNKG34LM"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ButtonConv("button", mi="13.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BoolConv("battery_low", "binary_sensor", mi="8.0.9001"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+        ZLumiSensConv("sensitivity", "select"),  # config "1.16.85"
+        BaseConv("inc_rotate_angle", "sensor", mi="0.21.85"),
+        BaseConv("sum_rotate_angle", "sensor", mi="0.22.85"),
+        BaseConv("rotate_angle", "sensor", mi="0.23.85"),
+        BaseConv("sum_rotate_angle", "sensor", mi="0.24.85"),
+        BaseConv("sum_action_duration", "sensor", mi="0.25.85"),
+        BaseConv("inc_action_duration_when_hold", "sensor", mi="0.26.85"),
+        BaseConv("sum_action_duration_when_hold", "sensor", mi="0.27.85"),
+        BaseConv("action_duration_when_hold", "sensor", mi="0.28.85"),
+        BaseConv("rotate_angle_when_hold", "sensor", mi="0.29.85"),
+        BaseConv("action_duration_when_hold", "sensor", mi="0.30.85"),
+    ],
+}, {
+    # button switch with rotation
+    "lumi.switch.rkna01": ["Aqara", "Smart Knob Switch H1", "ZNXNKG01LM"],  # @miniknife88
+    "lumi.switch.acn053": ["Aqara", "Smart Knob Panel", "ZNXNKG35LM"],
+    "spec": [
+        BoolConv("channel_1", "switch", mi="4.1.85"),
+        BoolConv("channel_2", "switch", mi="4.2.85"),
+        BoolConv("channel_3", "switch", mi="4.3.85"),
+        MathConv("voltage", "sensor", mi="0.11.85", multiply=0.001, round=2),
+        MathConv("power", "sensor", mi="0.12.85", round=2),
+        MathConv("energy", "sensor", mi="0.13.85", multiply=0.001, round=2),
+        ButtonConv("button", mi="13.1.85"),
+        BaseConv("action", "sensor"),
+        MapConv("power_on_state", "select", mi="8.0.2030", map={0: "off", 1: "previous"}),  # config
+        BoolConv("charge_protect", "switch", mi="8.0.2031"),  # config
+        BaseConv("rotate_cumulate_angle", "sensor", mi="13.2.85"),
+        BaseConv("rotate_current_angle", "sensor", mi="13.3.85"),
+        BaseConv("rotate_current_angle_percent", "sensor", mi="13.5.85"),
+        BaseConv("rotate_cumulate_angle_percent", "sensor", mi="13.6.85"),
+        BaseConv("press_rotate_current_angle", "sensor", mi="13.10.85"),
+        BaseConv("press_rotate_cumulate_time", "sensor", mi="13.11.85"),
+        BaseConv("press_rotate_curr_angle_percent", "sensor", mi="13.12.85"),
+        BaseConv("press_rotate_cumu_angle_percent", "sensor", mi="13.13.85"),
+    ],
+}, {
+    # door window sensor
+    "lumi.magnet.agl02": ["Aqara", "Door Sensor T1", "MCCGQ12LM"],  # @Kris
+    "lumi.magnet.acn001": ["Aqara", "Door Sensor E1", "MCCGQ14LM"],
+    "spec": [
+        BoolConv("contact", "binary_sensor", mi="3.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BoolConv("battery_low", "binary_sensor", mi="8.0.9001"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+}, {
+    # motion sensor with illuminance
+    "lumi.motion.agl02": ["Aqara", "Motion Sensor T1", "RTCGQ12LM"],  # @miniknife88
+    "lumi.motion.acn001": ["Aqara", "Motion Sensor E1", "RTCGQ15LM"],
+    "spec": [
+        BoolConv("motion", "binary_sensor", mi="3.1.85"),
+        BaseConv("illuminance", "sensor", mi="0.3.85"),
+        BaseConv("illuminance", "sensor", mi="0.4.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        MathConv("detect_time", "number", mi="8.0.2115", min=2, max=180),  # config
+    ],
+}, {
+    # button switch, no retain
+    "lumi.remote.b1acn02": ["Aqara", "Button T1", "WXKG13LM"],  # @Kris
+    "spec": [
+        ButtonConv("button", mi="13.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2001"),  # voltage, mV
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+    ],
+}, {
+    # vibration sensor
+    "lumi.vibration.agl01": ["Aqara", "Vibration Sensor T1", "DJT12LM"],  # @Kris
+    "spec": [
+        BaseConv("action", "sensor"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BoolConv("battery_low", "binary_sensor", mi="8.0.9001"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("bed_activity", mi="0.1.85"),
+        TiltAngleConv("tilt_angle", mi="0.2.85"),
+        BaseConv("vibrate_intensity", mi="0.3.85"),
+        VibrationConv("Knock", mi="13.3.85"),
+        VibrationConv("vibration", mi="13.7.85"),
+        BaseConv("vibration_level", mi="14.1.85"),  # read/write from 1 to 30
+        MapConv("Knock_intensity_level", "select", mi="14.2.85", map={1: "high", 2: "medium", 3: "low"}),  # config
+        MapConv("report_interval_level", "select", mi="14.4.85", map={1: "1s", 2: "5s", 3: "10s"}),  # config
+    ],
+}, {
+    # temperature, humidity, PM2.5 and CO2 sensor
+    'lumi.airm.fhac01': ["Aqara", "Air Quality Monitor S1", "KQJCMB11LM"], # @justbin95
+    'spec': [
+        MathConv("temperature", "sensor", mi="0.1.85", multiply=0.01, round=2),  # celsius
+        MathConv("humidity", "sensor", mi="0.2.85", multiply=0.01, round=2),  # percentage
+        BaseConv("eco_two", "sensor", mi="0.6.85"),
+        BaseConv("pm25", "sensor", mi="0.19.85"),
+        BaseConv("pm1", "sensor", mi="0.41.85"),
+        BaseConv("pm10", "sensor", mi="0.42.85"),
+    ],
+}, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:lumi-acn01:1
+    "lumi.airmonitor.acn01": ["Aqara", "Air Quality Monitor CN", "VOCKQJK11LM"],
+    "spec": [
+        MathConv("temperature", "sensor", mi="0.1.85", multiply=0.01, round=2),  # celsius
+        MathConv("humidity", "sensor", mi="0.2.85", multiply=0.01, round=2),  # percentage
+        BaseConv("tvoc", "sensor", mi="0.3.85"),  # ppb
+#        BaseConv("air_quality_index", "air_quality", mi="13.1.85", entity={"icon": "mdi:air-filter"}),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),  # voltage, mV
+        MapConv("battery_low", "binary_sensor", mi="8.0.2001", map={1: False, 2: True}),  # diagnostic
+        MapConv("display_unit", "select", mi="14.1.85", map={0: "℃, mg/m³", 1: "℃, ppb", 16: "℉, mg/m³", 17: "℉, ppb"}),  # config
+    ],
+    "ttl": "0s",
+}, {
+    # cube action, no retain
+    'lumi.remote.cagl01': ["Aqara", "Cube T1", "MFKZQ11LM"],  # @Kris
+    'lumi.remote.cagl02': ["Aqara", "Cube T1 Pro", "MFKZQ12LM"],  # @Kris
+    "spec": [
+        ZLumiCubeMain("action", "sensor"),
+        ZLumiCubeRotate("angle"),
+        # Converter("action", mi="13.1.85"),
+        # Converter("duration", mi="0.2.85", parent="action"),
+        # MathConv("angle", mi="0.3.85", parent="action", multiply=0.001),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+    ],
+}, {
+    "lumi.lunar.acn01": ["Aqara", "Smart Sleep Monitor", "ZNSMBL11LM"],
+    "spec": [
+        BaseConv("heart_rate", mi="0.8.85"),  # not implement
+        BaseConv("breath_rate", mi="0.9.85"),  # not implement
+        BaseConv("body_movements", mi="0.10.85"),  # not implement
+        MapConv("mode", mi="14.35.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+    ],
+}, {
+    "lumi.curtain.hagl07": ["Aqara", "Curtain C2", "ZNCLDJ14LM"],   # @darkbao
+    "lumi.curtain.vagl02": ["Aqara", "Curtain T1", "ZNGZDJ15LM"],
+    "lumi.curtain.acn04": ["Aqara", "Curtain C3", "ZNCLDJ01LM"],
+    "lumi.curtain.acn015": ["Aqara", "Curtain T2", "ZNGZDJ16LM"],
+    "lumi.curtain.acn002": ["Aqara", "Roller Shade E1", "ZNJLBL01LM"],
+    "lumi.curtain.acn003": ["Aqara", "Curtain Driver E1", "ZNJLBL01LM"],
+    "lumi.curtain.agl001": ["Aqara", "Curtain Driver E1", "ZNJLBL01LM"],
+    "lumi.curtain.acn004": ["Aqara", "Curtain Controller X1", "ZNJLBL02LM"],
+    "lumi.curtain.acn007": ["Aqara", "Curtain Controller", "ZNJLBL03LM"],
+    "spec": [
+        MapConv("motor", "cover", mi="14.8.85", map={0: "stop", 1: "close", 2: "open"}),
+        BaseConv("target_position", mi="1.1.85"),
+        CurtainPosConv("position", mi="0.55.85"),
+        MapConv("run_state", mi="14.4.85", map={0: "closing", 1: "opening", 2: "stop"}),
+        BaseConv("battery", "sensor", mi="8.0.2001"),  # percent
+        BaseConv("motor_stroke", "switch", mi="4.1.85"),  # config
+        BaseConv("motor_reverse", "switch", mi="4.2.85"),  # config
+        MapConv("motor_speed", "select", mi="14.3.85", map={0: "low", 1: "mid", 2: "high"}),  # config
+        BaseConv("battery_voltage", "sensor", mi="8.0.2008"),  # diagnostic
+        MapConv("battery_charging", "binary_sensor", mi="13.1.85", map={0: False, 1: True, 2: False}),  # diagnostic
+    ],
+}, {
+    "lumi.curtain.acn010": ["Aqara", "Organ™ Smart Curtain Motor C4", "DSKDJ11LM"],
+    "spec": [
+        MapConv("motor_1", "cover", mi="1.11.85", map={0: "stop", 1: "close", 2: "open"}),
+        MapConv("motor_2", "cover", mi="1.21.85", map={0: "stop", 1: "close", 2: "open"}),
+        MapConv("run_state_1", mi="13.11.85", map={0: "closing", 1: "opening", 2: "stop"}),
+        MapConv("run_state_2", mi="13.11.85", map={0: "closing", 1: "opening", 2: "stop"}),
+        CurtainPosConv("position_1", mi="0.57.85"),
+        CurtainPosConv("position_2", mi="0.58.85"),
+        BaseConv("motor_1_reverse", "switch", mi="4.11.85"),  # config
+        BaseConv("motor_2_reverse", "switch", mi="4.21.85"),  # config
+        MapConv("motor_speed", "select", mi="14.35.85", map={0: "low", 1: "mid", 2: "high"}),  # config
+    ],
+}, {
+    # water leak sensor
+    "lumi.flood.acn001": ["Aqara", "Water Leak Sensor E1", "SJCGQ13LM"],
+    "spec": [
+        BoolConv("moisture", "binary_sensor", mi="3.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        ZLumiBasicAlarm("moisture", basic_attr=100),  # read "no alarm" from heartbeats
+    ],
+}, {
+    "lumi.airer.acn001": ["Aqara", "Smart Clothes Drying Rack H1", "ZNLYJ13LM"],
+    "spec": [
+        ZLumiBrightness("brightness", mi="1.7.85"),
+        ZLumiColorTemp("color_temp", mi="1.9.85"),
+        BoolConv("light", "light", mi="4.21.85"),
+        BaseConv("disinfect", "switch", mi="4.22.85"),  # config
+        BaseConv("hot_drying", "switch", mi="4.66.85"),  # config
+        BaseConv("disinfect", "switch", mi="4.67.85"),  # config
+        BoolConv("occupancy", "binary_sensor", mi="3.1.85"),
+        MapConv("motor", "cover", mi="14.1.85", map={0: "stop", 1: "open", 2: "close"}),
+        BaseConv("position", mi="1.1.85"),
+    ],
+}, {
+    "aqara.feeder.acn001": ["Aqara", "Smart Feeder C1", "ZNCWWSQ01LM"],
+    "spec": [
+        BoolConv("feed", "switch", mi="4.21.85"),
+        BoolConv("child_lock_switch", "switch", mi="4.22.85"),
+        BoolConv("light", "switch", mi="4.23.85"),
+        BoolConv("auto_feed", "switch", mi="4.24.85"),
+        BaseConv("portion", "sensor", mi="13.104.85"),
+    ],
+}, {
+    "lumi.airrtc.tcpecn01": ["Aqara", "Thermostat S1", "KTWKQ02ES"],
+    "lumi.ctrl_hvac.es1": ["Aqara", "Thermostat", "KTWKQ01ES"],
+    "spec": [
+        ClimateConv("climate", "climate", mi="14.2.85"),
+        BoolConv("power", mi="3.1.85"),
+        BaseConv("current_temp", mi="3.2.85"),
+        MapConv("hvac_mode", mi="14.8.85", map={0: "heat", 1: "cool", 15: "off"}),
+        MapConv("fan_mode", mi="14.10.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+        ClimateTempConv("target_temp", mi="14.9.85"),
+        BoolConv("reboot", "switch", mi="14.16.85"),
+    ],
+}, {
+    "lumi.airrtc.tcpco2ecn01": ["Aqara", "Thermostat (CO2)", "KTWKQ04ES"],
+    "spec": [
+        BaseConv("eco_two", "sensor", mi="0.6.85"),
+        ClimateConv("climate", "climate", mi="14.2.85"),
+        BoolConv("power", mi="3.1.85"),
+        BaseConv("current_temp", mi="3.2.85"),
+        MapConv("hvac_mode", mi="14.8.85", map={0: "heat", 1: "cool", 15: "off"}),
+        MapConv("fan_mode", mi="14.10.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+        ClimateTempConv("target_temp", mi="14.9.85"),
+    ],
+}, {
+    "lumi.bhf_light.acn001": ["Aqara", "Smart Yuba T1", "ZNYB01LM"],
+    "spec": [
+        ClimateConv("climate", "climate", mi="14.51.85"),
+        BoolConv("power", mi="4.21.85"),
+        BaseConv("current_temp", mi="0.1.85"),
+        MapConv("hvac_mode", mi="14.51.85", map={0: "heat", 3: "dry", 4: "fan_only", 5: "auto"}),
+        MapConv("fan_mode", mi="14.35.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+        ClimateTempConv("target_temp", mi="1.8.85"),
+        BoolConv("light", "light", mi="4.1.85"),
+        ZLumiBrightness("brightness", mi="1.7.85"),
+        ZLumiColorTemp("color_temp", mi="1.9.85"),
+    ],
+}, {
+    "aqara.airrtc.acn02": ["Aqara", "Air Conditioning T1", ""],
+    "spec": [
+        ClimateConv("climate", "climate", mi="14.51.85"),
+        BaseConv("current_temp", mi="0.1.85"),
+        ClimateTempConv("target_temp", mi="1.1.85"),
+        BoolConv("power_status", "switch", mi="4.1.85"),
+        MapConv("fan_mode", mi="14.1.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+        MapConv("hvac_mode", mi="14.140.85", map={0: "auto", 1: "cool", 2: "dry", 3: "fan_ony", 4: "heat"}),
+    ],
+}, {
+    "aqara.toilet.acn002": ["Aqara", "Smart Toilet T1", "ZNTL01LM"],
+    "spec": [
+        BoolConv("power", "switch", mi="4.1.85"),
+        BoolConv("pee", "switch", mi="4.2.85"),
+        BoolConv("flush", "switch", mi="4.7.85"),
+        BoolConv("auto flip cover", "switch", mi="4.22.85"),
+        BoolConv("auto close cover", "switch", mi="4.23.85"),
+        MapConv("clean direction", "select", mi="4.39.85", map={0: "Off", 1: "Auto", 2: "Manual"}),  # config
+        MapConv("water temperature", "select", mi="4.50.85", map={0: "Normal", 1: "31", 2: "33", 3: "35", 4: "37", 5: "39"}),  # config
+        MapConv("wash level", "select", mi="4.51.85", map={0: "weak", 1: "weak moderate", 2: "moderate", 3: "moderate strong", 4: "strong"}),  # config
+        MapConv("warm dry", "select", mi="4.53.85", map={0: "Off", 1: "Normal", 2: "Low", 3: "Low Middle", 4: "Middle", 5: "Middle High", 6: "High"}),  # config
+    ],
+}, {
+    "aqara.bed.hhcn03": ["Aqara", "Smart Bed W1", "ZNBD01LM"],
+    "spec": [
+        BoolConv("stop", "switch", mi="4.7.85"),
+        BoolConv("child lock", "switch", mi="4.20.85"),
+        BoolConv("massage", "switch", mi="4.23.85"),
+        BoolConv("back and leg", "switch", mi="4.31.85"),
+    ],
+}, {
+    "aqara.vent.eicn01": ["Aqara", "Ventilation Mechanical Controllor", ""],
+    "spec": [
+        BoolConv("power", "switch", mi="4.1.85"),
+        MapConv("fan_mode", mi="14.39.85", map={0: "low", 1: "medium", 2: "high", 3: "auto"}),
+    ],
+}, {
+    "lumi.magnet.akr01": ["Aqara", "Door/Window Sensor P1", "MCCGQ13LM"],
+    "lumi.magnet.ac01": ["Aqara", "Door/Window Sensor P1 CN", "MCCGQ13LM"],
+    "spec": [
+        # hass: On means open, Off means closed
+        BoolConv("contact", "binary_sensor", mi="3.1.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),
+        BoolConv("battery_low", "binary_sensor", mi="8.0.9001"),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+    "ttl": "0s",
+}, {
+    "lumi.motion.agl04": ["Aqara", "Precision Motion Sensor", "RTCGQ13LM"],
+    "spec": [
+        ConstConv("motion", "binary_sensor", mi="3.1.85", value=True),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),  # voltage, mV
+        MapConv("sensitivity", "select", mi="14.1.85", map={1: "low", 2: "medium", 3: "high"}),  # config
+        MathConv("detect_time", "number", mi="8.0.2115", min=2, max=180),  # config
+        MapConv("battery_low", "binary_sensor", mi="8.0.9001", map={0: False, 1: True}),  # diagnostic
+        #BaseConv("idle_time", "sensor", mi=""),  # diagnostic
+        BaseConv("battery_original", mi="8.0.2001"),  # diagnostic
+        BaseConv("model_id", mi="8.0.2041"),  # diagnostic
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+}, {
+    # motion sensor P1 with illuminance
+    "lumi.motion.ac02": ["Aqara", "Motion Sensor P1", "RTCGQ15LM"],
+    "spec": [
+        ConstConv("motion", "binary_sensor", mi="3.1.85", value=True),
+        BaseConv("illuminance", "sensor", mi="0.3.85"),
+        BatVoltConv("battery", "sensor", mi="8.0.2008"),  # voltage, mV
+        MapConv("battery_low", "binary_sensor", mi="8.0.9001", map={0: False, 1: True}),  # diagnostic
+        BoolConv("flash_led_if_detected", "switch", mi="4.21.85"),
+        BaseConv("chip_temperature", "sensor", mi="8.0.2006"),  # diagnostic
+    ],
+    "ttl": "0s",
+}, {
+    "lumi.motion.ac01": ["Aqara", "Presence Detector FP1", "RTCZCGQ12LM"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="3.51.85"),
+        BaseConv("movements", "sensor", mi="13.21.85"),
+        MapConv("direction_status", "sensor", mi="13.27.85", map={0: "Enter", 1: "Leave", 2: "Leftward", 3: "Right", 4: "Right entry", 5: "Left exit", 6: "Approach", 7: "Stay away"}),
+        MapConv("monitoring_mode", "select", mi="4.1.85", map={0: "Undirected", 1: "Left and right"}),  # config
+        MapConv("reverted_mode", "select", mi="4.2.85", map={0: "Disable", 1: "Enable"}),  # config
+        MapConv("approaching_distance", "select", mi="14.47.85", map={0: "Near", 1: "Middle", 2: "Far"}),  # config
+    ],
+}, {
+    "lumi.sensor_occupy.agl1": ["Aqara", "AI Presence Detector FP1E", "RTCZCGQ13LM"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="3.51.85"),
+        BaseConv("movements", "sensor", mi="13.21.85"),
+        MapConv("direction_status", "sensor", mi="13.27.85", map={0: "Enter", 1: "Leave", 2: "Leftward", 3: "Right", 4: "Right entry", 5: "Left exit", 6: "Approach", 7: "Stay away"}),
+        MapConv("monitoring_mode", "select", mi="4.1.85", map={0: "Undirected", 1: "Left and right"}),  # config
+        MapConv("reverted_mode", "select", mi="4.2.85", map={0: "Disable", 1: "Enable"}),  # config
+        MapConv("AI sensitivity adaptive switch", "select", mi="4.4.85", map={0: "Disable", 1: "Enable"}),  # config
+        MapConv("approach_switch", "select", mi="4.5.85", map={0: "Disable", 1: "Enable"}),  # config
+        MapConv("approaching_distance", "select", mi="14.47.85", map={0: "Near", 1: "Middle", 2: "Far"}),  # config
+        MapConv("working_mode", "select", mi="14.49.85", map={0: "Presence", 1: "Area detection"}),  # config
+        MapConv("AI interference comes from recognition switch", "select", mi="4.72.85", map={0: "Disable", 1: "Enable"}),  # config
+    ],
+}, {
+    "aqara.lock.wbzac1": ["Aqara", "Door Lock P100", "ZNMS19LM"],
+    "spec": [
+        LockActionConv("key_id", mi="13.1.85"),  # "inside"
+        LockActionConv("key_id", mi="13.2.85"),  # "fingerprint"
+        LockActionConv("key_id", mi="13.3.85"),  # "password"
+        LockActionConv("key_id", mi="13.4.85"),  # "nfc"
+        LockActionConv("key_id", mi="13.5.85"),  # "homekit"
+        LockActionConv("key_id", mi="13.6.85"),  # "bluetooth"
+        LockActionConv("key_id", mi="13.7.85"),  # "key"
+        BaseConv("key_id", "sensor", entity={"icon": "mdi:key"}),
+        MapConv("lock", "binary_sensor", mi="13.10.85", map={0: True, 1: False}, entity={"icon": "mdi:lock-smart", "class": "lock"}),
+        MapConv("latch_state", "binary_sensor", mi="13.11.85", map={0: True, 1: False}, entity={"icon": "mdi:locker", "class": "lock"}),
+        BoolConv("away_mode", "binary_sensor", mi="13.12.85"),
+        LockActionConv("event", mi="13.8.85", map={3235774478: "open_indoor_in_away_mode"}),
+        LockActionConv("event", mi="13.9.85", map={3235774478: "open_by_key_in_away_mode"}),
+        LockActionConv("event", mi="13.13.85", map={1: "Someone is lingering at the door"}),
+        LockActionConv("event", mi="13.14.85", map=LOCK_NOTIFY),
+        LockActionConv("event", mi="13.15.85", map={0: "fingerprint", 1: "password", 2: "nfc", 3: "bluetooth", 4: "temporary password", 5: "key", 15: "unkown open method"}),
+        BaseConv("lock_event", "sensor", entity={"icon": "mdi:lock"}),
+        MapConv("door state", "sensor", mi="13.20.85", map={0: "open", 1: "close", 2: "not close door after timeout", 3: "doorbell", 4: "broke", 5: "ajar"}, entity={"icon": "mdi:door-closed"}),
+        # BaseConv("Camera", "switch", mi="14.1.85", value=255),
+        LockActionConv("lock_state", mi="13.40.85", map={0: "password number"}),
+        LockActionConv("lock_state", mi="13.43.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.50.85", map={0: "wifi_info"}),
+        LockActionConv("lock_state", mi="13.51.85", map={0: "wifi_connect"}),
+        LockActionConv("lock_state", mi="13.60.85", map={0: "verification failed", 2: "verification failed"}),
+        LockActionConv("lock_state", mi="14.83.85", map={3: "camera info"}),
+        BaseConv("action", "sensor"),
+        # other sensors
+        MathConv("li_battery", "sensor", mi="13.32.85", min=0, max=100, entity={"class": "battery", "units": "%", "category": "diagnostic"}),
+        MathConv("li_battery_temperature", "sensor", mi="13.33.85", multiply=0.1, round=1, min=0, max=100, entity={"class": "temperature", "units": UNIT_CELSIUS, "category": "diagnostic"}),
+        BaseConv("battery", "sensor", mi="13.37.85"),
+    ],
+    "ttl": "0s",
+}, {
+
+    "aqara.lock.bzacn3": ["Aqara", "Door Lock N100", "ZNMS16LM"],
+    "aqara.lock.bzacn4": ["Aqara", "Door Lock N100", "ZNMS16LM"],
+    "spec": [
+        LockActionConv("key_id", mi="13.41.85"),  # "inside"
+        LockActionConv("key_id", mi="13.42.85"),  # "fingerprint"
+        LockActionConv("key_id", mi="13.43.85"),  # "password"
+        LockActionConv("key_id", mi="13.44.85"),  # "nfc"
+        LockActionConv("key_id", mi="13.45.85"),  # "homekit"
+        LockActionConv("key_id", mi="13.49.85"),  # "open in away mode"
+        BaseConv("key_id", "sensor", entity={"icon": "mdi:key"}),
+        MapConv("lock", "binary_sensor", mi="13.31.85", map={0: True, 1: False}, entity={"icon": "mdi:lock-smart", "class": "lock"}),
+        MapConv("latch_state", "binary_sensor", mi="13.33.85", map={0: True, 1: False}, entity={"icon": "mdi:locker", "class": "lock"}),
+        MapConv("away_mode", "binary_sensor", mi="13.54.85", map={0: "disable away mode", 1: "enable away mode"}),
+        MapConv("door state", "sensor", mi="13.17.85", map={0: "open", 1: "close", 2: "not close door after timeout", 3: "doorbell", 4: "broke", 5: "ajar"}, entity={"icon": "mdi:door-closed"}),
+        LockActionConv("lock_state", mi="13.40.85", map={0: "password number"}),
+        LockActionConv("lock_state", mi="13.43.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.50.85", map={0: "wifi_info"}),
+        LockActionConv("lock_state", mi="13.51.85", map={0: "wifi_connect"}),
+        LockActionConv("lock_state", mi="13.60.85", map={0: "verification failed", 2: "verification failed"}),
+        LockActionConv("lock_state", mi="13.63.85", map={0: "user added"}),
+        LockActionConv("lock_state", mi="13.64.85", map={0: "user removed"}),
+        LockActionConv("lock_state", mi="13.65.85", map={0: "all user removed"}),
+        LockActionConv("lock_state", mi="13.66.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.67.85", map={0: "nfc removed"}),
+        LockActionConv("lock_state", mi="13.68.85", map={0: "homekit reset"}),
+        LockActionConv("lock_state", mi="13.83.85", map={0: "bluetooth"}),
+        LockActionConv("lock_state", mi="13.88.85", map={0: "door"}),
+        BaseConv("action", "sensor"),
+        # other sensors
+        MathConv("voltage", "sensor", mi="13.55.85", multiply=0.001, round=2),
+        BaseConv("battery", "sensor", mi="13.56.85"),
+    ],
+}, {
+    "aqara.lock.dacn03": ["Aqara", "Door Lock H100", "ZNMS21LM"],
+    "aqara.lock.eicn01": ["Aqara", "Door Lock A100", "ZNMS02ES"],
+    "aqara.lock.agl002": ["Aqara", "Door Lock A100", "ZNMS02ES"],
+    "aqara.lock.aqgl01": ["Aqara", "Smart Door Lock D100", "ZNMS20LM"],
+    "params": [
+        LockActionConv("key_id", mi="13.1.85"),  # "inside"
+        LockActionConv("key_id", mi="13.42.85"),  # "fingerprint"
+        LockActionConv("key_id", mi="13.43.85"),  # "password"
+        LockActionConv("key_id", mi="13.44.85"),  # "nfc"
+        LockActionConv("key_id", mi="13.45.85"),  # "homekit"
+        LockActionConv("key_id", mi="13.46.85"),  # "temporary password"
+        LockActionConv("key_id", mi="13.7.85"),  # "key"
+        BaseConv("key_id", "sensor", entity={"icon": "mdi:key"}),
+        MapConv("lock", "binary_sensor", mi="4.20.85", map={0: True, 1: False}, entity={"icon": "mdi:lock-smart", "class": "lock"}),
+        MapConv("latch_state", "binary_sensor", mi="13.31.85", map={0: True, 1: False}, entity={"icon": "mdi:locker", "class": "lock"}),
+        MapConv("away_mode", "binary_sensor", mi="13.54.85", map={0: "disable away mode", 1: "enable away mode"}),
+        LockActionConv("event", mi="13.49.85", map={3235774478: "open_by_key_in_away_mode"}),
+        LockActionConv("event", mi="13.51.85", map={3235774478: "open_indoor_in_away_mode"}),
+        LockActionConv("event", mi="13.14.85", map=LOCK_NOTIFY),
+        BaseConv("lock_event", "sensor", entity={"icon": "mdi:lock"}),
+        MapConv("door state", "sensor", mi="13.17.85", map={0: "open", 1: "close", 2: "not close door after timeout", 3: "doorbell", 4: "broke", 5: "ajar"}, entity={"icon": "mdi:door-closed"}),
+        LockActionConv("lock_state", mi="13.40.85", map={0: "password number"}),
+        LockActionConv("lock_state", mi="13.43.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.50.85", map={0: "wifi_info"}),
+        LockActionConv("lock_state", mi="13.51.85", map={0: "wifi_connect"}),
+        LockActionConv("lock_state", mi="13.60.85", map={0: "verification failed", 2: "verification failed"}),
+        BaseConv("action", "sensor"),
+        # other sensors
+        MathConv("voltage", "sensor", mi="13.55.85", multiply=0.001, round=2),
+        MathConv("li_battery", "sensor", mi="13.32.85", min=0, max=100, entity={"class": "battery", "units": "%", "category": "diagnostic"}),
+        MathConv("li_battery_temperature", "sensor", mi="13.33.85", multiply=0.1, round=1, min=0, max=100, entity={"class": "temperature", "units": UNIT_CELSIUS, "category": "diagnostic"}),
+    ],
+    "ttl": "0s",
+}, {
+    "aqara.lock.acn001": ["Aqara", "Door Lock A100 Pro", "ZNMS02ES"],
+    "params": [
+        LockActionConv("key_id", mi="13.43.85"),  # "password"
+        LockActionConv("key_id", mi="13.44.85"),  # "nfc"
+        LockActionConv("key_id", mi="13.45.85"),  # "homekit"
+        LockActionConv("key_id", mi="13.46.85"),  # "temporary password"
+        LockActionConv("key_id", mi="13.7.85"),  # "key"
+        BaseConv("key_id", "sensor", entity={"icon": "mdi:key"}),
+        MapConv("lock", "binary_sensor", mi="4.20.85", map={0: True, 1: False}, entity={"icon": "mdi:lock-smart", "class": "lock"}),
+        MapConv("latch_state", "binary_sensor", mi="13.31.85", map={0: True, 1: False}, entity={"icon": "mdi:locker", "class": "lock"}),
+        MapConv("away_mode", "binary_sensor", mi="13.54.85", map={0: "disable away mode", 1: "enable away mode"}),
+        LockActionConv("event", mi="13.49.85", map={3235774478: "open_by_key_in_away_mode"}),
+        LockActionConv("event", mi="13.51.85", map={3235774478: "open_indoor_in_away_mode"}),
+        LockActionConv("event", mi="13.14.85", map=LOCK_NOTIFY),
+        BaseConv("lock_event", "sensor", entity={"icon": "mdi:lock"}),
+        MapConv("door state", "sensor", mi="13.17.85", map={0: "open", 1: "close", 2: "not close door after timeout", 3: "doorbell", 4: "broke", 5: "ajar"}, entity={"icon": "mdi:door-closed"}),
+        MapConv("lock state", "sensor", mi="13.88.85", map={1: "unable lock", 2: "not close", 3: "not lock", 4: "locked", 5: "locked inside", 6: "unlock", 7: "locked both", 8: "ajar"}, entity={"icon": "mdi:door-closed"}),
+        LockActionConv("lock_state", mi="13.40.85", map={0: "password number"}),
+        LockActionConv("lock_state", mi="13.43.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.50.85", map={0: "wifi_info"}),
+        LockActionConv("lock_state", mi="13.51.85", map={0: "wifi_connect"}),
+        LockActionConv("lock_state", mi="13.60.85", map={0: "verification failed", 2: "verification failed"}),
+        BaseConv("action", "sensor"),
+        # other sensors
+        MathConv("voltage", "sensor", mi="13.55.85", multiply=0.001, round=2),
+        MathConv("li_battery", "sensor", mi="13.32.85", min=0, max=100, entity={"class": "battery", "units": "%", "category": "diagnostic"}),
+        MathConv("li_battery_temperature", "sensor", mi="13.69.85", multiply=0.1, round=1, max=100, entity={"class": "temperature", "units": UNIT_CELSIUS, "category": "diagnostic"}),
+    ],
+    "ttl": "0s",
+}, {
+    "aqara.lock.acn004": ["Aqara", "Smart Door Lock D200", "ZNMS23LM"],
+    "aqara.lock.acn005": ["Aqara", "Smart Door Lock D200i", "ML-D01D"],
+    "spec": [
+        BoolConv("away_mode", "binary_sensor", mi="13.12.85"),
+        #MapConv("door state", "binary_sensor", mi="13.17.85", map={0: True, 1: False}, entity={"icon": "mdi:door-closed", "class": "door"}),
+        MapConv("auto locking", "binary_sensor", mi="13.31.85", map={0: True, 1: False}, entity={"icon": "mdi:key", "class": "lock"}),
+        MapConv("latch state", "binary_sensor", mi="13.33.85", map={0: True, 1: False}, entity={"icon": "mdi:locker", "class": "lock"}),
+        LockActionConv("key_id", mi="13.43.85"),  # "password"
+        LockActionConv("key_id", mi="13.44.85"),  # "nfc"
+        LockActionConv("key_id", mi="13.45.85"),  # "homekit"
+        LockActionConv("key_id", mi="13.46.85"),  # "temporary password"
+        LockActionConv("key_id", mi="13.51.85"),  # "inside"
+        LockActionConv("key_id", mi="13.53.85"),  # "face"
+        BaseConv("key_id", "sensor", entity={"icon": "mdi:key"}),
+        BaseConv("lock", "sensor", mi="13.17.85", entity={"icon": "mdi:lock-smart", "class": "lock"}),
+        LockActionConv("lock_state", mi="13.37.85", map={0: "verification failed"}),
+        LockActionConv("lock_state", mi="13.63.85", map={0: "user added"}),
+        LockActionConv("lock_state", mi="13.64.85", map={0: "user removed"}),
+        LockActionConv("lock_state", mi="13.65.85", map={0: "all user removed"}),
+        LockActionConv("lock_state", mi="13.66.85", map={0: "nfc added"}),
+        LockActionConv("lock_state", mi="13.67.85", map={0: "nfc removed"}),
+        LockActionConv("lock_state", mi="13.68.85", map={0: "homekit reset"}),
+        LockActionConv("lock_state", mi="13.88.85", map={0: "door"}),
+        BaseConv("action", "sensor"),
+        # other sensors
+        MathConv("voltage", "sensor", mi="13.55.85", multiply=0.001, round=2),
+        BaseConv("battery", "sensor", mi="13.56.85"),
+    ],
+    "ttl": "0s",
 }]

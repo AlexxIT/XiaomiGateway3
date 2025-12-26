@@ -10,7 +10,7 @@ from .converters import silabs
 from .converters.base import BaseConv, decode_time, encode_time
 from .converters.lumi import LUMI_GLOBALS
 from .converters.zigbee import ZConverter
-from .devices import DEVICES
+from .devices import DEVICES, DEVICES_AIOT_ZIGBEE, DEVICES_AIOT_GATEWAY
 
 if TYPE_CHECKING:
     from .gate.base import XGateway
@@ -236,7 +236,7 @@ class XDevice:
         if ieee := self.extra.get("ieee"):
             assert RE_ZIGBEE_IEEE.match(ieee), ieee
         if did := self.extra.get("did"):
-            if type in (GATEWAY, MESH):
+            if type in (MESH):
                 assert did.isdecimal()
             elif type == ZIGBEE:
                 assert did.startswith("lumi.")
@@ -267,7 +267,15 @@ class XDevice:
         # support custom model from yaml
         model = self.extra.get("model") or self.model
 
-        for desc in DEVICES:
+        devices = []
+        if self.extra.get("cloud", "") == "aiot":
+            if self.type == ZIGBEE:
+                devices.extend(DEVICES_AIOT_ZIGBEE)
+        if self.type == GATEWAY:
+            devices.extend(DEVICES_AIOT_GATEWAY)
+        devices.extend(DEVICES)
+
+        for desc in devices:
             # if this spec for current model
             if info := desc.get(model):
                 self.extra["market_brand"] = info[0]
