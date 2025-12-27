@@ -5317,6 +5317,15 @@ DEVICES += [{
         MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
     ],
 }, {
+    # https://home.miot-spec.com/spec/zjcx.plug.qcsw02
+     25140: ["Chuanxiang", "Magnetic Wall Charging Socket", "zjcx.plug.qcsw02"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        BaseConv("indicator_light", "switch", mi="5.p.1"),
+        BaseConv("magnetic_state", "binary_sensor", mi="6.p.1"),  # Magnetic State
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "memory", 1: "on", 2: "off"}),
+    ]
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
