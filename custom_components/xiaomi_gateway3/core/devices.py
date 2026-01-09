@@ -1791,7 +1791,19 @@ DEVICES += [{
         MathConv("no_one_duration", "sensor", mi="2.p.1082", min=1, max=120, entity={"units": UNIT_MINUTES, "icon": "mdi:timer-off"}),
         MapConv("no_one_duration", mi="2.p.1078", map={1: 0}),
         MapConv("has_someone_duration", mi="2.p.1078", map={0: 0}),
-    ],        
+    ],
+}, {
+    # https://home.miot-spec.com/spec/linp.sensor_occupy.es5b
+    27151: ["Linptech", "Human Presence Sensor ES5", "ES5BB", "linp.sensor_occupy.es5b"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        BaseConv("battery", "sensor", mi="7.p.1003", entity=ENTITY_LAZY),  # uint8
+        BoolConv("customized_property", "binary_sensor", mi="5.p.1019"), #custom close range
+        MapConv("event_type", "sensor", mi="5.e.1097.p.1", map={0: "0_Reset", 1: "1_OffLightLeave", 2: "2_OffLightExit", 3: "3_OffLightSleep", 4: "4_OffLightExit", 5: "5_RadarNoiseExceedMinor", 6: "6_RadarNoiseExceedCritical", 7: "7_RadarNoiseNormal", 8: "8_RadarNoiseError"}),
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1080", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
+        BaseConv("no_one_duration", "sensor", mi="2.p.1079", entity={"enabled": False, "units": UNIT_MINUTES})  # uint8
+    ],
 }, {
     8613: ["H+", "Double Wall Switch", "huca.switch.dh2"],
     "spec": [
