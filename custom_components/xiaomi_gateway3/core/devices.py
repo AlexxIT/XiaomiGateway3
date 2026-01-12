@@ -2011,6 +2011,18 @@ DEVICES += [{
     ],
     # "ttl": "7d"
 }, {
+    #https://home.miot-spec.com/spec/line.remote.fwkge2    
+    30883: ["Ark Fish", "Ark Fish Wireless Switch E2","AFWXKG220000", "line.remote.fwkge2"],
+    "spec": [
+    # Action events (single/double/long press)
+    BaseConv("action", "sensor"),
+    ConstConv("action", mi="5.e.1012", value=BUTTON_SINGLE),
+    ConstConv("action", mi="5.e.1013", value=BUTTON_DOUBLE),
+    ConstConv("action", mi="5.e.1014", value=BUTTON_HOLD),
+    # Battery level
+    BaseConv("battery", "sensor", mi="4.p.1003"),
+    ],      
+}, {
     12183: ["Lockin", "Door Lock M20 Pro", "loock.lock.r2"],
     "spec": [
         # lock action
