@@ -2012,7 +2012,7 @@ DEVICES += [{
     # "ttl": "7d"
 }, {
     #https://home.miot-spec.com/spec/line.remote.fwkge2    
-    30883: ["Ark Fish", "Ark Fish Wireless Switch E2","AFWXKG220000", "line.remote.fwkge2"],
+    30883: ["LineHope", "Ark Fish Wireless Switch E2","AFWXKG220000", "line.remote.fwkge2"],
     "spec": [
     # Action events (single/double/long press)
     BaseConv("action", "sensor"),
