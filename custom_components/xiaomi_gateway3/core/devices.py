@@ -2372,6 +2372,9 @@ DEVICES += [{
     ],
 }, {
     17601: ["Xiaomi", "Xiaomi Smart Door Lock 2 (Finger Vein Unlock)", "XMZNMS03OD", "xiaomi.lock.b03"],
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:lock:0000A038:xiaomi-b04sv:1
+    # TODO: need to improve some parameters
+    18390: ["Xiaomi", "Smart Door Lock E30", "xiaomi.lock.b04sv"],
     "spec": [
         # Battery Level
         BaseConv("battery", "sensor", mi="4.p.1003"),
