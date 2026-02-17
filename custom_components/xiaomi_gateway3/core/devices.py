@@ -2289,6 +2289,10 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec/shuse.flood.ss05
     19533: ["Shuse", "Water Leak Sensor", "shuse.flood.ss05"],
+    # https://home.miot-spec.com/spec/shuse.flood.ss40  
+    30404: ["Shuse", "Water Leak Sensor", "shuse.flood.ss40"],
+    # https://home.miot-spec.com/spec/shuse.flood.sssj    
+    27489: ["Shuse", "Water Leak Sensor Pro", "shuse.flood.ss05"],
     "spec": [
         BaseConv("water_leak", "binary_sensor", mi="2.p.1006"),
         BaseConv("battery", "sensor", mi="3.p.1003"),
