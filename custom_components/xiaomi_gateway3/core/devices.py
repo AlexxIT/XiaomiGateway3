@@ -2217,8 +2217,50 @@ DEVICES += [{
         MapConv("action", mi="5.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
         MapConv("action", mi="5.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
         MapConv("action", mi="5.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
-        ConstConv("action", mi="5.e.1036", value="rotate"),
-        BaseConv("rotate", mi="5.e.1036.p.2"),
+        # The knob in this device can be tuned clockwise and anti-clockwise. It can also be pressed. 
+        # The device does not report how much the knob is turned and only report one knob event per second.
+        # However, the device remembers the previous state and report the previous state along with the knob event.
+        # Such complex events are designed to map different clockwise/anti-clockwise knob events to each button, so users do not need to create dedicated state machine to track it.
+        # e.g. a usecase is that button 1 controls the ceiling light and knob for its brightness. Button 2 controls lamps and knob for their brightness.
+        #      When the knob is pressed, the knob events controls the temperature of these lights instead.
+        # The toggling knob state will get reset after you press a different button
+        # e.g. 1) press button_1 and turn knob -> knob_anti_clockwise_after_pressing_button_1
+        #      2) press the knob and turn knob -> knob_anti_clockwise_after_toggling_knob_and_pressing_button_1
+        #      3) press button_2 and turn knob -> knob_anti_clockwise_after_pressing_button_2
+        # Therefore, if you only uses clockwise and anti-clockwise events on its own, you need to merge these events into two triggers in your automation.
+        MapConv("action", mi="5.e.1036.p.2", map={-11: "knob_anticlockwise_after_toggling_button_1", 
+                                                  -12: "knob_anticlockwise_after_toggling_button_2", 
+                                                  -13: "knob_anticlockwise_after_toggling_button_3",
+                                                  -14: "knob_anticlockwise_after_toggling_button_4", 
+                                                  -15: "knob_anticlockwise_after_toggling_button_5", 
+                                                  -16: "knob_anticlockwise_after_toggling_button_6",
+                                                  -17: "knob_anticlockwise_after_toggling_button_7", 
+                                                  -18: "knob_anticlockwise_after_toggling_button_8", 
+                                                  11: "knob_clockwise_after_toggling_button_1", 
+                                                  12: "knob_clockwise_after_toggling_button_2", 
+                                                  13: "knob_clockwise_after_toggling_button_3",
+                                                  14: "knob_clockwise_after_toggling_button_4", 
+                                                  15: "knob_clockwise_after_toggling_button_5", 
+                                                  16: "knob_clockwise_after_toggling_button_6",
+                                                  17: "knob_clockwise_after_toggling_button_7", 
+                                                  18: "knob_clockwise_after_toggling_button_8", 
+                                                  -21: "knob_anticlockwise_after_toggling_button_1_and_knob", 
+                                                  -22: "knob_anticlockwise_after_toggling_button_2_and_knob", 
+                                                  -23: "knob_anticlockwise_after_toggling_button_3_and_knob",
+                                                  -24: "knob_anticlockwise_after_toggling_button_4_and_knob", 
+                                                  -25: "knob_anticlockwise_after_toggling_button_5_and_knob", 
+                                                  -26: "knob_anticlockwise_after_toggling_button_6_and_knob",
+                                                  -27: "knob_anticlockwise_after_toggling_button_7_and_knob", 
+                                                  -28: "knob_anticlockwise_after_toggling_button_8_and_knob", 
+                                                  22: "knob_clockwise_after_toggling_button_1_and_knob", 
+                                                  22: "knob_clockwise_after_toggling_button_2_and_knob", 
+                                                  23: "knob_clockwise_after_toggling_button_3_and_knob",
+                                                  24: "knob_clockwise_after_toggling_button_4_and_knob", 
+                                                  25: "knob_clockwise_after_toggling_button_5_and_knob", 
+                                                  26: "knob_clockwise_after_toggling_button_6_and_knob",
+                                                  27: "knob_clockwise_after_toggling_button_7_and_knob", 
+                                                  28: "knob_clockwise_after_toggling_button_8_and_knob",}),
+
     ],
     # "ttl": "6h"  # battery every 6 hours
 }, {
