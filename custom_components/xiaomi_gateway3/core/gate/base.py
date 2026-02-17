@@ -130,6 +130,9 @@ class XGateway:
                 "type": GATEWAY,
                 "mac": info["mac"].lower(),  # aa:bb:cc:dd:ee:ff
                 "fw_ver": info["version"],
+                "uid": info.get("uid", ""),
+                "cloud": info.get("cloud", ""),
+                "sn": info.get("sn")
             }
             if "lan_mac" in info:
                 extra["mac2"] = info["lan_mac"]

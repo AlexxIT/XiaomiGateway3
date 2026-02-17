@@ -41,10 +41,12 @@ class XEntity(Entity):
 
         self.listen_attrs: set = {conv.attr}
 
+        sn = None
         if device.type == GATEWAY:
             connections = {(CONNECTION_NETWORK_MAC, device.extra["mac"])}
             if mac2 := device.extra.get("mac2"):
                 connections.add((CONNECTION_NETWORK_MAC, mac2))
+            sn = device.extra.get("sn")
         elif device.type == ZIGBEE:
             connections = {(CONNECTION_ZIGBEE, device.extra["ieee"])}
         elif device.type in (BLE, MESH):
@@ -67,6 +69,7 @@ class XEntity(Entity):
             sw_version=device.firmware,
             hw_version=device.extra.get("hw_ver"),
             via_device=via_device,
+            serial_number=sn,
         )
         self._attr_has_entity_name = True
         self._attr_name = attr_human_name(conv.attr)

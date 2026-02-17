@@ -41,7 +41,12 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
         return None
 
     # try to enable telnet and return miio info
-    result = await enable_telnet(host, token, key)
+    if token == "aiot" or token == "aqara":
+        if not await check_port(host, 23):
+            return {"error": "wrong_telnet"}
+        return {"host": host}
+    else:
+        result = await enable_telnet(host, token, key)
 
     # waiting for telnet to start
     await asyncio.sleep(1)

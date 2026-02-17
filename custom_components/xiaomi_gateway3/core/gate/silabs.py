@@ -31,7 +31,7 @@ class SilabsGateway(XGateway):
         self.ieee = info["mac"][2:].upper()
         assert len(self.ieee) == 16
 
-        self.new_sdk = info["hostVer"] >= "3.14"
+        self.new_sdk = info.get("hostVer", "0.0.0") >= "3.14"
 
         # little delay before neighbors scan
         self.silabs_neighbors_start_ts = time.time() - 3600 + 30
