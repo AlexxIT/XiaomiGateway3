@@ -9,7 +9,8 @@ class Session:
     reader: asyncio.StreamReader
     writer: asyncio.StreamWriter
 
-    def __init__(self, host: str, port=23):
+    def __init__(self, host: str, custom_password: str | None, port=23):
+        self.custom_password = custom_password
         self.coro = asyncio.open_connection(host, port, limit=1_000_000)
 
     async def __aenter__(self):
@@ -39,7 +40,7 @@ class Session:
         else:
             raise Exception(f"Unknown response: {resp}")
 
-        await shell.login()
+        await shell.login(self.custom_password)
         await shell.prepare()
 
         return shell
