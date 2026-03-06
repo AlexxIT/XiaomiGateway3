@@ -2318,6 +2318,12 @@ DEVICES += [{
         MapConv("event_type", "sensor", mi="2.e.1104.p.4", map={0: "Water Immersion Alarm", 1: "Flood Relief", 2: "Water Alarm", 3: "Water Removal"}, entity={"enabled": False}),
         BaseConv("cus_event_1", "sensor", mi="6.e.1022.p.1", entity={"enabled": False}),
         BaseConv("cus_event_2", "sensor", mi="6.e.1022.p.2", entity={"enabled": False}),
+
+        BLEMapConv("water_leak_bottom", mi=18438, map={"00": False, "01": True}),
+        BLEMapConv("water_leak_top", mi=18555, map={"00": False, "01": True}),
+        # BLEMapConv("water_leak", "binary_sensor", mi=19048, map={"00": True, "01": False, "02": True, "03": False}),
+        BLEMapConv("event_type", mi=19048, map={"00": "Water Immersion Alarm", "01": "Flood Relief", "02": "Water Alarm", "03": "Water Removal"}),
+        BLEByteConv("battery", mi=1003),
     ],
 }, {
     # rhj.sensor_occupy.l730a
