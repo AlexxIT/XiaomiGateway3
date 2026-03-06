@@ -1799,8 +1799,8 @@ DEVICES += [{
         BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
         BaseConv("illuminance", "sensor", mi="2.p.1005"),
         BaseConv("battery", "sensor", mi="7.p.1003", entity=ENTITY_LAZY),  # uint8
-        BoolConv("customized_property", "binary_sensor", mi="5.p.1019"), #custom close range
-        MapConv("event_type", "sensor", mi="5.e.1097.p.1", map={0: "0_Reset", 1: "1_OffLightLeave", 2: "2_OffLightExit", 3: "3_OffLightSleep", 4: "4_OffLightExit", 5: "5_RadarNoiseExceedMinor", 6: "6_RadarNoiseExceedCritical", 7: "7_RadarNoiseNormal", 8: "8_RadarNoiseError"}),
+        BoolConv("near_occupancy", "binary_sensor", mi="5.p.1019"),  # custom close range
+        MapConv("event_type", "sensor", mi="5.e.1097.p.1", map={0: "Reset", 1: "OffLightLeave", 2: "OffLightExit", 3: "OffLightSleep", 4: "OffLightExit", 5: "RadarNoiseExceedMinor", 6: "RadarNoiseExceedCritical", 7: "RadarNoiseNormal", 8: "RadarNoiseError"}),
         BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity={"enabled": False, "units": UNIT_MINUTES}),  # uint8
         BaseConv("no_one_duration", "sensor", mi="2.p.1082", entity={"enabled": False, "units": UNIT_MINUTES})  # uint8
     ],
