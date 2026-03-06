@@ -147,7 +147,11 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def async_step_token(self, user_input: dict = None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
-        kwargs = {}
+        kwargs = {
+            "description_placeholders": {
+                "link": "https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token",
+            },
+        }
 
         if user_input:
             if "key" not in user_input:

@@ -41,7 +41,7 @@
         }
       },
       "token": {
-        "description": "You can obtain Mi Home token automatically with [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) or [manually](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
+        "description": "You can obtain Mi Home token automatically with [Cloud integration]({link}).",
         "data": {
           "host": "Host",
           "token": "Token",

@@ -41,7 +41,7 @@
         }
       },
       "token": {
-        "description": "可以透過 [雲端整合](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自動或 [手動](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 取得網關 Token。",
+        "description": "可以透過 [雲端整合]({link}) 取得網關 Token。",
         "data": {
           "host": "網關IP",
           "token": "Token",

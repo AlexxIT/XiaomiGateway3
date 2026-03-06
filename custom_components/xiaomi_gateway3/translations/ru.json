@@ -40,7 +40,7 @@
         }
       },
       "token": {
-        "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) или [вручную](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
+        "description": "Вы можете получить Mi Home токен автоматически с помощью [облачной интеграции]({link}).",
         "data": {
           "host": "IP-адрес",
           "token": "Токен",

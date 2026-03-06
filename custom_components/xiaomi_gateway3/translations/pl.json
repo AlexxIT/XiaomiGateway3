@@ -40,7 +40,7 @@
         }
       },
       "token": {
-        "description": "Możesz uzyskać token automatycznie używając [danych logowania do konta Xiaomi](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) bądź [ręcznie](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
+        "description": "Możesz uzyskać token automatycznie używając [danych logowania do konta Xiaomi]({link}).",
         "data": {
           "host": "Host (Adres IP bramki)",
           "token": "Token"
