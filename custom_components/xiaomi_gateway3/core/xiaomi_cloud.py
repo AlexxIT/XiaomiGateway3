@@ -9,7 +9,7 @@ from typing import TypedDict
 
 from aiohttp import ClientSession
 from cryptography.hazmat.primitives import ciphers
-from cryptography.hazmat.primitives.ciphers import algorithms
+from cryptography.hazmat.decrepit.ciphers import algorithms
 
 SDK_VERSION = "4.2.29"
 BASE = {
