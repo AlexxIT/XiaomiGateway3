@@ -5320,6 +5320,15 @@ DEVICES += [{
         MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
     ],
 }, {
+    27151: ["Linptech", "Human Presence Sensor ES5 (Side Mounted)", "linp.sensor_occupy.es5b"],
+    "spec": [
+        BoolConv("occupancy", "binary_sensor", mi="2.p.1078"),
+        BaseConv("illuminance", "sensor", mi="2.p.1005"),
+        BaseConv("has_someone_duration", "sensor", mi="2.p.1081", entity={"units": UNIT_MINUTES, "icon": "mdi:timer"}),
+        MathConv("no_one_duration", "sensor", mi="2.p.1082", min=1, max=120, entity={"units": UNIT_MINUTES, "icon": "mdi:timer-off"}),
+        BoolConv("near_occupancy", "binary_sensor", mi="5.p.1019"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
