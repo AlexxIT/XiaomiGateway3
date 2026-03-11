@@ -23,14 +23,16 @@ async def check_port(host: str, port: int) -> bool:
         s.close()
 
 
-async def gateway_info(host: str, token: str = None, key: str = None) -> dict | None:
+async def gateway_info(
+    host: str, token: str = None, key: str = None, custom_password: str = None
+) -> dict | None:
     # Strategy:
     # 1. Check open telnet and return host, did, token, key
     # 2. Try to enable telnet using host, token and (optionaly) key
     # 3. Check open telnet again
     # 4. Return error
     try:
-        async with Session(host) as sh:
+        async with Session(host, custom_password) as sh:
             info = await sh.get_miio_info()
         info["host"] = host
         return info
@@ -55,10 +57,14 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
 
 
 # universal command for open telnet on all models
-TELNET_CMD = "passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"
+TELNET_CMD = (
+    "{}; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"
+)
 
 
-async def enable_telnet(host: str, token: str, key: str = None) -> str:
+async def enable_telnet(
+    host: str, token: str, key: str = None, custom_password: str = None
+) -> str:
     # Strategy:
     # 1. Get miio info
     miio = AsyncMiIO(host, token)
@@ -87,16 +93,22 @@ async def enable_telnet(host: str, token: str, key: str = None) -> str:
         # PS. Can't try `system_command` without `miio_info`
         methods = ["set_ip_info", "enable_telnet_service"]
 
+    password_command = (
+        f'printf "$USER:{custom_password}" | chpasswd'
+        if custom_password
+        else "passwd -d $USER"
+    )
+
     # 4. Return ok or some error
     for method in methods:
         if method == "enable_telnet_service":
             params = None
         elif method == "set_ip_info":
-            params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
+            params = {"ssid": '""', "pswd": "1; " + TELNET_CMD.format(password_command)}
         elif method == "system_command":
             params = {
                 "password": miio_password(miio.device_id, miio_info["mac"], key),
-                "command": TELNET_CMD,
+                "command": TELNET_CMD.format(password_command),
             }
         else:
             raise NotImplementedError(method)
