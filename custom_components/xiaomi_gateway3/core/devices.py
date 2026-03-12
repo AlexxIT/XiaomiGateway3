@@ -2508,8 +2508,7 @@ DEVICES += [{
         # BLE 
         BLEFloatConv("temperature", "sensor", mi=18433, round=1),
         BLEByteConv("humidity", "sensor", mi=18434),
-        BLEByteConv("battery", "sensor", mi=20483),
-#        BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),
+        BLEByteConv("battery", "sensor", mi=19459),
     ],
 }]
 
