@@ -1891,6 +1891,11 @@ DEVICES += [{
     16186: ["GranwinIoT", "V5 Eight Key Switch (BLE)", "giot.remote.v58kwm"],
     "spec": [
         BaseConv("action", "sensor"),
+        # mibeacon2 spec
+        MapConv("action", mi=18956, map={"01": BUTTON_1_SINGLE,  "02": BUTTON_2_SINGLE, "03": BUTTON_3_SINGLE, "04": BUTTON_4_SINGLE, "05": "button_5_single", "06": "button_6_single", "07": "button_7_single", "08": "button_8_single"}),
+        MapConv("action", mi=18957, map={"01": BUTTON_1_DOUBLE, "02": BUTTON_2_DOUBLE, "03": BUTTON_3_DOUBLE, "04": BUTTON_4_DOUBLE, "05": "button_5_double", "06": "button_6_double", "07": "button_7_double", "08": "button_8_double"}),
+        MapConv("action", mi=18958, map={"01": BUTTON_1_HOLD, "02": BUTTON_2_HOLD, "03": BUTTON_3_HOLD, "04": BUTTON_4_HOLD, "05": "button_5_hold", "06": "button_6_hold", "07": "button_7_hold", "08": "button_8_hold"}),
+        # miot spec
         MapConv("action", mi="2.e.1012.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE, 5: "button_5_single", 6: "button_6_single", 7: "button_7_single", 8: "button_8_single"}),
         MapConv("action", mi="2.e.1013.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE, 5: "button_5_double", 6: "button_6_double", 7: "button_7_double", 8: "button_8_double"}),
         MapConv("action", mi="2.e.1014.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD, 5: "button_5_hold", 6: "button_6_hold", 7: "button_7_hold", 8: "button_8_hold"}),
@@ -2210,7 +2215,7 @@ DEVICES += [{
     "spec": [
         # main sensors
         BLEFloatConv("temperature", "sensor", mi=18433, round=1),  # float
-        BLEFloatConv("humidity", "sensor", mi=18440, round=1),  # float
+        BLEByteConv("humidity", "sensor", mi=18434),  # uint8
         BLEByteConv("battery", "sensor", mi=20483),  # uint8
         MathConv("temperature", mi="2.p.1001", round=1),
         MathConv("humidity", mi="2.p.1002", round=1),
@@ -2219,6 +2224,10 @@ DEVICES += [{
         ConstConv("action", mi="5.e.1012", value=BUTTON_SINGLE),
         ConstConv("action", mi="5.e.1013", value=BUTTON_DOUBLE),
         ConstConv("action", mi="5.e.1014", value=BUTTON_HOLD),
+        # mibeacon2 spec
+        ConstConv("action", mi=22028, value=BUTTON_SINGLE),
+        ConstConv("action", mi=22029, value=BUTTON_DOUBLE),
+        ConstConv("action", mi=22030, value=BUTTON_HOLD),
     ],
 }, {
     # https://github.com/AlexxIT/XiaomiGateway3/pull/1303
@@ -2491,6 +2500,16 @@ DEVICES += [{
         ConstConv("action", mi=8, value="armed"),
         BLELock("lock", mi=11),
         BLEToothbrush("toothbrush", mi=16),
+    ],
+}, { 
+    # https://mijia.wiki/products/vchon.sensor_ht.mbs20 
+    32489: ["RSH", "RSH BLE thermometer and hygrometer", "vchon.sensor_ht.mbs20"],
+    "spec": [
+        # BLE 
+        BLEFloatConv("temperature", "sensor", mi=18433, round=1),
+        BLEByteConv("humidity", "sensor", mi=18434),
+        BLEByteConv("battery", "sensor", mi=20483),
+#        BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),
     ],
 }]
 
