@@ -5338,6 +5338,17 @@ DEVICES += [{
         MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
     ],
 }, {
+    # https://home.miot-spec.com/spec/090615.curtain.curx1
+    22088: ["PTX", "X1 Curtain Motor", "090615.curtain.curx1"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={0: "pause", 1: "open", 2: "close", 3: "toggle"}),
+        CurtainPosConv("position", mi="2.p.3"),
+        BaseConv("target_position", mi="2.p.4"),
+        MapConv("status", mi="2.p.2", map={0: "stop", 1: "opening", 2: "closing"}),
+        BaseConv("motor_reverse", "switch", mi="2.p.5"),
+        MapConv("speed-level", "select", mi="2.p.7", map={0: "high", 1: "medium", 2: "low"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
