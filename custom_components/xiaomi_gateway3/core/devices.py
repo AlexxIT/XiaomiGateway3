@@ -2509,6 +2509,9 @@ DEVICES += [{
         BLEFloatConv("temperature", "sensor", mi=18433, round=1),
         BLEByteConv("humidity", "sensor", mi=18434),
         BLEByteConv("battery", "sensor", mi=19459),
+        MathConv("temperature", mi="2.p.1001", round=1),
+        MathConv("humidity", mi="2.p.1002", round=1),
+        BaseConv("battery", mi="3.p.1003", entity=ENTITY_LAZY),
     ],
 }]
 
