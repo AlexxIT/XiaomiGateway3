@@ -543,6 +543,7 @@ Total devices: 250
 |~|Two Key Mesh Switch|topwit.switch.rzw02|switch_1, switch_2, mode_1, mode_2, action|
 |~|Two-Button Switch |ydhome.switch.s2|left_switch, right_switch|
 |~|ZB Mesh Light MESH2.0|zbmesh.light.wy0a02|light, mode, power_on_state, flex_switch, night_light, fade_time, lowest_brightness, master_slave_switch, breathing_speed, beat_speed, rhythm_switch, rhythm_speed|
+|~|Mesh Smart Power Metering Controller|iot.switch.jdltdq|switch, default_power_on_state, energy, power, current, voltage, indicator_light, child_lock|
 
 ## Supported Matter
 
