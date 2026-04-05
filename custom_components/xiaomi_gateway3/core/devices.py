@@ -5338,6 +5338,20 @@ DEVICES += [{
         MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
     ],
 }, {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:bath-heater:0000A028:topwit-rzw76:1:0000C82C
+    26045: ["TOPWIT", "Bath Heater Switch", "topwit.bhf_light.rzw76"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        MapConv("status", "sensor", mi="4.p.1", map={1: "Idle", 2: "Busy", 3: "Delay"}),
+        MathConv("temperature", "sensor", mi="4.p.5", min=-30, max=100),
+        BoolConv("heat_low", "switch", mi="4.p.6"),
+        BaseConv("blow", "switch", mi="4.p.7"),
+        BaseConv("ventilation", "switch", mi="4.p.8"),
+        BoolConv("heat_high", "switch", mi="4.p.9"),
+        BaseConv("child_lock_status", "binary_sensor", mi="6.p.1"),
+        MathConv("ventilation_delay", "number", mi="7.p.1", min=0, max=43200, entity={"category": "config", "units": UNIT_SECONDS}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
