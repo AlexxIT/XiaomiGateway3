@@ -5350,6 +5350,7 @@ DEVICES += [{
         BoolConv("heat_high", "switch", mi="4.p.9"),
         BaseConv("child_lock_status", "binary_sensor", mi="6.p.1"),
         MathConv("ventilation_delay", "number", mi="7.p.1", min=0, max=43200, entity={"category": "config", "units": UNIT_SECONDS}),
+        BaseConv("stop_working", "button", mi="4.a.1"),
     ],
 }, {
     "default": "mesh",  # default Mesh device
