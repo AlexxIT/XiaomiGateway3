@@ -1707,6 +1707,17 @@ DEVICES += [{
         BaseConv("battery", mi="2.p.1003"),
     ]
 }, {
+    # https://home.miot-spec.com/s/xiaomi.sensor_ht.o3 — international/Malaysian variant of MJWSD05MMC
+    # Uses MiBeacon v1 EIDs (18433/18434) for temp/humidity, eid 19459 for battery
+    # Different from miaomiaoce.sensor_ht.t9 (pid 10290) which uses MiBeacon v2 EIDs
+    19527: ["Xiaomi", "TH Sensor O3", "MJWSD05MMC", "xiaomi.sensor_ht.o3"],
+    "spec": [
+        # mibeacon spec
+        BLEFloatConv("temperature", "sensor", mi=18433, round=1),  # float
+        BLEByteConv("humidity", "sensor", mi=18434),  # uint8
+        BLEByteConv("battery", "sensor", mi=19459, entity=ENTITY_LAZY),  # uint8
+    ]
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:xiaomi-mini:1:0000D063
     21941: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.mini"],
     "spec": [
