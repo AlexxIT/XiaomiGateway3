@@ -3487,7 +3487,7 @@ DEVICES += [{
         BaseConv("led", "switch", mi="5.p.1"),
     ],
 }, {
-    23308: ["Linptech", "Single Wall Switch T1", "linp.switch.t2dbw1"],
+    23474: ["Linptech", "Single Wall Switch T1", "linp.switch.t2dbw1"],
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         MapConv("mode", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
