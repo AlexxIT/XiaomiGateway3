@@ -5433,6 +5433,34 @@ DEVICES += [{
         BoolConv("motor_reverse", "switch", mi="2.p.5", entity=ENTITY_CONFIG), # config
     ],
 }, {
+    # https://home.miot-spec.com/p/ckcper.switch.bln001
+    29462: ["Cpcker", "Single Wall Switch", "PKZN-MJST-M3", "ckcper.switch.bln001"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),        
+        MapConv("wireless", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="6.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="6.e.2", value=BUTTON_DOUBLE),
+        ConstConv("action", mi="6.e.3", value=BUTTON_HOLD),
+        BaseConv("led", "switch", mi="7.p.8", entity=ENTITY_CONFIG),
+        MathConv("backlight_brightness", "number", mi="7.p.9", min=1, max=100, entity=ENTITY_CONFIG),
+    ],    
+}, {
+    #https://home.miot-spec.com/p/ckcper.switch.bln002
+    29463: ["Cpcker", "Double Wall Switch", "PKZN-MJST-M3", "ckcper.switch.bln002"],
+    "spec": [        
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        BaseConv("led", "switch", mi="9.p.10", entity=ENTITY_CONFIG),
+        MathConv("backlight_brightness", "number", mi="9.p.11", min=1, max=100, entity=ENTITY_CONFIG),
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="8.e.1.p.1", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE}),
+        MapConv("action", mi="8.e.2.p.1", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE}),
+        MapConv("action", mi="8.e.3.p.1", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD}),
+    ],        
+}, {
     19534: ["Mean Well", "Smart Chromatic Controller", "ftd.light.nomain"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
