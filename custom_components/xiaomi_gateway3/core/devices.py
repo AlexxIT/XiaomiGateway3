@@ -4480,7 +4480,6 @@ DEVICES += [{
         ConstConv("action", mi="7.e.2", value=BUTTON_3_DOUBLE),
         ConstConv("action", mi="7.e.3", value=BUTTON_3_HOLD),
         MapConv("action", mi="12.e.1.p.1", map={1: "home",2: "away",3: "leisure",}),
-        MathConv("screen_brightness", "number", mi="10.p.2", min=1, max=100, entity=ENTITY_CONFIG),
         BoolConv("night_mode", "switch", mi="10.p.4", entity=ENTITY_CONFIG),
         MapConv("occupancy", "binary_sensor", mi="9.e.1.p.1", map={0: False, 1: True}),
         BoolConv("virtual_switch_a", "switch", mi="13.p.2"),
