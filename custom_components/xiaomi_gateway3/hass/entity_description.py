@@ -7,9 +7,6 @@ from homeassistant.components.number import NumberDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.components.switch import SwitchDeviceClass
 from homeassistant.const import (
-    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_PARTS_PER_BILLION,
-    CONCENTRATION_PARTS_PER_MILLION,
     LIGHT_LUX,
     MAJOR_VERSION,
     MINOR_VERSION,
@@ -23,6 +20,8 @@ from homeassistant.const import (
     UnitOfPressure,
     UnitOfTemperature,
     UnitOfTime,
+    UnitOfDensity,
+    UnitOfRatio,
 )
 from homeassistant.helpers.entity import Entity, EntityCategory
 
@@ -88,16 +87,16 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     # sensors without device class
     "action": {"icon": "mdi:bell"},
     "conductivity": {"icon": "mdi:flower", "units": CONDUCTIVITY},
-    "formaldehyde": {"units": CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER},
+    "formaldehyde": {"units": UnitOfDensity.MILLIGRAMS_PER_CUBIC_METER},
     "gas_density": {"icon": "mdi:google-circles-communities", "units": "% LEL"},
     "rssi": {"units": SIGNAL_STRENGTH_DECIBELS_MILLIWATT},
     "smoke_density": {"icon": "mdi:google-circles-communities", "units": "% obs/ft"},
     "supply": {"icon": "mdi:gauge", "units": PERCENTAGE},
-    "tvoc": {"icon": "mdi:cloud", "units": CONCENTRATION_PARTS_PER_BILLION},
+    "tvoc": {"icon": "mdi:cloud", "units": UnitOfRatio.PARTS_PER_BILLION},
     "eco_two": {
         "name": "eCO2",
         "icon": "mdi:molecule-co2",
-        "units": CONCENTRATION_PARTS_PER_MILLION,
+        "units": UnitOfRatio.PARTS_PER_MILLION,
     },
     ##
     # stats sensors
