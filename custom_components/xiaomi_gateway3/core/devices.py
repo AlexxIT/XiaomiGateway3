@@ -1707,6 +1707,15 @@ DEVICES += [{
         BaseConv("battery", mi="2.p.1003"),
     ]
 }, {
+    # MJWSD05MMC variant with pdid 19527, uses different BLE eids than pdid 10290
+    19527: ["Xiaomi", "TH Sensor 3", "MJWSD05MMC", "miaomiaoce.sensor_ht.t9"],
+    "spec": [
+        # mibeacon2 spec, confirmed via gateway BLE event capture
+        BLEFloatConv("temperature", "sensor", mi=18433, round=1),  # float
+        BLEByteConv("humidity", "sensor", mi=18434),  # uint8
+        BLEByteConv("battery", "sensor", mi=18435, entity=ENTITY_LAZY),  # uint8
+    ],
+}, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:xiaomi-mini:1:0000D063
     21941: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.mini"],
     "spec": [
