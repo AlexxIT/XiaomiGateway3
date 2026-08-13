@@ -2087,6 +2087,23 @@ DEVICES += [{
         ConstConv("action", mi="10.e.1", value="low_battery"),
     ],
 }, {
+    12229: ["Xiaomi", "Safe Box", "MCN003"],
+    "spec": [
+        # Operation ID
+        BaseConv("operation_id", "sensor", mi="2.e.1020.p.1"),
+        BaseConv("lock_timestamp", "sensor", mi="2.e.1020.p.2"),
+        MapConv("lock_action", "sensor", mi="2.e.1020.p.3", map={1: "lock", 2: "unlock"}),
+        MapConv("method", "sensor", mi="2.e.1020.p.5", map={1: "mobile_phone", 2: "fingerprint", 3: "password", 8: "lock_key", 9: "one_time_password", 12: "coerce", 13: "two_step_verification", 15: "manual", 16: "auto"}),
+        MapConv("position", "sensor", mi="2.e.1020.p.6", map={1: "indoor", 2: "outdoor", 3: "not tell indoor or outdoor"}),
+        MapConv("abnormal_type", "sensor", mi="2.e.1007.p.4", map={1: "Frequent Unlocking Failed By Multiple Methods", 9: "Door Lock Was Damaged", 10: "Locked Unsuccessfully", 16: "Door Lock Mechanical Failure", 17: "Door Lock Main Part Failure", 19: "Door Lock Batteries Are Low", 20: "Door Lock Batteries Are Nearly Depleted", 23: "Leaving The Door Open Timed Out"}),
+        MapConv("door_state", "sensor", mi="3.p.1", map={1: "Locked", 2: "Unlocked", 3: "Leaving The Door Open Timed Out"}),
+        # battery sensor
+        BaseConv("battery", "sensor", mi="4.p.1003"),
+        # low battery
+        BaseConv("low_battery", "sensor", mi="4.e.1001.p.1003"),
+
+    ],
+}, {
     14456: ["LeMesh", "Scenario wireless knob switch K4", "lemesh.remote.ts4"],
     "spec": [
         BaseConv("battery", "sensor", mi="4.p.1003"),  # uint8
