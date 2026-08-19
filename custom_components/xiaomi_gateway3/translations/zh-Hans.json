@@ -40,7 +40,7 @@
         }
       },
       "token": {
-        "description": "可以通过 [添加小米云账号](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) 自动或 [手动](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md) 获取网关Token。请阅读 [已支持的网关固件版本](https://github.com/AlexxIT/XiaomiGateway3#supported-firmwares)",
+        "description": "可以通过 [添加小米云账号]({link}) 获取网关Token。请阅读 已支持的网关固件版本",
         "data": {
           "host": "网关IP",
           "token": "Token",

@@ -7,9 +7,6 @@ from homeassistant.components.number import NumberDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.components.switch import SwitchDeviceClass
 from homeassistant.const import (
-    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_PARTS_PER_BILLION,
-    CONCENTRATION_PARTS_PER_MILLION,
     LIGHT_LUX,
     MAJOR_VERSION,
     MINOR_VERSION,
@@ -38,6 +35,17 @@ elif (MAJOR_VERSION, MINOR_VERSION) >= (2024, 7):
     CONDUCTIVITY = UnitOfConductivity.MICROSIEMENS
 else:
     from homeassistant.const import CONDUCTIVITY
+
+if (MAJOR_VERSION, MINOR_VERSION) >= (2026, 7):
+    from homeassistant.const import UnitOfDensity, UnitOfRatio
+
+    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER = UnitOfDensity.MILLIGRAMS_PER_CUBIC_METER
+    CONCENTRATION_PARTS_PER_BILLION = UnitOfRatio.PARTS_PER_BILLION
+    CONCENTRATION_PARTS_PER_MILLION = UnitOfRatio.PARTS_PER_MILLION
+else:
+    from homeassistant.const import CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER
+    from homeassistant.const import CONCENTRATION_PARTS_PER_BILLION
+    from homeassistant.const import CONCENTRATION_PARTS_PER_MILLION
 
 # just to reduce the code
 CELSIUS = UnitOfTemperature.CELSIUS
