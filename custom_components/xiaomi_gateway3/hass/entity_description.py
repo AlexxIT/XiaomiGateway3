@@ -20,8 +20,6 @@ from homeassistant.const import (
     UnitOfPressure,
     UnitOfTemperature,
     UnitOfTime,
-    UnitOfDensity,
-    UnitOfRatio,
 )
 from homeassistant.helpers.entity import Entity, EntityCategory
 
@@ -37,6 +35,17 @@ elif (MAJOR_VERSION, MINOR_VERSION) >= (2024, 7):
     CONDUCTIVITY = UnitOfConductivity.MICROSIEMENS
 else:
     from homeassistant.const import CONDUCTIVITY
+
+if (MAJOR_VERSION, MINOR_VERSION) >= (2026, 7):
+    from homeassistant.const import UnitOfDensity, UnitOfRatio
+
+    CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER = UnitOfDensity.MILLIGRAMS_PER_CUBIC_METER
+    CONCENTRATION_PARTS_PER_BILLION = UnitOfRatio.PARTS_PER_BILLION
+    CONCENTRATION_PARTS_PER_MILLION = UnitOfRatio.PARTS_PER_MILLION
+else:
+    from homeassistant.const import CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER
+    from homeassistant.const import CONCENTRATION_PARTS_PER_BILLION
+    from homeassistant.const import CONCENTRATION_PARTS_PER_MILLION
 
 # just to reduce the code
 CELSIUS = UnitOfTemperature.CELSIUS
@@ -87,16 +96,16 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     # sensors without device class
     "action": {"icon": "mdi:bell"},
     "conductivity": {"icon": "mdi:flower", "units": CONDUCTIVITY},
-    "formaldehyde": {"units": UnitOfDensity.MILLIGRAMS_PER_CUBIC_METER},
+    "formaldehyde": {"units": CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER},
     "gas_density": {"icon": "mdi:google-circles-communities", "units": "% LEL"},
     "rssi": {"units": SIGNAL_STRENGTH_DECIBELS_MILLIWATT},
     "smoke_density": {"icon": "mdi:google-circles-communities", "units": "% obs/ft"},
     "supply": {"icon": "mdi:gauge", "units": PERCENTAGE},
-    "tvoc": {"icon": "mdi:cloud", "units": UnitOfRatio.PARTS_PER_BILLION},
+    "tvoc": {"icon": "mdi:cloud", "units": CONCENTRATION_PARTS_PER_BILLION},
     "eco_two": {
         "name": "eCO2",
         "icon": "mdi:molecule-co2",
-        "units": UnitOfRatio.PARTS_PER_MILLION,
+        "units": CONCENTRATION_PARTS_PER_MILLION,
     },
     ##
     # stats sensors
