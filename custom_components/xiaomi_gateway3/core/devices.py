@@ -4603,6 +4603,19 @@ DEVICES += [{
         BaseConv("local_control", "sensor", mi="10.p.4", entity=ENTITY_DIAGNOSTIC),
     ],    
 }, {
+    29442: ["Linptech", "Linptech Wall Switch E3S 2 Key", "linp.switch.e3sbw2"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_1", "select", mi="5.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
+        MapConv("mode_2", "select", mi="6.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
+        MapConv("white_indicator", "select", mi="10.p.3", map={0: "Off", 100: "On"}),
+        MapConv("orange_indicator", "select", mi="10.p.4", map={0: "Off", 100: "On"}),
+        MapConv("anti_flicker", "select", mi="10.p.11", map={0: "Middle", 1: "High", 2: "Low"}),
+    ],
+}, {
     16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
