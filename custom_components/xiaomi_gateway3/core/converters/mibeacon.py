@@ -329,3 +329,42 @@ class BLEScaleS400(BaseConv):
                 payload["impedance_high"] = impedance / 10
             else:
                 payload["impedance_low"] = impedance / 10
+
+
+class BLEScaleS800(BaseConv):
+    def decode(self, device: "XDevice", payload: dict, value: int):
+        value = int(value)
+
+        kind = (value >> 24) & 0xFF
+        stage = (value >> 16) & 0xFF
+        data = value & 0xFFFF
+
+        # p2: measurement stage
+        if self.attr == "p2":
+            payload["s800_measure_stage"] = stage
+            return
+
+        # p3: data for previous/current p2 stage
+        if self.attr == "p3":
+            related_stage = payload.get("s800_measure_stage")
+
+            # empty / service p3
+            if value == 0 or (stage == 0 and data == 0):
+                return
+
+            # Weight:
+            # p2 stage 0x05 -> next p3 high16 / 100
+            if related_stage == 0x05:
+                weight_raw = (value >> 16) & 0xFFFF
+                weight = weight_raw / 100
+
+                if 20.0 <= weight <= 250.0:
+                    payload["weight"] = round(weight, 2)
+
+            # Heart rate:
+            # p2 stage 0x15 -> next p3 kind + 50
+            elif related_stage == 0x15 and kind > 0:
+                heart_rate = kind + 50
+
+                if 40 <= heart_rate <= 220:
+                    payload["heart_rate"] = heart_rate
