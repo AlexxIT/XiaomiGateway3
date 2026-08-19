@@ -3327,8 +3327,8 @@ DEVICES += [{
         BaseConv("opposition_led", "button", mi="7.a.5", entity=ENTITY_CONFIG),
         BaseConv("on_led", "button", mi="7.a.6", entity=ENTITY_CONFIG),
         BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
-        BaseConv("overcharging-on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
-        BaseConv("overcharging-off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
+        BaseConv("overcharging_on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
+        BaseConv("overcharging_off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
     ]
 }, {
     26162: ["YuTai", "Mesh Smart Plug V8", "yutai.plug.fsov8m"],
@@ -3347,8 +3347,8 @@ DEVICES += [{
         BaseConv("opposition_led", "button", mi="7.a.5", entity=ENTITY_CONFIG),
         BaseConv("on_led", "button", mi="7.a.6", entity=ENTITY_CONFIG),
         BaseConv("off_led", "button", mi="7.a.7", entity=ENTITY_CONFIG),
-        BaseConv("overcharging-on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
-        BaseConv("overcharging-off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
+        BaseConv("overcharging_on", "button", mi="7.a.14", entity=ENTITY_CONFIG),
+        BaseConv("overcharging_off", "button", mi="7.a.15", entity=ENTITY_CONFIG),
     ]
 }, {
     # A third party module widely used in small brand wall switches
