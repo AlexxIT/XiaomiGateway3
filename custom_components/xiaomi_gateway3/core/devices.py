@@ -5547,7 +5547,7 @@ DEVICES += [{
         MapConv("mode","select",mi="2.p.13", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 5: "Reading", 6: "Computer", 7: "Sleep", 8: "Wakeup"}),
     ],
 }, {
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:bath-heater:0000A028:topwit-rzw76:1:0000C82C
+  # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:bath-heater:0000A028:topwit-rzw76:1:0000C82C
     26045: ["TOPWIT", "Bath Heater Switch", "topwit.bhf_light.rzw76"],
     "spec": [
         BaseConv("light", "light", mi="2.p.1"),
@@ -5560,6 +5560,19 @@ DEVICES += [{
         BaseConv("child_lock_status", "binary_sensor", mi="6.p.1"),
         MathConv("ventilation_delay", "number", mi="7.p.1", min=0, max=43200, entity={"category": "config", "units": UNIT_SECONDS}),
         BaseConv("stop_working", "button", mi="4.a.1"),
+    ],
+}, {
+    19142: [None, "Mesh Smart Power Metering Controller", "iot.switch.jdltdq"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+        # BoolConv("fault", "binary_sensor", mi="2.p.3"),  # diagnostic
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MathConv("energy", "sensor", mi="3.p.1", min=0, multiply=0.01),  # uint32
+        MathConv("power", "sensor", mi="3.p.2", min=0),  # uint16
+        MathConv("current", "sensor", mi="3.p.4", min=0, multiply=0.01),  # uint16
+        MathConv("voltage", "sensor", mi="3.p.5", min=0),  # uint16
+        BaseConv("led", "switch", mi="6.p.1"),  # config
+        BaseConv("child_lock", "switch", mi="7.p.7"),  # config
     ],
 }, {
     "default": "mesh",  # default Mesh device
