@@ -57,6 +57,13 @@ class XEntity(Entity):
         else:
             via_device = None
 
+        sw_version = device.firmware
+        if sw_version is not None:
+            sw_version = str(sw_version)
+        hw_version = device.extra.get("hw_ver")
+        if hw_version is not None:
+            hw_version = str(hw_version)
+
         self._attr_available = device.available
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device.uid)},
@@ -64,8 +71,8 @@ class XEntity(Entity):
             manufacturer=device.extra.get("market_brand"),
             name=device.human_name,
             model=device.human_model,
-            sw_version=device.firmware,
-            hw_version=device.extra.get("hw_ver"),
+            sw_version=sw_version,
+            hw_version=hw_version,
             via_device=via_device,
         )
         self._attr_has_entity_name = True
