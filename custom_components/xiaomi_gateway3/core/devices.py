@@ -5660,11 +5660,12 @@ DEVICES += [{
     22088: ["PTX", "X1 Curtain Motor", "090615.curtain.curx1"],
     "spec": [
         MapConv("motor", "cover", mi="2.p.1", map={0: "pause", 1: "open", 2: "close", 3: "toggle"}),
+        MapConv("run_state", mi="2.p.2", map={0: "stop", 1: "opening", 2: "closing"}),
         CurtainPosConv("position", mi="2.p.3"),
         BaseConv("target_position", mi="2.p.4"),
-        MapConv("status", mi="2.p.2", map={0: "stop", 1: "opening", 2: "closing"}),
         BaseConv("motor_reverse", "switch", mi="2.p.5"),
         MapConv("speed_level", "select", mi="2.p.7", map={0: "high", 1: "medium", 2: "low"}),
+        BoolConv("on", "switch", mi="2.p.11"),
     ],
 }, {
     # https://home.miot-spec.com/spec/zjcx.plug.qcsw02
