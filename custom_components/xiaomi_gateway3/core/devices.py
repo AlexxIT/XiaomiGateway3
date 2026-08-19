@@ -5701,6 +5701,14 @@ DEVICES += [{
         MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 7: "Sleep", 8: "Wakeup", 9: "Breath", 10: "Beat"}),
     ],
 }, {
+    19506: ["YouMi", "4-Key Switch", "tofan.switch.s01"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("channel_4", "switch", mi="5.p.1"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
