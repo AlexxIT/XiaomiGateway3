@@ -5342,12 +5342,12 @@ DEVICES += [{
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1"),
         # BoolConv("fault", "binary_sensor", mi="2.p.3"),  # diagnostic
-        MapConv("default_power_on_state", "select", mi="2.p.5", map={0: "Default", 1: "Off", 2: "On"}),  # config
+        MapConv("power_on_state", "select", mi="2.p.5", map={0: "Default", 1: "Off", 2: "On"}),  # config
         MathConv("energy", "sensor", mi="3.p.1", min=0, multiply=0.01),  # uint32
         MathConv("power", "sensor", mi="3.p.2", min=0),  # uint16
         MathConv("current", "sensor", mi="3.p.4", min=0, multiply=0.01),  # uint16
         MathConv("voltage", "sensor", mi="3.p.5", min=0),  # uint16
-        BaseConv("indicator_light", "switch", mi="6.p.1"),  # config
+        BaseConv("led", "switch", mi="6.p.1"),  # config
         BaseConv("child_lock", "switch", mi="7.p.7"),  # config
     ],
 }, {
