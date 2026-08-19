@@ -8,8 +8,10 @@ from .shell_mgw2 import ShellMGW2
 class Session:
     reader: asyncio.StreamReader
     writer: asyncio.StreamWriter
+    telnet_password: str
 
-    def __init__(self, host: str, port=23):
+    def __init__(self, host: str, port=23, telnet_password: str = None):
+        self.telnet_password = telnet_password
         self.coro = asyncio.open_connection(host, port, limit=1_000_000)
 
     async def __aenter__(self):
@@ -29,13 +31,12 @@ class Session:
     async def login(self) -> ShellMGW | ShellE1 | ShellMGW2:
         coro = self.reader.readuntil(b"login: ")
         resp: bytes = await asyncio.wait_for(coro, 3)
-
         if b"rlxlinux" in resp:
             shell = ShellMGW(self.reader, self.writer)
         elif b"Aqara-Hub-E1" in resp or b"Aqara_Hub_E1" in resp:
-            shell = ShellE1(self.reader, self.writer)
+            shell = ShellE1(self.reader, self.writer, telnet_password = self.telnet_password)
         elif b"Mijia_Hub_V2" in resp:
-            shell = ShellMGW2(self.reader, self.writer)
+            shell = ShellMGW2(self.reader, self.writer, telnet_password = self.telnet_password)
         else:
             raise Exception(f"Unknown response: {resp}")
 
