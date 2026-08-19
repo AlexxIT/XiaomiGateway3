@@ -5693,6 +5693,14 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.5", map={0: "memory", 1: "on", 2: "off"}),
     ],
 }, {
+    28808: ["QEEX", "QEEX Smart Bulb", "trzn.light.wy0a04"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "Day", 2: "Night", 3: "Warmth", 4: "TV", 7: "Sleep", 8: "Wakeup", 9: "Breath", 10: "Beat"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
