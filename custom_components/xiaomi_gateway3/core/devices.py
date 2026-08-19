@@ -3211,7 +3211,7 @@ DEVICES += [{
     ],
 }, {
     10441: ["Linptech", "Presence Sensor ES1", "ES1ZB", "linp.sensor_occupy.hb01"],
-    17160: ["Yeelight", "Yeelight Customized Presence Sensor ES1", "ES1ZB", "linp.sensor_occupy.hb01"],
+    17160: ["Yeelight", "Human Presence Sensor", "yeelink.sensor_occupy.a"],
     "spec": [
         # main sensors
         BoolConv("occupancy", "binary_sensor", mi="2.p.1"),
