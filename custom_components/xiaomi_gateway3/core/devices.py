@@ -5325,7 +5325,7 @@ DEVICES += [{
         BaseConv("target_position", mi="2.p.4"),
         MapConv("status", mi="2.p.2", map={0: "stop", 1: "opening", 2: "closing"}),
         BaseConv("motor_reverse", "switch", mi="2.p.5"),
-        MapConv("speed-level", "select", mi="2.p.7", map={0: "high", 1: "medium", 2: "low"}),
+        MapConv("speed_level", "select", mi="2.p.7", map={0: "high", 1: "medium", 2: "low"}),
     ],
 }, {
     "default": "mesh",  # default Mesh device
