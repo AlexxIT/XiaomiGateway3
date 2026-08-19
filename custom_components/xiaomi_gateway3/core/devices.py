@@ -4440,10 +4440,10 @@ DEVICES += [{
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
         BaseConv("channel_2", "switch", mi="3.p.1"),
-        MapConv("working_mode_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-        MapConv("working_mode_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
-        MapConv("fast_mode_1", "select", mi="5.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
-        MapConv("fast_mode_2", "select", mi="6.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}),
+        MapConv("mode_1", "select", mi="5.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
+        MapConv("mode_2", "select", mi="6.p.1", map={0: "Multiple Click", 1: "Quick Single Click"}),
         BaseConv("action", "sensor"),
         ConstConv("action", mi="5.e.1", value=BUTTON_1_SINGLE),
         ConstConv("action", mi="5.e.2", value=BUTTON_1_DOUBLE),
@@ -4454,7 +4454,6 @@ DEVICES += [{
         MapConv("white_indicator", "select", mi="10.p.3", map={0: "Off", 100: "On"}),
         MapConv("orange_indicator", "select", mi="10.p.4", map={0: "Off", 100: "On"}),
         MapConv("anti_flicker", "select", mi="10.p.11", map={0: "Middle", 1: "High", 2: "Low"}),
-
     ],
 }, {
     16854: ["ZNSN", "Mesh Six-Key Oled Wall Switch", "znsn.switch.oled6"],
