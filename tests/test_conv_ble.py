@@ -330,6 +330,42 @@ def test_14523():
     assert p == {"action": "single"}
 
 
+def test_12505():
+    device = XDevice(12505)
+
+    p = device.decode(
+        {
+            "siid": 11,
+            "eiid": 1022,
+            "arguments": [
+                {"piid": 1, "value": 1},
+                {"piid": 2, "value": 1165343397},
+                {"piid": 3, "value": 1778217052},
+            ],
+        }
+    )
+    assert p == {
+        "heart_rate": 105,
+        "impedance_high": 444.5,
+        "profile_id": 1,
+        "timestamp": 1778217052,
+        "weight": 67.7,
+    }
+
+    p = device.decode(
+        {
+            "siid": 11,
+            "eiid": 1022,
+            "arguments": [
+                {"piid": 1, "value": 1},
+                {"piid": 2, "value": 1086062592},
+                {"piid": 3, "value": 1778217052},
+            ],
+        }
+    )
+    assert p == {"impedance_low": 414.3, "profile_id": 1, "timestamp": 1778217052}
+
+
 def test_18639():
     device = XDevice(18639)
 
