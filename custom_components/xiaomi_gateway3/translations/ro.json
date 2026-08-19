@@ -40,7 +40,7 @@
         }
       },
       "token": {
-        "description": "Poti obtine tokenul Mi Home in mod automat prin [Cloud integration](https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token) sau [manual](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
+        "description": "Poti obtine tokenul Mi Home in mod automat prin [Cloud integration]({link}).",
         "data": {
           "host": "IP Gateway",
           "token": "Token"

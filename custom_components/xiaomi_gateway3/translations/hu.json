@@ -40,7 +40,7 @@
         }
       },
       "token": {
-        "description": "A Mi Home tokent automatikusan beszerezheti a [Cloud integrációval] (https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token), vagy [manuálisan](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md).",
+        "description": "A Mi Home tokent automatikusan beszerezheti a [Cloud integrációval]({link}).",
         "data": {
           "host": "Hoszt",
           "token": "Token"
