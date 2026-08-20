@@ -2510,6 +2510,16 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="5.p.1003"),
     ],
 }, {
+    26193: ["Shuse", "Air Monitor", "shuse.airm.ss006"],
+    "spec": [
+        MathConv("temperature", "sensor", mi="3.p.1001", round=1),
+        MathConv("humidity", "sensor", mi="3.p.1008", round=1),
+        MathConv("air_quality", "sensor", mi="3.p.1028"),
+        MathConv("co_two", "sensor", mi="3.p.1029"),
+        MathConv("formaldehyde", "sensor", mi="3.p.1030"),
+        MathConv("tvoc", "sensor", mi="3.p.1031"),
+    ],
+}, {
     # https://mijia.wiki/products/vchon.sensor_ht.mbs20
     32489: ["RSH", "Thermometer and hygrometer", "vchon.sensor_ht.mbs20"],
     "spec": [

@@ -107,6 +107,11 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
         "icon": "mdi:molecule-co2",
         "units": CONCENTRATION_PARTS_PER_MILLION,
     },
+    "co_two": {
+        "name": "CO2",
+        "icon": "mdi:molecule-co2",
+        "units": CONCENTRATION_PARTS_PER_MILLION,
+    },
     ##
     # stats sensors
     "binary_sensor.gateway": {
