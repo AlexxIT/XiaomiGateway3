@@ -5726,6 +5726,12 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="3.p.11", map={0: "off", 1: "default"}),  # uint32, config
     ],
 }, {
+    26430: ["WenGuangHui", "WGH Smart Wall Outlet", "V7ICM", "sixwgh.plug.v7icm"],
+    "spec": [
+        BaseConv("outlet", "switch", mi="2.p.1"), # Main switch
+        BaseConv("aux_disable", "switch", mi="7.p.2"), # Voice function toggle switch
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
