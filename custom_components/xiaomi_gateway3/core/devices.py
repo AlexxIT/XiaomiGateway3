@@ -2687,6 +2687,7 @@ DEVICES += [{
         MapConv("color_temperature_switch", "button", mi="4.p.4", map={0: True}, entity=ENTITY_CONFIG),
         MapConv("on_or_brightness", "button", mi="4.p.5", map={0: True}, entity=ENTITY_CONFIG),
         MapConv("on_or_color_temperature", "button", mi="4.p.6", map={0: True}, entity=ENTITY_CONFIG),
+    ] 
 }, {
     10055: ["Symi", "Mesh Light", "symi.light.wy0a01"],
     "spec": [
