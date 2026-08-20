@@ -3231,6 +3231,21 @@ DEVICES += [{
         ConstConv("action", mi="8.e.2", value=BUTTON_DOUBLE),
     ],
 }, {
+    12472: ["PTX", "Mesh Three Wall Switch (no N)", "090615.switch.aidh3"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        MapConv("wireless_1", "select", mi="2.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        MapConv("wireless_2", "select", mi="3.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        MapConv("wireless_3", "select", mi="4.p.2", map={0: "Wired And Wireless", 1: "Wireless"}, entity=ENTITY_CONFIG),
+        BaseConv("led", "switch", mi="9.p.1", entity=ENTITY_CONFIG),
+        BaseConv("action", "sensor", entity=ENTITY_DISABLED),
+        ConstConv("action", mi="6.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="7.e.1", value=BUTTON_SINGLE),
+        ConstConv("action", mi="8.e.1", value=BUTTON_SINGLE),
+    ],
+}, {
     12471: ["PTX", "Mesh Double Wall Switch (no N)", "090615.switch.aidh2"],
     "spec": [
         BaseConv("channel_1", "switch", mi="2.p.1"),
