@@ -5703,6 +5703,20 @@ DEVICES += [{
         BaseConv("channel_4", "switch", mi="5.p.1"),
     ],
 }, {
+    28968: ["Linptech", "Mini Curtain Motor", "linp.curtain.ec1db"],
+    "spec": [
+        MapConv("curtain", "cover", mi="2.p.1", map={0: "open", 1: "close", 2: "stop"}),
+        MapConv("run_state", mi="2.p.2", map={0: "opening", 1: "closing", 2: "stop"}),
+        CurtainPosConv("position", mi="2.p.3"),
+        BaseConv("target_position", mi="2.p.4"),
+		BaseConv("illuminance", "sensor", mi="3.p.1"),
+		BaseConv("wakeup", "button", mi="5.a.5"),
+		MapConv("wakeup_state", "sensor", mi="5.p.2", map={0: "idle", 1: "running"}),
+		MathConv("speed", "number", mi="5.p.4", min=1, max=14, step=0.1, entity={"category": "config", "units": "cm/s"}),
+		MathConv("wakeup_position", "number", mi="5.p.5", min=10, max=100, step=1, entity={"category": "config", "units": "%"}),
+		MathConv("wakeup_duration", "number", mi="5.p.6", min=5, max=240, step=1, entity={"category": "config", "units": UNIT_MINUTES}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
