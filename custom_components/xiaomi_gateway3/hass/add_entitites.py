@@ -27,21 +27,17 @@ def handle_add_entities(
             # connect all device entities to this gateway
             CONFIG_ENTRIES[device.did] = gw
 
+            fix_device_registry(hass, config_entry.entry_id, device.uid)
+
             # instant setup all entities, except lazy
             for entity in get_entities(device, gw.stats_domain):
                 gw.debug("add_entity", device=device, entity=entity.entity_id)
-                add_entity(hass, config_entry, entity)
+                async_add_entities = XEntity.ADD[config_entry.entry_id + entity.domain]
+                async_add_entities([entity], update_before_add=False)
 
             # add listener for setup lazy entities (if device has them)
             if remove_listener := handle_lazy_entities(hass, config_entry, device):
                 lazy_listeners[device.did] = remove_listener
-        else:
-            # device already added to another config entry (gateway)
-            # so we add device to the current config entry
-            device_registry.async_get(hass).async_get_or_create(
-                config_entry_id=config_entry.entry_id,
-                identifiers={(DOMAIN, device.uid)},
-            )
 
     def remove_device(device: XDevice):
         # remove device entities connection to this gateway
@@ -89,20 +85,6 @@ def create_entity(device: XDevice, conv: BaseConv) -> XEntity:
         or XEntity.NEW.get(conv.domain)
     )
     return cls(device, conv)
-
-
-def add_entity(hass: HomeAssistant, config_entry: ConfigEntry, entity: XEntity):
-    # if device belong to multiple config entries - disabling one of config entry will
-    # block any other config entry for creation device entities
-    reg = entity_registry.async_get(hass)
-    entity_id = reg.async_get_entity_id(entity.domain, DOMAIN, entity.unique_id)
-    if registry_entry := reg.async_get(entity_id):
-        # remove disabled_by flag for entity
-        if registry_entry.disabled_by == "config_entry":
-            reg.async_update_entity(entity_id=entity_id, disabled_by=None)
-
-    async_add_entities = XEntity.ADD[config_entry.entry_id + entity.domain]
-    async_add_entities([entity], update_before_add=False)
 
 
 def handle_lazy_entities(
@@ -169,3 +151,33 @@ def get_extra_entities(converters: list[BaseConv], entities: dict[str, str]):
                 break
         else:
             converters.append(BaseConv(attr, new_domain))
+
+
+def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: str):
+    """
+    Fixing the consequences of the 2026.8 update.
+    https://developers.home-assistant.io/blog/2026/07/21/device-registry-single-config-entry/
+    """
+    dr = device_registry.async_get(hass)
+    # check all device entries
+    entries = dr.devices.get_entries(identifiers={(DOMAIN, device_uid)})
+
+    # first time start - just skip
+    if len(entries) == 0:
+        return
+
+    # single device - check if it is from this config entry
+    if len(entries) == 1:
+        if entries[0].config_entry_id != config_entry_id:
+            dr.async_update_device(entries[0].id, new_config_entry_id=config_entry_id)
+        return
+
+    # multiple devices - find the one with entities and remove all others
+    devices_with_entities = entity_registry.async_get(hass).async_device_ids()
+
+    for entry in entries:
+        if entry.id in devices_with_entities:
+            if entry.config_entry_id != config_entry_id:
+                dr.async_update_device(entry.id, new_config_entry_id=config_entry_id)
+        else:
+            dr.async_remove_device(entry.id)
