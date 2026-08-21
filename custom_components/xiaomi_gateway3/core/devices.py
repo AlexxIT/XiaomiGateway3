@@ -2681,6 +2681,23 @@ DEVICES += [{
         MapConv("dimming", "select", mi="4.p.3", map={0: "Gradient", 1: "Immediately"}, entity=ENTITY_CONFIG),
         BoolConv("night_light", "switch", mi="4.p.5", entity=ENTITY_CONFIG),
     ]
+}, {    
+    22843: ["Yeelight", "Smart Color Temperature Light Strip 2.0", "yeelink.light.str1"],
+    "spec": [
+        # Basic light control
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wake Up", 14: "Dusk", 15: "Sleep Aid", 16: "My Mode-Scenario 1", 17: "My Mode-Scenario 2", 18: "My Mode-Scenario 3", 19: "My Mode-Scenario 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}, entity=ENTITY_CONFIG),
+        BaseConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),
+        BaseConv("night_light", "switch", mi="2.p.13", entity=ENTITY_CONFIG),
+        # Scene trigger buttons; Button press passes True, MapConv converts True to MIoT value 0
+        MapConv("brightness_switch", "button", mi="4.p.1", map={0: True}, entity=ENTITY_CONFIG),
+        MapConv("color_temperature_switch", "button", mi="4.p.4", map={0: True}, entity=ENTITY_CONFIG),
+        MapConv("on_or_brightness", "button", mi="4.p.5", map={0: True}, entity=ENTITY_CONFIG),
+        MapConv("on_or_color_temperature", "button", mi="4.p.6", map={0: True}, entity=ENTITY_CONFIG),
+    ] 
 }, {
     10055: ["Symi", "Mesh Light", "symi.light.wy0a01"],
     "spec": [
