@@ -177,11 +177,26 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
         return
 
     # multiple devices - find the one with entities and remove all others
-    devices_with_entities = entity_registry.async_get(hass).async_device_ids()
+    er = entity_registry.async_get(hass)
+    devices_ids = er.async_device_ids()
+    main_device = None
 
     for entry in entries:
-        if entry.id in devices_with_entities:
-            if entry.config_entry_id != config_entry_id:
-                dr.async_update_device(entry.id, new_config_entry_id=config_entry_id)
-        else:
-            dr.async_remove_device(entry.id)
+        if entry.id in devices_ids:
+            # if device has entities
+            if main_device is None:
+                # set main device
+                main_device = entry
+                continue
+
+            # if another device has entities (maybe old converter)
+            for entity in er.entities.get_entries_for_device_id(entry.id, True):
+                # move this entities to main device
+                er.async_update_entity(entity.entity_id, device_id=main_device.id)
+
+        # remove this device, because it without entities
+        dr.async_remove_device(entry.id)
+
+    if main_device and main_device.config_entry_id != config_entry_id:
+        # move main device to current config entry
+        dr.async_update_device(main_device.id, new_config_entry_id=config_entry_id)
