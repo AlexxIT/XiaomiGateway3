@@ -4365,6 +4365,11 @@ DEVICES += [{
         MapConv("right_switch_mode", "select", mi="3.p.2", map={0: "normal_switch", 1: "wireless_switch", 2: "smart_switch", 3: "button_switch"}),
     ]
 }, {
+    23928: ["GranchiploT", "Gra Smart Controller V7 (Mesh)", "giot.plug.v7icm"],
+    "spec": [
+        BaseConv("switch", "switch", mi="2.p.1"),
+    ]
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1063
     10371: ["PTX", "Mesh Multifunction Wireless Switch", "PTX-AK3-QMIMB", "090615.remote.mlsw0a"],
     "spec": [
