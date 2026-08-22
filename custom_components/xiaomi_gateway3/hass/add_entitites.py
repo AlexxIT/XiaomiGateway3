@@ -32,8 +32,7 @@ def handle_add_entities(
             # instant setup all entities, except lazy
             for entity in get_entities(device, gw.stats_domain):
                 gw.debug("add_entity", device=device, entity=entity.entity_id)
-                async_add_entities = XEntity.ADD[config_entry.entry_id + entity.domain]
-                async_add_entities([entity], update_before_add=False)
+                add_entity(hass, config_entry, entity)
 
             # add listener for setup lazy entities (if device has them)
             if remove_listener := handle_lazy_entities(hass, config_entry, device):
@@ -85,6 +84,11 @@ def create_entity(device: XDevice, conv: BaseConv) -> XEntity:
         or XEntity.NEW.get(conv.domain)
     )
     return cls(device, conv)
+
+
+def add_entity(hass: HomeAssistant, config_entry: ConfigEntry, entity: XEntity):
+    async_add_entities = XEntity.ADD[config_entry.entry_id + entity.domain]
+    async_add_entities([entity], update_before_add=False)
 
 
 def handle_lazy_entities(
