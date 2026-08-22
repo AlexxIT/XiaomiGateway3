@@ -22,10 +22,16 @@ class ShellBase:
 
     async def exec(self, command: str, as_bytes=False, timeout=10) -> str | bytes:
         """Run command and return it result."""
-        self.writer.write(command.encode() + b"\n")
-        coro = self.reader.readuntil(b"# ")
-        raw = await asyncio.wait_for(coro, timeout=timeout)
-        return raw[:-2] if as_bytes else raw[:-2].decode()
+        self.writer.write((command + "\r\n").encode())
+        raw = bytearray()
+        while buffer := await asyncio.wait_for(
+            self.reader.read(1_000_000), timeout=timeout
+        ):
+            raw += buffer
+            if raw.endswith(b"# "):
+                raw = raw[:-2]
+                break
+        return bytes(raw) if as_bytes else raw.decode()
 
     async def read_file(self, filename: str, as_base64=False, tail=None):
         command = f"tail -c {tail} {filename}" if tail else f"cat {filename}"
