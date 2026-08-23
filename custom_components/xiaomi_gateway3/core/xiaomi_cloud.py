@@ -16,7 +16,6 @@ from cryptography.hazmat.decrepit.ciphers import algorithms
 _LOGGER = logging.getLogger(__name__)
 
 SDK_VERSION = "4.2.29"
-
 BASE = {
     "cn": "https://api.io.mi.com/app",
     "de": "https://de.api.io.mi.com/app",
@@ -39,20 +38,17 @@ class AuthResult(TypedDict, total=False):
 
 
 class MiCloud:
-    # All instance variables are initialized in __init__ to completely avoid 
+    # All instance variables are initialized in __init__ to completely avoid
     # multi-account cross-contamination caused by shared class variables.
-
     def __init__(
         self, session: ClientSession = None, servers: list = None, sid: str = None,
         timeout: int = 30
     ):
-        # If no session is provided, create one with a timeout
         self.session = session or ClientSession(timeout=aiohttp.ClientTimeout(total=timeout))
         self.servers = servers or ["cn"]
         self.sid = sid or "xiaomiio"
         self.device_id = get_random_string(16)
-        
-        # Instance variables, independent for each instance to avoid interference
+
         self.auth = None          # dict or None
         self.cookies = None       # dict or None
         self.ssecurity = None     # bytes or None
@@ -107,30 +103,28 @@ class MiCloud:
             return {"ok": False, "exception": e}
 
     async def login_captcha(self, code: str) -> AuthResult:
-        # Restore the original dual-branch logic to prevent initial login captcha failure, 
-        # while adding None defense.
         if self.auth is None:
             return {"ok": False, "exception": Exception("Auth info missing, please call login() first")}
-            
+
         # Case 1: Secondary verification captcha (has flag and identity_session)
         if "flag" in self.auth and "identity_session" in self.auth:
             return await self._send_ticket(
                 self.auth["flag"], self.auth["identity_session"], code
             )
-            
+
         # Case 2: Initial login graphical captcha (has username and password)
         if "username" in self.auth and "password" in self.auth:
             return await self.login(
                 self.auth["username"], self.auth["password"], captcha_code=code
             )
-            
+
         return {"ok": False, "exception": Exception("Invalid auth state for captcha")}
 
     async def login_verify(self, ticket: str) -> AuthResult:
         try:
-            # Fix: Check if self.auth exists and contains necessary keys
             if self.auth is None or "flag" not in self.auth or "identity_session" not in self.auth:
                 raise Exception("Auth info missing, please call login() first")
+            
             flag = self.auth["flag"]
             key = "Phone" if flag == FLAG_PHONE else "Email"
             r = await self.session.post(
@@ -165,11 +159,11 @@ class MiCloud:
             "hash": hashlib.md5(password.encode()).hexdigest().upper(),
         }
         if captcha_code:
-            # Fix: Get ick from self.auth, raise exception if missing
             if self.auth is None or "ick" not in self.auth:
                 raise Exception("Missing ick for captcha")
             cookies["ick"] = self.auth["ick"]
             data["captCode"] = captcha_code
+
         r = await self.session.post(
             "https://account.xiaomi.com/pass/serviceLoginAuth2",
             cookies=cookies,
@@ -185,47 +179,46 @@ class MiCloud:
     async def _get_credentials(self, data: dict) -> AuthResult:
         if not data.get("location"):
             raise Exception(f"Missing location in credentials: {data}")
-            
+
         r1 = await self.session.get(data["location"])
         if await r1.read() != b"ok":
             raise Exception("Location request did not return 'ok'")
-            
+
         self.cookies = {k: v.value for k, v in r1.cookies.items()}
         for r2 in r1.history:
             data.update({k: v.value for k, v in r2.cookies.items()})
             if ext := r2.headers.get("extension-pragma"):
                 data.update(json.loads(ext))
-                
+
         if "ssecurity" not in data:
             raise Exception(f"Missing ssecurity in credentials: {data}")
-            
         self.ssecurity = base64.b64decode(data["ssecurity"])
-        
-        # Safely get userId and passToken to avoid KeyError
-        user_id = data.get("userId") or data.get("cUserId")  # Sometimes the key name is cUserId
+
+        # 修复了原 PR 中 `or` 可能导致的逻辑漏洞（当 userId 为 0 或空字符串时）
+        user_id = data.get("userId", data.get("cUserId"))
         pass_token = data.get("passToken")
+        
         if not user_id or not pass_token:
             raise Exception(f"Missing userId or passToken in credentials: {data}")
-            
+
         return {"ok": True, "token": f"{user_id}:{pass_token}"}
 
     async def _get_notification_url(self, notification_url: str) -> AuthResult:
         if "/fe/service/identity/authStart" not in notification_url:
             raise Exception(f"Invalid notification URL: {notification_url}")
-            
+
         notification_url = notification_url.replace(
             "/fe/service/identity/authStart", "/identity/list"
         )
         r = await self.session.get(notification_url)
         res1 = parse_auth_response(await r.read())
-        
         if res1.get("code") != 2:
             raise Exception(f"Get notification failed: {res1}")
-            
+
         flag = res1["flag"]
         if flag not in (FLAG_EMAIL, FLAG_PHONE):
             raise Exception(f"Invalid flag: {res1}")
-            
+
         return await self._send_ticket(flag, r.cookies["identity_session"])
 
     async def _send_ticket(
@@ -241,9 +234,8 @@ class MiCloud:
             res1 = parse_auth_response(await r.read())
             if res1.get("code") != 0:
                 raise Exception(f"Verify ticket failed: {res1}")
-                
+
             if captcha_code:
-                # Fix: Get ick from self.auth, raise exception if missing
                 if self.auth is None or "ick" not in self.auth:
                     raise Exception("Missing ick for captcha")
                 cookies = {"identity_session": identity_session, "ick": self.auth["ick"]}
@@ -251,7 +243,7 @@ class MiCloud:
             else:
                 cookies = {"identity_session": identity_session}
                 data = {"retry": 0, "icode": "", "_json": "true"}
-                
+
             r = await self.session.post(
                 f"https://account.xiaomi.com/identity/auth/send{key}Ticket",
                 cookies=cookies,
@@ -259,48 +251,46 @@ class MiCloud:
             )
             res2 = parse_auth_response(await r.read())
             self.auth = {"flag": flag, "identity_session": identity_session}
-            
+
             if captcha_url := res2.get("captchaUrl"):
                 data = await self._get_captcha_url(captcha_url)
                 self.auth["ick"] = data["ick"]
                 return {"ok": False, "captcha": data["image"]}
-                
+
             if res2.get("code") != 0:
                 raise Exception(f"Send ticket failed: {res2}")
-                
+
             return {"ok": False, "verify": res1[f"masked{key}"]}
         except Exception as e:
             return {"ok": False, "exception": e}
 
     async def request(self, server: str, path: str, params: dict) -> dict:
-        # Defensive check: ensure logged in
         if not self.ok:
             raise RuntimeError("Cannot request: MiCloud is not logged in or ssecurity is missing.")
-            
+
         form: dict[str, str] = {"data": json.dumps(params, separators=(",", ":"))}
         nonce: bytes = gen_nonce()
         signed_nonce: bytes = gen_signed_nonce(self.ssecurity, nonce)
-        
         form["rc4_hash__"] = gen_signature_base64(path, form, signed_nonce)
+
         for k, v in form.items():
             ciphertext: bytes = crypt(signed_nonce, v.encode())
             form[k] = base64.b64encode(ciphertext).decode()
+
         form["signature"] = gen_signature_base64(path, form, signed_nonce)
         form["_nonce"] = base64.b64encode(nonce).decode()
-        
+
         url = BASE.get(server, server) + path
         r = await self.session.post(url, cookies=self.cookies, data=form)
-        
         if not r.ok:
             raise Exception(f"Request failed with status {r.status}")
-            
+
         ciphertext: bytes = base64.b64decode(await r.read())
         plaintext: bytes = crypt(signed_nonce, ciphertext)
         res = json.loads(plaintext)
-        
         if res.get("code") != 0:
             raise Exception(f"API error: {res}")
-            
+
         return res["result"]
 
     async def get_devices(self) -> list[dict] | None:
@@ -315,8 +305,7 @@ class MiCloud:
             try:
                 resp = await self.request(server, "/v2/home/device_list_page", payload)
                 if resp:
-                    # Safely get values to avoid KeyError
-                    total.extend(resp.get("list", []))
+                    total.extend(resp["list"])
             except Exception as e:
                 _LOGGER.warning("Failed to get devices from server %s: %s", server, e)
                 continue
@@ -343,11 +332,9 @@ class MiCloud:
                 resp = await self.request(server, "/v2/device/blt_get_beaconkey", payload)
                 if resp:
                     beaconkey = resp.get("beaconkey")
-                    # Return only when non-empty
                     if beaconkey:
                         return beaconkey
             except Exception as e:
-                # Log warning and continue trying the next server
                 _LOGGER.warning("Failed to get bindkey from server %s: %s", server, e)
                 continue
         return None
