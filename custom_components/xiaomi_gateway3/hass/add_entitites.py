@@ -2,7 +2,7 @@ import copy
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry, entity_registry
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .entity import XEntity
 from .. import MultiGateway, XDevice
@@ -117,8 +117,8 @@ def handle_lazy_entities(
 
     # 3. Restore previous lazy entities from Hass entity registry
     prefix = device.uid + "_"
-    reg = entity_registry.async_get(hass)
-    for entry in reg.entities.values():
+    entity_registry = er.async_get(hass)
+    for entry in entity_registry.entities.values():
         if entry.platform != DOMAIN or not entry.unique_id.startswith(prefix):
             continue
         _, attr = entry.unique_id.split("_", 1)
@@ -162,41 +162,46 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
     Fixing the consequences of the 2026.8 update.
     https://developers.home-assistant.io/blog/2026/07/21/device-registry-single-config-entry/
     """
-    dr = device_registry.async_get(hass)
     # check all device entries
-    entries = dr.devices.get_entries(identifiers={(DOMAIN, device_uid)})
+    device_registry = dr.async_get(hass)
+    device_entries = device_registry.async_get_devices(
+        identifiers={(DOMAIN, device_uid)}
+    )
 
     # first time start - just skip
-    if len(entries) == 0:
+    if len(device_entries) == 0:
+        return
+
+    # first time after migration - delete all duplicate devices
+    if len(device_entries) > 1:
+        for device_entry in device_entries:
+            if device_entry.config_entry_id != config_entry_id:
+                device_registry.async_update_device(
+                    device_entry.id,
+                    remove_config_entry_id=device_entry.config_entry_id,
+                )
         return
 
     # single device - check if it is from this config entry
-    if len(entries) == 1:
-        if entries[0].config_entry_id != config_entry_id:
-            dr.async_update_device(entries[0].id, new_config_entry_id=config_entry_id)
+    device_entry = device_entries[0]
+    if device_entry.config_entry_id == config_entry_id:
         return
 
-    # multiple devices - find the one with entities and remove all others
-    er = entity_registry.async_get(hass)
-    devices_ids = er.async_device_ids()
-    main_device = None
+    entity_registry = er.async_get(hass)
+    entity_entries = entity_registry.entities.get_entries_for_device_id(device_entry.id)
 
-    for entry in entries:
-        if entry.id in devices_ids:
-            # if device has entities
-            if main_device is None:
-                # set main device
-                main_device = entry
-                continue
+    # move device to this config entry
+    device_registry.async_update_device(
+        device_entry.id,
+        add_config_entry_id=config_entry_id,
+        remove_config_entry_id=device_entry.config_entry_id,
+    )
 
-            # if another device has entities (maybe old converter)
-            for entity in er.entities.get_entries_for_device_id(entry.id, True):
-                # move this entities to main device
-                er.async_update_entity(entity.entity_id, device_id=main_device.id)
-
-        # remove this device, because it without entities
-        dr.async_remove_device(entry.id)
-
-    if main_device and main_device.config_entry_id != config_entry_id:
-        # move main device to current config entry
-        dr.async_update_device(main_device.id, new_config_entry_id=config_entry_id)
+    # move entities from deleted to this device (and this config entry)
+    for entity_entry in entity_entries:
+        entity_registry.async_get_or_create(
+            entity_entry.domain,
+            entity_entry.platform,
+            entity_entry.unique_id,
+            device_id=device_entry.id,
+        )
