@@ -27,14 +27,13 @@ def handle_add_entities(
         # instant setup all entities, except lazy
         for entity in get_entities(device, gw.stats_domain):
             gw.debug("add_entity", device=device, entity=entity.entity_id)
-            
-            # Fix: Use .get() to prevent KeyError and gateway crash if domain is missing
+            # Fix: Use .get() to prevent KeyError, and warn if missing
             add_key = config_entry.entry_id + entity.domain
             async_add_entities = XEntity.ADD.get(add_key)
             if async_add_entities:
                 async_add_entities([entity], update_before_add=False)
             else:
-                gw.debug("add_entity_skipped", device=device, entity=entity.entity_id, key=add_key)
+                gw.warning("add_entity_skipped", device=device, entity=entity.entity_id, key=add_key)  # FIX: upgrade to warning
 
         # add listener for setup lazy entities (if device has them)
         if remove_listener := handle_lazy_entities(hass, config_entry, device):
@@ -95,23 +94,33 @@ def handle_lazy_entities(
     if not lazy_attrs:
         return None
 
-    def add_lazy_entity(attr: str) -> XEntity:
+    def add_lazy_entity(attr: str):
+        # FIX: Safely find converter, avoid StopIteration
+        conv = next((i for i in device.converters if i.attr == attr and i.domain), None)
+        if conv is None:
+            gw = CONFIG_ENTRIES.get(device.did)
+            if gw:
+                gw.warning("add_lazy_entity_failed", device=device, attr=attr, reason="No converter with domain")
+            # Remove attr to prevent repeated warnings, but entity cannot be created
+            lazy_attrs.discard(attr)
+            return None
+        
+        # Remove attr only after successful creation
         lazy_attrs.remove(attr)
-        # important to check non empty domain for some BLE devices
-        conv = next(i for i in device.converters if i.attr == attr and i.domain)
         entity = create_entity(device, conv)
         gw = CONFIG_ENTRIES.get(device.did)
         gw.debug("add_lazy_entity", device=device, entity=entity.entity_id)
         
-        # Fix: Replace undefined add_entity with actual async registration logic
-        # Optimization: Use .get() to prevent KeyError if domain is missing in registry
+        # Fix: Use .get() and warn if missing
         add_key = config_entry.entry_id + entity.domain
         async_add_entities = XEntity.ADD.get(add_key)
         if async_add_entities:
             async_add_entities([entity], update_before_add=False)
         else:
-            gw.debug("add_lazy_entity_skipped", device=device, entity=entity.entity_id, key=add_key)
-        
+            gw.warning("add_lazy_entity_skipped", device=device, entity=entity.entity_id, key=add_key)
+            # If the entity couldn't be added, we should not return it
+            return None
+            
         return entity
 
     # 3. Restore previous lazy entities from Hass entity registry
@@ -120,7 +129,8 @@ def handle_lazy_entities(
     for entry in reg.entities.values():
         if entry.platform != DOMAIN or not entry.unique_id.startswith(prefix):
             continue
-        _, attr = entry.unique_id.split("_", 1)
+        # FIX: Use rsplit to correctly handle underscores in device.uid
+        _, attr = entry.unique_id.rsplit("_", 1)
         if attr in lazy_attrs:
             add_lazy_entity(attr)
 
@@ -129,9 +139,13 @@ def handle_lazy_entities(
         return None
 
     def on_device_update(data: dict):
-        for attr in data.keys() & lazy_attrs:
+        for attr in data.keys() & lazy_attrs.copy():  # copy to avoid mutation during iteration
             entity = add_lazy_entity(attr)
-            entity.on_device_update(data)
+            if entity is not None:
+                # FIX: Defer update to avoid race condition with async_add_entities
+                # Use call_soon to ensure entity is fully registered before update
+                hass.loop.call_soon(lambda e=entity, d=data: e.on_device_update(d))
+                
         if not lazy_attrs:
             device.remove_listener(on_device_update)
 
