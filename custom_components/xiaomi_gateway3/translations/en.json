@@ -45,7 +45,8 @@
         "data": {
           "host": "Host",
           "token": "Token",
-          "key": "Key"
+          "key": "Key",
+          "custom_password": "Custom Telnet password"
         }
       }
     }
@@ -65,7 +66,7 @@
           "host": "Host",
           "token": "Token",
           "key": "Key",
-          "telnet_cmd": "Open Telnet command",
+          "custom_password": "Custom Telnet password",
           "ble": "Support Bluetooth devices",
           "stats": "Add statistic sensors",
           "debug": "Debug logs"

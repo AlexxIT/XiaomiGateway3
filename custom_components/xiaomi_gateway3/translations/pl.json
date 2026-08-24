@@ -62,7 +62,7 @@
         "data": {
           "host": "Host",
           "token": "Token",
-          "telnet_cmd": "Komenda do otwarcia protokołu telnet",
+          "custom_password": "Własne hasło do telnet",
           "ble": "Wsparcie dla urządzeń BLE (Bluetoth Low Energy)",
           "stats": "Dane dotyczące wydajności Zigbee i BLE",
           "debug": "Debugowanie"
