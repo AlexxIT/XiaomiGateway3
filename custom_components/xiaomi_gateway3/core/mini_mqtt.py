@@ -36,7 +36,7 @@ class MQTTMessage:
 
     @property
     def json(self) -> dict:
-        return json.loads(self.payload)
+        return json.loads(self.payload.rstrip(b"\x00"))
 
     def __str__(self):
         return f"{self.topic} {self.payload.decode()}"
