@@ -5769,6 +5769,115 @@ DEVICES += [{
         BaseConv("aux_disable", "switch", mi="7.p.2"), # Voice function toggle switch
     ],
 }, {
+    23533: ["KECHUANGZHE", "Curtain Mini4", "bjkcz.curtain.kczble"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={1: "open", 2: "close", 0: "stop"}),
+        BaseConv("target_position", mi="2.p.4"),
+        CurtainPosConv("position", mi="2.p.3"),
+        MathConv("speed", "number", mi="2.p.6", min=0, max=100),
+        MathConv("current_position", "sensor", mi="2.p.3", min=0, max=100),
+    ],
+}, {
+    27521: ["Maxi", "VRF Air-conditioner Controller", "maxi.airc.air08"],
+    "spec": [
+        BaseConv("ac_switch", "switch", mi="2.p.1"),
+        MapConv("ac_mode", "select", mi="2.p.2", map={0: "Auto", 1: "Heat", 2: "Cool", 4: "Fan", 8: "Dry"}),
+        MathConv("ac_target_temp", "number", mi="2.p.3", min=16, max=32),
+        MathConv("temperature", "sensor", mi="5.p.2", round=1),
+        MapConv("ac_fan_speed", "select", mi="8.p.2", map={0: "Auto", 1: "Low", 2: "Mid", 3: "High"}),
+    ],
+}, {
+    16794: [None, "Smart Curtain CT03", "bean.curtain.ct03"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={3: "stop", 1: "open", 2: "close"}),
+        BaseConv("target_position", mi="2.p.3"),
+        CurtainPosConv("position", mi="2.p.2"),
+        MathConv("current_position", "sensor", mi="2.p.2", min=0, max=100),
+        MapConv("status", "sensor", mi="2.p.4", map={1: "Opening", 2: "Closing", 6: "Stop"}),
+        MapConv("curtain_style", "select", mi="4.p.11", map={0: "Not Set", 1: "Open Both", 2: "Open Left", 3: "Open Right"}, entity=ENTITY_CONFIG),
+        MapConv("curtain_type", "select", mi="4.p.12", map={0: "Not Set", 1: "Curt", 2: "RomanPole", 3: "RollUp", 4: "Canopy", 5: "RomanCurt", 6: "Honeycomb", 7: "FoldCurt", 8: "DayNight", 9: "Blinds", 10: "SoftGauze", 11: "ShangriLa"}, entity=ENTITY_CONFIG),
+        MapConv("curtain_reverse", "select", mi="4.p.1", map={1: "Reverse"}, entity=ENTITY_CONFIG),
+        MathConv("relative_open", "number", mi="4.p.9", min=5, max=50, step=5, entity=ENTITY_CONFIG),
+        MathConv("relative_close", "number", mi="4.p.10", min=5, max=50, step=5, entity=ENTITY_CONFIG),
+        MapConv("inch_run", "select", mi="4.p.13", map={0: "InchUp", 1: "InchDown", 2: "QuickUp", 3: "QuickDown", 4: "InchUpLimit", 5: "InchDownLimit"}, entity=ENTITY_CONFIG),
+        MapConv("set_limit", "select", mi="4.p.14", map={1: "TripUp", 2: "TripDown", 3: "TripThird"}, entity=ENTITY_CONFIG),
+        MapConv("run_to_limit", "select", mi="4.p.15", map={1: "TripUpRun", 2: "TripDownRun", 3: "TripThirdRun"}, entity=ENTITY_CONFIG),
+        MapConv("delete_limit", "select", mi="4.p.16", map={1: "TripUpClear", 2: "TripDownClear", 3: "TripThirdClear"}, entity=ENTITY_CONFIG),
+        MathConv("curtain_runtime", "sensor", mi="4.p.7", entity=ENTITY_DIAGNOSTIC),
+        MathConv("work_status", "sensor", mi="4.p.6", entity=ENTITY_DIAGNOSTIC),
+    ],
+}, {
+    22171: [None, "Smart Door Lock S5 Pro", "line.lock.fms5s"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("lock_action", "sensor", mi="3.e.1020.p.1", map={1: "lock", 0: "unlock"}),
+        MapConv("method", "sensor", mi="3.e.1020.p.2", map={0: "ble", 1: "password", 2: "fingerprint", 3: "key", 4: "turntable", 5: "nfc", 6: "one_time_password", 7: "periodic_password", 8: "coerce"}),
+        BaseConv("operation_id", "sensor", mi="3.e.1020.p.3"),
+        BaseConv("lock_timestamp", "sensor", mi="3.e.1020.p.4"),
+        MapConv("abnormal_type", "sensor", mi="3.e.1007.p.5", map={0: "wrong_password", 1: "wrong_fingerprint", 2: "doorbell", 3: "door_opened_forcefully", 4: "system_lock", 6: "low_battery", 7: "door_open_mode", 21: "open_set_close", 22: "activate_backlock", 23: "eliminate_anti_lock"}),
+        BaseConv("battery", "sensor", mi="5.p.1003"),
+    ],
+}, {
+    15341: [None, "Day/Night Honeycomb Blind", "giot.curtain.v1icm"],
+    "spec": [
+        MapConv("motor", "cover", mi="2.p.1", map={2: "stop", 1: "open", 0: "close"}),
+        BaseConv("target_position", mi="2.p.4"),
+        CurtainPosConv("position", mi="2.p.3"),
+        MathConv("real_position", "sensor", mi="2.p.3", min=0, max=100),
+        BoolConv("motor_reverse", "switch", mi="2.p.5"),
+    ],
+}, {
+    27791: [None, "4-Key Screen Switch D1", "tofan.switch.pxln4"],
+    "spec": [
+        BaseConv("channel_1", "switch", mi="2.p.1"),
+        BaseConv("channel_2", "switch", mi="3.p.1"),
+        BaseConv("channel_3", "switch", mi="4.p.1"),
+        BaseConv("channel_4", "switch", mi="5.p.1"),
+        MapConv("action", "sensor", mi="6.e.1.p.1", map={1: "button_1", 2: "button_2", 3: "button_3", 4: "button_4"}),
+    ],
+}, {
+    17084: [None, "3-in-1 Thermostat", "bean.airrtc.nt01"],
+    "spec": [
+        MathConv("temperature", "sensor", mi="6.p.2", round=1),
+        MathConv("humidity", "sensor", mi="6.p.1", round=1),
+        BaseConv("ac_switch", "switch", mi="4.p.1"),
+        MapConv("ac_mode", "select", mi="2.p.2", map={0: "Auto", 1: "Cool", 2: "Heat", 3: "Fan", 4: "Dry"}),
+        MathConv("ac_target_temp", "number", mi="4.p.2", min=16, max=32),
+        MapConv("ac_fan_speed", "select", mi="5.p.1", map={0: "Auto", 2: "Low", 3: "Mid", 4: "High"}),
+        BaseConv("fresh_air_switch", "switch", mi="3.p.1"),
+        MapConv("fresh_air_mode", "select", mi="3.p.3", map={0: "Supply", 1: "Exhaust"}),
+        MapConv("fresh_air_speed", "select", mi="3.p.4", map={0: "Auto", 2: "Low", 3: "Mid", 4: "High"}),
+        BaseConv("floor_switch", "switch", mi="2.p.1"),
+        MathConv("floor_target_temp", "number", mi="2.p.4", min=16, max=35),
+        MathConv("temp_calibration", "number", mi="7.p.6", min=-10, max=10, entity=ENTITY_CONFIG),
+        MathConv("humi_calibration", "number", mi="7.p.7", min=-20, max=20, entity=ENTITY_CONFIG),
+        MathConv("ac_temp_max", "number", mi="7.p.2", min=28, max=32, entity=ENTITY_CONFIG),
+        MathConv("ac_temp_min", "number", mi="7.p.3", min=16, max=20, entity=ENTITY_CONFIG),
+        MathConv("floor_temp_max", "number", mi="7.p.4", min=28, max=35, entity=ENTITY_CONFIG),
+        MathConv("floor_temp_min", "number", mi="7.p.5", min=16, max=20, entity=ENTITY_CONFIG),
+        MathConv("three_one_mode", "number", mi="7.p.1", min=0, max=15, entity=ENTITY_CONFIG),
+        BaseConv("floor_fault", "sensor", mi="2.p.3", entity=ENTITY_DIAGNOSTIC),
+        BaseConv("fresh_air_fault", "sensor", mi="3.p.2", entity=ENTITY_DIAGNOSTIC),
+    ],
+}, {
+    19378: [None, "Dual-Key Switch", "lemesh.switch.sw2f12"],
+    "spec": [
+        BaseConv("call_elevator", "switch", mi="2.p.1"),
+        BaseConv("elevator_sensor", "switch", mi="3.p.1"),
+    ],
+}, {
+    23820: [None, "Smart Light Strip", "trzn.light.wy0a02"],
+    23815: [None, "Smart Downlight/Spotlight", "trzn.light.wy0a01"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6500),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "Scene 1", 17: "Scene 2", 18: "Scene 3", 19: "Scene 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}, entity=ENTITY_CONFIG),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}, entity=ENTITY_CONFIG),
+        BoolConv("flex_switch", "switch", mi="2.p.12", entity=ENTITY_CONFIG),
+        BoolConv("led", "switch", mi="2.p.13", entity=ENTITY_CONFIG),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
