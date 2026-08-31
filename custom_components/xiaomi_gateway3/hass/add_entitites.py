@@ -162,46 +162,51 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
     Fixing the consequences of the 2026.8 update.
     https://developers.home-assistant.io/blog/2026/07/21/device-registry-single-config-entry/
     """
-    # check all device entries
-    device_registry = dr.async_get(hass)
-    device_entries = device_registry.async_get_devices(
-        identifiers={(DOMAIN, device_uid)}
-    )
-
-    # first time start - just skip
-    if len(device_entries) == 0:
-        return
-
-    # first time after migration - delete all duplicate devices
-    if len(device_entries) > 1:
-        for device_entry in device_entries:
-            if device_entry.config_entry_id != config_entry_id:
-                device_registry.async_update_device(
-                    device_entry.id,
-                    remove_config_entry_id=device_entry.config_entry_id,
-                )
-        return
-
-    # single device - check if it is from this config entry
-    device_entry = device_entries[0]
-    if device_entry.config_entry_id == config_entry_id:
-        return
-
-    entity_registry = er.async_get(hass)
-    entity_entries = entity_registry.entities.get_entries_for_device_id(device_entry.id)
-
-    # move device to this config entry
-    device_registry.async_update_device(
-        device_entry.id,
-        add_config_entry_id=config_entry_id,
-        remove_config_entry_id=device_entry.config_entry_id,
-    )
-
-    # move entities from deleted to this device (and this config entry)
-    for entity_entry in entity_entries:
-        entity_registry.async_get_or_create(
-            entity_entry.domain,
-            entity_entry.platform,
-            entity_entry.unique_id,
-            device_id=device_entry.id,
+    try:
+        # check all device entries
+        device_registry = dr.async_get(hass)
+        device_entries = device_registry.async_get_devices(
+            identifiers={(DOMAIN, device_uid)}
         )
+
+        # first time start - just skip
+        if len(device_entries) == 0:
+            return
+
+        # first time after migration - delete all duplicate devices
+        if len(device_entries) > 1:
+            for device_entry in device_entries:
+                if device_entry.config_entry_id != config_entry_id:
+                    device_registry.async_update_device(
+                        device_entry.id,
+                        remove_config_entry_id=device_entry.config_entry_id,
+                    )
+            return
+
+        # single device - check if it is from this config entry
+        device_entry = device_entries[0]
+        if device_entry.config_entry_id == config_entry_id:
+            return
+
+        entity_registry = er.async_get(hass)
+        entity_entries = entity_registry.entities.get_entries_for_device_id(
+            device_entry.id
+        )
+
+        # move device to this config entry
+        device_registry.async_update_device(
+            device_entry.id,
+            add_config_entry_id=config_entry_id,
+            remove_config_entry_id=device_entry.config_entry_id,
+        )
+
+        # move entities from deleted to this device (and this config entry)
+        for entity_entry in entity_entries:
+            entity_registry.async_get_or_create(
+                entity_entry.domain,
+                entity_entry.platform,
+                entity_entry.unique_id,
+                device_id=device_entry.id,
+            )
+    except AttributeError:
+        pass  # skip support for old HA versions
