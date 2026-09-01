@@ -1744,9 +1744,9 @@ DEVICES += [{
     23530: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.minigl"],
     "spec": [
         # MiBeacon2 spec 
-        BLEFloatConv("temperature", mi=19457, round=1),
-        BLEByteConv("humidity", mi=19458),
-        BLEByteConv("battery", mi=18435, entity=ENTITY_LAZY),
+        BLEFloatConv("temperature", mi=18433, round=1),
+        BLEByteConv("humidity", mi=18434),
+        BLEByteConv("battery", mi=19459),
         # MIoT spec
         BaseConv("temperature", "sensor", mi="2.p.1001"),
         BaseConv("humidity", "sensor", mi="2.p.1002"),
