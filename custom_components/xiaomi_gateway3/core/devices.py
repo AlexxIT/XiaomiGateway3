@@ -5885,6 +5885,16 @@ DEVICES += [{
         BoolConv("led", "switch", mi="2.p.13", entity=ENTITY_CONFIG),
     ],
 }, {
+    26276: ["Legrand", "Scene Switch 4 Gang", "lhz.remote.4gang"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        MapConv("action", mi="2.e.1012.p.2", map={1: BUTTON_1_SINGLE, 2: BUTTON_2_SINGLE, 3: BUTTON_3_SINGLE, 4: BUTTON_4_SINGLE}),
+        MapConv("action", mi="2.e.1013.p.2", map={1: BUTTON_1_DOUBLE, 2: BUTTON_2_DOUBLE, 3: BUTTON_3_DOUBLE, 4: BUTTON_4_DOUBLE}),
+        MapConv("action", mi="2.e.1014.p.2", map={1: BUTTON_1_HOLD, 2: BUTTON_2_HOLD, 3: BUTTON_3_HOLD, 4: BUTTON_4_HOLD}),
+        ConstConv("action", mi="2.e.1028", value="reset"),  # device-be-reset
+        BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY)
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
