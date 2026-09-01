@@ -5739,6 +5739,12 @@ DEVICES += [{
         BaseConv("channel_2", "switch", mi="3.p.1"),
         BaseConv("channel_3", "switch", mi="4.p.1"),
         BaseConv("channel_4", "switch", mi="5.p.1"),
+        MapConv("action", "sensor", mi="6.e.1.p.1", map={1: "button_1", 2: "button_2", 3: "button_3", 4: "button_4"}),
+        BoolConv("radar_status", "binary_sensor", mi="13.p.16"),
+        BoolConv("radar_enabled", "switch", mi="13.p.12"),
+        MathConv("radar_sensitivity", "number", mi="13.p.14", min=1, max=16, entity=ENTITY_CONFIG),
+        MathConv("radar_delay", "number", mi="13.p.13", min=2, max=240, step=1, entity=ENTITY_CONFIG),
+        BaseConv("all_relay_status", "sensor", mi="13.p.15", entity=ENTITY_DIAGNOSTIC),
     ],
 }, {
     28968: ["Linptech", "Mini Curtain Motor", "linp.curtain.ec1db"],
