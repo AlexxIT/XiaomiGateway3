@@ -1741,6 +1741,7 @@ DEVICES += [{
 }, {
     # https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:temperature-humidity-sensor:0000A00A:xiaomi-mini:1:0000D063
     21941: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.mini"],
+    23530: ["Xiaomi", "TH Sensor 3 Mini", "MJWSD06MMC", "xiaomi.sensor_ht.minigl"],
     "spec": [
         # MiBeacon2 spec 
         BLEFloatConv("temperature", mi=19457, round=1),
