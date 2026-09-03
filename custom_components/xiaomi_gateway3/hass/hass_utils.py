@@ -1,4 +1,5 @@
 import logging
+import sys
 from urllib.parse import urlencode
 
 import yaml
@@ -319,3 +320,16 @@ def remove_device(hass: HomeAssistant, device: XDevice):
 
     for gw in device.gateways:
         gw.remove_device(device)
+
+
+def import_custom_converters(hass: HomeAssistant):
+    # Fix HA 2026.9.0 https://github.com/home-assistant/core/pull/180967
+    # Idea from homeassistant.loader._async_mount_config_dir
+    sys.path.insert(0, hass.config.config_dir)
+    try:
+        import xiaomi_gateway3  # noqa: F401, PLC0415
+    except ModuleNotFoundError:
+        pass
+    except Exception as e:
+        _LOGGER.error("Can't load external converters", exc_info=e)
+    sys.path.remove(hass.config.config_dir)

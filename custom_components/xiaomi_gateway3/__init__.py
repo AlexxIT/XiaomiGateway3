@@ -68,6 +68,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     hass.data[DOMAIN] = {}
 
+    hass_utils.import_custom_converters(hass)
+
     await hass_utils.store_devices(hass)
 
     return True

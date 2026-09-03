@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import re
 import time
 from functools import cached_property
@@ -18,11 +17,8 @@ if TYPE_CHECKING:
 try:
     # noinspection PyUnresolvedReferences
     from xiaomi_gateway3 import DEVICES  # loading external converters
-except ModuleNotFoundError:
+except:
     pass
-except Exception as e:
-    logger = logging.getLogger(__package__)
-    logger.error("Can't load external converters", exc_info=e)
 
 
 RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
