@@ -15,7 +15,6 @@ from homeassistant.helpers.template import Template
 
 from .entity_description import setup_entity_description
 from ..core.const import BLE, DOMAIN, GATEWAY, MESH, ZIGBEE
-from ..core.converters.base import BaseConv
 
 if TYPE_CHECKING:
     from ..core.converters.base import BaseConv
@@ -34,6 +33,7 @@ def attr_human_name(attr: str):
 class XEntity(Entity):
     ADD: dict[str, AddEntitiesCallback] = {}  # key: "config_entry_id+domain"
     NEW: dict[str, Callable] = {}  # key: "domain.attr" or "domain"
+    VIA: dict[str, str] = {}  # key: uid
 
     def __init__(self, device: "XDevice", conv: "BaseConv"):
         self.device = device
@@ -41,40 +41,37 @@ class XEntity(Entity):
 
         self.listen_attrs: set = {conv.attr}
 
+        info: dict[str, str | set | tuple] = {
+            "identifiers": {(DOMAIN, device.uid)},
+            "name": device.human_name,
+            "model": device.human_model,
+        }
+
         if device.type == GATEWAY:
-            connections = {(CONNECTION_NETWORK_MAC, device.extra["mac"])}
+            info["connections"] = {(CONNECTION_NETWORK_MAC, device.extra["mac"])}
             if mac2 := device.extra.get("mac2"):
-                connections.add((CONNECTION_NETWORK_MAC, mac2))
+                info["connections"].add((CONNECTION_NETWORK_MAC, mac2))
         elif device.type == ZIGBEE:
-            connections = {(CONNECTION_ZIGBEE, device.extra["ieee"])}
+            info["connections"] = {(CONNECTION_ZIGBEE, device.extra["ieee"])}
         elif device.type in (BLE, MESH):
-            connections = {(CONNECTION_BLUETOOTH, device.extra["mac"])}
-        else:
-            connections = None
+            info["connections"] = {(CONNECTION_BLUETOOTH, device.extra["mac"])}
+
+        if manufacturer := device.extra.get("market_brand"):
+            info["manufacturer"] = manufacturer
+        if sw_version := device.firmware:
+            info["sw_version"] = str(sw_version)
+        if hw_version := device.extra.get("hw_ver"):
+            info["hw_version"] = str(hw_version)
 
         if device.type != GATEWAY:
-            via_device = (DOMAIN, device.gateways[0].device.uid)
-        else:
-            via_device = None
-
-        sw_version = device.firmware
-        if sw_version is not None:
-            sw_version = str(sw_version)
-        hw_version = device.extra.get("hw_ver")
-        if hw_version is not None:
-            hw_version = str(hw_version)
+            gateway_uid = device.gateways[0].device.uid
+            if "via_device" in DeviceInfo.__annotations__:
+                info["via_device"] = (DOMAIN, gateway_uid)
+            elif via_device_id := XEntity.VIA.get(gateway_uid):
+                info["via_device_id"] = via_device_id
 
         self._attr_available = device.available
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, device.uid)},
-            connections=connections,
-            manufacturer=device.extra.get("market_brand"),
-            name=device.human_name,
-            model=device.human_model,
-            sw_version=sw_version,
-            hw_version=hw_version,
-            via_device=via_device,
-        )
+        self._attr_device_info = DeviceInfo(**info)
         self._attr_has_entity_name = True
         self._attr_name = attr_human_name(conv.attr)
         self._attr_should_poll = False

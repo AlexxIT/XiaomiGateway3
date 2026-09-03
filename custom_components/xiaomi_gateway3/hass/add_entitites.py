@@ -27,7 +27,7 @@ def handle_add_entities(
             # connect all device entities to this gateway
             CONFIG_ENTRIES[device.did] = gw
 
-            fix_device_registry(hass, config_entry.entry_id, device.uid)
+            fix_device_registry(hass, config_entry.entry_id, device)
 
             # instant setup all entities, except lazy
             for entity in get_entities(device, gw.stats_domain):
@@ -157,7 +157,7 @@ def get_extra_entities(converters: list[BaseConv], entities: dict[str, str]):
             converters.append(BaseConv(attr, new_domain))
 
 
-def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: str):
+def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device: XDevice):
     """
     Fixing the consequences of the 2026.8 update.
     https://developers.home-assistant.io/blog/2026/07/21/device-registry-single-config-entry/
@@ -166,7 +166,7 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
         # check all device entries
         device_registry = dr.async_get(hass)
         device_entries = device_registry.async_get_devices(
-            identifiers={(DOMAIN, device_uid)}
+            identifiers={(DOMAIN, device.uid)}
         )
 
         # first time start - just skip
@@ -177,15 +177,16 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
         if len(device_entries) > 1:
             for device_entry in device_entries:
                 if device_entry.config_entry_id != config_entry_id:
-                    device_registry.async_update_device(
-                        device_entry.id,
-                        remove_config_entry_id=device_entry.config_entry_id,
-                    )
+                    device_registry.async_remove_device(device_entry.id)
+                elif device.type == GATEWAY:
+                    XEntity.VIA[device.uid] = device_entry.id
             return
 
         # single device - check if it is from this config entry
         device_entry = device_entries[0]
         if device_entry.config_entry_id == config_entry_id:
+            if device.type == GATEWAY:
+                XEntity.VIA[device.uid] = device_entry.id
             return
 
         entity_registry = er.async_get(hass)
@@ -195,9 +196,7 @@ def fix_device_registry(hass: HomeAssistant, config_entry_id: str, device_uid: s
 
         # move device to this config entry
         device_registry.async_update_device(
-            device_entry.id,
-            add_config_entry_id=config_entry_id,
-            remove_config_entry_id=device_entry.config_entry_id,
+            device_entry.id, new_config_entry_id=config_entry_id
         )
 
         # move entities from deleted to this device (and this config entry)
