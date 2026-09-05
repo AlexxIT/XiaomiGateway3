@@ -1,5 +1,4 @@
 import asyncio
-
 from . import core_utils
 from .const import GATEWAY, GROUP, MATTER, MESH, ZIGBEE
 from .device import XDevice
@@ -13,7 +12,6 @@ from .gate.openmiio import OpenMiioGateway
 from .gate.silabs import SilabsGateway
 from .shell.session import Session
 
-
 class MultiGateway(
     BLEGateway,
     LumiGateway,
@@ -25,6 +23,10 @@ class MultiGateway(
 ):
     main_task: asyncio.Task | None = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._listeners_added = False
+
     def start(self):
         if self.main_task:
             return
@@ -34,37 +36,60 @@ class MultiGateway(
     async def stop(self):
         if not self.main_task:
             return
-
         self.debug("stop")
-        # wait main task for finished: mqtt disconnect and gateway available false
-        # updated for all devices
-        while not self.main_task.cancelled():
-            self.main_task.cancel()
-            await asyncio.sleep(0.1)
+        task = self.main_task
         self.main_task = None
+        task.cancel()
+        try:
+            await asyncio.wait_for(task, timeout=5.0)
+        except asyncio.CancelledError:
+            pass
+        except asyncio.TimeoutError:
+            self.warning("Main task did not stop within 5 seconds, forcing cancellation.")
+            task.cancel()
+            try:
+                await asyncio.wait_for(task, timeout=1.0)
+            except asyncio.CancelledError:
+                pass
+            except Exception as e:
+                self.debug("Exception during force cancellation", exc_info=e)
+        except Exception as e:
+            self.debug("Exception during main task shutdown", exc_info=e)
 
     async def run_forever(self):
         while True:
-            # check if telnet port OK
-            if not await core_utils.check_port(self.host, 23):
-                if not await self.enable_telnet():
-                    await asyncio.sleep(30)
+            try:
+                if not await core_utils.check_port(self.host, 23):
+                    if not await self.enable_telnet():
+                        await asyncio.sleep(30)
+                        continue
+                if not await self.prepare_gateway():
+                    await asyncio.sleep(60)
                     continue
-
-            if not await self.prepare_gateway():
-                await asyncio.sleep(60)
-                continue
-
-            await self.handle_mqtt_messages()
+                
+                try:
+                    await self.handle_mqtt_messages()
+                except asyncio.CancelledError:
+                    raise
+                except Exception as e:
+                    self.warning(f"MQTT handler crashed, reconnecting in 10s: {e}", exc_info=e)
+                    await asyncio.sleep(10)
+            except asyncio.CancelledError:
+                self.debug("run_forever cancelled, exiting")
+                raise
+            except Exception as e:
+                self.error(f"Unexpected error in run_forever loop: {e}", exc_info=True)
+                await asyncio.sleep(10)
 
     async def enable_telnet(self) -> bool:
         """Enable telnet with miio protocol."""
         if not (token := self.options.get("token")):
             return False
+        key = self.options.get("key")
+        if key is None:
+            self.debug("No key provided, assuming it's not required for telnet enable")
         try:
-            resp = await core_utils.enable_telnet(
-                self.host, token, self.options.get("key")
-            )
+            resp = await core_utils.enable_telnet(self.host, token, key)
             self.debug("enable_telnet", data=resp)
             return resp == "ok"
         except Exception as e:
@@ -77,13 +102,13 @@ class MultiGateway(
                 if not await sh.only_one():
                     self.debug("Connection from a second Hass detected")
                     return False
-
+                
                 info = await sh.get_miio_info()
                 model, fw = info["model"], info["version"]
-
+                
                 if model == "lumi.gateway.mgl03" and fw < "1.4.7_0160":
                     self.warning(f"Unsupported firmware: {info}")
-
+                
                 support_ble_mesh = model in (
                     "lumi.gateway.mgl03",
                     "lumi.gateway.mcn001",
@@ -97,35 +122,51 @@ class MultiGateway(
                 await self.openmiio_prepare_gateway(sh)
 
                 if support_ble_mesh:
-                    await self.ble_read_devices(sh)
-                    await self.mesh_read_devices(sh)
-
+                    try:
+                        await self.ble_read_devices(sh)
+                    except Exception as e:
+                        self.warning(f"Failed to read BLE devices: {e}", exc_info=True)
+                    try:
+                        await self.mesh_read_devices(sh)
+                    except Exception as e:
+                        self.warning(f"Failed to read Mesh devices: {e}", exc_info=True)
+                
                 if support_matter:
-                    await self.matter_read_devices(sh)
+                    try:
+                        await self.matter_read_devices(sh)
+                    except Exception as e:
+                        self.warning(f"Failed to read Matter devices: {e}", exc_info=True)
 
-            self.add_event_listener(EVENT_MQTT_PUBLISH, self.lumi_on_mqtt_publish)
-            self.add_event_listener(EVENT_MQTT_PUBLISH, self.miot_on_mqtt_publish)
-            self.add_event_listener(EVENT_MQTT_PUBLISH, self.openmiio_on_mqtt_publish)
-            self.add_event_listener(EVENT_MQTT_PUBLISH, self.silabs_on_mqtt_publish)
-
-            if support_ble_mesh:
-                self.add_event_listener(EVENT_MQTT_PUBLISH, self.ble_on_mqtt_publish)
-                self.add_event_listener(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
-
-            if support_matter:
-                self.add_event_listener(EVENT_MQTT_PUBLISH, self.matter_on_mqtt_publish)
-
-            self.add_event_listener(EVENT_TIMER, self.openmiio_on_timer)
-            self.add_event_listener(EVENT_TIMER, self.silabs_on_timer)
-
-            return True
+                if not self._listeners_added:
+                    self.add_event_listener(EVENT_MQTT_PUBLISH, self.lumi_on_mqtt_publish)
+                    self.add_event_listener(EVENT_MQTT_PUBLISH, self.miot_on_mqtt_publish)
+                    self.add_event_listener(EVENT_MQTT_PUBLISH, self.openmiio_on_mqtt_publish)
+                    self.add_event_listener(EVENT_MQTT_PUBLISH, self.silabs_on_mqtt_publish)
+                    
+                    if support_ble_mesh:
+                        self.add_event_listener(EVENT_MQTT_PUBLISH, self.ble_on_mqtt_publish)
+                        self.add_event_listener(EVENT_MQTT_PUBLISH, self.mesh_on_mqtt_publish)
+                    if support_matter:
+                        self.add_event_listener(EVENT_MQTT_PUBLISH, self.matter_on_mqtt_publish)
+                    
+                    self.add_event_listener(EVENT_TIMER, self.openmiio_on_timer)
+                    self.add_event_listener(EVENT_TIMER, self.silabs_on_timer)
+                    
+                    self._listeners_added = True
+                    self.debug("Event listeners registered")
+                
+                return True
         except Exception as e:
             self.debug("Can't prepare gateway", exc_info=e)
+            self._listeners_added = False
             return False
 
     async def send(self, device: XDevice, data: dict):
+        if device is None:
+            self.debug("Send called with None device, ignoring")
+            return
+            
         if device.type == GATEWAY:
-            # support multispec in lumi and miot formats
             if "cmd" in data and "method" in data:
                 lumi_data = {
                     "cmd": data["cmd"],
@@ -142,9 +183,7 @@ class MultiGateway(
                 await self.lumi_send(device, data)
             elif "method" in data:
                 await self.miot_send(device, data)
-
         elif device.type == ZIGBEE:
-            # support multispec in lumi and silabs format
             if "cmd" in data and "commands" in data:
                 lumi_data = {"cmd": data["cmd"], "did": data["did"]}
                 if "params" in data:
@@ -158,11 +197,12 @@ class MultiGateway(
                 await self.lumi_send(device, data)
             elif "commands" in data:
                 await self.silabs_send(device, data)
-
         elif device.type in (MESH, GROUP):
             await self.miot_send(device, data)
         elif device.type == MATTER:
             await self.matter_send(device, data)
+        else:
+            self.debug(f"Send command not supported for device type: {device.type}", device=device)
 
     async def telnet_command(self, cmd: str) -> bool | None:
         self.debug("telnet_command", data=cmd)
@@ -187,6 +227,9 @@ class MultiGateway(
                 elif cmd == "unlock_firmware":
                     await sh.lock_firmware(False)
                     return await sh.check_firmware_lock() is False
-
+                else:
+                    self.debug(f"Unknown telnet command: {cmd}")
+                    return False
         except Exception as e:
             self.error(f"Can't run telnet command: {cmd}", exc_info=e)
+            return False
