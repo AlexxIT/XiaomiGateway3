@@ -11,7 +11,6 @@ from homeassistant.helpers.typing import ConfigType
 from .core import logger
 from .core.const import DOMAIN
 from .core.device import XDevice
-from .core.gate.base import EVENT_MQTT_CONNECT
 from .core.gateway import MultiGateway
 from .hass import hass_utils
 from .hass.add_entitites import handle_add_entities
@@ -67,8 +66,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             XEntity.attributes_template = template
 
     hass.data[DOMAIN] = {}
-
-    hass_utils.import_custom_converters(hass)
 
     await hass_utils.store_devices(hass)
 

@@ -1,5 +1,7 @@
 import asyncio
+import logging
 import re
+import sys
 import time
 from functools import cached_property
 from typing import Callable, Optional, TYPE_CHECKING, TypedDict
@@ -14,11 +16,21 @@ from .devices import DEVICES
 if TYPE_CHECKING:
     from .gate.base import XGateway
 
+_LOGGER = logging.getLogger(__package__)
+
 try:
+    # Fix HA 2026.9.0 https://github.com/home-assistant/core/pull/180967
+    # Idea from homeassistant.loader._async_mount_config_dir
+    sys.path.insert(0, __file__.split("custom_components")[0])
+
     # noinspection PyUnresolvedReferences
     from xiaomi_gateway3 import DEVICES  # loading external converters
-except:
+except ModuleNotFoundError:
     pass
+except Exception as e:
+    _LOGGER.error("Can't load external converters", exc_info=e)
+finally:
+    sys.path.pop(0)
 
 
 RE_NETWORK_MAC = re.compile(r"^[0-9a-f:]{17}$")  # lowercase hex with colons
