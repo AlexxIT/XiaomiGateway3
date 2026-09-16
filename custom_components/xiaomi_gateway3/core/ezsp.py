@@ -21,12 +21,14 @@ FIRMWARES = {
 }
 
 
-async def update_zigbee_firmware(hass: HomeAssistant, host: str, custom: bool):
+async def update_zigbee_firmware(
+    hass: HomeAssistant, host: str, custom: bool, custom_password: str | None
+):
     tar_fw = "7.5.0.0" if custom else "6.6.2.0"
 
     _LOGGER.info(f"{host} [FWUP] Target zigbee firmware v{tar_fw}")
 
-    session = Session(host)
+    session = Session(host, custom_password)
 
     try:
         await session.connect()
@@ -125,7 +127,7 @@ def flash_firmware(host: str, content: bytes) -> bool:
         sock.settimeout(3)
         sock.connect((host, 8889))
 
-        sock.send(b"\x0A")
+        sock.send(b"\x0a")
 
         if b"Gecko Bootloader v1.8.0" not in read(sock):
             _LOGGER.warning(f"{host} [FWUP] Not in boot before flash")

@@ -44,7 +44,8 @@
         "data": {
           "host": "网关IP",
           "token": "Token",
-          "key": "Key"
+          "key": "Key",
+          "custom_password": "自定义Telnet密码"
         }
       }
     }
@@ -63,6 +64,7 @@
         "data": {
           "host": "主机",
           "token": "Token",
+          "custom_password": "自定义Telnet密码",
           "ble": "支持 BLE 设备",
           "stats": "Zigbee 和 BLE 效能数据",
           "debug": "调试信息"
