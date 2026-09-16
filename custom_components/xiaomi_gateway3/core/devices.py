@@ -5926,6 +5926,16 @@ DEVICES += [{
         ConstConv("action", mi="6.e.3", value=BUTTON_2_HOLD),
     ],
 }, {
+    21641: ["Xiaomi", "Mesh Downlight 2", "xiaomi.light.btlm2"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=5700),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 1: "Lighting", 2: "TV", 3: "Warmth", 4: "Night Light"}),
+        BoolConv("flex_switch", "switch", mi="2.p.12"),
+        MapConv("power_on_state", "select", mi="2.p.17", map={0: "On", 1: "Default", 2: "Off"}),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
