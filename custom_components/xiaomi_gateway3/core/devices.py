@@ -1488,7 +1488,16 @@ DEVICES += [{
         BLEByteConv("supply", "sensor", mi=4115),  # uint8, Remaining percentage, range 0~100
         BLEToothbrush("toothbrush", mi=16),
     ],
-}, { 
+}, {
+    2054: ["Xiaomi", "Toothbrush T700", "MES604", "k0918.toothbrush.t700"],
+    6032: ["Xiaomi", "Toothbrush T700i", "MES604", "k0918.toothbrush.t700i"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        BLEByteConv("battery", "sensor", mi=4106),
+        BLEByteConv("supply", "sensor", mi=4115),
+        BLEToothbrush("toothbrush", mi=12291),
+    ],
+}, {
    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:printer:0000A060:xiaomi-label:1
    13566: ["Xiaomi", "Label printer", "MJBQDYJ1-WC", "xiaomi.printer.label"], 
    "spec": [
@@ -2548,7 +2557,6 @@ DEVICES += [{
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1001
     1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM", "lumi.lock.bzacn2"],
-    2054: ["Xiaomi", "Toothbrush T700", "MES604", "k0918.toothbrush.t700"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/657
     2444: ["Lockin", "Door Lock", "XMZNMST02YD", "loock.lock.t1"],
     2480: ["Lockin", "Safe Box", "BGX-5/X1-3001", "loock.safe.v1"],
@@ -2559,7 +2567,6 @@ DEVICES += [{
     3685: ["Xiaomi", "Face Recognition Smart Door Lock X", "XMZNMS06LM", "lumi.lock.bmcn05"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1156
     3899: ["Lockin", "Door Lock", "XMZNMSTO3YD", "loock.lock.t1pro"],
-    6032: ["Xiaomi", "Toothbrush T700i", "MES604", "k0918.toothbrush.t700i"],
     "spec": [
         # https://iot.mi.com/new/doc/accesses/direct-access/embedded-development/ble/object-definition
         # old link: https://iot.mi.com/new/doc/embedded-development/ble/object-definition
