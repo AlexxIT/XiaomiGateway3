@@ -1572,6 +1572,33 @@ DEVICES += [{
     ],
     # "ttl": "60m",  # battery every 4:30 min
 }, {
+    31418: ["Xiaomi", "Smoke Alarm 2", "xiaomi.sensor_smoke.yg2"],
+    # https://home.miot-spec.com/spec/xiaomi.sensor_smoke.yg2
+    "spec": [
+        # miot spec
+        MapConv("smoke", "binary_sensor", mi="2.p.1004", map={1: False, 2: True}),
+        MapConv("status", "sensor", mi="2.p.1004", map={1: "normal", 2: "smoke_alarm", 4: "fault", 5: "dust", 6: "high_temp"}, entity={"category": "diagnostic"}),  # diagnostic, enabled
+        MapConv("battery_low", "binary_sensor", mi="6.p.1132", map={0: False, 1: True}, entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        MapConv("battery_state", "sensor", mi="6.p.1132", map={0: "full", 1: "low"}, entity={"category": "diagnostic"}),  # diagnostic, enabled
+        BoolConv("mute", "binary_sensor", mi="2.p.1059"),
+        MapConv("sensitivity", "sensor", mi="2.p.1054", map={0: "high", 1: "standard", 2: "low"}, entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        BaseConv("heartbeat_led", "sensor", mi="4.p.1", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        BaseConv("temperature", "sensor", mi="2.e.1017.p.1001"),
+        BaseConv("temperature", mi="2.p.1001"),  # update param without entity
+        BaseConv("smoke_duration", "sensor", mi="2.e.1017.p.1130", entity={"icon": "mdi:timer", "units": "s"}),
+        BaseConv("smoke_duration", mi="2.p.1130"),  # update param without entity
+        MapConv("action", "sensor", mi="2.e.1017.p.8", map={
+            0: "smoke_alarm", 1: "smoke_high_temp_alarm", 2: "smoke_diff_temp_alarm",
+            3: "smoke_alarm_cleared", 4: "high_temp_alarm", 5: "fault",
+            6: "fault_cleared", 7: "dust_accumulation", 8: "dust_cleared",
+            9: "temp_refresh", 10: "normal_heartbeat", 11: "temp_normal", 12: "paired_normal",
+        }),
+        BaseConv("custom_property_3", "sensor", mi="8.p.1077", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        BaseConv("custom_property_5", "sensor", mi="8.p.1094", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        ConstConv("action", mi="2.e.1028", value="reset"),  # device-be-reset
+        ConstConv("action", mi="6.e.1001", value="low_battery"),  # low-battery event
+    ],
+}, {
     # https://github.com/AlexxIT/XiaomiGateway3/issues/180
     2701: ["Xiaomi", "Motion Sensor 2", "RTCGQ02LM", "lumi.motion.bmgl01"],  # 15,4119,4120,4123
     "spec": [
