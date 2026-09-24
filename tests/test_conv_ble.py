@@ -466,3 +466,50 @@ def test_20962():
                 {"piid": 3, "value": 0},
             ],
         }
+
+
+def test_18628():
+    # gateway mgl03 fw 1.5.0 reports this lock as raw mibeacon, not as spec
+    device = XDevice(18628)
+
+    p = device.decode({"eid": 19477, "edata": "10"})
+    assert p == {"door": "locked"}
+    p = device.decode({"eid": 19477, "edata": "20"})
+    assert p == {"door": "unlocked"}
+    p = device.decode({"eid": 19477, "edata": "40"})
+    assert p == {"door": "ajar"}
+
+    p = device.decode({"eid": 20483, "edata": "64"})
+    assert p == {"battery": 100}
+
+    # unlocked from outside with the duress fingerprint
+    p = device.decode({"eid": 18964, "edata": "020c02971197ffb46a"})
+    assert p.pop("timestamp")
+    assert p == {
+        "action": "unlock",
+        "action_id": 2,
+        "position": "outdoor",
+        "method": "coerce",
+        "method_id": 12,
+        "key_id": 4503,
+    }
+
+    # unlocked from outside with a periodic password
+    p = device.decode({"eid": 18964, "edata": "020a02a60f29fbb46a"})
+    assert p.pop("timestamp")
+    assert p == {
+        "action": "unlock",
+        "action_id": 2,
+        "position": "outdoor",
+        "method": "periodic_password",
+        "method_id": 10,
+        "key_id": 4006,
+    }
+
+    p = device.decode({"eid": 18951, "edata": "10fbb46a18"})
+    assert p.pop("timestamp")
+    assert p == {"action": "error", "error": "Door Was Ajar", "error_id": 24}
+
+    p = device.decode({"eid": 22022, "edata": "29fbb46a"})
+    assert p.pop("timestamp")
+    assert p == {"action": "doorbell"}
