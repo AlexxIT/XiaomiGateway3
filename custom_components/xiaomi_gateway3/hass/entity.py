@@ -51,6 +51,7 @@ class XEntity(Entity):
             info["connections"] = {(CONNECTION_NETWORK_MAC, device.extra["mac"])}
             if mac2 := device.extra.get("mac2"):
                 info["connections"].add((CONNECTION_NETWORK_MAC, mac2))
+            info["serial_number"] = device.extra.get("sn")
         elif device.type == ZIGBEE:
             info["connections"] = {(CONNECTION_ZIGBEE, device.extra["ieee"])}
         elif device.type in (BLE, MESH):

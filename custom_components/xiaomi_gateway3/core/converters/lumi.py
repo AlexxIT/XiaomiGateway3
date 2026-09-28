@@ -115,6 +115,9 @@ class LockActionConv(BaseConv):
         elif self.attr == "key_id":
             payload["action"] = "lock"
             payload[self.attr] = value
+        elif self.attr == "event":
+            payload["action"] = "lock"
+            payload["lock_event"] = self.map.get(value)
         elif self.attr == "alarm":
             v = self.map.get(value)
             if v != "doorbell":

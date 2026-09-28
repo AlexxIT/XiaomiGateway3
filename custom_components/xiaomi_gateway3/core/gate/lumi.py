@@ -7,14 +7,17 @@ from ..device import XDevice, XDeviceExtra, hex_to_ieee
 from ..mini_mqtt import MQTTMessage
 from ..shell.shell_mgw import ShellMGW
 from ..shell.shell_mgw2 import ShellMGW2
+from ..shell.shell_m2 import ShellM2
+from ..shell.shell_m2poe import ShellM2PoE
 
 
 class LumiGateway(XGateway):
-    async def lumi_read_devices(self, sh: ShellMGW | ShellMGW2):
+    async def lumi_read_devices(self, sh: ShellMGW | ShellMGW2 | ShellM2 | ShellM2PoE):
         raw = await sh.read_file("/data/zigbee/device.info")
         lumi = json.loads(raw)["devInfo"]
 
         xiaomi_did = await sh.read_xiaomi_did()
+        cloud = await sh.get_cloud() or "miot"
 
         for item in lumi:
             did = item["did"]
@@ -27,6 +30,7 @@ class LumiGateway(XGateway):
                     "nwk": item["shortId"],
                     "fw_ver": item["appVer"],
                     "hw_ver": item["hardVer"],
+                    "cloud": cloud
                 }
                 if did in xiaomi_did:
                     extra["cloud_did"] = xiaomi_did[did]

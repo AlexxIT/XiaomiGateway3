@@ -139,7 +139,10 @@ class MultiGateway(
                 await self.lumi_send(device, lumi_data)
                 await self.miot_send(device, miot_data)
             elif "cmd" in data:
-                await self.lumi_send(device, data)
+                if device.extra.get("cloud") == "aiot":
+                    await self.openmiio_send(device, data)
+                else:
+                    await self.lumi_send(device, data)
             elif "method" in data:
                 await self.miot_send(device, data)
 

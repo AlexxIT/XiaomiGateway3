@@ -11,6 +11,12 @@ Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Ga
 | Xiaomi Multimode Gateway 2 (CN) | DMWG03LM              | **yes**           |
 | Xiaomi Multimode Gateway 2 (EU) | ZNDMWG04LM, BHR6765GL | **yes**           |
 | Aqara Hub E1 (CN)               | ZHWG16LM              | **yes**           |
+| Aqara Gateway M2 PoE (CN)       | ZHWG19LM              | **yes** See Note  |
+| Aqara Camera Hub G3 CN          | ZNSXJ13LM             | **yes** See Note  |
+| Aqara Gateway M3 (CN)           | ZHWG24LM              | **yes** See Note  |
+| Aqara Hub M100 (CN)             | ZHWG24LM              | **yes** See Note  |
+| Aqara Gateway M200 (CN)         | AG047GLB02            | **yes** See Note  |
+| Aqara Doorbell G410 (CN)        | ZNKSML05              | **yes** See Note  |
 | Xiaomi Gateway 2 (CN)           | DGNWG02LM             | **no**, [goto][1] |
 | Xiaomi Gateway (EU)             | DGNWG05LM             | **no**, [goto][2] |
 
@@ -20,13 +26,15 @@ Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Ga
 [2]: https://openlumi.github.io/
 [3]: https://github.com/niceboygithub/AqaraGateway
 
+Note: Only Zigbee supported. Manually add the gateway that enabled telnet and use "aiot" or "aqara" as Token
+
 Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
 
 ---
 
 * [Supported Firmwares](#supported-firmwares)
 * [Supported Devices](#supported-devices)
-  * [Add new device](#add-new-device) 
+  * [Add new device](#add-new-device)
 * [Installation](#installation)
 * [Configuration](#configuration)
 * [Network configuration](#network-configuration)
@@ -83,7 +91,7 @@ Recommended firmwares:
 | Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you updated it to latest firmware                | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
 | Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
-| Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | no solution                                                          |
+| Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | use button click method                                              |
 
 - Read more https://github.com/AlexxIT/Blog/issues/13
 
@@ -102,7 +110,7 @@ Gateway Zigbee chip can work in three modes:
 
    - Support Xiaomi/Aqara Zigbee devices simultaneously in Mi Home and Hass
    - Support some Zigbee devices from other brands only in Hass
-   
+
 **2. Zigbee Home Automation (ZHA)**
 
    - Support for [Zigbee devices of hundreds of brands](https://zigbee.blakadder.com/zha.html) only in Hass ([read more](#zigbee-home-automation-mode))
@@ -150,9 +158,9 @@ You may skip 1st step if you know token for you Gateway. If you have multiple Ga
 
 You need gateway `key` only for Xiaomi Multimode Gateway on fw 1.5.5, [read more](https://github.com/AlexxIT/Blog/issues/13).
 
-**ATTENTION:** If you using two Hass with one gateway - you should use same integration version on both of them! 
+**ATTENTION:** If you using two Hass with one gateway - you should use same integration version on both of them!
 
-## Network configuration 
+## Network configuration
 
 All settings are **important** or you may have an unstable operation of the gateway.
 
@@ -165,7 +173,7 @@ All settings are **important** or you may have an unstable operation of the gate
    - Authentication: WPA2 (don't use WPA3)
 - MikroTik Router settings:
    - Wireless > Security Profiles > Group Key Update: **01:00:00** (1 hour or more)
-- Keenetic Router settings: 
+- Keenetic Router settings:
    - Disable "[Airtime Fairness](https://help.keenetic.com/hc/en-us/articles/360009149400)" for 2.4GHz
    - Disable "[256-QAM](https://help.keenetic.com/hc/en-us/articles/4402854785170)" for 2.4GHz
 
@@ -248,7 +256,7 @@ params:                              # all decoded params in one message
   occupancy: false
   occupancy_duration: 0
 ttl: 50m                             # time to live (TTL) - available timeout (maximum last_seen value)
-uid: 649e31xxxxxx                    # hass UID - "12 hex mac" for BLE and Mesh, "0x + 16 hex IEEE" for Zigbee 
+uid: 649e31xxxxxx                    # hass UID - "12 hex mac" for BLE and Mesh, "0x + 16 hex IEEE" for Zigbee
 ```
 
 **Device update** - manual call for device params update. Don't work for many Zigbee battery devices. Don't work for all BLE devices. Don't work for offline Mesh devices.
@@ -556,7 +564,7 @@ Read more in [wiki](https://github.com/AlexxIT/XiaomiGateway3/wiki/Handle-BLE-Lo
 
 ## Xiaomi Multimode Gateway beeper
 
-You can run beeper/buzzer with service: 
+You can run beeper/buzzer with service:
 
 - duration in seconds
 - volume from 1 to 3
@@ -606,7 +614,7 @@ After rebooting the gateway, all changes will be reset. The component will launc
 
 ## Troubleshooting
 
-Put your Gateways and your child bluetooth/zigbee devices far away from **USB 3.0 devices and cables, SSDs, WiFi routers**, etc. USB3 hub can almost completely block the Zigbee signal from your Xiaomi Plug up to 20 centimeters away. 
+Put your Gateways and your child bluetooth/zigbee devices far away from **USB 3.0 devices and cables, SSDs, WiFi routers**, etc. USB3 hub can almost completely block the Zigbee signal from your Xiaomi Plug up to 20 centimeters away.
 
 [![](https://img.youtube.com/vi/tHqZhNcFEvA/mqdefault.jpg)](https://www.youtube.com/watch?v=tHqZhNcFEvA)
 
@@ -674,42 +682,42 @@ logger:
 
 ## FAQ
 
-**Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**  
+**Q. Does this integration support Xiaomi Robot Vacuum, Xiaomi Philips Bulb...?**
 A. No. The integration does not support Xiaomi Wi-Fi devices.
 
-**Q. Which Mi Home region is best to use?**  
+**Q. Which Mi Home region is best to use?**
 A. Most devices are supported in the China region. In European regions the new Zigbee devices E1/H1/T1-series and some Mesh devices may not work. Read more about [regional restrictions](#regional-restrictions).
 
-**Q. What do multimode gateway beeps mean?**  
+**Q. What do multimode gateway beeps mean?**
 A. Beeps AFTER adding Zigbee devices:
 1. No new devices found, the pair is stopped.
 2. New device successfully added.
 3. Unsupported device model.
 
-Also, if you are using hacked motion sensor - the gateway will periodically beeps. You can [disable it](https://github.com/AlexxIT/XiaomiGateway3/issues/919). 
+Also, if you are using hacked motion sensor - the gateway will periodically beeps. You can [disable it](https://github.com/AlexxIT/XiaomiGateway3/issues/919).
 
-**Q. Does the integration work without internet?**  
+**Q. Does the integration work without internet?**
 A. Partially. The component connects to a hub on the local network. Adding new devices from/to Mi Home requires Internet.
 
-**Q. Does the integration support non Xiaomi Zigbee devices?**  
+**Q. Does the integration support non Xiaomi Zigbee devices?**
 A. Yes. There are three ways to connect third party Zigbee devices. All methods have a different set of supported devices. There is no exact supported list. Don't expect absolutely every device on the market to be supported in any of these methods.
 
-**Q. Will the Zigbee devices continue to work in Mi Home?**  
+**Q. Will the Zigbee devices continue to work in Mi Home?**
 A. Yes. If you do not enable ZHA or z2m mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
 
-**Q. Do I need to receive a token or enable Telnet manually?**  
+**Q. Do I need to receive a token or enable Telnet manually?**
 A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
 
-**Q. Should I open or solder the hub?**  
+**Q. Should I open or solder the hub?**
 A. No.
 
-**Q. Should I use ZHA mode?**  
+**Q. Should I use ZHA mode?**
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
 
-**Q. How many Zigbee devices does the hub support?**  
+**Q. How many Zigbee devices does the hub support?**
 A. The hub can connect directly up to 32 battery-powered devices (end devices). And **additionaly** up to 26 powered devices (routers). Other devices on your network can work through routers. The maximum number of devices is unknown. Official Xiaomi documentation writes about 128 devices.
 
-**Q. Why does the two-button switch only have one entity action?**  
+**Q. Why does the two-button switch only have one entity action?**
 A. All button clicks are displayed in the status of that one entity.
 
 ## Useful links
