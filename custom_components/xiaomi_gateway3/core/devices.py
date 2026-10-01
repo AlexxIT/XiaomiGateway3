@@ -1639,6 +1639,16 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="4.p.1003"),
         MapConv("button_mode", "select", mi="3.p.1020", map={0: "Multiple Click", 1: "Quick Single Click"}),
     ],
+}, {
+    39609: ["Xiaomi", "Mijia Smart TH Monitor 3 Pro", "MJWSD07MMC", "xiaomi.sensor_ht.new3pr"],
+    "spec": [
+        MathConv("temperature", "sensor", mi="7.p.1001", round=1),
+        BaseConv("humidity", "sensor", mi="7.p.1002"),
+        BaseConv("battery", "sensor", mi="4.p.1003", entity=ENTITY_LAZY),
+        BaseConv("co_two", "sensor", mi="8.p.1029"),
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="4.e.1001", value="low_battery"),
+    ],
 }]
 
 # Xiaomi BLE MiBeacon2 + MIoT spec
