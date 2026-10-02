@@ -161,7 +161,7 @@ class SilabsGateway(XGateway):
     async def silabs_process_join(self, data: dict):
         self.debug("silabs_process_join", data=data)
         try:
-            async with Session(self.host) as sh:
+            async with Session(self.host, telnet_password = self.options["telnet_password"]) as sh:
                 # check if model should be prevented from unpairing
                 if self.force_pair or not data["model"].startswith(("lumi.", "ikea.")):
                     self.force_pair = False
@@ -287,7 +287,7 @@ class SilabsGateway(XGateway):
 
     async def silabs_restart(self):
         try:
-            async with Session(self.host) as sh:
+            async with Session(self.host, telnet_password = self.options["telnet_password"]) as sh:
                 # names for all supported gateway models
                 await sh.exec("killall Lumi_Z3GatewayHost_MQTT mZ3GatewayHost_MQTT")
         except Exception as e:

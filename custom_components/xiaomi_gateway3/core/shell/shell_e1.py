@@ -9,7 +9,9 @@ class ShellE1(ShellBase):
     async def login(self):
         self.writer.write(b"root\n")
         await asyncio.sleep(0.1)
-        self.writer.write(b"\n")  # empty password
+        if self.telnet_password:
+            self.writer.write(str.encode(self.telnet_password))
+        self.writer.write(b"\n")
 
         coro = self.reader.readuntil(b" # ")
         await asyncio.wait_for(coro, timeout=3)
