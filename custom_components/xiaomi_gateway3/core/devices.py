@@ -612,7 +612,7 @@ DEVICES += [{
         ZLumiMagnetTamperConv("tamper", "binary_sensor"),
         ZLumiMagnetBatteryConv("battery", "sensor", entity=ENTITY_LAZY),
         BaseConv("battery_voltage", "sensor", entity=ENTITY_LAZY),
-        ZLumiMagnetDistanceConv("detection_distance", "select", entity=ENTITY_CONFIG),
+        ZLumiMagnetDetectionDistanceConv("detection_distance", "select", entity=ENTITY_CONFIG),
         MapConv("action", "sensor", mi="4.p.1", map={1: "single"}, entity=ENTITY_DISABLED),
     ],
 }, {

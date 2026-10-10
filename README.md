@@ -123,32 +123,6 @@ Gateway entity shows connection state to gateway. It has many useful information
 
 Zigbee, BLE, Mesh and Matter devices has optional `zigbee`, `ble`, `mesh`, `matter` that shows `last_report` time in state and may useful intormation in attributes.
 
-### Aqara Door and Window Sensor P1
-
-The built-in profile is for **MCCGQ13LM / `lumi.magnet.ac01`** in the default Mi Home mode; see the [device catalog](DEVICES.md#supported-xiaomi-zigbee). It does not apply to Motion Sensor P1, Door and Window Sensor P2, or devices managed by ZHA/Zigbee2MQTT.
-
-**Entities**
-
-- `contact` follows the Home Assistant door convention: `on` means open, `off` means closed. Check physical opening/closing and `tamper` events on your gateway before relying on automations. [Invert state](#entities-customize) is an optional customization, not a substitute for checking the reported polarity.
-- `battery_voltage` (mV) and `battery` (%) appear after the first supported voltage report and are restored on subsequent starts. Percentage is a voltage-based estimate, clamped between 0% at 2850 mV and 100% at 3000 mV, not a measurement of remaining runtime. The supported Power Configuration report has 100 mV resolution.
-- `action` is disabled by default. It exposes `single` when the gateway forwards the corresponding native event; see [Handle Button Actions](#handle-button-actions). An action event does not prove a fresh battery report.
-
-**Detection distance**
-
-`detection_distance` is a configuration select, disabled by default for new entities. Enable it on the device's entity page if needed; an existing enabled entity keeps that setting. Options are `10mm`, `20mm`, and `30mm`, not measured distances.
-
-The [Aqara FAQ](https://www.aqara.cn/aqara-door-and-windows-sensor-p1_install_faq) describes hysteresis: for the factory `20mm` setting, closing occurs below 20 mm and opening above 30 mm. Magnet type and mounting affect these thresholds.
-
-Choose an option once while the device is awake, then confirm a fresh report/readback. The integration does not optimistically change the selected value after a write. A restored value, available options, or an `unavailable` entity is not an acknowledgement. Do not repeatedly use **Device update** to force a response: it sends requests to the device.
-
-Wake-up/write timing through Xiaomi gateway firmware still needs hardware verification. Follow the [device manual](https://static-resource.aqara.com/temp/Aqara%E9%97%A8%E7%AA%97%E4%BC%A0%E6%84%9F%E5%99%A8P1%E8%AF%B4%E6%98%8E%E4%B9%A6_1663667202414.pdf); do not use a long button hold merely to wake it, as this can reset/rejoin the device.
-
-**Verification and battery diagnostics**
-
-This profile does not establish official P1 support in every Xiaomi gateway/region/firmware. Physical tamper, distance writes, voltage reports after a button press and periodic voltage reporting must be verified on the actual gateway. Updating the profile alone is not a reason to re-pair the device or erase its registry entries. If upgrading from generic support, use the new `contact` entity and review automations; an old `binary` entity can remain in the registry.
-
-The profile adds no periodic polling, binding or reporting configuration. This does **not** prove that gateway firmware sends no extra requests or that rapid battery drain is fixed. For diagnosis, record gateway/device firmware and [Device info](#device-command-select), then inspect existing [debug logs](#debug-mode) for fresh voltage and both directions of Zigbee traffic. Distinguish incoming reports from requests to the device; restored states and a saturated `100%` value are not evidence of battery stability. Check the first minutes and hours rather than waiting for the battery to run down.
-
 ### Add new device
 
 You can change the operation of an existing device or add support for any **Xiaomi Zigbee**, **Xiaomi BLE**, **Xiaomi Mesh** or any **other brand Zigbee** device by writing an [external converter](https://github.com/AlexxIT/XiaomiGateway3/wiki/Converters).

@@ -482,6 +482,8 @@ class ZLumiBasicAlarm(ZConverter):
                 payload[self.attr] = False
 
 
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/devices/lumi.ts#L264-L281
 class ZLumiMagnetBatteryConv(ZBatteryVoltConv):
     def decode(self, device: "XDevice", payload: dict, data: dict):
         if data.get(self.attr_id) in (None, 0xFF):  # unsupported or unknown voltage
@@ -492,7 +494,10 @@ class ZLumiMagnetBatteryConv(ZBatteryVoltConv):
         payload[self.attr] = conv(voltage, 2850, 3000, 0, 100)
 
 
-class ZLumiMagnetDistanceConv(ZMapConv):
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L594-L600
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L8605-L8620
+class ZLumiMagnetDetectionDistanceConv(ZMapConv):
     cluster_id = 0xFCC0
     attr_id = 0x010C
     map = {1: "10mm", 2: "20mm", 3: "30mm"}
@@ -525,6 +530,8 @@ class ZLumiMagnetDistanceConv(ZMapConv):
         payload.setdefault("commands", []).extend(cmd)
 
 
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L758-L762
 class ZLumiMagnetTamperConv(ZBoolConv):
     cluster_id = 0xFCC0
     attr_id = 0x0140
