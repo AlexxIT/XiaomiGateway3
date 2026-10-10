@@ -606,6 +606,16 @@ DEVICES += [{
         # ZBatteryVoltConv("battery", bind=True, report=True),
     ],
 }, {
+    "lumi.magnet.ac01": ["Aqara", "Door/Window Sensor P1", "MCCGQ13LM"],
+    "spec": [
+        ZIASZoneConv("contact", "binary_sensor"),
+        ZLumiMagnetTamperConv("tamper", "binary_sensor"),
+        ZLumiMagnetBatteryConv("battery", "sensor", entity=ENTITY_LAZY),
+        BaseConv("battery_voltage", "sensor", entity=ENTITY_LAZY),
+        ZLumiMagnetDistanceConv("detection_distance", "select", entity=ENTITY_CONFIG),
+        MapConv("action", "sensor", mi="4.p.1", map={1: "single"}, entity=ENTITY_DISABLED),
+    ],
+}, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
     "spec": [
         MapConv("contact", "binary_sensor", mi="2.p.1", map={0: True, 1: False}),
