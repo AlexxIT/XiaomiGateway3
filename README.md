@@ -253,6 +253,8 @@ uid: 649e31xxxxxx                    # hass UID - "12 hex mac" for BLE and Mesh,
 
 **Device update** - manual call for device params update. Don't work for many Zigbee battery devices. Don't work for all BLE devices. Don't work for offline Mesh devices.
 
+On **Aqara P1 (MCCGQ13LM)**, briefly press the button immediately before changing **Detection Distance** or reading it with `homeassistant.update_entity`; do not hold it. Each change requests one write followed by one read, without automatic retries. The select keeps the last reported value until a distance response/report arrives.
+
 **Zigbee reconfig** - start the initial setup process for 3rd party Zigbee devices
 
 **Delete device** - manual call leave command for Zigbee devices. **Important!** Hass device will be automatically removed only when device leave network. You need to wake up the battery device so it can receive leave command.

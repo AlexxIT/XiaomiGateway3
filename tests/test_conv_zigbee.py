@@ -298,10 +298,15 @@ def test_aqara_p1_detection_distance_commands():
     device = XDevice(
         "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
     )
-    assert device.encode({"detection_distance": "20mm"}) == {
+    p = device.encode({"detection_distance": "20mm"})
+    silabs.optimize_read(p["commands"])
+    assert p == {
         "commands": [
             {"commandcli": "zcl mfg-code 4447"},
             {"commandcli": "zcl global write 64704 268 32 {02}"},
+            {"commandcli": "send 0x1234 1 1"},
+            {"commandcli": "zcl mfg-code 4447"},
+            {"commandcli": "zcl global read 64704 268"},
             {"commandcli": "send 0x1234 1 1"},
         ]
     }

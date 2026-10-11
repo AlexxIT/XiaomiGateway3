@@ -522,6 +522,8 @@ class ZLumiMagnetDetectionDistanceConv(ZMapConv):
             mfg=0x115F,
         )
         payload.setdefault("commands", []).extend(cmd)
+        # Read once after writing; the acknowledgement contains no distance.
+        self.encode_read(device, payload)
 
     def encode_read(self, device: "XDevice", payload: dict):
         cmd = zcl_read(
