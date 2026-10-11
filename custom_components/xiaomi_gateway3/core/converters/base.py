@@ -101,6 +101,16 @@ class BaseConv:
             payload.setdefault("params", []).append(params)
 
 
+class NotifyConv(BaseConv):
+    """Receive notify-only properties without requesting or writing them."""
+
+    def encode(self, device: "XDevice", payload: dict, value):
+        pass
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        pass
+
+
 @dataclass
 class ConstConv(BaseConv):
     """In any cases set constant value to attribute."""

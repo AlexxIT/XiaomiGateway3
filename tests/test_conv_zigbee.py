@@ -325,3 +325,17 @@ def test_aqara_p1_action():
     )
     assert device.decode([{"siid": 4, "piid": 1, "value": 1}]) == {"action": "single"}
     assert device.decode([{"siid": 4, "piid": 1, "value": 2}]) == {}
+
+
+def test_aqara_p1_open_time_notify_only():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
+    )
+    assert device.decode([{"siid": 5, "piid": 1, "value": 20}]) == {"open_time": 20}
+
+    # Manual updates must not poll or write this notify-only MIoT property.
+    assert device.encode_read({"open_time"}) == {}
+    assert device.encode({"open_time": 0}) == {}
+    assert device.encode_read(
+        {"open_time", "detection_distance"}
+    ) == device.encode_read({"detection_distance"})

@@ -614,6 +614,8 @@ DEVICES += [{
         BaseConv("battery_voltage", "sensor", entity=ENTITY_LAZY),
         ZLumiMagnetDetectionDistanceConv("detection_distance", "select", entity=ENTITY_CONFIG),
         MapConv("action", "sensor", mi="4.p.1", map={1: "single"}, entity=ENTITY_DISABLED),
+        # MIoT open-time in seconds; do not synthesize a reset on closing.
+        NotifyConv("open_time", "sensor", mi="5.p.1", entity=ENTITY_DISABLED),
     ],
 }, {
     "lumi.magnet.acn001": ["Aqara", "Door/Window Sensor E1 CN", "MCCGQ14LM"],
