@@ -498,6 +498,8 @@ class ZLumiMagnetBatteryConv(ZBatteryVoltConv):
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L594-L600
 # https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L8605-L8620
 class ZLumiMagnetDetectionDistanceConv(ZMapConv):
+    # Briefly press the device button immediately before read/write.
+    # Do not hold it: a long press resets pairing.
     cluster_id = 0xFCC0
     attr_id = 0x010C
     map = {1: "10mm", 2: "20mm", 3: "30mm"}
