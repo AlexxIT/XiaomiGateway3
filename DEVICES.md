@@ -1,6 +1,6 @@
 # Supported devices
 
-Total devices: 562
+Total devices: 563
 
 ## Supported Gateways
 
@@ -16,7 +16,7 @@ Total devices: 5
 
 ## Supported Xiaomi Zigbee
 
-Total devices: 103
+Total devices: 104
 
 |Brand|Name|Model|Entities|
 |---|---|---|---|
@@ -37,6 +37,7 @@ Total devices: 103
 |Aqara|Door Lock S2 Pro CN|ZNMS13LM, lumi.lock.acn03|lock, square, reverse, latch, battery, action|
 |Aqara|Door/Window Sensor|MCCGQ11LM, lumi.sensor_magnet.aq2|contact, battery, battery_low, chip_temperature|
 |Aqara|Door/Window Sensor E1 CN|MCCGQ14LM, lumi.magnet.acn001|contact, battery, battery_low|
+|Aqara|Door/Window Sensor P1|MCCGQ13LM, lumi.magnet.ac01|contact, tamper, battery, battery_voltage, detection_distance, action, open_time|
 |Aqara|Double Wall Button|WXKG02LM, lumi.sensor_86sw2|action, battery, battery_low, chip_temperature|
 |Aqara|Double Wall Button|WXKG02LM, lumi.sensor_86sw2.es1|action, battery, battery_low, chip_temperature|
 |Aqara|Double Wall Button CN|WXKG02LM, lumi.remote.b286acn01|action, battery, battery_low, chip_temperature|

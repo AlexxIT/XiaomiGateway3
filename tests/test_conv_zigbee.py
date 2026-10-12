@@ -200,3 +200,142 @@ def test_tuya_button():
         }
     )
     assert p == {"action": "button_single", "button": "single"}
+
+
+def test_aqara_p1_contact():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa"
+    )
+    # IAS notifications from #1004; other zone status bits must not open the door.
+    for status, contact in ((0x20, False), (0x21, True), (0x24, False), (0x25, True)):
+        p = decode(
+            device,
+            {"clusterId": "0x0500", "APSPlayload": f"0x199C00{status:02X}0000000000"},
+        )
+        assert p == {"contact": contact}
+
+
+def test_aqara_p1_tamper():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
+    )
+    for value, tamper in ((0, False), (1, True)):
+        p = decode(
+            device,
+            {"clusterId": "0xFCC0", "APSPlayload": f"0x1C5F11ED0A400110{value:02X}"},
+        )
+        assert p == {"tamper": tamper}
+    assert decode(
+        device, {"clusterId": "0xFCC0", "APSPlayload": "0x1C5F11EE01400186"}
+    ) == {}
+    assert device.encode_read({"tamper"}) == {
+        "commands": [
+            {"commandcli": "zcl mfg-code 4447"},
+            {"commandcli": "zcl global read 64704 320"},
+            {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+
+
+def test_aqara_p1_battery():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
+    )
+    for raw, voltage, battery in (
+        (28, 2800, 0),
+        (29, 2900, 33),
+        (30, 3000, 100),
+        (37, 3700, 100),
+    ):
+        p = decode(
+            device,
+            {"clusterId": "0x0001", "APSPlayload": f"0x18AC0A200020{raw:02X}"},
+        )
+        assert p == {"battery_voltage": voltage, "battery": battery}
+    for frame in ("0x18AD01200086", "0x18AE0A200020FF"):
+        assert decode(device, {"clusterId": "0x0001", "APSPlayload": frame}) == {}
+    assert device.encode_read({"battery", "battery_voltage"}) == {
+        "commands": [
+            {"commandcli": "zcl global read 1 32"},
+            {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+
+
+def test_aqara_p1_detection_distance():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa"
+    )
+    # Report attribute 0x009F and readback attribute 0x010C use the same options.
+    for prefix in ("0x1C5F11ED0A9F0020", "0x1C5F11ED010C010020"):
+        for value, option in ((1, "10mm"), (2, "20mm"), (3, "30mm")):
+            p = decode(
+                device,
+                {"clusterId": "0xFCC0", "APSPlayload": f"{prefix}{value:02X}"},
+            )
+            assert p == {"detection_distance": option}
+    for frame in (
+        "0x1C5F11EE0A9F0020010C012002",
+        "0x1C5F11EF0A0C0120029F002001",
+    ):
+        assert decode(device, {"clusterId": "0xFCC0", "APSPlayload": frame}) == {
+            "detection_distance": "20mm"
+        }
+    assert decode(
+        device,
+        {"clusterId": "0xFCC0", "APSPlayload": "0x1C5F11F0019F000020030C0186"},
+    ) == {"detection_distance": "30mm"}
+    for frame in (
+        "0x1C5F11F1010C0186",
+        "0x1C5F11F2010C01002004",
+        "0x1C5F11F30A9F002000",
+        "0x1C5F11F40A9F0020010C012004",
+    ):
+        assert decode(device, {"clusterId": "0xFCC0", "APSPlayload": frame}) == {}
+
+
+def test_aqara_p1_detection_distance_commands():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
+    )
+    p = device.encode({"detection_distance": "20mm"})
+    silabs.optimize_read(p["commands"])
+    assert p == {
+        "commands": [
+            {"commandcli": "zcl mfg-code 4447"},
+            {"commandcli": "zcl global write 64704 268 32 {02}"},
+            {"commandcli": "send 0x1234 1 1"},
+            {"commandcli": "zcl mfg-code 4447"},
+            {"commandcli": "zcl global read 64704 268"},
+            {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+    assert device.encode_read({"detection_distance"}) == {
+        "commands": [
+            {"commandcli": "zcl mfg-code 4447"},
+            {"commandcli": "zcl global read 64704 268"},
+            {"commandcli": "send 0x1234 1 1"},
+        ]
+    }
+
+
+def test_aqara_p1_action():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa"
+    )
+    assert device.decode([{"siid": 4, "piid": 1, "value": 1}]) == {"action": "single"}
+    assert device.decode([{"siid": 4, "piid": 1, "value": 2}]) == {}
+
+
+def test_aqara_p1_open_time_notify_only():
+    device = XDevice(
+        "lumi.magnet.ac01", type=ZIGBEE, ieee="aa:aa:aa:aa:aa:aa:aa:aa", nwk="0x1234"
+    )
+    assert device.decode([{"siid": 5, "piid": 1, "value": 20}]) == {"open_time": 20}
+
+    # Manual updates must not poll or write this notify-only MIoT property.
+    assert device.encode_read({"open_time"}) == {}
+    assert device.encode({"open_time": 0}) == {}
+    assert device.encode_read(
+        {"open_time", "detection_distance"}
+    ) == device.encode_read({"detection_distance"})

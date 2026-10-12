@@ -482,6 +482,71 @@ class ZLumiBasicAlarm(ZConverter):
                 payload[self.attr] = False
 
 
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/devices/lumi.ts#L264-L281
+class ZLumiMagnetBatteryConv(ZBatteryVoltConv):
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        if data.get(self.attr_id) in (None, 0xFF):  # unsupported or unknown voltage
+            return
+        super().decode(device, payload, data)
+        voltage = payload[self.attr]
+        payload["battery_voltage"] = voltage
+        payload[self.attr] = conv(voltage, 2850, 3000, 0, 100)
+
+
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L594-L600
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L8605-L8620
+class ZLumiMagnetDetectionDistanceConv(ZMapConv):
+    # Briefly press the device button immediately before read/write.
+    # Do not hold it: a long press resets pairing.
+    cluster_id = 0xFCC0
+    attr_id = 0x010C
+    map = {1: "10mm", 2: "20mm", 3: "30mm"}
+
+    def decode(self, device: "XDevice", payload: dict, data: dict):
+        # Prefer explicit readback over the report attribute in combined messages.
+        value = data.get(self.attr_id)
+        if value is None:
+            value = data.get(0x009F)
+        if value in self.map:
+            payload[self.attr] = self.map[value]
+
+    def encode(self, device: "XDevice", payload: dict, value: str):
+        v = next(k for k, v in self.map.items() if v == value)
+        cmd = zcl_write(
+            device.nwk,
+            self.ep or 1,
+            self.cluster_id,
+            self.attr_id,
+            v,
+            type_id=TYPE_UINT8,
+            mfg=0x115F,
+        )
+        payload.setdefault("commands", []).extend(cmd)
+        # Read once after writing; the acknowledgement contains no distance.
+        self.encode_read(device, payload)
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        cmd = zcl_read(
+            device.nwk, self.ep or 1, self.cluster_id, self.attr_id, mfg=0x115F
+        )
+        payload.setdefault("commands", []).extend(cmd)
+
+
+# Thanks to zigbee2mqtt:
+# https://github.com/Koenkk/zigbee-herdsman-converters/blob/9dabbe4e343573c5a3070605efd843a1b3a16058/src/lib/lumi.ts#L758-L762
+class ZLumiMagnetTamperConv(ZBoolConv):
+    cluster_id = 0xFCC0
+    attr_id = 0x0140
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        cmd = zcl_read(
+            device.nwk, self.ep or 1, self.cluster_id, self.attr_id, mfg=0x115F
+        )
+        payload.setdefault("commands", []).extend(cmd)
+
+
 class ZLumiSensConv(ZConverter):
     cluster_id = IasZone.cluster_id
     attr_id = 0xFFF0  # read attr

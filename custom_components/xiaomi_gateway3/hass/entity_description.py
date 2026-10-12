@@ -78,6 +78,7 @@ ENTITY_DESCRIPTIONS: dict[str, dict] = {
     "sensor.illuminance": {"class": SENSOR.ILLUMINANCE, "units": LIGHT_LUX},
     "sensor.humidity": {"class": SENSOR.HUMIDITY, "units": PERCENTAGE},
     "sensor.moisture": {"class": SENSOR.MOISTURE, "units": PERCENTAGE},
+    "sensor.open_time": {"class": SENSOR.DURATION, "units": UnitOfTime.SECONDS},
     "sensor.power": {"class": SENSOR.POWER, "units": UnitOfPower.WATT},
     "sensor.pressure": {"class": SENSOR.PRESSURE, "units": UnitOfPressure.HPA},
     "sensor.temperature": {"class": SENSOR.TEMPERATURE, "units": CELSIUS},
