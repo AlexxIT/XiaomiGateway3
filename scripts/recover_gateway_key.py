@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Recover a gateway key without enabling Telnet. Requires aiohttp/cryptography.
+"""Recover a Hub 2 gateway key. Run from a Gateway3 source checkout.
 
-Run from a Gateway3 source checkout. Only confirmed firmware is enabled normally;
-experimental mode also requires an explicitly analysed firmware profile.
+Enter the gateway IP address and paste its Mi Home token when prompted.
+Requires aiohttp and cryptography.
 """
 
 import argparse
+import getpass
 import asyncio
 import importlib.util
 import json
@@ -51,23 +52,18 @@ def read_private_token(path):
 
 
 def reserve_output(path):
-    parent = path.parent
-    info = parent.stat()
-    if (
-        not parent.is_dir()
-        or parent.is_symlink()
-        or info.st_mode & 0o077
-        or info.st_uid != os.geteuid()
-    ):
-        raise ValueError("private_output_directory_required")
     return os.open(
         path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600
     )
 
 
 async def recover(args, core):
-    token = read_private_token(args.token_file)
-    descriptor = reserve_output(args.output)
+    token = (
+        read_private_token(args.token_file)
+        if args.token_file
+        else getpass.getpass("Mi Home token: ").strip()
+    )
+    descriptor = reserve_output(args.output) if args.output else None
     saved = False
     try:
         identity = await core.async_probe_gateway(args.hub, token)
@@ -78,56 +74,50 @@ async def recover(args, core):
             identity=identity,
             timeout=args.timeout,
             port=args.port,
-            experimental=args.experimental,
+            experimental=False,
         )
-        with os.fdopen(descriptor, "w") as output:
-            descriptor = None
-            json.dump(
-                {
-                    "model": identity.model,
-                    "firmware": identity.firmware,
-                    "mac": identity.mac,
-                    "key": key,
-                },
-                output,
-            )
-            output.flush()
-            os.fsync(output.fileno())
+        if descriptor is not None:
+            with os.fdopen(descriptor, "w") as output:
+                descriptor = None
+                json.dump(
+                    {"model": identity.model, "firmware": identity.firmware,
+                     "mac": identity.mac, "key": key}, output,
+                )
+                output.flush()
+                os.fsync(output.fileno())
         saved = True
     finally:
         if descriptor is not None:
             os.close(descriptor)
-        if not saved:
+        if not saved and args.output:
             args.output.unlink(missing_ok=True)
-    print(json.dumps({"key_saved": True, "key_not_printed": True}))
+    print(f"Gateway key: {key}")
+    if args.output:
+        print(f"Saved to {args.output}")
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--hub", required=True, help="Own gateway's private LAN IPv4")
+    parser.add_argument("--hub", help="Gateway IP address; prompted if omitted")
     parser.add_argument(
         "--token-file",
-        required=True,
         type=Path,
-        help="Owner-only file containing the ordinary MIIO token",
+        help="Read the token from a file instead of prompting",
     )
     parser.add_argument("--callback-address", help="This computer's reachable LAN IPv4")
     parser.add_argument(
         "--port", type=int, default=0, help="Receiver port; 0 chooses a free port"
     )
     parser.add_argument(
-        "--output", required=True, type=Path, help="New file in a private directory"
+        "--output", type=Path, help="Also save the key to a new JSON file"
     )
     parser.add_argument(
         "--timeout", type=float, default=90, help="Upload wait, 1 to 300 seconds"
     )
-    parser.add_argument(
-        "--experimental",
-        action="store_true",
-        help="Also permit explicitly analysed experimental profiles",
-    )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     try:
+        if not args.hub:
+            args.hub = input("Gateway IP address: ").strip()
         core = load_core()
         asyncio.run(recover(args, core))
     except KeyboardInterrupt:

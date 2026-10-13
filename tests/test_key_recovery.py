@@ -290,7 +290,7 @@ def test_probe_transport_failures(monkeypatch, device_id, error):
         asyncio.run(core.async_probe_gateway("192.168.100.2", "0" * 32))
 
 
-def test_cli_private_storage_and_no_overwrite(tmp_path):
+def test_script_private_file_and_no_overwrite(tmp_path):
     tmp_path.chmod(0o700)
     token = tmp_path / "token"
     token.write_text("0" * 32)
@@ -306,8 +306,9 @@ def test_cli_private_storage_and_no_overwrite(tmp_path):
     with pytest.raises(FileExistsError):
         cli.reserve_output(target)
     tmp_path.chmod(0o755)
-    with pytest.raises(ValueError):
-        cli.reserve_output(tmp_path / "other")
+    fd = cli.reserve_output(tmp_path / "other")
+    os.close(fd)
+    assert (tmp_path / "other").stat().st_mode & 0o777 == 0o600
 
 
 def test_cli_success_and_failure_cleanup(tmp_path, capsys):
@@ -334,7 +335,7 @@ def test_cli_success_and_failure_cleanup(tmp_path, capsys):
     )
     asyncio.run(cli.recover(args, FakeCore()))
     assert json.loads(args.output.read_text())["key"] == FIXTURE_KEY
-    assert FIXTURE_KEY not in capsys.readouterr().out
+    assert f"Gateway key: {FIXTURE_KEY}" in capsys.readouterr().out
 
     class BadCore(FakeCore):
         async def async_recover_gateway_key(self, *args, **kwargs):
@@ -356,3 +357,52 @@ def test_sensitive_miio_log_parameters_are_redacted():
             == "[redacted]"
         )
     assert transport._log_params("miIO.info", []) == []
+
+
+@pytest.mark.parametrize("save_file", [False, True])
+def test_script_prompts_for_token_and_prints_key(tmp_path, monkeypatch, capsys, save_file):
+    import getpass
+    prompts = []
+
+    def pasted_token(prompt):
+        prompts.append(prompt)
+        return "0" * 32
+
+    monkeypatch.setattr(getpass, "getpass", pasted_token)
+
+    class FakeCore:
+        async def async_probe_gateway(self, host, token):
+            assert host == "192.168.100.2"
+            assert token == "0" * 32
+            return IDENTITY
+
+        async def async_recover_gateway_key(self, *args, **kwargs):
+            return FIXTURE_KEY
+
+    tmp_path.chmod(0o755)
+    output = tmp_path / "key.json" if save_file else None
+    args = SimpleNamespace(token_file=None, output=output, hub="192.168.100.2",
+                           callback_address=None, timeout=90, port=0)
+    asyncio.run(cli.recover(args, FakeCore()))
+    text = capsys.readouterr().out
+    assert f"Gateway key: {FIXTURE_KEY}" in text
+    assert "0" * 32 not in text
+    assert prompts == ["Mi Home token: "]
+    if save_file:
+        assert json.loads(output.read_text())["key"] == FIXTURE_KEY
+        assert output.stat().st_mode & 0o777 == 0o600
+    else:
+        assert not list(tmp_path.iterdir())
+
+
+def test_script_default_run_prompts_for_host(monkeypatch):
+    from unittest.mock import AsyncMock
+    monkeypatch.setattr("builtins.input", lambda prompt: " 192.168.100.2 ")
+    monkeypatch.setattr(cli, "load_core", lambda: object())
+    recover = AsyncMock()
+    monkeypatch.setattr(cli, "recover", recover)
+    assert cli.main([]) == 0
+    args = recover.await_args.args[0]
+    assert args.hub == "192.168.100.2"
+    assert args.token_file is None
+    assert args.output is None

@@ -63,23 +63,23 @@
       },
       "key_recovery": {
         "title": "Recover missing gateway key",
-        "description": "A recovery method is available for this confirmed gateway build. Home Assistant suggests {callback_address}. Use a numeric private IPv4 address that the gateway can reach. Recovery starts a temporary callback listener on a port chosen by Home Assistant; allow the gateway to reach this Home Assistant host on that port. This reads one diagnostic file and does not enable Telnet or alter account passwords. Some firmware removes an existing temporary /tmp/log.tar.gz archive after the upload. Recovery can take up to 90 seconds. To use the manual path, enter an existing 16-character key instead.",
+        "description": "Home Assistant can recover the key for this gateway. Use the suggested HA address ({callback_address}) for the gateway’s reply, then select the checkbox below. Recovery takes up to 90 seconds. If you already have a key, enter it instead.",
         "data": {
-          "callback_address": "Callback IPv4 address",
+          "callback_address": "Home Assistant IP address",
           "key": "Existing gateway key (optional)",
-          "confirm_recovery": "I explicitly consent to request the gateway key"
+          "confirm_recovery": "Recover my gateway key"
         }
       },
       "key_recovery_confirm": {
         "title": "Confirm existing gateway setup",
-        "description": "The recovered key is held in memory and has not been saved yet. Continuing calls this integration's existing gateway setup check. That check may clear the gateway root password and enable Telnet. Proceed only if you accept those actions.",
+        "description": "The key was recovered. Continue to set up Gateway3. This enables Telnet and clears the gateway root password.",
         "data": {
-          "confirm_setup": "I accept these gateway setup actions"
+          "confirm_setup": "Continue with gateway setup"
         }
       }
     },
     "progress": {
-      "recovering_key": "Requesting and validating the gateway key. Keep this setup window open; it may take up to 90 seconds."
+      "recovering_key": "Recovering your gateway key. This can take up to 90 seconds."
     }
   },
   "options": {
