@@ -60,6 +60,7 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 | Aqara Hub E1 (CN)                  | 4.0.1         | only Token    |
 | Xiaomi Multimode Gateway (CN/EU)   | 1.5.5 - 1.5.6 | Token and Key |
 | Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.7         | Token and Key |
+| Xiaomi Multimode Gateway 2 (EU)    | 1.0.8_0013    | Token and Key; [LAN key recovery](docs/gateway-key-recovery.md) validated |
 
 **PS.** Firmwares from 1.4.6 to 1.4.7 for Xiaomi Multimode Gateway may work but **UNSUPPORTED**. Please don't create issues if something doesn't work on them.
 
@@ -82,7 +83,8 @@ Recommended firmwares:
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, but shipped from the factory with firmware 1.4.6 and lower | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
 | Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you updated it to latest firmware                | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
-| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
+| Xiaomi Multimode Gateway 2 (EU), `lumi.gateway.mgl001`                                   | stock firmware 1.0.8_0013, missing Key                                             | [recover Key over LAN](docs/gateway-key-recovery.md) without UART |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166) for other unverified builds    |
 | Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | no solution                                                          |
 
 - Read more https://github.com/AlexxIT/Blog/issues/13
@@ -698,10 +700,10 @@ A. Yes. There are three ways to connect third party Zigbee devices. All methods 
 A. Yes. If you do not enable ZHA or z2m mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
 
 **Q. Do I need to receive a token or enable Telnet manually?**  
-A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
+A. The token can be obtained using the Mi Home account. Supported older firmware enables Telnet with the token; newer firmware also needs the gateway Key. See the [firmware table](#supported-firmwares) and [key recovery guide](docs/gateway-key-recovery.md). Physical gateway setup clears the executing user's password and starts Telnet.
 
 **Q. Should I open or solder the hub?**  
-A. No.
+A. Usually not. Some newer builds require UART to obtain a missing Key. Stock EU Hub 2 `lumi.gateway.mgl001` `1.0.8_0013` has a validated [LAN alternative](docs/gateway-key-recovery.md); other builds remain subject to the HOWTO above.
 
 **Q. Should I use ZHA mode?**  
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.

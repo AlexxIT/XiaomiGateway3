@@ -21,6 +21,11 @@ HELLO = bytes.fromhex(
 )
 
 
+def _log_params(method, params):
+    """Keep export encryption settings and derived command passwords out of logs."""
+    return "[redacted]" if method in ("async_device_feedback_log", "system_command") else params
+
+
 class BasemiIO:
     """A simple class that implements the miIO protocol."""
 
@@ -159,7 +164,7 @@ class SyncMiIO(BasemiIO):
             _LOGGER.debug(
                 f"{self.addr[0]} | Device offline"
                 if pings >= 2
-                else f"{self.addr[0]} | Can't send {method} {params}"
+                else f"{self.addr[0]} | Can't send {method} {_log_params(method, params)}"
             )
             return None
 
@@ -328,7 +333,7 @@ class AsyncMiIO(BasemiIO, BaseProtocol):
             _LOGGER.debug(f"{self.addr[0]} | Device offline")
             return None
 
-        _LOGGER.debug(f"{self.addr[0]} | No answer on {method} {params}")
+        _LOGGER.debug(f"{self.addr[0]} | No answer on {method} {_log_params(method, params)}")
         return {}
 
     async def send_bulk(self, method: str, params: list) -> list:
