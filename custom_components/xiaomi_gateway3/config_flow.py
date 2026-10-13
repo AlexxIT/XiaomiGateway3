@@ -1,4 +1,6 @@
+import asyncio
 import base64
+import inspect
 import logging
 
 import homeassistant.helpers.config_validation as cv
@@ -8,11 +10,24 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .core import core_utils
+from .core import key_recovery
 from .core.const import DOMAIN, PID_BLE, PID_WIFI, PID_WIFI_BLE
 from .core.xiaomi_cloud import AuthResult, MiCloud
 from .hass import hass_utils
 
 _LOGGER = logging.getLogger(__name__)
+
+_KEY_RECOVERY_ERRORS = {
+    "invalid_input",
+    "cannot_connect",
+    "invalid_token",
+    "unsupported_firmware",
+    "invalid_identity",
+    "callback_unavailable",
+    "method_rejected",
+    "upload_timeout",
+    "invalid_upload",
+}
 
 SERVERS = {
     "cn": "China",
@@ -39,6 +54,13 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
     cloud_user_input: dict = None
 
     cloud_gateways: list[dict] = None
+    _key_recovery_context: dict = None
+    _key_recovery_identity = None
+    _key_recovery_callback_address: str = None
+    _key_recovery_task: asyncio.Task = None
+    _key_recovery_error: str = None
+    _recovered_gateway_key: str = None
+    _gateway_info_retry_input: dict = None
 
     async def async_step_user(self, user_input: dict = None):
         if self.cloud_gateways is None:
@@ -145,6 +167,195 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
         result = await self.cloud.login_verify(user_input["code"])
         return await self._process_cloud_result(result)
 
+    def _supports_cancellable_recovery_progress(self) -> bool:
+        """Only offer recovery where HA can cancel its progress task."""
+        progress_method = getattr(self, "async_show_progress", None)
+        if progress_method is None:
+            return False
+        try:
+            parameters = inspect.signature(progress_method).parameters
+        except (TypeError, ValueError):
+            return False
+        return "progress_task" in parameters
+
+    async def _async_offer_key_recovery(self, user_input: dict) -> bool:
+        """Offer recovery before gateway_info makes another Telnet attempt."""
+        if await core_utils.check_port(user_input["host"], 23):
+            return False
+
+        identity = await key_recovery.async_probe_gateway(
+            user_input["host"], user_input["token"]
+        )
+        if not key_recovery.supports_recovery(identity, experimental=False):
+            return False
+
+        self._key_recovery_context = {
+            "host": user_input["host"],
+            "token": user_input["token"],
+        }
+        self._key_recovery_identity = identity
+        try:
+            self._key_recovery_callback_address = key_recovery.callback_ipv4(
+                user_input["host"]
+            )
+        except key_recovery.RecoveryError:
+            self._key_recovery_callback_address = ""
+        return True
+
+    def _show_key_recovery_form(self, user_input: dict = None, errors: dict = None):
+        defaults = {
+            "callback_address": self._key_recovery_callback_address or "",
+        }
+        if user_input:
+            defaults.update(
+                {
+                    key: user_input[key]
+                    for key in ("callback_address", "key", "confirm_recovery")
+                    if key in user_input
+                }
+            )
+
+        return self.async_show_form(
+            step_id="key_recovery",
+            data_schema=vol_schema(
+                {
+                    vol.Optional("callback_address"): str,
+                    vol.Optional("key"): str,
+                    vol.Required("confirm_recovery", default=False): bool,
+                },
+                defaults,
+            ),
+            errors=errors,
+            description_placeholders={
+                "callback_address": self._key_recovery_callback_address or "not detected",
+            },
+        )
+
+    @staticmethod
+    def _key_recovery_error_code(error: Exception) -> str:
+        code = getattr(error, "code", None)
+        return code if code in _KEY_RECOVERY_ERRORS else "recovery_failed"
+
+    async def async_step_key_recovery(self, user_input: dict = None):
+        if not user_input:
+            error = self._key_recovery_error
+            self._key_recovery_error = None
+            errors = {"base": error} if error else None
+            return self._show_key_recovery_form(errors=errors)
+
+        manual_key = user_input.get("key")
+        consent = user_input.get("confirm_recovery", False)
+        if manual_key and consent:
+            return self._show_key_recovery_form(
+                user_input, errors={"base": "recovery_choose_one"}
+            )
+        if manual_key:
+            context = self._key_recovery_context
+            return await self.async_step_token(
+                {
+                    "host": context["host"],
+                    "token": context["token"],
+                    "key": manual_key,
+                }
+            )
+        if not consent:
+            return self._show_key_recovery_form(
+                user_input, errors={"base": "recovery_consent_required"}
+            )
+
+        self._key_recovery_callback_address = user_input.get(
+            "callback_address", ""
+        )
+        self._key_recovery_error = None
+        self._recovered_gateway_key = None
+        self._key_recovery_task = self.hass.async_create_task(
+            self._async_run_key_recovery()
+        )
+        return await self.async_step_key_recovery_progress()
+
+    async def _async_run_key_recovery(self) -> None:
+        """Keep the key out of the Task result and any surfaced exception."""
+        context = self._key_recovery_context
+        try:
+            recovered_key = await key_recovery.async_recover_gateway_key(
+                context["host"],
+                context["token"],
+                callback_address=self._key_recovery_callback_address or None,
+                identity=self._key_recovery_identity,
+                timeout=90,
+                port=0,
+                experimental=False,
+            )
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:
+            # Convert exceptions to a safe code; do not retain error text.
+            self._key_recovery_error = self._key_recovery_error_code(error)
+            return
+
+        if not isinstance(recovered_key, str) or len(recovered_key) != 16:
+            self._key_recovery_error = "invalid_upload"
+            return
+        self._recovered_gateway_key = recovered_key
+
+    async def async_step_key_recovery_progress(self, user_input: dict = None):
+        task = self._key_recovery_task
+        if task is None:
+            return await self.async_step_key_recovery()
+        if not task.done():
+            return self.async_show_progress(
+                step_id="key_recovery_progress",
+                progress_action="recovering_key",
+                progress_task=task,
+            )
+
+        try:
+            # The wrapper stores the validated key privately and always returns
+            # None, so it cannot appear in a Task result or progress state.
+            task.result()
+        except asyncio.CancelledError:
+            self._key_recovery_task = None
+            self._recovered_gateway_key = None
+            return self.async_show_progress_done(next_step_id="key_recovery")
+        except Exception:
+            # The wrapper normally converts failures to safe error codes.
+            self._key_recovery_error = "recovery_failed"
+
+        if not self._key_recovery_error and not self._recovered_gateway_key:
+            self._key_recovery_error = "invalid_upload"
+        self._key_recovery_task = None
+        next_step = (
+            "key_recovery"
+            if self._key_recovery_error
+            else "key_recovery_confirm"
+        )
+        return self.async_show_progress_done(next_step_id=next_step)
+
+    async def async_step_key_recovery_confirm(self, user_input: dict = None):
+        if user_input:
+            if not user_input.get("confirm_setup"):
+                errors = {"base": "confirm_setup_required"}
+            elif not self._key_recovery_context or not self._recovered_gateway_key:
+                return await self.async_step_token()
+            else:
+                return await self.async_step_token(
+                    {
+                        "host": self._key_recovery_context["host"],
+                        "token": self._key_recovery_context["token"],
+                        "key": self._recovered_gateway_key,
+                    }
+                )
+        else:
+            errors = None
+
+        return self.async_show_form(
+            step_id="key_recovery_confirm",
+            data_schema=vol.Schema(
+                {vol.Required("confirm_setup", default=False): bool}
+            ),
+            errors=errors,
+        )
+
     async def async_step_token(self, user_input: dict = None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
         kwargs = {
@@ -154,10 +365,38 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
         }
 
         if user_input:
-            if "key" not in user_input:
-                user_input["key"] = await hass_utils.restore_gateway_key(
-                    self.hass, user_input["token"]
-                )
+            user_input = user_input.copy()
+            if not user_input.get("key"):
+                retry_input = self._gateway_info_retry_input
+                if (
+                    retry_input
+                    and retry_input["host"] == user_input["host"]
+                    and retry_input["token"] == user_input["token"]
+                    and retry_input.get("key")
+                ):
+                    # HA clients may omit a form default when retrying after a
+                    # gateway_info error. Preserve the known key for this same
+                    # host/token rather than exporting it again.
+                    user_input["key"] = retry_input["key"]
+                elif "key" not in user_input:
+                    user_input["key"] = await hass_utils.restore_gateway_key(
+                        self.hass, user_input["token"]
+                    )
+
+            # A missing key on this confirmed build would make gateway_info
+            # check Telnet again after reporting no_key. Offer recovery first,
+            # but only when HA supports cancellable progress tasks.
+            if (
+                not user_input.get("key")
+                and self._supports_cancellable_recovery_progress()
+            ):
+                try:
+                    if await self._async_offer_key_recovery(user_input):
+                        return await self.async_step_key_recovery()
+                except Exception:
+                    # Keep the existing setup path for unverified identities,
+                    # unreachable gateways, and other preflight failures.
+                    pass
 
             # check gateway, key is optional
             info = await core_utils.gateway_info(**user_input)
@@ -167,6 +406,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                 )
 
             kwargs["errors"] = {"base": info["error"]}
+            self._gateway_info_retry_input = user_input.copy()
 
         data = vol_schema(
             {

@@ -46,4 +46,6 @@ side effects, troubleshooting and network prerequisites.
 This contribution does not change regional registration, remove existing
 Gateway3 network recommendations or prove ZHA, Zigbee2MQTT, Matter or multiple-HA
 compatibility. Independent matching-device reproduction is still needed before
-widening support. No optional Home Assistant recovery flow is included here.
+widening support. The optional Home Assistant recovery flow uses this same build restriction.
+Its backend tests ran on HA 2026.10.1; actual frontend rendering and a complete
+physical missing-key setup through that flow remain unverified.

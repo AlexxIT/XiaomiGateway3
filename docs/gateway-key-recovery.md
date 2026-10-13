@@ -54,6 +54,13 @@ The temporary endpoint accepts only the gateway's source address and a random
 URL. Routing/NAT must preserve that address. This does not remove Gateway3's
 separate firmware and [network requirements](../README.md#network-configuration).
 
+## Optional Home Assistant setup
+
+The integration can offer recovery during gateway setup when no saved/manual
+key exists, Telnet is closed and the model/build matches. Recovery requires
+explicit consent, followed by a separate confirmation before enabling Telnet.
+See [Home Assistant setup instructions](gateway-key-recovery-home-assistant.md).
+
 ## Run from a source checkout
 
 Clone this contribution's source branch and change into the checkout. Do not

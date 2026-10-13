@@ -8,7 +8,20 @@
       "wrong_model": "Unsupported gateway model",
       "wrong_token": "Wrong Mi Home token",
       "wrong_telnet": "Wrong open telnet command",
-      "verify": "Click to verify url"
+      "verify": "Click to verify url",
+      "invalid_input": "Recovery input is invalid. Enter a numeric private IPv4 address and try again.",
+      "cannot_connect": "Home Assistant could not communicate with the gateway.",
+      "invalid_token": "The gateway answered the handshake but no valid identity reply arrived. Check the token and connection.",
+      "unsupported_firmware": "This exact gateway firmware is not supported for key recovery.",
+      "invalid_identity": "Home Assistant could not verify the gateway identity.",
+      "callback_unavailable": "Home Assistant could not start the local receiver at that address. Check the local address and port availability.",
+      "method_rejected": "The gateway rejected the recovery request.",
+      "upload_timeout": "The gateway did not return the key within 90 seconds. You can retry or enter a key manually.",
+      "invalid_upload": "The gateway returned data that failed validation.",
+      "recovery_failed": "Key recovery failed. You can retry or enter a key manually.",
+      "recovery_consent_required": "Select explicit recovery consent, or enter an existing key.",
+      "recovery_choose_one": "Select either recovery consent or a manual key.",
+      "confirm_setup_required": "Confirm the existing gateway setup actions before continuing."
     },
     "step": {
       "user": {
@@ -47,7 +60,26 @@
           "token": "Token",
           "key": "Key"
         }
+      },
+      "key_recovery": {
+        "title": "Recover missing gateway key",
+        "description": "A recovery method is available for this confirmed gateway build. Home Assistant suggests {callback_address}. Use a numeric private IPv4 address that the gateway can reach. Recovery starts a temporary callback listener on a port chosen by Home Assistant; allow the gateway to reach this Home Assistant host on that port. This reads one diagnostic file and does not enable Telnet or alter account passwords. Some firmware removes an existing temporary /tmp/log.tar.gz archive after the upload. Recovery can take up to 90 seconds. To use the manual path, enter an existing 16-character key instead.",
+        "data": {
+          "callback_address": "Callback IPv4 address",
+          "key": "Existing gateway key (optional)",
+          "confirm_recovery": "I explicitly consent to request the gateway key"
+        }
+      },
+      "key_recovery_confirm": {
+        "title": "Confirm existing gateway setup",
+        "description": "The recovered key is held in memory and has not been saved yet. Continuing calls this integration's existing gateway setup check. That check may clear the gateway root password and enable Telnet. Proceed only if you accept those actions.",
+        "data": {
+          "confirm_setup": "I accept these gateway setup actions"
+        }
       }
+    },
+    "progress": {
+      "recovering_key": "Requesting and validating the gateway key. Keep this setup window open; it may take up to 90 seconds."
     }
   },
   "options": {
