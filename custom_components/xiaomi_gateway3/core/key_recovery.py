@@ -88,7 +88,7 @@ async def async_probe_gateway(host, token):
         raise RecoveryError("invalid_input")
     client = AsyncMiIO(host, token)
     try:
-        info = await client.info(tries=1)
+        info = await client.info()
     except (ValueError, OSError):
         raise RecoveryError("cannot_connect") from None
     if not isinstance(info, dict) or not info:

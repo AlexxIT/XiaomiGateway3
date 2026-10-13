@@ -372,10 +372,11 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                     retry_input
                     and retry_input["host"] == user_input["host"]
                     and retry_input["token"] == user_input["token"]
-                    and retry_input.get("key")
+                    and self._recovered_gateway_key
+                    and retry_input.get("key") == self._recovered_gateway_key
                 ):
                     # HA clients may omit a form default when retrying after a
-                    # gateway_info error. Preserve the known key for this same
+                    # gateway_info error. Preserve the recovered key for this same
                     # host/token rather than exporting it again.
                     user_input["key"] = retry_input["key"]
                 elif "key" not in user_input:
@@ -386,6 +387,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             # A missing key on this confirmed build would make gateway_info
             # check Telnet again after reporting no_key. Offer recovery first,
             # but only when HA supports cancellable progress tasks.
+            preflight_error = None
             if (
                 not user_input.get("key")
                 and self._supports_cancellable_recovery_progress()
@@ -393,10 +395,9 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                 try:
                     if await self._async_offer_key_recovery(user_input):
                         return await self.async_step_key_recovery()
-                except Exception:
-                    # Keep the existing setup path for unverified identities,
-                    # unreachable gateways, and other preflight failures.
-                    pass
+                except Exception as error:
+                    preflight_error = self._key_recovery_error_code(error)
+                    _LOGGER.debug("Gateway key recovery preflight failed: %s", preflight_error)
 
             # check gateway, key is optional
             info = await core_utils.gateway_info(**user_input)
@@ -405,6 +406,8 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                     title=user_input["host"], data={}, options=user_input
                 )
 
+            if preflight_error and info["error"] == "no_key":
+                info["error"] = preflight_error
             kwargs["errors"] = {"base": info["error"]}
             self._gateway_info_retry_input = user_input.copy()
 

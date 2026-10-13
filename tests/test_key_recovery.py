@@ -406,3 +406,40 @@ def test_script_default_run_prompts_for_host(monkeypatch):
     assert args.hub == "192.168.100.2"
     assert args.token_file is None
     assert args.output is None
+
+
+def test_identity_probe_recovers_after_a_dropped_udp_reply(monkeypatch):
+    import sys
+    from unittest.mock import AsyncMock
+
+    attempts = []
+
+    class Socket:
+        def settimeout(self, _timeout):
+            pass
+
+        async def connect(self, _address):
+            pass
+
+        def sendto(self, packet):
+            self.message_id = int(packet)
+
+        async def recv(self, _size):
+            attempts.append(self.message_id)
+            if len(attempts) == 1:
+                raise asyncio.TimeoutError()
+            return json.dumps({"id": self.message_id, "result": {
+                "model": IDENTITY.model, "fw_ver": IDENTITY.firmware,
+                "mac": IDENTITY.mac,
+            }}).encode()
+
+        def close(self):
+            pass
+
+    protocol = sys.modules[core.AsyncMiIO.__module__]
+    monkeypatch.setattr(protocol, "AsyncSocket", Socket)
+    monkeypatch.setattr(core.AsyncMiIO, "ping", AsyncMock(return_value=True))
+    monkeypatch.setattr(core.AsyncMiIO, "_pack_raw", lambda self, message_id, *_args: str(message_id).encode())
+    monkeypatch.setattr(core.AsyncMiIO, "_unpack_raw", lambda self, packet: packet)
+    assert asyncio.run(core.async_probe_gateway("192.168.100.2", "0" * 32)) == IDENTITY
+    assert len(attempts) == 2

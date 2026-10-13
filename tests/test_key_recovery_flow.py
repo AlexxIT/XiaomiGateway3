@@ -229,7 +229,7 @@ async def test_open_telnet_keeps_existing_missing_key_path(hass, monkeypatch, fl
 
 
 @pytest.mark.asyncio
-async def test_manual_key_fallback_is_retained_on_setup_retry(
+async def test_manual_key_can_be_resubmitted_on_setup_retry(
     hass, monkeypatch, flow_handlers
 ):
     mocks = _mock_supported_missing_key(monkeypatch)
@@ -251,7 +251,7 @@ async def test_manual_key_fallback_is_retained_on_setup_retry(
     mocks["gateway_info"].assert_awaited_once()
 
     retry = await hass.config_entries.flow.async_configure(
-        flow_id, {"host": HOST, "token": TOKEN}
+        flow_id, {"host": HOST, "token": TOKEN, "key": KEY}
     )
 
     assert retry["type"] == "abort"
@@ -543,3 +543,39 @@ async def test_flow_runs_real_receiver_and_archive_validation(
         mocks["gateway_info"].assert_awaited_once()
     finally:
         pytest_socket.disable_socket(allow_unix_socket=True)
+
+
+@pytest.mark.asyncio
+async def test_cleared_wrong_manual_key_offers_recovery_again(hass, monkeypatch, flow_handlers):
+    mocks = _mock_supported_missing_key(monkeypatch)
+    mocks["gateway_info"].return_value = {"error": "wrong_telnet"}
+    flow_id = await _start_token_flow(hass)
+    await _submit_token(hass, flow_id)
+    failed = await hass.config_entries.flow.async_configure(
+        flow_id, {"key": KEY, "confirm_recovery": False}
+    )
+    assert failed["errors"] == {"base": "wrong_telnet"}
+    result = await _submit_token(hass, flow_id, key="")
+    assert result["step_id"] == "key_recovery"
+    assert mocks["gateway_info"].await_count == 1
+    assert mocks["probe"].await_count == 2
+    hass.config_entries.flow.async_abort(flow_id)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("code", ["cannot_connect", "invalid_token"])
+async def test_preflight_failure_does_not_claim_unsupported_firmware(
+    hass, monkeypatch, flow_handlers, code, caplog
+):
+    mocks = _mock_supported_missing_key(monkeypatch)
+    mocks["probe"].side_effect = key_recovery.RecoveryError(code)
+    mocks["gateway_info"].return_value = {"error": "no_key"}
+    flow_id = await _start_token_flow(hass)
+    failed = await _submit_token(hass, flow_id)
+    assert failed["step_id"] == "token"
+    assert failed["errors"] == {"base": code}
+    assert TOKEN not in caplog.text
+    mocks["probe"].side_effect = None
+    result = await _submit_token(hass, flow_id)
+    assert result["step_id"] == "key_recovery"
+    hass.config_entries.flow.async_abort(flow_id)
