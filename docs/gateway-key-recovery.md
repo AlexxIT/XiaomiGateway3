@@ -47,7 +47,9 @@ Xiaomi gateways are outside this method's confirmed scope.
    Recovery uses plain HTTP because that is the validated firmware upload path.
 5. Keep the gateway's existing registration and firmware. Resetting, unbinding,
    Android, Bluetooth and region migration are not recovery prerequisites proven
-   by this method. The actual recovery used Ethernet; Wi-Fi was not tested.
+   by this method. In the verified recovery, the hub was connected to the router
+   by Ethernet and the recovery computer used Wi-Fi. Communication was through
+   the local network; no direct cable between the computer and hub was needed.
 
 Do not disable your HA authentication or expose the receiver to the internet.
 The temporary endpoint accepts only the gateway's source address and a random

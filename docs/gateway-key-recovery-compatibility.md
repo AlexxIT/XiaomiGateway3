@@ -24,6 +24,9 @@ existing recovery path in Gateway3.
 
 ## What was verified
 
+The hub was connected to the router by Ethernet. The recovery computer used
+Wi-Fi on the local network, without a direct cable to the hub.
+
 The recovered key subsequently worked with the existing physical Gateway3 setup.
 Four mesh lights passed local basic control and restoration, and the integration
 reconnected after one ordinary hub reboot. Selected light modes were also tested.
