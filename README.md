@@ -700,10 +700,10 @@ A. Yes. There are three ways to connect third party Zigbee devices. All methods 
 A. Yes. If you do not enable ZHA or z2m mode, the devices will continue to work in Mi Home. And you can use automation in both Mi Home and Hass.
 
 **Q. Do I need to receive a token or enable Telnet manually?**  
-A. The token can be obtained using the Mi Home account. Supported older firmware enables Telnet with the token; newer firmware also needs the gateway Key. See the [firmware table](#supported-firmwares) and [key recovery guide](docs/gateway-key-recovery.md). Physical gateway setup clears the executing user's password and starts Telnet.
+A. The token can be obtained using the Mi Home account. Supported older firmware enables Telnet with the token; newer firmware also needs the gateway Key. See the [firmware table](#supported-firmwares) and [key recovery guide](docs/gateway-key-recovery.md). Physical gateway setup clears the root password and starts Telnet.
 
 **Q. Should I open or solder the hub?**  
-A. Usually not. Some newer builds require UART to obtain a missing Key. Stock EU Hub 2 `lumi.gateway.mgl001` `1.0.8_0013` has a validated [LAN alternative](docs/gateway-key-recovery.md); other builds remain subject to the HOWTO above.
+A. No. Please do not open and solder your hub.
 
 **Q. Should I use ZHA mode?**  
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
