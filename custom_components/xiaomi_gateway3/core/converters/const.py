@@ -65,3 +65,48 @@ UNIT_METERS = "m"
 # lock: On means open (unlocked), Off means closed (locked)
 STATE_UNLOCK = True
 STATE_LOCKED = False
+
+LOCK_NOTIFY = {
+    3235774464: "Frequent door opening failures due to incorrect passwords",  # 0xC0DE0000
+    3235774465: "Frequent door opening failures due to incorrect fingerprints",  # 0xC0DE0001
+    3235774469: "Frequent door opening with abnormal keys",  # 0xC0DE0005
+    3235774470: "Foreign objects in the keyhole",  # 0xC0DE0006
+    3235774471: "Keys not removed",  # 0xC0DE0007
+    3235774472: "Frequent door opening failures with incorrect NFC",  # 0xC0DE0008
+    3235774473: "Door unlocked after timeout",  # 0xC0DE0009
+    3235774474: "Multiple verification failures (advanced protection)",  # 0xC0DE000A
+    3235778564: "Automatic lock body abnormal"  # 0xC0DE1004
+}
+
+GESTURE_MAP = {
+    2: "Two",
+    4: "Four",
+    5: "Five",
+    6: "Eight",
+    10: "OK",
+    101: "Both Two",
+    102: "Both Four",
+    103: "Both Four",
+    104: "Both Eight",
+    105: "Both OK"
+}
+
+PETS_MAP = {
+    0: "",
+    1: "Cat",
+    2: "Dog",
+    3: "Cat or Dog"
+}
+
+ALARM_INDEX_MAP = {
+    0: "Police car 1",
+    1: "Police car 2",
+    2: "Safety accident",
+    3: "Missile countdown",
+    4: "Ghost scream",
+    5: "Sniper rifle",
+    6: "Battle",
+    7: "Air raid alarm",
+    8: "Dog bark",
+    10000: "default"
+}
