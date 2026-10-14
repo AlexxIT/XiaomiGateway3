@@ -5986,6 +5986,17 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="2.p.17", map={0: "On", 1: "Default", 2: "Off"}),
     ],
 }, {
+    28561: ["Yeelight", "Yeelight Smart Color Temperature Bulb", "yeelink.light.bulb1"],
+    "spec": [
+        BaseConv("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", mink=2700, maxk=6000),
+        MapConv("mode", "select", mi="2.p.7", map={0: "None", 4: "Day", 5: "Night", 7: "Warmth", 8: "Tv", 9: "Reading", 10: "Computer", 11: "Hospitality", 12: "Entertainment", 13: "Wakeup", 14: "Dusk", 15: "Sleep", 16: "Scene 1", 17: "Scene 2", 18: "Scene 3", 19: "Scene 4", 20: "Eye Protection", 21: "Breath", 22: "Beat", 23: "Rhythm"}),
+        MapConv("power_on_state", "select", mi="2.p.9", map={0: "Default", 1: "On", 2: "Off"}),
+        BoolConv("flex_switch", "switch", mi="2.p.12"),
+        BoolConv("night_light_switch", "switch", mi="2.p.13"),
+    ],
+}, {
     "default": "mesh",  # default Mesh device
     "spec": [
         BaseConv("switch", "switch", mi="2.p.1", entity=ENTITY_LAZY),  # bool
