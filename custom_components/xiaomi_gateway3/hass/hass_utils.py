@@ -122,11 +122,12 @@ async def update_device_name(hass: HomeAssistant, cloud_device: dict):
         device.extra["cloud_name"] = cloud_device["name"]
 
         registry = device_registry.async_get(hass)
-        device_entry = registry.async_get_device({(DOMAIN, device.uid)})
+        device_entries = registry.async_get_devices(identifiers={(DOMAIN, device.uid)})
 
         # check if device_entry.name changed
-        if device_entry and device_entry.name != device.human_name:
-            registry.async_update_device(device_entry.id, name=device.human_name)
+        for device_entry in device_entries:
+            if device_entry.name != device.human_name:
+                registry.async_update_device(device_entry.id, name=device.human_name)
         return
 
 
