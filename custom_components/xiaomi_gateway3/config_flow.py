@@ -23,6 +23,10 @@ SERVERS = {
     "us": "United States",
 }
 
+TOKEN_PLACEHOLDERS = {
+    "link": "https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token",
+}
+
 
 def vol_schema(schema: dict, defaults: dict = None) -> vol.Schema:
     if defaults:
@@ -61,6 +65,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                             vol.Optional("key"): str,
                         }
                     ),
+                    description_placeholders=TOKEN_PLACEHOLDERS,
                 )
 
         actions = {"cloud": "Add Mi Cloud Account", "token": "Add Gateway using Token"}
@@ -147,12 +152,6 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def async_step_token(self, user_input: dict = None):
         """GUI > Configuration > Integrations > Plus > Xiaomi Gateway 3"""
-        kwargs = {
-            "description_placeholders": {
-                "link": "https://github.com/AlexxIT/XiaomiGateway3#obtain-mi-home-device-token",
-            },
-        }
-
         if user_input:
             if "key" not in user_input:
                 user_input["key"] = await hass_utils.restore_gateway_key(
@@ -166,7 +165,9 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                     title=user_input["host"], data={}, options=user_input
                 )
 
-            kwargs["errors"] = {"base": info["error"]}
+            errors = {"base": info["error"]}
+        else:
+            errors = None
 
         data = vol_schema(
             {
@@ -176,7 +177,12 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
             },
             user_input,
         )
-        return self.async_show_form(step_id="token", data_schema=data, **kwargs)
+        return self.async_show_form(
+            step_id="token",
+            data_schema=data,
+            errors=errors,
+            description_placeholders=TOKEN_PLACEHOLDERS,
+        )
 
     @staticmethod
     @callback
