@@ -20,7 +20,9 @@ Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Ga
 [2]: https://openlumi.github.io/
 [3]: https://github.com/niceboygithub/AqaraGateway
 
-Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares. And thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
+- Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruction](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61) how to enable Telnet on old firmwares.
+- Thanks to an unknown researcher for [instruction](https://gist.github.com/zvldz/1bd6b21539f84339c218f9427e022709) how to open telnet on new firmwares.
+- Thanks to [@oliver-mee](https://github.com/oliver-mee) for a [way to obtain](https://github.com/AlexxIT/XiaomiGateway3/pull/1781) the gateway key on new firmwares.
 
 ---
 
@@ -56,18 +58,17 @@ Thanks to [@Serrj](https://community.home-assistant.io/u/serrj-sv/) for [instruc
 | Gateway                            | Firmwares     | Required      |
 |------------------------------------|---------------|---------------|
 | Xiaomi Multimode Gateway (CN/EU)   | 1.5.0 - 1.5.4 | only Token    |
-| Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.3 - 1.0.6 | only Token    |
+| Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.3 - 1.0.8 | only Token    |
 | Aqara Hub E1 (CN)                  | 4.0.1         | only Token    |
-| Xiaomi Multimode Gateway (CN/EU)   | 1.5.5 - 1.5.6 | Token and Key |
-| Xiaomi Multimode Gateway 2 (CN/EU) | 1.0.7         | Token and Key |
+| Xiaomi Multimode Gateway (CN/EU)   | 1.5.5 - 1.5.7 | Token and Key |
 
 **PS.** Firmwares from 1.4.6 to 1.4.7 for Xiaomi Multimode Gateway may work but **UNSUPPORTED**. Please don't create issues if something doesn't work on them.
 
 **PS.** For "*only Token*" firmwares integration will get Key automatically and save it to integration settings and to `/config/.storage/xiaomi_gateway3/keys.json`. Please save it safely somewhere else.
 
 Recommended firmwares:
-- Xiaomi Multimode Gateway (CN/EU) - 1.5.4 - 1.5.6
-- Xiaomi Multimode Gateway 2 (CN/EU) - 1.0.6 - 1.0.7
+- Xiaomi Multimode Gateway (CN/EU) - 1.5.4 - 1.5.7
+- Xiaomi Multimode Gateway 2 (CN/EU) - 1.0.6 - 1.0.8
 - Aqara Hub E1 (CN) - 4.0.1
 
 **HOWTO get token** [read here](#obtain-mi-home-device-token)
@@ -77,12 +78,11 @@ Recommended firmwares:
 | Gateway                                                                                 | Situation                                                                           | Solution                                                             |
 |-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|----------------------------------------------------------------------|
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.4 and lower                                                            | setup integration and use only Token                                 |
-| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.6 and lower                                                            | setup integration and use only Token                                 |
+| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.8 and lower                                                            | setup integration and use only Token                                 |
 | Aqara Hub E1 (CN)                                                                       | firmware 4.0.1 and lower                                                            | setup integration and use only Token                                 |
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, but shipped from the factory with firmware 1.4.6 and lower | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
 | Xiaomi Multimode Gateway (CN/EU), Xiaomi Multimode Gateway 2 (CN/EU), Aqara Hub E1 (CN) | worked previously in the Hass, but you updated it to latest firmware                | [use button click method](https://github.com/AlexxIT/Blog/issues/13) |
 | Xiaomi Multimode Gateway (CN/EU)                                                        | firmware 1.5.5 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1057)    |
-| Xiaomi Multimode Gateway 2 (CN/EU)                                                      | firmware 1.0.7 and more, never worked in the Hass                                   | [use UART](https://github.com/AlexxIT/XiaomiGateway3/issues/1166)    |
 | Aqara Hub E1 (CN)                                                                       | firmware 4.0.4 and more, never worked in the Hass                                   | no solution                                                          |
 
 - Read more https://github.com/AlexxIT/Blog/issues/13
@@ -701,7 +701,7 @@ A. Yes. If you do not enable ZHA or z2m mode, the devices will continue to work 
 A. No. The token is obtained automatically using the login / password from the Mi Home account. Telnet turns on automatically using token.
 
 **Q. Should I open or solder the hub?**  
-A. No.
+A. It depends on the gateway model and firmware version. Read the "Supported Firmwares" section.
 
 **Q. Should I use ZHA mode?**  
 A. You decide. If all of your Zigbee devices are supported in Mi Home, it is best to use it. If you have two hubs - you can use one of them in Mi Home mode, and the second in ZHA mode. Or you can also use the hub in Mi Home mode with Xiaomi devices and a Zigbee USB Dongle for other Zigbee devices.
