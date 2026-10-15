@@ -25,7 +25,7 @@ async def check_port(host: str, port: int) -> bool:
         s.close()
 
 
-async def gateway_info(host: str, token: str = None, key: str = None) -> dict | None:
+async def gateway_info(host: str, token: str = None, key: str = None, telnet_password: str = None) -> dict | None:
     # Strategy:
     # 1. Check open telnet and return host, did, token, key
     # 2. Try to get key for Multimode Gateway 2 (CN/EU)
@@ -33,7 +33,7 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
     # 4. Check open telnet again
     # 5. Return error
     try:
-        async with Session(host) as sh:
+        async with Session(host, telnet_password = telnet_password) as sh:
             info = await sh.get_miio_info()
         info["host"] = host
         return info
@@ -48,13 +48,13 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
         key = info.get("key")
 
     # try to enable telnet and return miio info
-    result = await enable_telnet(host, token, key)
+    result = await enable_telnet(host, token, key, telnet_password)
 
     # waiting for telnet to start
     await asyncio.sleep(1)
 
     # call with empty token so only telnet will check
-    if info := await gateway_info(host):
+    if info := await gateway_info(host, telnet_password = telnet_password):
         return info
 
     # result ok, but telnet can't be opened
@@ -62,10 +62,9 @@ async def gateway_info(host: str, token: str = None, key: str = None) -> dict | 
 
 
 # universal command for open telnet on all models
-TELNET_CMD = "passwd -d $USER; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd"
+TELNET_CMD = 'echo "$USER:%s" | chpasswd; riu_w 101e 53 3012 || echo enable > /sys/class/tty/tty/enable; telnetd;'
 
-
-async def enable_telnet(host: str, token: str, key: str = None) -> str:
+async def enable_telnet(host: str, token: str, key: str = None, telnet_password: str = None) -> str:
     # Strategy:
     # 1. Get miio info
     miio = AsyncMiIO(host, token)
@@ -99,11 +98,11 @@ async def enable_telnet(host: str, token: str, key: str = None) -> str:
         if method == "enable_telnet_service":
             params = None
         elif method == "set_ip_info":
-            params = {"ssid": '""', "pswd": "1; " + TELNET_CMD}
+            params = {"ssid": '""', "pswd": "1; " + TELNET_CMD % (telnet_password or "")}
         elif method == "system_command":
             params = {
                 "password": miio_password(miio.device_id, miio_info["mac"], key),
-                "command": TELNET_CMD,
+                "command": TELNET_CMD % (telnet_password or ""),
             }
         else:
             raise NotImplementedError(method)
