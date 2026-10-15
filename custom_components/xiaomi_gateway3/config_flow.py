@@ -63,6 +63,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                             vol.Required("host", default=device["localip"]): str,
                             vol.Required("token", default=device["token"]): str,
                             vol.Optional("key"): str,
+                            vol.Optional("custom_password"): str,
                         }
                     ),
                     description_placeholders=TOKEN_PLACEHOLDERS,
@@ -174,6 +175,7 @@ class FlowHandler(ConfigFlow, domain=DOMAIN):
                 vol.Required("host"): str,
                 vol.Required("token"): str,
                 vol.Optional("key"): str,
+                vol.Optional("custom_password"): str,
             },
             user_input,
         )
@@ -249,6 +251,7 @@ class OptionsFlowHandler(OptionsFlow):
                 vol.Required("host"): str,
                 vol.Required("token"): str,
                 vol.Optional("key"): str,
+                vol.Optional("custom_password"): str,
                 vol.Optional("stats"): vol.In(
                     {
                         False: "Disabled",  # for backward compatibility
