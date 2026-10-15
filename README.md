@@ -42,6 +42,7 @@ Home Assistant custom component for control **Xiaomi Multimode Gateway** (aka Ga
 * [Zigbee Home Automation Mode](#zigbee-home-automation-mode)
 * [Zigbee2MQTT Mode](#zigbee2mqtt-mode)
 * [Zigbee custom firmware](#zigbee-custom-firmware)
+* [ESPHome Bluetoth proxy](#esphome-bluetoth-proxy)
 * [Handle Button Actions](#handle-button-actions)
 * [Handle BLE Locks](#handle-ble-locks)
 * [Obtain Mi Home device token](#obtain-mi-home-device-token)
@@ -91,6 +92,7 @@ For Xiaomi Multimode Gateway you also can:
 
 - optional update firmware via [Telnet](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
 - optional install [custom firmware](https://github.com/zvldz/mgl03_fw/tree/main/firmware)
+- use it as [ESPHome bluetooth proxy](https://github.com/AlexxIT/XiaomiGateway3/issues/1778)
 
 Please, not ask me why you need it.
 
@@ -523,6 +525,10 @@ It is possible because of these people:
 ### Firmware 7.3.1.0 MultiPAN RCP
 
 [Read more](https://github.com/AlexxIT/XiaomiGateway3/issues/1328)
+
+## ESPHome Bluetoth proxy
+
+Project [Bluetooth proxy & Zigbee router](https://github.com/dbuezas/Xiaomi-Gateway-3-BTProxy-Zigbee-router) [#1778](https://github.com/AlexxIT/XiaomiGateway3/issues/1778) by [@dbuezas](https://github.com/dbuezas).
 
 ## Handle Button Actions
 
