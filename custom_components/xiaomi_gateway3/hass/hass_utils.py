@@ -41,7 +41,7 @@ async def store_devices(hass: HomeAssistant):
         XDevice.restore = data
 
     async def dump_state(*args):
-        if not XDevice.restore:
+        if not XGateway.devices:
             return
 
         # update last_decode_ts for all devices in the store
