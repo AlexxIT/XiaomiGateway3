@@ -65,10 +65,10 @@ class XEntity(Entity):
 
         if device.type != GATEWAY:
             gateway_uid = device.gateways[0].device.uid
-            if "via_device" in DeviceInfo.__annotations__:
-                info["via_device"] = (DOMAIN, gateway_uid)
-            elif via_device_id := XEntity.VIA.get(gateway_uid):
+            if via_device_id := XEntity.VIA.get(gateway_uid):
                 info["via_device_id"] = via_device_id
+            elif "via_device" in DeviceInfo.__annotations__:
+                info["via_device"] = (DOMAIN, gateway_uid)
 
         self._attr_available = device.available
         self._attr_device_info = DeviceInfo(**info)
