@@ -49,9 +49,9 @@ class XAqaraS2(XEntity, ClimateEntity):
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ONOFF
     )
-    _attr_target_temperature = 0
+    _attr_native_target_temperature = 0
     _attr_target_temperature_step = 1
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     # support only KTWKQ03ES for now
     _attr_max_temp = 30
     _attr_min_temp = 17
@@ -66,7 +66,7 @@ class XAqaraS2(XEntity, ClimateEntity):
         if "power" in data:
             self._enabled = data["power"]
         if "current_temp" in data:
-            self._attr_current_temperature = data["current_temp"]
+            self._attr_native_current_temperature = data["current_temp"]
         if "fan_mode" in data:
             self._attr_fan_mode = data["fan_mode"]
         if "hvac_mode" in data:
@@ -78,7 +78,7 @@ class XAqaraS2(XEntity, ClimateEntity):
         if "target_temp" in data:
             # fix scenes with turned off climate
             # https://github.com/AlexxIT/XiaomiGateway3/issues/101#issuecomment-757781988
-            self._attr_target_temperature = data["target_temp"]
+            self._attr_native_target_temperature = data["target_temp"]
 
         self._attr_hvac_mode = self._mode if self._enabled else HVACMode.OFF
 
@@ -97,7 +97,7 @@ class XAqaraE1(XEntity, ClimateEntity):
     _attr_hvac_mode = None
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
     _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ONOFF
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 30
     _attr_min_temp = 5
     _attr_target_temperature_step = 0.5
@@ -114,9 +114,9 @@ class XAqaraE1(XEntity, ClimateEntity):
         if "mode" in data:
             self._mode = data["mode"]
         if "current_temp" in data:
-            self._attr_current_temperature = data["current_temp"]
+            self._attr_native_current_temperature = data["current_temp"]
         if "target_temp" in data:
-            self._attr_target_temperature = data["target_temp"]
+            self._attr_native_target_temperature = data["target_temp"]
 
         if self._enabled is None or self._mode is None:
             return
@@ -152,7 +152,7 @@ class XScdvbHAVC(XEntity, ClimateEntity):
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE | ONOFF
     )
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_max_temp = 32
     _attr_min_temp = 16
     _attr_target_temperature_step = 1
@@ -171,9 +171,9 @@ class XScdvbHAVC(XEntity, ClimateEntity):
         if "fan_mode" in data:
             self._attr_fan_mode = data["fan_mode"]
         if "current_temp" in data:
-            self._attr_current_temperature = data["current_temp"]
+            self._attr_native_current_temperature = data["current_temp"]
         if "target_temp" in data:
-            self._attr_target_temperature = data["target_temp"]
+            self._attr_native_target_temperature = data["target_temp"]
 
         if self._enabled is None or self._mode is None:
             return
