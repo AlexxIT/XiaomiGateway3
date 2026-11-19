@@ -1372,6 +1372,15 @@ DEVICES += [{
         ZBatteryVoltConv("battery_voltage", "sensor"),
     ],
 }, {
+    "TRADFRI SHORTCUT Button": ["IKEA", "TRADFRI shortcut button", "E1812"],
+    "support": 1,
+    "spec": [
+        ZIkeaShortcutOnConv("action", "sensor", bind=True),
+        ZIkeaShortcutLevelConv("action", bind=True),
+        ZBatteryPercConv("battery", "sensor", bind=True),
+        ZBatteryVoltConv("battery_voltage", "sensor"),
+    ],
+}, {
     "FYRTUR block-out roller blind": ["IKEA", "FYRTUR roller blind", "E1757"],
     "support": 5,  # @AlexxIT
     "spec": [
