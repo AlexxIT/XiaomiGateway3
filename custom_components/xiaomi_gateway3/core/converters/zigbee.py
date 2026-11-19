@@ -623,7 +623,30 @@ class ZHueDimmerLevelConv(ZConverter):
     def encode_read(self, device: "XDevice", payload: dict):
         pass
 
+class ZIkeaShortcutOnConv(ZConverter):
+    """IKEA TRADFRI SHORTCUT Button (E1812): short push = On."""
+    cluster_id = OnOff.cluster_id
 
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        command_id = value.get("cluster_command_id")
+        if command_id == 1:  # On
+            payload[self.attr] = BUTTON_SINGLE
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        pass
+
+class ZIkeaShortcutLevelConv(ZConverter):
+    """long push = Level Control move (with on/off)."""
+    cluster_id = LevelControl.cluster_id
+
+    def decode(self, device: "XDevice", payload: dict, value: dict):
+        command_id = value.get("cluster_command_id")
+        if command_id == 5:  # move_with_on_off
+            payload[self.attr] = BUTTON_HOLD
+
+    def encode_read(self, device: "XDevice", payload: dict):
+        pass
+        
 class ZLumiBrightness(BaseConv):
     """Converter decode and read data in Lumi format for support heartbeats.
     But encode data in Zigbee format for support transition.
