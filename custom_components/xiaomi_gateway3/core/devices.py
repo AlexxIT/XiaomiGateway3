@@ -2601,7 +2601,7 @@ DEVICES += [{
         BLEByteConv("battery", "sensor", mi=19459),
         MathConv("temperature", mi="2.p.1001", round=1),
         MathConv("humidity", mi="2.p.1002", round=1),
-        BaseConv("battery", mi="3.p.1003", entity=ENTITY_LAZY),
+        BaseConv("battery", mi="3.p.1003"),
     ],
 }, {
     26197: [None, "SO Smart Aroma Diffuser S5", "bwj.diffuser.s5"],
