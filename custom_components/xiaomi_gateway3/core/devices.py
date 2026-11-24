@@ -1661,6 +1661,17 @@ DEVICES += [{
         BaseConv("action", "sensor"),
         ConstConv("action", mi="4.e.1001", value="low_battery"),
     ],
+}, {
+    # https://home.miot-spec.com/spec/yeeloc.etool.m09
+    # Yeeloc ETool M09，BLE pdid 15599
+    15599: ["Yeeloc", "Cabinet Lock M09", "M09", "yeeloc.etool.m09"],
+    "spec": [
+        # v2:  3.1003
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        # v1 2.4
+        # BaseConv("battery", "sensor", mi="2.p.4"),
+    ],
+    "ttl": "6h",
 }]
 
 # Xiaomi BLE MiBeacon2 + MIoT spec
