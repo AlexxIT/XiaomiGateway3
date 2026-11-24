@@ -1510,6 +1510,16 @@ DEVICES += [{
         BLEToothbrush("toothbrush", mi=12291),
     ],
 }, {
+    # https://home.miot-spec.com/spec/soocare.toothbrush.1501
+    8179: ["Xiaomi", "Toothbrush T501", "MES607", "soocare.toothbrush.1501"],
+    "spec": [
+        BaseConv("action", "sensor"),
+        ConstConv("action", mi="5.e.1022", value="start"),
+        ConstConv("action", mi="5.e.1023", value="finish"),
+        BaseConv("battery", "sensor", mi="3.p.1003"),
+        BaseConv("brush_head_left", "sensor", mi="4.p.1041"),
+    ],
+}, {
    # MIOT https://home.miot-spec.com/spec?type=urn:miot-spec-v2:device:printer:0000A060:xiaomi-label:1
    13566: ["Xiaomi", "Label printer", "MJBQDYJ1-WC", "xiaomi.printer.label"], 
    "spec": [
