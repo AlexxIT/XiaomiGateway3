@@ -81,9 +81,23 @@ async def setup_cloud(hass: HomeAssistant, config_entry: ConfigEntry):
     cloud = MiCloud(async_create_clientsession(hass), data["servers"])
 
     if token := data.get("token"):
-        await cloud.login_token(token)
+        res = await cloud.login_token(token)
     else:
-        await cloud.login_password(data["username"], data["password"])
+        res = await cloud.login_password(data["username"], data["password"])
+
+    if not cloud.ok:
+        # Without this the entry only shows "Failed to set up", with nothing in the log
+        if e := res.get("exception"):
+            reason = repr(e)
+        elif res.get("captcha"):
+            reason = "captcha required"
+        elif res.get("verify"):
+            reason = "verification required"
+        else:
+            reason = "unknown error"
+        _LOGGER.warning(
+            "Xiaomi cloud login failed for %s: %s", data["username"], reason
+        )
 
     if cloud.ok:
         cloud.devices = await cloud.get_devices()  # load devices from cloud
